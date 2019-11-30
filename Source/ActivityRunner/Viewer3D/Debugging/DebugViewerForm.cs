@@ -206,8 +206,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
             };
         }
 
-
-      public int RedrawCount;
+        public int RedrawCount;
 	  private Font trainFont;
 	  private Font sidingFont;
 	  private SolidBrush trainBrush;
@@ -223,8 +222,8 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
       /// <param name="e"></param>
       void UITimer_Tick(object sender, EventArgs e)
       {
-		  if (Viewer.DebugViewerEnabled == false) { this.Visible = false; firstShow = true; return; }
-		  else this.Visible = true;
+		  //if (Viewer.DebugViewerEnabled == false) { this.Visible = false; firstShow = true; return; }
+		  //else this.Visible = true;
 
 		 if (Program.Simulator.GameTime - lastUpdateTime < 1) return;
 		 lastUpdateTime = Program.Simulator.GameTime;
@@ -240,7 +239,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 			  // do this only once
 			  loaded = true;
 			  //trackSections.DataSource = new List<InterlockingTrack>(simulator.InterlockingSystem.Tracks.Values).ToArray();
-              Localizer.Localize(this, Viewer.Catalog);
+//              Localizer.Localize(this, Viewer.Catalog);
 		  }
 
 		  switchItemsDrawn = new List<SwitchWidget>();
@@ -2254,12 +2253,12 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 
         protected static PointF PointFromLocation(in WorldLocation location)
         {
-            return new PointF(location.TileX * WorldLocation.TileSize + location.Location.X, location.TileZ * WorldLocation.TileSize + location.Location.Z);
+            return new PointF((float)(location.TileX * WorldLocation.TileSize + location.Location.X), (float)(location.TileZ * WorldLocation.TileSize + location.Location.Z));
         }
 
         protected static Vector2 VectorFromLocation(in WorldLocation location)
         {
-            return new Vector2(location.TileX * WorldLocation.TileSize + location.Location.X, location.TileZ * WorldLocation.TileSize + location.Location.Z);
+            return new Vector2((float)(location.TileX * WorldLocation.TileSize + location.Location.X), (float)(location.TileZ * WorldLocation.TileSize + location.Location.Z));
         }
     }
     #endregion
