@@ -61,12 +61,15 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             base.Initialize();
         }
 
+        private Debugging.DispatchViewer viewer;
         protected override void Update(GameTime gameTime)
         {
             KeyboardState state = Keyboard.GetState();
             if (state.IsKeyDown(Microsoft.Xna.Framework.Input.Keys.A))
             {
-                new Debugging.DispatchViewer(Program.Viewer.Simulator, null).Show();
+                if (null == viewer)
+                    viewer = new Debugging.DispatchViewer(Program.Viewer.Simulator, null);
+                viewer.Show();
             }
             base.Update(gameTime);
         }
