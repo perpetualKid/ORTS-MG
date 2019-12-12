@@ -279,7 +279,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
                             //{
                             DebugVector A = new DebugVector(s.Location);
                             DebugVector B = new DebugVector(connectedNode.UiD.Location);
-                            segments.Add(new LineSegment(A, B, /*s.InterlockingTrack.IsOccupied*/ false, null));
+                            segments.Add(new LineSegment(A, B, null));
                             //}
                         }
 
@@ -305,7 +305,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
                         DebugVector B = new DebugVector(item.Location);
                         var x = DebugVector.DistanceSqr(A, B);
                         if (x < 0.1) continue;
-                        segments.Add(new LineSegment(B, A, /*s.InterlockingTrack.IsOccupied*/ false, item));
+                        segments.Add(new LineSegment(B, A, item));
                     }
                     switches.Add(new SwitchWidget(trackJunctionNode));
                 }
@@ -638,6 +638,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 		  catch {  } //errors for avatar, just ignore
          using(Graphics g = Graphics.FromImage(pictureBox1.Image))
          {
+                g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 			 subX = minX + ViewWindow.X; subY = minY + ViewWindow.Y;
             g.Clear(Color.White);
             
@@ -1254,15 +1255,6 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
         /// <param name="simulator"></param>
         private static void AddSegments(List<LineSegment> segments, TrackNode node, TrackVectorSection[] items,  ref float minX, ref float minY, ref float maxX, ref float maxY, Simulator simulator)
       {
-
-         bool occupied = false;
-
-
-         //if (simulator.InterlockingSystem.Tracks.ContainsKey(node))
-         //{
-         //   occupied = node.InterlockingTrack.IsOccupied;
-         //}
-
          double tempX1, tempX2, tempZ1, tempZ2;
 
          for (int i = 0; i < items.Length - 1; i++)
@@ -1284,7 +1276,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
             CalcBounds(ref minX, tempX2, false);
             CalcBounds(ref minY, tempZ2, false);
 
-            segments.Add(new LineSegment(A, B, occupied, items[i]));
+            segments.Add(new LineSegment(A, B, items[i]));
          }
       }
 
@@ -2285,7 +2277,13 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
    /// </summary>
    public class LineSegment
    {
-	   public DebugVector A;
+        public ref PointF StartPoint => ref CurvePoints[0];
+        public ref PointF EndPoint => ref CurvePoints[2];
+        public ref PointF MidPoint => ref CurvePoints[1];
+
+        public PointF[] CurvePoints { get; } = new PointF[3];
+
+        public DebugVector A;
 	   public DebugVector B;
 	   public DebugVector C;
 	   //public float radius;
@@ -2294,7 +2292,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 	   public float angle1, angle2;
 	   //public SectionCurve curve = null;
        //public TrVectorSection MySection;
-	   public LineSegment(DebugVector A, DebugVector B, bool Occupied, TrackVectorSection Section)
+	   public LineSegment(DebugVector A, DebugVector B, TrackVectorSection Section)
 	   {
 		   this.A = A;
 		   this.B = B;

@@ -1094,7 +1094,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
             if (UserInput.IsPressed(UserCommand.GameSwitchManualMode)) PlayerTrain.RequestToggleManualMode();
 
-            if (UserInput.IsPressed(UserCommand.GameMultiPlayerDispatcher)) { DebugViewerEnabled = !DebugViewerEnabled; return; }
+            if (UserInput.IsPressed(UserCommand.GameMultiPlayerDispatcher))
+            {
+                if (null == dispatcherViewer)
+                {
+                    new Thread(RunDispatcherViewer).Start();
+                }
+//                DebugViewerEnabled = !DebugViewerEnabled; return;
+            }
             if (UserInput.IsPressed(UserCommand.DebugSoundForm)) { SoundDebugFormEnabled = !SoundDebugFormEnabled; return; }
 
             if (UserInput.IsPressed(UserCommand.CameraJumpSeeSwitch))
@@ -1468,7 +1475,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 }
             }
 
-            MouseState currentMouseState = Mouse.GetState();
+            MouseState currentMouseState = Mouse.GetState(Game.Window);
 
             if (currentMouseState.X != originalMouseState.X ||
                 currentMouseState.Y != originalMouseState.Y)
@@ -1824,5 +1831,18 @@ namespace Orts.ActivityRunner.Viewer3D
                 catch { }
             }).Start();
         }
+
+        private Dispatcher.DispatcherViewer dispatcherViewer;
+
+        private void RunDispatcherViewer()
+        {
+            if (null == dispatcherViewer)
+            {
+                dispatcherViewer = new Dispatcher.DispatcherViewer(Settings);
+                dispatcherViewer.Run();
+                dispatcherViewer = null;
+            }
+        }
+
     }
 }

@@ -54,9 +54,9 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
 
                 if (MPManager.IsMultiPlayer() || Game.Settings.ViewDispatcher)
                 {
-                    //Program.DebugViewer = new DispatchViewer(Viewer.Simulator, Viewer);
-                    //Program.DebugViewer.Hide();
-                    //Viewer.DebugViewerEnabled = false;
+                    Program.DebugViewer = new DispatchViewer(Viewer.Simulator, Viewer);
+                    Program.DebugViewer.Hide();
+                    Viewer.DebugViewerEnabled = false;
                 }
 
                 Program.SoundDebugForm = new SoundDebugForm(Viewer);

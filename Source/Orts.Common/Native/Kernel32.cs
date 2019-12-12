@@ -102,12 +102,12 @@ namespace Orts.Common.Native
         [StructLayout(LayoutKind.Sequential)]
         public struct IO_COUNTERS
         {
-            public UInt64 ReadOperationCount;
-            public UInt64 WriteOperationCount;
-            public UInt64 OtherOperationCount;
-            public UInt64 ReadTransferCount;
-            public UInt64 WriteTransferCount;
-            public UInt64 OtherTransferCount;
+            public ulong ReadOperationCount;
+            public ulong WriteOperationCount;
+            public ulong OtherOperationCount;
+            public ulong ReadTransferCount;
+            public ulong WriteTransferCount;
+            public ulong OtherTransferCount;
         };
 
         [StructLayout(LayoutKind.Sequential, Size = 64)]

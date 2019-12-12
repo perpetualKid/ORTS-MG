@@ -52,13 +52,16 @@ namespace Orts.ActivityRunner.Viewer3D
 
         private static InputSettings inputSettings;
 
+        private static Game game;
+
         public static void Initialize(Game game)
         {
+            UserInput.game = game;
             inputSettings = game.Settings.Input;
             Raildriver = new UserInputRailDriver(game);
         }
 
-        public static void Update(bool active)
+        public static void Update()
         {
             Raildriver.Update();
             if (Orts.MultiPlayer.MPManager.IsMultiPlayer() && Orts.MultiPlayer.MPManager.Instance().ComposingText)
@@ -67,8 +70,8 @@ namespace Orts.ActivityRunner.Viewer3D
             lastKeyboardState = keyboardState;
             lastMouseState = mouseState;
             // Make sure we have an "idle" (everything released) keyboard and mouse state if the window isn't active.
-            keyboardState = active ? Keyboard.GetState() : emptyKeyboardState;
-            mouseState = active ? Mouse.GetState() : new MouseState(0, 0, lastMouseState.ScrollWheelValue, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
+            keyboardState = game.IsActive ? Keyboard.GetState() : emptyKeyboardState;
+            mouseState = game.IsActive ? Mouse.GetState(game.Window) : new MouseState(0, 0, lastMouseState.ScrollWheelValue, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released, ButtonState.Released);
 
 #if DEBUG_RAW_INPUT
             for (Keys key = 0; key <= Keys.OemClear; key++)

@@ -63,11 +63,26 @@ namespace Orts.Common.Native
             public byte Reserved1;
         }
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct NativeMessage
+        {
+            public IntPtr Handle;
+            public uint Msg;
+            public IntPtr WParam;
+            public IntPtr LParam;
+            public uint Time;
+            public System.Drawing.Point P;
+        }
+
         public static IntPtr SendMessage(IntPtr hwnd, int msg, IntPtr wParam, string lParam)
         { return SendMessageNative(hwnd, msg, wParam, lParam); }
         [DllImport("user32.dll", EntryPoint = "SendMessage", CharSet = CharSet.Unicode, SetLastError = true)]
         private static extern IntPtr SendMessageNative(IntPtr hWnd, int msg, IntPtr wParam, [MarshalAs(UnmanagedType.LPWStr)]string lParam);
 
-
+        public static bool PeekMessage(out NativeMessage message, IntPtr hwnd, uint filterMin, uint filterMax, uint flags)
+        { return PeekMessageNative(out message, hwnd, filterMin, filterMax, flags); }
+        [return: MarshalAs(UnmanagedType.Bool)]
+        [DllImport("User32.dll", EntryPoint = "PeekMessage", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern bool PeekMessageNative(out NativeMessage message, IntPtr hWnd, uint filterMin, uint filterMax, uint flags);
     }
 }

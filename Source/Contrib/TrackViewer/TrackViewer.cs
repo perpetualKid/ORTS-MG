@@ -188,9 +188,9 @@ namespace ORTS.TrackViewer
             Control.FromHandle(Window.Handle).Controls.Add(new TextBox() { Top = -100 });
 
             statusBarControl = new StatusBarControl(this);
-            TrackViewer.Localize(statusBarControl);
+//            TrackViewer.Localize(statusBarControl);
             menuControl = new MenuControl(this);
-            TrackViewer.Localize(menuControl);
+//            TrackViewer.Localize(menuControl);
             menuControl.PopulateLanguages();
             DrawColors.Initialize(menuControl);
 

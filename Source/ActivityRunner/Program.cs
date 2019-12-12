@@ -50,16 +50,9 @@ namespace Orts.ActivityRunner
             path = Path.Combine(path, (Environment.Is64BitProcess) ? "x64" : "x86");
             NativeMethods.SetDllDirectory(path);
 
-            new System.Threading.Thread(RunDispatcherViewer).Start();
             var game = new Game(settings);
             game.PushState(new GameStateRunActivity(args));
             game.Run();
-        }
-
-        private static void RunDispatcherViewer()
-        {
-            var dispatcher = new Viewer3D.Dispatcher.DispatcherViewer();
-            dispatcher.Run();
         }
     }
 }

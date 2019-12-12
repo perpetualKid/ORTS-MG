@@ -24,6 +24,7 @@ using System.Reflection;
 
 namespace Orts.Common
 {
+    #region Enum Extension
     public static class EnumExtension
     {
         private static class EnumCache<T> where T : Enum
@@ -130,6 +131,7 @@ namespace Orts.Common
             return EnumCache<T>.Values[(EnumCache<T>.Values.IndexOf(item) - 1 + EnumCache<T>.Values.Count) % EnumCache<T>.Values.Count];
         }
     }
+    #endregion
 
     [Description("Reverser")]
     public enum Direction
@@ -173,4 +175,13 @@ namespace Orts.Common
         Stop,
         Permission,
     }
+
+    public enum ScreenMode
+    {
+        WindowedPresetResolution,
+        FullscreenPresetResolution,
+        FullscreenNativeResolution,
+    }
+
+
 }

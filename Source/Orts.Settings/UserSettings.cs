@@ -353,6 +353,8 @@ namespace Orts.Settings
         public int[] WindowPosition_ComposeMessage { get; set; }
         [Default(new[] { 100, 0 })]
         public int[] WindowPosition_TrainList { get; set; }
+        [Default(new[] { 300, 200 })]
+        public int[] WindowSize_DispatcherViewer { get; set; }
 
         // Menu-game communication settings:
         [Default(false)]

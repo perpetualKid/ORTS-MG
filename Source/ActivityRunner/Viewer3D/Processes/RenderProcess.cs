@@ -31,13 +31,6 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
     //[CallOnThread("Render")]
     public class RenderProcess
     {
-        private enum ScreenMode
-        {
-            WindowedPresetResolution,
-            FullscreenPresetResolution,
-            FullscreenNativeResolution,
-        }
-
         public const int ShadowMapCountMaximum = 4;
 
         public Point DisplaySize { get; private set; }
@@ -254,7 +247,7 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
                 game.UpdaterProcess.WaitTillFinished();
 
                 // Must be done in XNA Game thread.
-                UserInput.Update(game.IsActive);
+                UserInput.Update();
 
                 // Swap frames and start the next update (non-threaded updater does the whole update).
                 SwapFrames(ref CurrentFrame, ref NextFrame);
