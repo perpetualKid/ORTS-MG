@@ -417,7 +417,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
             {
                 if (currentGearIndex < nextGearIndex)
                 {
-                    DieselEngine.locomotive.SignalEvent(Event.GearUp);
+                    DieselEngine.locomotive.SignalEvent(TrainEvent.GearUp);
                     currentGearIndex = nextGearIndex;
                 }
             }
@@ -425,7 +425,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
             {
                 if (currentGearIndex > nextGearIndex)
                 {
-                    DieselEngine.locomotive.SignalEvent(Event.GearDown);
+                    DieselEngine.locomotive.SignalEvent(TrainEvent.GearDown);
                     currentGearIndex = nextGearIndex;
                 }
             }

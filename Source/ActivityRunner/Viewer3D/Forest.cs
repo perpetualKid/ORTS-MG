@@ -346,7 +346,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 rotated.x *= -1;
 
             // Compute distance to curve's center at (radius,0) then adjust to get distance from centerline.
-            dx = rotated.x - trackSection.Radius;
+            dx = (float)rotated.x - trackSection.Radius;
             var lat = Math.Sqrt(dx * dx + rotated.z * rotated.z) - trackSection.Radius;
             if (Math.Abs(lat) > MaximumCenterlineOffset + treeWidth)
                 return false;

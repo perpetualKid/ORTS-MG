@@ -37,10 +37,6 @@ using Orts.Formats.Msts.Models;
 using Orts.Formats.Msts.Parsers;
 using Orts.Simulation.RollingStocks.SubSystems.PowerSupplies;
 
-using ORTS.Scripting.Api;
-
-using Event = Orts.Common.Event;
-
 namespace Orts.Simulation.RollingStocks
 {
     ///////////////////////////////////////////////////
@@ -188,7 +184,7 @@ namespace Orts.Simulation.RollingStocks
         /// <summary>
         /// Used when someone want to notify us of an event
         /// </summary>
-        public override void SignalEvent(Event evt)
+        public override void SignalEvent(TrainEvent evt)
         {
             base.SignalEvent(evt);
         }

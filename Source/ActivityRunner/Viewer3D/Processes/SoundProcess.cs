@@ -139,10 +139,10 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
                 OpenAL.alListenerf(OpenAL.AL_GAIN, Program.Simulator.Paused ? 0 : (float)Game.Settings.SoundVolumePercent / 100f);
 
                 // Update activity sounds
-                if (viewer.Simulator.SoundNotify != Event.None)
+                if (viewer.Simulator.SoundNotify != TrainEvent.None)
                 {
                     if (viewer.World.GameSounds != null) viewer.World.GameSounds.HandleEvent(viewer.Simulator.SoundNotify);
-                    viewer.Simulator.SoundNotify = Event.None;
+                    viewer.Simulator.SoundNotify = TrainEvent.None;
                 }
 
                 // Update all sound in our list

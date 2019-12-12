@@ -174,6 +174,7 @@
     <Compile Include="Viewer3D\Signals.cs" />
     <Compile Include="Viewer3D\Sky.cs" />
     <Compile Include="Viewer3D\Sound.cs" />
+    <Compile Include="Viewer3D\Sound\SoundEvents.cs" />
     <Compile Include="Viewer3D\SuperElevation.cs" />
     <Compile Include="Viewer3D\Terrain.cs" />
     <Compile Include="Viewer3D\Tiles.cs" />
@@ -347,6 +348,10 @@
     <ProjectReference Include="..\ORTS.Common\Orts.Common.csproj">
       <Project>{DA94D876-7D35-46C3-AECE-AFACE72C686C}</Project>
       <Name>Orts.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orts.Scripting.Api\Orts.Scripting.Api.csproj">
+      <Project>{2b4cbbd5-2eea-4149-9da1-9cbb2625a474}</Project>
+      <Name>Orts.Scripting.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\ORTS.Settings\Orts.Settings.csproj">
       <Project>{67F84996-8769-4FD8-819B-464AF269037B}</Project>

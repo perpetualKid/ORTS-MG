@@ -16,6 +16,7 @@
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
 using Orts.ActivityRunner.Viewer3D;
+using Orts.Formats.Msts;
 using Orts.Formats.Msts.Files;
 using Orts.Formats.Msts.Models;
 using System.Collections.Generic;
@@ -80,7 +81,7 @@ namespace Orts.ContentChecker
 
                             //The file can be in multiple places
                             //Assume .wav file for now
-                            var fullPath = Orts.Common.ORTSPaths.GetFileFromFolders(possiblePaths.ToArray(), file);
+                            var fullPath = FolderStructure.FindFileFromFolders(possiblePaths, file);
                             if (fullPath == null)
                             {
                                 //apparently the file does not exist, but we want to make that known to the user, so we make a path anyway

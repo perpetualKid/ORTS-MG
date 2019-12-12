@@ -19,10 +19,12 @@
 
 using System;
 using System.Windows.Forms;
+
 using Microsoft.Xna.Framework;
-using Orts.Common;
-using Orts.Common.Input;
+
 using Orts.ActivityRunner.Viewer3D.Processes;
+using Orts.Common.Input;
+using Orts.Simulation.Commanding;
 
 namespace Orts.ActivityRunner.Viewer3D.Popups
 {

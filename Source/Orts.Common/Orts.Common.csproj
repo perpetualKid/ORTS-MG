@@ -62,6 +62,7 @@
     <Compile Include="Calc\Interpolator.cs" />
     <Compile Include="Calc\MovingAverage.cs" />
     <Compile Include="Exceptions.cs" />
+    <Compile Include="IEventHandler.cs" />
     <Compile Include="Logging\FileTeeLogger.cs" />
     <Compile Include="Logging\ORTraceListener.cs" />
     <Compile Include="Position\EarthCoordinates.cs" />

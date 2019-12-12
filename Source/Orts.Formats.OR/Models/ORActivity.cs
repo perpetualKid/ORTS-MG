@@ -10,7 +10,7 @@ namespace Orts.Formats.OR.Models
         // Override values for activity creators
         public bool IsActivityOverride { get; private set; } = false;
 
-        public Events Events { get; private set; }
+        public ActivityEvents Events { get; private set; }
 
         public class OptionsSettings //this redirection has no functional advantage, only grouping to improve clarity in development
         {

@@ -28,22 +28,22 @@
 // #define DEBUG_TRACEINFO
 // DEBUG flag for debug prints
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+
 using Microsoft.Xna.Framework;
+
+using Orts.Common;
 using Orts.Formats.Msts;
+using Orts.Formats.Msts.Models;
 using Orts.Formats.OR;
 using Orts.MultiPlayer;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
 using Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS;
 using Orts.Simulation.Signalling;
-using Orts.Common;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using Event = Orts.Common.Event;
-using Orts.Formats.Msts.Files;
-using Orts.Formats.Msts.Models;
 
 namespace Orts.Simulation.AIs
 {
@@ -700,11 +700,11 @@ namespace Orts.Simulation.AIs
                 {
                     if (Simulator.Weather.PricipitationIntensityPPSPM2 > 0 && !leadingloco.Wiper)
                     {
-                        leadingloco.SignalEvent(Event.WiperOn);
+                        leadingloco.SignalEvent(TrainEvent.WiperOn);
                     }
                     else if (Simulator.Weather.PricipitationIntensityPPSPM2 == 0 && leadingloco.Wiper)
                     {
-                        leadingloco.SignalEvent(Event.WiperOff);
+                        leadingloco.SignalEvent(TrainEvent.WiperOff);
                     }
                 }
             }
@@ -4406,7 +4406,7 @@ namespace Orts.Simulation.AIs
                 // set various items
                 attachTrain.CheckFreight();
                 attachTrain.activityClearingDistanceM = attachTrain.Cars.Count < standardTrainMinCarNo ? shortClearingDistanceM : standardClearingDistanceM;
-                attachCar.SignalEvent(Event.Couple);
+                attachCar.SignalEvent(TrainEvent.Couple);
 
                 // <CSComment> as of now it seems to run better without this initialization
                 //if (MovementState != AI_MOVEMENT_STATE.AI_STATIC)
@@ -4521,7 +4521,7 @@ namespace Orts.Simulation.AIs
             // set various items
             CheckFreight();
             activityClearingDistanceM = Cars.Count < standardTrainMinCarNo ? shortClearingDistanceM : standardClearingDistanceM;
-            attachCar.SignalEvent(Event.Couple);
+            attachCar.SignalEvent(TrainEvent.Couple);
 
             // remove attached train
             if (attachTrain.TrainType == TRAINTYPE.AI)
@@ -4579,7 +4579,7 @@ namespace Orts.Simulation.AIs
                         Cars.Remove(car);
                     }
                 }
-                Cars[0].SignalEvent(Event.Couple);
+                Cars[0].SignalEvent(TrainEvent.Couple);
             }
             else
             {
@@ -4609,7 +4609,7 @@ namespace Orts.Simulation.AIs
                         Cars.Remove(car);
                     }
                 }
-                Cars[Cars.Count - 1].SignalEvent(Event.Couple);
+                Cars[Cars.Count - 1].SignalEvent(TrainEvent.Couple);
             }
 
             TerminateCoupling(attachTrain, thisTrainFront, attachTrainFront, passedLength);
@@ -4652,7 +4652,7 @@ namespace Orts.Simulation.AIs
                         attachTrain.Cars.Remove(car);
                     }
                 }
-                attachTrain.Cars[0].SignalEvent(Event.Couple);
+                attachTrain.Cars[0].SignalEvent(TrainEvent.Couple);
             }
             else
             {
@@ -4683,7 +4683,7 @@ namespace Orts.Simulation.AIs
                         attachTrain.Cars.Remove(car);
                     }
                 }
-                attachTrain.Cars[attachTrain.Cars.Count - 1].SignalEvent(Event.Couple);
+                attachTrain.Cars[attachTrain.Cars.Count - 1].SignalEvent(TrainEvent.Couple);
             }
 
             TerminateCoupling(attachTrain, thisTrainFront, attachTrainFront, -stealedLength);
@@ -6542,7 +6542,7 @@ namespace Orts.Simulation.AIs
                                 {
                                     MayDepart = true;
                                     DisplayMessage = Simulator.Catalog.GetString("Passenger boarding completed. You may depart now.");
-                                    Simulator.SoundNotify = Event.PermissionToDepart;
+                                    Simulator.SoundNotify = TrainEvent.PermissionToDepart;
                                 }
                             }
                         }

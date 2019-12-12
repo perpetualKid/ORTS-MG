@@ -24,7 +24,7 @@ using System.Linq;
 using System.Text;
 
 using Microsoft.Xna.Framework;
-
+using Orts.Common;
 using Orts.Common.Calc;
 using Orts.Common.Logging;
 using Orts.Common.Position;
@@ -35,8 +35,6 @@ using Orts.Formats.Msts.Models;
 using Orts.Simulation.AIs;
 using Orts.Simulation.Physics;
 using Orts.Simulation.Signalling;
-
-using Event = Orts.Common.Event;
 
 namespace Orts.Simulation
 {
@@ -137,15 +135,15 @@ namespace Orts.Simulation
             // Compile list of freight events, if any, from the parsed ACT file.
             foreach (var i in actFile?.Activity?.Events?.AsEnumerable())
             {
-                if (i is EventCategoryAction)
+                if (i is ActionActivityEvent)
                 {
                     EventList.Add(new EventCategoryActionWrapper(i, Simulator));
                 }
-                if (i is EventCategoryLocation)
+                if (i is LocationActivityEvent)
                 {
                     EventList.Add(new EventCategoryLocationWrapper(i, Simulator));
                 }
-                if (i is EventCategoryTime)
+                if (i is TimeActivityEvent)
                 {
                     EventList.Add(new EventCategoryTimeWrapper(i, Simulator));
                 }
@@ -966,7 +964,7 @@ namespace Orts.Simulation
                         {
                             maydepart = true;
                             DisplayMessage = Simulator.Catalog.GetString("Passenger boarding completed. You may depart now.");
-                            Simulator.SoundNotify = Event.PermissionToDepart;
+                            Simulator.SoundNotify = TrainEvent.PermissionToDepart;
                         }
 
                         ldbfevaldepartbeforeboarding = false;//reset flag. Debrief Eval
@@ -1102,14 +1100,14 @@ namespace Orts.Simulation
     /// </summary>
     public abstract class EventWrapper
     {
-        public Orts.Formats.Msts.Models.Event ParsedObject;     // Points to object parsed from file *.act
+        public Orts.Formats.Msts.Models.ActivityEvent ParsedObject;     // Points to object parsed from file *.act
         public int OriginalActivationLevel; // Needed to reset .ActivationLevel
         public int TimesTriggered;          // Needed for evaluation after activity ends
         public Boolean IsDisabled;          // Used for a reversible event to prevent it firing again until after it has been reset.
         protected Simulator Simulator;
         public Train Train;              // Train involved in event; if null actual or original player train
 
-        public EventWrapper(Orts.Formats.Msts.Models.Event @event, Simulator simulator)
+        public EventWrapper(Orts.Formats.Msts.Models.ActivityEvent @event, Simulator simulator)
         {
             ParsedObject = @event;
             Simulator = simulator;
@@ -1227,10 +1225,10 @@ namespace Orts.Simulation
         SidingItem SidingEnd2;
         List<string> ChangeWagonIdList;   // Wagons to be assembled, picked up or dropped off.
 
-        public EventCategoryActionWrapper(Orts.Formats.Msts.Models.Event @event, Simulator simulator)
+        public EventCategoryActionWrapper(Orts.Formats.Msts.Models.ActivityEvent @event, Simulator simulator)
             : base(@event, simulator)
         {
-            var e = this.ParsedObject as EventCategoryAction;
+            var e = this.ParsedObject as ActionActivityEvent;
             if (e.SidingId != null)
             {
                 var i = e.SidingId.Value;
@@ -1254,7 +1252,7 @@ namespace Orts.Simulation
         override public Boolean Triggered(Activity activity)
         {
             Train OriginalPlayerTrain = Simulator.OriginalPlayerTrain;
-            var e = this.ParsedObject as EventCategoryAction;
+            var e = this.ParsedObject as ActionActivityEvent;
             if (e.WorkOrderWagons != null)
             {                     // only if event involves wagons
                 if (ChangeWagonIdList == null)
@@ -1470,7 +1468,7 @@ namespace Orts.Simulation
 
     public class EventCategoryLocationWrapper : EventWrapper
     {
-        public EventCategoryLocationWrapper(Orts.Formats.Msts.Models.Event @event, Simulator simulator)
+        public EventCategoryLocationWrapper(Orts.Formats.Msts.Models.ActivityEvent @event, Simulator simulator)
             : base(@event, simulator)
         {
         }
@@ -1478,7 +1476,7 @@ namespace Orts.Simulation
         override public Boolean Triggered(Activity activity)
         {
             var triggered = false;
-            var e = this.ParsedObject as Orts.Formats.Msts.Models.EventCategoryLocation;
+            var e = this.ParsedObject as Orts.Formats.Msts.Models.LocationActivityEvent;
             var train = Simulator.PlayerLocomotive.Train;
             if (ParsedObject.TrainService != "" && Train != null)
             {
@@ -1512,14 +1510,14 @@ namespace Orts.Simulation
     public class EventCategoryTimeWrapper : EventWrapper
     {
 
-        public EventCategoryTimeWrapper(Orts.Formats.Msts.Models.Event @event, Simulator simulator)
+        public EventCategoryTimeWrapper(Orts.Formats.Msts.Models.ActivityEvent @event, Simulator simulator)
             : base(@event, simulator)
         {
         }
 
         override public Boolean Triggered(Activity activity)
         {
-            var e = this.ParsedObject as Orts.Formats.Msts.Models.EventCategoryTime;
+            var e = this.ParsedObject as Orts.Formats.Msts.Models.TimeActivityEvent;
             if (e == null) return false;
             Train = Simulator.PlayerLocomotive.Train;
             var triggered = (e.Time <= (int)Simulator.ClockTime - activity.StartTimeS);

@@ -45,18 +45,10 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Common\CommandLog.cs" />
-    <Compile Include="Common\Commands.cs" />
-    <Compile Include="Common\Events.cs" />
-    <Compile Include="Common\OrtsPaths.cs" />
-    <Compile Include="Common\Scripting\BrakeController.cs" />
-    <Compile Include="Common\Scripting\Common.cs" />
-    <Compile Include="Common\Scripting\PowerSupply\AbstractPowerSupply.cs" />
-    <Compile Include="Common\Scripting\PowerSupply\CircuitBreaker.cs" />
-    <Compile Include="Common\Scripting\PowerSupply\ElectricPowerSupply.cs" />
-    <Compile Include="Common\Scripting\ScriptManager.cs" />
-    <Compile Include="Common\Scripting\TrainControlSystem.cs" />
-    <Compile Include="Common\SteamTable.cs" />
+    <Compile Include="Commanding\ICommand.cs" />
+    <Compile Include="Commanding\CommandLog.cs" />
+    <Compile Include="Commanding\Commands.cs" />
+    <Compile Include="Simulation\Physics\SteamTable.cs" />
     <Compile Include="MultiPlayer\ClientComm.cs" />
     <Compile Include="MultiPlayer\Decoder.cs" />
     <Compile Include="MultiPlayer\Message.cs" />
@@ -134,6 +126,10 @@
     <ProjectReference Include="..\Orts.Formats.OR\Orts.Formats.OR.csproj">
       <Project>{0d8d312b-2c02-4b77-a795-566394a9db95}</Project>
       <Name>Orts.Formats.OR</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Orts.Scripting.Api\Orts.Scripting.Api.csproj">
+      <Project>{2b4cbbd5-2eea-4149-9da1-9cbb2625a474}</Project>
+      <Name>Orts.Scripting.Api</Name>
     </ProjectReference>
     <ProjectReference Include="..\ORTS.Settings\Orts.Settings.csproj">
       <Project>{67f84996-8769-4fd8-819b-464af269037b}</Project>

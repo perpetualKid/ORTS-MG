@@ -110,8 +110,6 @@ namespace Orts.Settings
         public bool DisableTCSScripts { get; set; }
 
         // Audio settings:
-        [Default(true)]
-        public bool MSTSBINSound { get; set; }
         [Default(100)]
         public int SoundVolumePercent { get; set; }
         [Default(5)]

@@ -316,7 +316,7 @@ namespace Orts.ActivityRunner.Viewer3D
             y = -(float)(radius * Math.Cos(angle) - Height / 2);
         }
 
-        private void SetData(float currentSpeed, int permittedSpeed, int targetSpeed, int releaseSpeed, float interventionSpeed, ORTS.Scripting.Api.MonitoringStatus status)
+        private void SetData(float currentSpeed, int permittedSpeed, int targetSpeed, int releaseSpeed, float interventionSpeed, MonitoringStatus status)
         {
             if (interventionSpeed < permittedSpeed)
                 interventionSpeed = permittedSpeed;
@@ -325,13 +325,13 @@ namespace Orts.ActivityRunner.Viewer3D
 
             switch (status)
             {
-                case ORTS.Scripting.Api.MonitoringStatus.Normal:
+                case MonitoringStatus.Normal:
                     GaugeColor = targetSpeed < permittedSpeed ? Color.White : ColorDarkGrey;
                     NeedleColor = ColorMediumGrey; SpeedColor = Color.Black; releaseSpeed = 0; interventionSpeed = permittedSpeed; break;
-                case ORTS.Scripting.Api.MonitoringStatus.Indication: GaugeColor = NeedleColor = Color.White; SpeedColor = Color.Black; interventionSpeed = permittedSpeed; break;
-                case ORTS.Scripting.Api.MonitoringStatus.Overspeed: GaugeColor = NeedleColor = ColorYellow; SpeedColor = Color.Black; interventionSpeed = permittedSpeed; break;
-                case ORTS.Scripting.Api.MonitoringStatus.Warning: GaugeColor = ColorYellow; NeedleColor = ColorOrange; SpeedColor = Color.Black; break;
-                case ORTS.Scripting.Api.MonitoringStatus.Intervention: GaugeColor = ColorYellow; NeedleColor = ColorRed; SpeedColor = Color.White; break;
+                case MonitoringStatus.Indication: GaugeColor = NeedleColor = Color.White; SpeedColor = Color.Black; interventionSpeed = permittedSpeed; break;
+                case MonitoringStatus.Overspeed: GaugeColor = NeedleColor = ColorYellow; SpeedColor = Color.Black; interventionSpeed = permittedSpeed; break;
+                case MonitoringStatus.Warning: GaugeColor = ColorYellow; NeedleColor = ColorOrange; SpeedColor = Color.Black; break;
+                case MonitoringStatus.Intervention: GaugeColor = ColorYellow; NeedleColor = ColorRed; SpeedColor = Color.White; break;
             }
 
             CurrentSpeedAngle = Speed2Angle(currentSpeed);

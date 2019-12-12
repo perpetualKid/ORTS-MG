@@ -25,6 +25,12 @@
 
 //
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using Orts.Common;
 using Orts.Common.Calc;
 using Orts.Common.Threading;
 using Orts.Formats.Msts.Files;
@@ -34,14 +40,6 @@ using Orts.Formats.OR.Parsers;
 using Orts.Simulation.AIs;
 using Orts.Simulation.RollingStocks;
 using Orts.Simulation.Signalling;
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-
-using Event = Orts.Common.Event;
 
 namespace Orts.Simulation.Timetables
 {
@@ -2368,7 +2366,7 @@ namespace Orts.Simulation.Timetables
                         car.CarID = String.Concat(TTTrain.Number.ToString("0###"), "_", carId.ToString("0##"));
                         carId++;
                         car.OrgConsist = String.Copy(consistDetails.ConsistFile).ToLower();
-                        car.SignalEvent(Event.Pantograph1Up);
+                        car.SignalEvent(TrainEvent.Pantograph1Up);
                         TTTrain.Length += car.CarLengthM;
                     }
 

@@ -34,10 +34,10 @@ using System.Threading;
 
 using GNU.Gettext;
 
-using Orts.Common;
 using Orts.Common.Position;
 using Orts.Formats.Msts.Parsers;
 using Orts.Simulation;
+using Orts.Simulation.Commanding;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
 

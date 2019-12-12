@@ -17,9 +17,9 @@
 
 using System;
 using System.IO;
+
 using Orts.Common;
 using Orts.Formats.Msts.Parsers;
-using ORTS.Scripting.Api;
 
 namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
 {
@@ -46,11 +46,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
                     switch (state)
                     {
                         case PowerSupplyState.PowerOff:
-                            Locomotive.SignalEvent(Event.EnginePowerOff);
+                            Locomotive.SignalEvent(TrainEvent.EnginePowerOff);
                             break;
 
                         case PowerSupplyState.PowerOn:
-                            Locomotive.SignalEvent(Event.EnginePowerOn);
+                            Locomotive.SignalEvent(TrainEvent.EnginePowerOn);
                             break;
                     }
 

@@ -85,7 +85,7 @@ namespace ORTS.TrackViewer.Drawing.Labels
                 {
                     DrawLabel(label);
                 }
-                float distanceSquared = CloseToMouse.GetGroundDistanceSquared(label.WorldLocation, drawArea.MouseLocation);
+                float distanceSquared = (float)WorldLocation.GetDistanceSquared2D(label.WorldLocation, drawArea.MouseLocation);
                 if (distanceSquared < closestDistanceSquared )
                 {
                     closestDistanceSquared = distanceSquared;

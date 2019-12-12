@@ -14,7 +14,7 @@ namespace Orts.Formats.Msts.Models
         public int NextActivityObjectUiD { get; private set; } = 32786;
         public ActivityObjects ActivityObjects { get; private set; }
         public FailedSignals FailedSignals { get; private set; }
-        public Events Events { get; private set; }
+        public ActivityEvents Events { get; private set; }
         public Traffic Traffic { get; private set; }
         public PlatformPassengersWaiting PlatformWaitingPassengers { get; private set; }
         public RestrictedSpeedZones ActivityRestrictedSpeedZones { get; private set; }
@@ -89,7 +89,7 @@ namespace Orts.Formats.Msts.Models
                 new STFReader.TokenProcessor("nextserviceuid",()=>{ NextServiceUiD = stf.ReadIntBlock(null); }),
                 new STFReader.TokenProcessor("nextactivityobjectuid",()=>{ NextActivityObjectUiD = stf.ReadIntBlock(null); }),
                 new STFReader.TokenProcessor("ortsaihornatcrossings", ()=>{ AIHornAtCrossings = stf.ReadIntBlock(AIHornAtCrossings); }),
-                new STFReader.TokenProcessor("events",()=>{ Events = new Events(stf); }),
+                new STFReader.TokenProcessor("events",()=>{ Events = new ActivityEvents(stf); }),
                 new STFReader.TokenProcessor("traffic_definition",()=>{ Traffic = new Traffic(stf); }),
                 new STFReader.TokenProcessor("activityobjects",()=>{ ActivityObjects = new ActivityObjects(stf); }),
                 new STFReader.TokenProcessor("platformnumpassengerswaiting",()=>{ PlatformWaitingPassengers = new PlatformPassengersWaiting(stf); }),  // 35 files. To test, use EUROPE1\ACTIVITIES\aftstorm.act

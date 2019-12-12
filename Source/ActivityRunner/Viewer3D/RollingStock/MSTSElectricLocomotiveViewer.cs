@@ -20,6 +20,7 @@
 using System;
 using Orts.Common;
 using Orts.Common.Input;
+using Orts.Simulation.Commanding;
 using Orts.Simulation.RollingStocks;
 
 namespace Orts.ActivityRunner.Viewer3D.RollingStock

@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
 using Orts.ActivityRunner.Viewer3D.Common;
+using Orts.ActivityRunner.Viewer3D.Sound;
 using Orts.Common;
 using Orts.Common.Position;
 using Orts.Common.Xna;
@@ -14,9 +15,6 @@ using Orts.Formats.Msts;
 using Orts.Formats.Msts.Models;
 using Orts.Simulation;
 using Orts.Simulation.RollingStocks;
-
-using Event = Orts.Common.Event;
-using Events = Orts.Common.Events;
 
 namespace Orts.ActivityRunner.Viewer3D.Shapes
 {
@@ -465,7 +463,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                     var soundPath = viewer.Simulator.RoutePath + @"\\sound\\" + soundFileName;
                     try
                     {
-                        soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, Events.Source.MSTSCrossing, soundPath);
+                        soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, SoundEventSource.Crossing, soundPath);
                         viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { soundSource });
                     }
                     catch
@@ -473,7 +471,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                         soundPath = viewer.Simulator.BasePath + @"\\sound\\" + soundFileName;
                         try
                         {
-                            soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, Events.Source.MSTSCrossing, soundPath);
+                            soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, SoundEventSource.Crossing, soundPath);
                             viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { soundSource });
                         }
                         catch (Exception error)
@@ -520,7 +518,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
             if (opening == levelCrossing.HasTrain)
             {
                 opening = !levelCrossing.HasTrain;
-                    soundSource?.HandleEvent(opening ? Event.CrossingOpening : Event.CrossingClosing);
+                    soundSource?.HandleEvent(opening ? TrainEvent.CrossingOpening : TrainEvent.CrossingClosing);
             }
 
             if (opening)
@@ -683,7 +681,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                 var soundPath = viewer.Simulator.RoutePath + @"\\sound\\" + viewer.Simulator.TRK.Route.DefaultDieselTowerSMS;
                 try
                 {
-                    soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, Events.Source.MSTSFuelTower, soundPath);
+                    soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, SoundEventSource.FuelTower, soundPath);
                     viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { soundSource });
                 }
                 catch
@@ -691,7 +689,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                     soundPath = viewer.Simulator.BasePath + @"\\sound\\" + viewer.Simulator.TRK.Route.DefaultDieselTowerSMS;
                     try
                     {
-                        soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, Events.Source.MSTSFuelTower, soundPath);
+                        soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, SoundEventSource.FuelTower, soundPath);
                         viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { soundSource });
                     }
                     catch (Exception error)
@@ -705,7 +703,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                 var soundPath = viewer.Simulator.RoutePath + @"\\sound\\" + viewer.Simulator.TRK.Route.DefaultWaterTowerSMS;
                 try
                 {
-                    soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, Events.Source.MSTSFuelTower, soundPath);
+                    soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, SoundEventSource.FuelTower, soundPath);
                     viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { soundSource });
                 }
                 catch
@@ -713,7 +711,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                     soundPath = viewer.Simulator.BasePath + @"\\sound\\" + viewer.Simulator.TRK.Route.DefaultWaterTowerSMS;
                     try
                     {
-                        soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, Events.Source.MSTSFuelTower, soundPath);
+                        soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, SoundEventSource.FuelTower, soundPath);
                         viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { soundSource });
                     }
                     catch (Exception error)
@@ -727,7 +725,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                 var soundPath = viewer.Simulator.RoutePath + @"\\sound\\" + viewer.Simulator.TRK.Route.DefaultCoalTowerSMS;
                 try
                 {
-                    soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, Events.Source.MSTSFuelTower, soundPath);
+                    soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, SoundEventSource.FuelTower, soundPath);
                     viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { soundSource });
                 }
                 catch
@@ -735,7 +733,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                     soundPath = viewer.Simulator.BasePath + @"\\sound\\" + viewer.Simulator.TRK.Route.DefaultCoalTowerSMS;
                     try
                     {
-                        soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, Events.Source.MSTSFuelTower, soundPath);
+                        soundSource = new SoundSource(viewer, WorldPosition.WorldLocation, SoundEventSource.FuelTower, soundPath);
                         viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { soundSource });
                     }
                     catch (Exception error)
@@ -775,7 +773,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
             // 0 can be used as a setting for instant animation.
             if (fuelPickupItem.ReFill() && fuelPickupItemObject.UiD == MSTSWagon.RefillProcess.ActivePickupObjectUID)
             {
-                if (animationKey == 0 && soundSource != null) soundSource.HandleEvent(Event.FuelTowerDown);
+                if (animationKey == 0 && soundSource != null) soundSource.HandleEvent(TrainEvent.FuelTowerDown);
                 if (fuelPickupItemObject.Options.AnimationSpeed == 0) animationKey = 1.0f;
                 else if (animationKey < animationFrames)
                     animationKey += elapsedTime.ClockSeconds * frameRate;
@@ -785,8 +783,8 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
             {
                 if (animationKey == animationFrames && soundSource != null)
                 {
-                    soundSource.HandleEvent(Event.FuelTowerTransferEnd);
-                    soundSource.HandleEvent(Event.FuelTowerUp);
+                    soundSource.HandleEvent(TrainEvent.FuelTowerTransferEnd);
+                    soundSource.HandleEvent(TrainEvent.FuelTowerUp);
                 }
                 animationKey -= elapsedTime.ClockSeconds * frameRate;
             }
@@ -798,7 +796,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
             if (animationKey > animationFrames)
             {
                 animationKey = animationFrames;
-                if (soundSource != null) soundSource.HandleEvent(Event.FuelTowerTransferStart);
+                if (soundSource != null) soundSource.HandleEvent(TrainEvent.FuelTowerTransferStart);
             }
 
             for (var i = 0; i < SharedShape.Matrices.Length; ++i)

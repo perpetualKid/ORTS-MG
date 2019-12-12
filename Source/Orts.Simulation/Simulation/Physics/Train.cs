@@ -78,10 +78,6 @@ using Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS;
 using Orts.Simulation.Signalling;
 using Orts.Simulation.Timetables;
 
-using ORTS.Scripting.Api;
-
-using Event = Orts.Common.Event;
-
 namespace Orts.Simulation.Physics
 {
     public class Train
@@ -1436,7 +1432,7 @@ namespace Orts.Simulation.Physics
             if (setMUParameters)
             {
                 // Flip the controls.
-                MUDirection = DirectionControl.Flip(MUDirection);
+                MUDirection = (Direction)((int)MUDirection * -1);
                 MUReverserPercent = -MUReverserPercent;
             }
             if (!((this is AITrain && (this as AITrain).AI.PreUpdate) || this.TrainType == TRAINTYPE.STATIC)) FormationReversed = true;
@@ -1482,7 +1478,7 @@ namespace Orts.Simulation.Physics
         /// ie doors open, pantograph up, lights on etc.
         /// </summary>
 
-        public void SignalEvent(Event evt)
+        public void SignalEvent(TrainEvent evt)
         {
             foreach (TrainCar car in Cars)
                 car.SignalEvent(evt);
@@ -1676,7 +1672,7 @@ namespace Orts.Simulation.Physics
                 else if (FrontTDBTraveller.IsEnd) RearTDBTraveller.Move(-1);//if front is out, move back
                 else if (RearTDBTraveller.IsEnd) RearTDBTraveller.Move(1);//if rear is out, move forward
                 foreach (var car in Cars) { car.SpeedMpS = 0; } //can set crash here by setting XNA matrix
-                SignalEvent(Event._ResetWheelSlip);//reset everything to 0 power
+                SignalEvent(TrainEvent._ResetWheelSlip);//reset everything to 0 power
             }
 
             if (this.TrainType == TRAINTYPE.REMOTE || updateMSGReceived == true) //server tolds me this train (may include mine) needs to update position
@@ -3581,14 +3577,16 @@ namespace Orts.Simulation.Physics
                 MSTSLocomotive lead = (MSTSLocomotive)Cars[LeadLocomotiveIndex];
                 if (lead.TrainBrakeController != null)
                 {
-                    lead.TrainBrakeController.UpdatePressure(ref EqualReservoirPressurePSIorInHg, 1000, ref BrakeLine4);
+                    var (pressurePSI, epControllerState) = lead.TrainBrakeController.UpdatePressure(EqualReservoirPressurePSIorInHg, BrakeLine4, 1000);
+                    EqualReservoirPressurePSIorInHg = (float)pressurePSI;
+                    BrakeLine4 = (float)epControllerState; 
                     maxPressurePSI = lead.TrainBrakeController.MaxPressurePSI;
                     fullServPressurePSI = lead.BrakeSystem is VacuumSinglePipe ? 16 : maxPressurePSI - lead.TrainBrakeController.FullServReductionPSI;
                     EqualReservoirPressurePSIorInHg =
                             MathHelper.Max(EqualReservoirPressurePSIorInHg, fullServPressurePSI);
                 }
                 if (lead.EngineBrakeController != null)
-                    lead.EngineBrakeController.UpdateEngineBrakePressure(ref BrakeLine3PressurePSI, 1000);
+                    BrakeLine3PressurePSI = (float)lead.EngineBrakeController.UpdateEngineBrakePressure(BrakeLine3PressurePSI, 1000);
                 if (lead.DynamicBrakeController != null)
                 {
                     MUDynamicBrakePercent = lead.DynamicBrakeController.Update(1000) * 100;
@@ -3788,9 +3786,13 @@ namespace Orts.Simulation.Physics
             {
                 MSTSLocomotive lead = (MSTSLocomotive)Cars[LeadLocomotiveIndex];
                 if (lead.TrainBrakeController != null)
-                    lead.TrainBrakeController.UpdatePressure(ref EqualReservoirPressurePSIorInHg, elapsedClockSeconds, ref BrakeLine4);
+                {
+                    var (pressurePSI, epControllerState) = lead.TrainBrakeController.UpdatePressure(EqualReservoirPressurePSIorInHg, BrakeLine4, elapsedClockSeconds);
+                    EqualReservoirPressurePSIorInHg = (float)pressurePSI;
+                    BrakeLine4 = (float)epControllerState;
+                }
                 if (lead.EngineBrakeController != null)
-                    lead.EngineBrakeController.UpdateEngineBrakePressure(ref BrakeLine3PressurePSI, elapsedClockSeconds);
+                    BrakeLine3PressurePSI = (float)lead.EngineBrakeController.UpdateEngineBrakePressure(BrakeLine3PressurePSI, elapsedClockSeconds);
                 lead.BrakeSystem.PropagateBrakePressure(elapsedClockSeconds);
             }
             else if (TrainType == TRAINTYPE.STATIC)
@@ -7364,7 +7366,7 @@ namespace Orts.Simulation.Physics
             {
                 if (Simulator.Confirmer != null) // As Confirmer may not be created until after a restore.
                     Simulator.Confirmer.Message(ConfirmLevel.Warning, Simulator.Catalog.GetString("Next signal already allocated to other train"));
-                Simulator.SoundNotify = Event.PermissionDenied;
+                Simulator.SoundNotify = TrainEvent.PermissionDenied;
                 return;
             }
 
@@ -7425,7 +7427,7 @@ namespace Orts.Simulation.Physics
                 {
                     if (Simulator.Confirmer != null) // As Confirmer may not be created until after a restore.
                         Simulator.Confirmer.Message(ConfirmLevel.Information, Simulator.Catalog.GetString("Request to clear signal cannot be processed"));
-                    Simulator.SoundNotify = Event.PermissionDenied;
+                    Simulator.SoundNotify = TrainEvent.PermissionDenied;
                 }
             }
         }
@@ -8523,8 +8525,8 @@ namespace Orts.Simulation.Physics
                 ref DistanceToEndNodeAuthorityM[routeIndex]);
             ValidRoute[routeIndex] = newRouteR;
             Simulator.SoundNotify = reqSignal.hasPermission == Signal.Permission.Granted ?
-                Event.PermissionGranted :
-                Event.PermissionDenied;
+                TrainEvent.PermissionGranted :
+                TrainEvent.PermissionDenied;
         }
 
         //================================================================================================//
@@ -9385,7 +9387,7 @@ namespace Orts.Simulation.Physics
                 {
                     if (Simulator.Confirmer != null) // As Confirmer may not be created until after a restore.
                         Simulator.Confirmer.Message(ConfirmLevel.Warning, Simulator.Catalog.GetString("Cannot clear signal behind train while in AUTO mode"));
-                    Simulator.SoundNotify = Event.PermissionDenied;
+                    Simulator.SoundNotify = TrainEvent.PermissionDenied;
                 }
 
                 else if (NextSignalObject[0] != null)
@@ -14945,7 +14947,7 @@ namespace Orts.Simulation.Physics
                 {
                     mstsWagon.DoorLeftOpen = open;
                 }
-                mstsWagon.SignalEvent(open ? Event.DoorOpen : Event.DoorClose); // hook for sound trigger
+                mstsWagon.SignalEvent(open ? TrainEvent.DoorOpen : TrainEvent.DoorClose); // hook for sound trigger
             }
         }
 

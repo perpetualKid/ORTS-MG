@@ -15,8 +15,9 @@
 // You should have received a copy of the GNU General Public License
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
-using ORTS.Scripting.Api;
-using System.Diagnostics;
+using System;
+using Orts.Common;
+using Orts.Scripting.Api;
 
 namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
 {
@@ -36,7 +37,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
         /// </summary>
         public bool ForceControllerReleaseGraduated;
         bool BrakeControllerInitialised; // flag to allow PreviousNotchPosition to be initially set.
-        MSTSNotch PreviousNotchPosition;
+        INotchController PreviousNotchPosition;
 
         public MSTSBrakeController()
         {
@@ -68,24 +69,24 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
         }
 
         // Train Brake Controllers
-        public override void UpdatePressure(ref float pressureBar, double elapsedClockSeconds, ref float epControllerState)
+        public override Tuple<double, double> UpdatePressure(double pressureBar, double epPressureBar, double elapsedClockSeconds)
         {
-            var epState = -1f;
+            double epState = -1.0;
 
             if (EmergencyBrakingPushButton() || TCSEmergencyBraking())
             {
-                pressureBar -= EmergencyRateBarpS() * (float)elapsedClockSeconds;
+                pressureBar -= EmergencyRateBarpS() * elapsedClockSeconds;
             }
             else if (TCSFullServiceBraking())
             {
                 if (pressureBar > MaxPressureBar() - FullServReductionBar())
-                    pressureBar -= ApplyRateBarpS() * (float)elapsedClockSeconds;
+                    pressureBar -= ApplyRateBarpS() * elapsedClockSeconds;
                 else if (pressureBar < MaxPressureBar() - FullServReductionBar())
                     pressureBar = MaxPressureBar() - FullServReductionBar();
             }
             else
             {
-                MSTSNotch notch = NotchController.GetCurrentNotch();
+                INotchController notch = NotchController.GetCurrentNotch();
 
                 if (!BrakeControllerInitialised) // The first time around loop, PreviousNotchPosition will be set up front with current value, this will stop crashes due to vsalue not being initialised. 
                 {
@@ -100,26 +101,26 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 else
                 {
                     epState = 0;
-                    float x = NotchController.GetNotchFraction();
-                    switch (notch.Type)
+                    double x = NotchController.GetNotchFraction();
+                    switch (notch.NotchStateType)
                     {
                         case ControllerState.Release:
-                            pressureBar += x * ReleaseRateBarpS() * (float)elapsedClockSeconds;
+                            pressureBar += x * ReleaseRateBarpS() * elapsedClockSeconds;
                             epState = -1;
                             break;
                         case ControllerState.FullQuickRelease:
-                            pressureBar += x * QuickReleaseRateBarpS() * (float)elapsedClockSeconds;
+                            pressureBar += x * QuickReleaseRateBarpS() * elapsedClockSeconds;
                             epState = -1;
                             break;
                         case ControllerState.Apply:
                         case ControllerState.FullServ:
-                            if (notch.Type == ControllerState.FullServ)
+                            if (notch.NotchStateType == ControllerState.FullServ)
                                 epState = x;
-                            pressureBar -= x * ApplyRateBarpS() * (float)elapsedClockSeconds;
+                            pressureBar -= x * ApplyRateBarpS() * elapsedClockSeconds;
                             break;
                         case ControllerState.Lap:
                             // Lap position applies min service reduction when first selected, and previous contoller position was Running, then no change in pressure occurs 
-                            if (PreviousNotchPosition.Type == ControllerState.Running) 
+                            if (PreviousNotchPosition.NotchStateType == ControllerState.Running) 
                             {
                                 pressureBar -= MinReductionBar();
                                 epState = -1;
@@ -127,7 +128,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                             break;
                         case ControllerState.MinimalReduction:
                             // Lap position applies min service reduction when first selected, and previous contoller position was Running or Release, then no change in pressure occurs                             
-                            if (PreviousNotchPosition.Type == ControllerState.Running || PreviousNotchPosition.Type == ControllerState.Release || PreviousNotchPosition.Type == ControllerState.FullQuickRelease)
+                            if (PreviousNotchPosition.NotchStateType == ControllerState.Running || PreviousNotchPosition.NotchStateType == ControllerState.Release || PreviousNotchPosition.NotchStateType == ControllerState.FullQuickRelease)
                             {
                                 pressureBar -= MinReductionBar();
                                 epState = -1;
@@ -143,21 +144,21 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                         case ControllerState.Suppression:
                         case ControllerState.ContServ:
                         case ControllerState.GSelfLap:
-                            if (notch.Type == ControllerState.EPApply || notch.Type == ControllerState.ContServ)
+                            if (notch.NotchStateType == ControllerState.EPApply || notch.NotchStateType == ControllerState.ContServ)
                                 epState = x;
                             x = MaxPressureBar() - MinReductionBar() * (1 - x) - FullServReductionBar() * x;
-                            DecreasePressure(ref pressureBar, x, ApplyRateBarpS(), (float)elapsedClockSeconds);
+                            pressureBar = DecreasePressure(pressureBar, x, ApplyRateBarpS(), elapsedClockSeconds);
                             if (ForceControllerReleaseGraduated)
-                                IncreasePressure(ref pressureBar, x, ReleaseRateBarpS(), (float)elapsedClockSeconds);
+                                pressureBar = IncreasePressure(pressureBar, x, ReleaseRateBarpS(), elapsedClockSeconds);
                             break;
                         case ControllerState.Emergency:
-                            pressureBar -= EmergencyRateBarpS() * (float)elapsedClockSeconds;
+                            pressureBar -= EmergencyRateBarpS() * elapsedClockSeconds;
                             epState = 1;
                             break;
                         case ControllerState.Dummy:
                             x *= MaxPressureBar() - FullServReductionBar();
-                            IncreasePressure(ref pressureBar, x, ReleaseRateBarpS(), elapsedClockSeconds);
-                            DecreasePressure(ref pressureBar, x, ApplyRateBarpS(), elapsedClockSeconds);
+                            pressureBar = IncreasePressure(pressureBar, x, ReleaseRateBarpS(), elapsedClockSeconds);
+                            pressureBar = DecreasePressure(pressureBar, x, ApplyRateBarpS(), elapsedClockSeconds);
                             epState = -1;
                             break;
                     }
@@ -170,46 +171,46 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 pressureBar = MaxPressureBar();
             if (pressureBar < 0)
                 pressureBar = 0;
-            epControllerState = epState;
+            return new Tuple<double, double>(pressureBar, epState);
         }
 
         // Engine Brake Controllers
-        public override void UpdateEngineBrakePressure(ref float pressureBar, double elapsedClockSeconds)
+        public override double UpdateEngineBrakePressure(double pressureBar, double elapsedClockSeconds)
         {
-            MSTSNotch notch = NotchController.GetCurrentNotch();
+            INotchController notch = NotchController.GetCurrentNotch();
             if (notch == null)
             {
                 pressureBar = (MaxPressureBar() - FullServReductionBar()) * CurrentValue();
             }
             else
             {                
-                float x = NotchController.GetNotchFraction();
-                switch (notch.Type)
+                double x = NotchController.GetNotchFraction();
+                switch (notch.NotchStateType)
                 {
                     case ControllerState.Neutral:
                     case ControllerState.Running:
                     case ControllerState.Lap:
                         break;
                     case ControllerState.FullQuickRelease:
-                        pressureBar -= x * QuickReleaseRateBarpS() * (float)elapsedClockSeconds;
+                        pressureBar -= x * QuickReleaseRateBarpS() * elapsedClockSeconds;
                         break;
                     case ControllerState.Release:
-                        pressureBar -= x * ReleaseRateBarpS() * (float)elapsedClockSeconds;
+                        pressureBar -= x * ReleaseRateBarpS() * elapsedClockSeconds;
                         break;
                     case ControllerState.Apply:
                     case ControllerState.FullServ:
-                        IncreasePressure(ref pressureBar, x * (MaxPressureBar() - FullServReductionBar()), ApplyRateBarpS(), elapsedClockSeconds);
+                        pressureBar = IncreasePressure(pressureBar, x * (MaxPressureBar() - FullServReductionBar()), ApplyRateBarpS(), elapsedClockSeconds);
                         break;
                     case ControllerState.Emergency:
-                        pressureBar += EmergencyRateBarpS() * (float)elapsedClockSeconds;
+                        pressureBar += EmergencyRateBarpS() * elapsedClockSeconds;
                         break;
                     case ControllerState.Dummy:
                         pressureBar = (MaxPressureBar() - FullServReductionBar()) * CurrentValue();
                         break;
                     default:
                         x *= MaxPressureBar() - FullServReductionBar();
-                        IncreasePressure(ref pressureBar, x, ApplyRateBarpS(), elapsedClockSeconds);
-                        DecreasePressure(ref pressureBar, x, ReleaseRateBarpS(), elapsedClockSeconds);
+                        pressureBar = IncreasePressure(pressureBar, x, ApplyRateBarpS(), elapsedClockSeconds);
+                        pressureBar = DecreasePressure(pressureBar, x, ReleaseRateBarpS(), elapsedClockSeconds);
                         break;
                 }
                 if (pressureBar > MaxPressureBar())
@@ -217,6 +218,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 if (pressureBar < 0)
                     pressureBar = 0;
             }
+            return pressureBar;
         }
 
         public override void HandleEvent(BrakeControllerEvent evt)
@@ -289,7 +291,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
             else if (TCSFullServiceBraking())
                 return ControllerState.TCSFullServ;
             else if (NotchController != null && NotchController.NotchCount() > 0)
-                return NotchController.GetCurrentNotch().Type;
+                return NotchController.GetCurrentNotch().NotchStateType;
             else
                 return ControllerState.Dummy;
         }
@@ -306,11 +308,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                     return NotchController.CurrentValue;
                 else
                 {
-                    MSTSNotch notch = NotchController.GetCurrentNotch();
+                    INotchController notch = NotchController.GetCurrentNotch();
 
                     if (!notch.Smooth)
                     {
-                        if (notch.Type == ControllerState.Dummy)
+                        if (notch.NotchStateType == ControllerState.Dummy)
                             return NotchController.CurrentValue;
                         else
                             return null;
@@ -327,24 +329,26 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
             }
         }
 
-        static void IncreasePressure(ref float pressurePSI, float targetPSI, float ratePSIpS, double elapsedSeconds)
+        private static double IncreasePressure(double pressurePSI, double targetPSI, double ratePSIpS, double elapsedSeconds)
         {
             if (pressurePSI < targetPSI)
             {
-                pressurePSI += ratePSIpS * (float)elapsedSeconds;
+                pressurePSI += ratePSIpS * elapsedSeconds;
                 if (pressurePSI > targetPSI)
                     pressurePSI = targetPSI;
             }
+            return pressurePSI;
         }
 
-        static void DecreasePressure(ref float pressurePSI, float targetPSI, float ratePSIpS, double elapsedSeconds)
+        private static double DecreasePressure(double pressurePSI, double targetPSI, double ratePSIpS, double elapsedSeconds)
         {
             if (pressurePSI > targetPSI)
             {
-                pressurePSI -= ratePSIpS * (float)elapsedSeconds;
+                pressurePSI -= ratePSIpS * elapsedSeconds;
                 if (pressurePSI < targetPSI)
                     pressurePSI = targetPSI;
             }
+            return pressurePSI;
         }
     }
 }

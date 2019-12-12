@@ -90,8 +90,8 @@ namespace Orts.Common.Position
            // Decimal degrees is assumed
             int gsamp = (wt_ew_dat - wt_ew_offset);  // Gsamp is Goode world tile x
             int gline = (wt_ns_offset - wt_ns_dat);  // Gline is Goode world tile Y
-            int y = (ul_y - ((gline - 1) * WorldPosition.TileSize) + (int)tileLocation.Z);   // Actual Goode X
-            int x = (ul_x + ((gsamp - 1) * WorldPosition.TileSize) + (int)tileLocation.X);   // Actual Goode Y
+            int y = (ul_y - ((gline - 1) * (int)WorldPosition.TileSize) + (int)tileLocation.Z);   // Actual Goode X
+            int x = (ul_x + ((gsamp - 1) * (int)WorldPosition.TileSize) + (int)tileLocation.X);   // Actual Goode Y
 
             // Return error code: 1 = success; -1 = math error; -2 = XY is in interrupted area of projection
             // Return latitude and longitude by reference
@@ -283,7 +283,8 @@ namespace Orts.Common.Position
             z -= pZ;
 
             // rotate the coordinates relative to a track section that is pointing due north ( +z in MSTS coordinate system )
-            return Rotate2D(rad, x, z);
+            var result = (Rotate2D(rad, x, z));
+            return ((float)result.x, (float)result.z);
         }
 
         //  2D Rotation
@@ -291,7 +292,7 @@ namespace Orts.Common.Position
         //    x' = cos(theta)*x - sin(theta)*y 
         //    y' = sin(theta)*x + cos(theta)*y        
         //where theta is the angle by which to rotate the point.
-        public static (float x, float z) Rotate2D(float radians, float x, float z)
+        public static (double x, double z) Rotate2D(float radians, float x, float z)
         {
             double cos = Math.Cos(radians);
             double sin = Math.Sin(radians);
@@ -299,7 +300,7 @@ namespace Orts.Common.Position
             double xp = cos * x - sin * z;
             double zp = sin * x + cos * z;
 
-            return ((float)xp, (float)zp);
+            return (xp, zp);
         }
 
 

@@ -38,22 +38,21 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+
 using Microsoft.Xna.Framework;
+
 using Orts.Common;
 using Orts.Common.Calc;
 using Orts.Common.Position;
 using Orts.Common.Xna;
 using Orts.Formats.Msts;
 using Orts.Formats.Msts.Models;
-using Orts.Formats.Msts.Parsers;
 using Orts.Simulation.AIs;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks.SubSystems;
 using Orts.Simulation.RollingStocks.SubSystems.Brakes;
 using Orts.Simulation.Signalling;
 using Orts.Simulation.Timetables;
-using ORTS.Scripting.Api;
-using Event = Orts.Common.Event;
 
 namespace Orts.Simulation.RollingStocks
 {
@@ -335,17 +334,17 @@ namespace Orts.Simulation.RollingStocks
                 if (IsDriveable && Train.IsActualPlayerTrain)
                 {
                     var loco = this as MSTSLocomotive;
-                    return Flipped ^ loco.UsingRearCab ? DirectionControl.Flip(Train.MUDirection) : Train.MUDirection;
+                    return Flipped ^ loco.UsingRearCab ? (Direction)((int)Train.MUDirection * -1) : Train.MUDirection;
                 }
                 else
                 {
-                    return Flipped ? DirectionControl.Flip(Train.MUDirection) : Train.MUDirection;
+                    return Flipped ? (Direction)((int)Train.MUDirection * -1) : Train.MUDirection;
                 }
             }
             set
             {
                 var loco = this as MSTSLocomotive;
-                Train.MUDirection = Flipped ^ loco.UsingRearCab ? DirectionControl.Flip(value) : value;
+                Train.MUDirection = Flipped ^ loco.UsingRearCab ? (Direction)((int)value * -1) : value;
             }
         }
         public BrakeSystem BrakeSystem;
@@ -1498,7 +1497,7 @@ namespace Orts.Simulation.RollingStocks
         /// Signals an event from an external source (player, multi-player controller, etc.) for this car.
         /// </summary>
         /// <param name="evt"></param>
-        public virtual void SignalEvent(Event evt) { }
+        public virtual void SignalEvent(TrainEvent evt) { }
         public virtual void SignalEvent(PowerSupplyEvent evt) { }
         public virtual void SignalEvent(PowerSupplyEvent evt, int id) { }
 

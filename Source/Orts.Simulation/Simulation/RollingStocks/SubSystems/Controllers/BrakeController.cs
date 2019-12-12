@@ -18,10 +18,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+
+using Orts.Common;
 using Orts.Common.Calc;
 using Orts.Formats.Msts.Parsers;
+using Orts.Scripting.Api;
 using Orts.Simulation.AIs;
-using ORTS.Scripting.Api;
 
 namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
 {
@@ -33,7 +35,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
         public bool Activated;
         string ScriptName = "MSTS";
         BrakeController Script;
-        public List<MSTSNotch> Notches = new List<MSTSNotch>();
+        public List<INotchController> Notches = new List<INotchController>();
 
         private bool emergencyBrakingPushButton = false;
         private bool tcsEmergencyBraking = false;
@@ -123,7 +125,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
         {
             get
             {
-                return Notches.Count > 0 ? Notches[CurrentNotch].Type : ControllerState.Dummy;
+                return Notches.Count > 0 ? Notches[CurrentNotch].NotchStateType : ControllerState.Dummy;
             }
         }
 
@@ -265,8 +267,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
             {
                 if (ScriptName != null && ScriptName != "MSTS")
                 {
-                    var pathArray = new string[] { Path.Combine(Path.GetDirectoryName(Locomotive.WagFilePath), "Script") };
-                    Script = Simulator.ScriptManager.Load(pathArray, ScriptName) as BrakeController;
+                    Script = Simulator.ScriptManager.Load(Path.Combine(Path.GetDirectoryName(Locomotive.WagFilePath), "Script"), ScriptName) as BrakeController;
                 }
                 if (Script == null)
                 {
@@ -319,32 +320,32 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
 
         public float Update(double elapsedClockSeconds)
         {
-            if (Script != null)
-                return Script.Update(elapsedClockSeconds);
-            else
-                return 0;
+            return Script?.Update(elapsedClockSeconds) ?? 0;
         }
 
-        public void UpdatePressure(ref float pressurePSI, double elapsedClockSeconds, ref float epControllerState)
+        public (double pressurePSI, double epPressureBar) UpdatePressure(double pressurePSI, double epPressureBar, double elapsedClockSeconds)
         {
             if (Script != null)
             {
                 // Conversion is needed until the pressures of the brake system are converted to Pressure.Atmospheric.
-                float pressureBar = (float)Pressure.Atmospheric.FromPSI(pressurePSI);
-                Script.UpdatePressure(ref pressureBar, elapsedClockSeconds, ref epControllerState);
-                pressurePSI = (float)Pressure.Atmospheric.ToPSI(pressureBar);
+                double pressureBar = Pressure.Atmospheric.FromPSI(pressurePSI);
+                var result = Script.UpdatePressure(pressureBar, epPressureBar, elapsedClockSeconds);
+                pressurePSI = Pressure.Atmospheric.ToPSI(result.Item1);
+                epPressureBar = result.Item2;
             }
+            return (pressurePSI, epPressureBar);
         }
 
-        public void UpdateEngineBrakePressure(ref float pressurePSI, double elapsedClockSeconds)
+        public double UpdateEngineBrakePressure(double pressurePSI, double elapsedClockSeconds)
         {
             if (Script != null)
             {
                 // Conversion is needed until the pressures of the brake system are converted to Pressure.Atmospheric.
-                float pressureBar = (float)Pressure.Atmospheric.FromPSI(pressurePSI);
-                Script.UpdateEngineBrakePressure(ref pressureBar, elapsedClockSeconds);
-                pressurePSI = (float)Pressure.Atmospheric.ToPSI(pressureBar);
+                double pressureBar = Pressure.Atmospheric.FromPSI(pressurePSI);
+                pressureBar = Script.UpdateEngineBrakePressure(pressureBar, elapsedClockSeconds);
+                pressurePSI = Pressure.Atmospheric.ToPSI(pressureBar);
             }
+            return pressurePSI;
         }
 
         public void SignalEvent(BrakeControllerEvent evt)
@@ -428,7 +429,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
         {
             if (Script != null)
             {
-                string state = ControllerStateDictionary.Dict[Script.GetState()];
+                //ToDo translation via catalog
+                string state = EnumExtension.GetDescription(Script.GetState());
                 string fraction = GetStateFractionScripted();
 
                 if (String.IsNullOrEmpty(state) && String.IsNullOrEmpty(fraction))

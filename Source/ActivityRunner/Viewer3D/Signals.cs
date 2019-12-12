@@ -30,15 +30,13 @@ using Microsoft.Xna.Framework.Graphics;
 
 using Orts.ActivityRunner.Viewer3D.Common;
 using Orts.ActivityRunner.Viewer3D.Shapes;
+using Orts.ActivityRunner.Viewer3D.Sound;
 using Orts.Common;
 using Orts.Common.Position;
 using Orts.Common.Xna;
 using Orts.Formats.Msts;
 using Orts.Formats.Msts.Models;
 using Orts.Simulation.Signalling;
-
-using Event = Orts.Common.Event;
-using Events = Orts.Common.Events;
 
 namespace Orts.ActivityRunner.Viewer3D
 {
@@ -287,7 +285,7 @@ namespace Orts.ActivityRunner.Viewer3D
                         var soundPath = Viewer.Simulator.RoutePath + @"\\sound\\" + Viewer.Simulator.TRK.Route.DefaultSignalSMS;
                         try
                         {
-                            Sound = new SoundSource(Viewer, SignalShape.WorldPosition.WorldLocation, Events.Source.MSTSSignal, soundPath);
+                            Sound = new SoundSource(Viewer, SignalShape.WorldPosition.WorldLocation, SoundEventSource.Signal, soundPath);
                             Viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { Sound });
                         }
                         catch (Exception error)
@@ -326,7 +324,7 @@ namespace Orts.ActivityRunner.Viewer3D
                     {
                         SemaphoreTarget = SignalTypeData.DrawAspects[DisplayState].SemaphorePos;
                         SemaphoreSpeed = SignalTypeData.SemaphoreAnimationTime <= 0 ? 0 : (SemaphoreTarget > SemaphorePos ? +1 : -1) / SignalTypeData.SemaphoreAnimationTime;
-                        if (Sound != null) Sound.HandleEvent(Event.SemaphoreArm);
+                        if (Sound != null) Sound.HandleEvent(TrainEvent.SemaphoreArm);
                     }
                 }
 

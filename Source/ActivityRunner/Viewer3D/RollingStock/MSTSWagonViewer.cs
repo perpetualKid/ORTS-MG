@@ -20,20 +20,21 @@
 // Debug for Sound Variables
 //#define DEBUG_WHEEL_ANIMATION 
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+
 using Microsoft.Xna.Framework;
 
 using Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems;
 using Orts.ActivityRunner.Viewer3D.Shapes;
 using Orts.Common;
 using Orts.Common.Input;
+using Orts.Simulation.Commanding;
 using Orts.Simulation.RollingStocks;
 using Orts.Simulation.RollingStocks.SubSystems;
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
 
 namespace Orts.ActivityRunner.Viewer3D.RollingStock
 {

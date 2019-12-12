@@ -164,7 +164,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                     {
                         foreach (var @event in owner.Viewer.Simulator.ActivityRun.EventList)
                         {
-                            var eventAction = @event.ParsedObject as EventCategoryAction;
+                            var eventAction = @event.ParsedObject as ActionActivityEvent;
                             if (eventAction != null)
                             {
                                 if (separatorShown)
@@ -440,7 +440,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                 dbfevaltaskname = "";
                                 dbfevaltasklocation = "";
                                 dbfevaltaskstatus = "";
-                                var eventAction = @event.ParsedObject as EventCategoryAction;
+                                var eventAction = @event.ParsedObject as ActionActivityEvent;
                                 if (eventAction != null)
                                 {
 

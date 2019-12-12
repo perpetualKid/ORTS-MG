@@ -52,7 +52,7 @@
     <Compile Include="Models\Activity.cs" />
     <Compile Include="Models\CabViewControl.cs" />
     <Compile Include="Models\Camera.cs" />
-    <Compile Include="Models\Event.cs" />
+    <Compile Include="Models\ActivityEvent.cs" />
     <Compile Include="Models\Path.cs" />
     <Compile Include="Models\Route.cs" />
     <Compile Include="Models\Signal.cs" />

@@ -2,8 +2,10 @@
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace Orts.Formats.Msts
 {
@@ -199,6 +201,59 @@ namespace Orts.Formats.Msts
 
         //    return File.Exists(smsSoundPath) ? smsSoundPath : globalSoundPath;
         //}
+
+        /// <summary>
+        /// Static variables to reduce occurrence of duplicate warning messages.
+        /// </summary>
+        static string badBranch = "";
+        static string badPath = "";
+        static readonly Dictionary<string, StringDictionary> filesFound = new Dictionary<string, StringDictionary>();
+
+        /// <summary>
+        /// Search an array of paths for a file. Paths must be in search sequence.
+        /// No need for trailing "\" on path or leading "\" on branch parameter.
+        /// </summary>
+        /// <param name="pathArray">2 or more folders, e.g. "D:\MSTS", E:\OR"</param>
+        /// <param name="branch">a filename possibly prefixed by a folder, e.g. "folder\file.ext"</param>
+        /// <returns>null or the full file path of the first file found</returns>
+        public static string FindFileFromFolders(IEnumerable<string> paths, string fileRelative)
+        {
+            if (string.IsNullOrEmpty(fileRelative))
+                return string.Empty;
+
+            if (filesFound.TryGetValue(fileRelative, out StringDictionary existingFiles))
+            {
+                foreach (string path in paths)
+                {
+                    if (existingFiles.ContainsKey(path))
+                        return existingFiles[path];
+                }
+            }
+            foreach (string path in paths)
+            {
+                string fullPath = Path.Combine(path, fileRelative);
+                if (File.Exists(fullPath))
+                {
+                    if (null != existingFiles)
+                        existingFiles.Add(path, fullPath);
+                    else
+                        filesFound.Add(fileRelative, new StringDictionary
+                                {
+                                    { path, fullPath }
+                                });
+                    return fullPath;
+                }
+            }
+
+            var firstPath = paths.First();
+            if (fileRelative != badBranch || firstPath != badPath)
+            {
+                Trace.TraceWarning("File {0} missing from {1}", fileRelative, firstPath);
+                badBranch = fileRelative;
+                badPath = firstPath;
+            }
+            return null;
+        }
 
     }
 }

@@ -30,6 +30,12 @@
 // #define DEBUG_TRACEINFO
 //
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+
+using Orts.Common;
 using Orts.Common.Calc;
 using Orts.Common.Threading;
 using Orts.Formats.Msts.Files;
@@ -37,13 +43,6 @@ using Orts.Formats.Msts.Models;
 using Orts.MultiPlayer;
 using Orts.Simulation.RollingStocks;
 using Orts.Simulation.Timetables;
-
-using ORTS.Scripting.Api;
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 
 namespace Orts.Simulation.AIs
 {

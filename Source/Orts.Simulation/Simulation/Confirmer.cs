@@ -22,108 +22,7 @@ using System.Diagnostics;
 
 namespace Orts.Simulation
 {
-    public enum ConfirmLevel
-    {
-        [Description("None")] None,
-        [Description("Information")] Information,
-        [Description("Warning")] Warning,
-        [Description("Error")] Error,
-        [Description("MSG")] MSG,
-    };
-
     // <CJComment> Some of these are not cab controls or even controls. However they all make good use of structured text. </CJComment>
-    public enum CabControl {
-        None
-        // Power
-      , Reverser
-      , Throttle
-      , Wheelslip
-        // Electric Power
-      , Power
-      , Pantograph1
-      , Pantograph2
-      , Pantograph3
-      , Pantograph4
-      , CircuitBreakerClosingOrder
-      , CircuitBreakerOpeningOrder
-      , CircuitBreakerClosingAuthorization
-        // Diesel Power
-      , PlayerDiesel
-      , HelperDiesel
-      , DieselFuel
-      // Steam power
-      , SteamLocomotiveReverser
-      , Regulator
-      , Injector1
-      , Injector2
-      , Blower
-      , SteamHeat
-      , Damper
-      , FireboxDoor
-      , FiringRate
-      , FiringIsManual
-      , FireShovelfull
-      , CylinderCocks
-      , CylinderCompound
-      , SmallEjector
-      , TenderCoal
-      , TenderWater
-      // General
-      , WaterScoop
-      // Braking
-      , TrainBrake
-      , EngineBrake
-      , DynamicBrake
-      , EmergencyBrake
-      , BailOff
-      , InitializeBrakes
-      , Handbrake
-      , Retainers
-      , BrakeHose
-      // Cab Devices
-      , Sander
-      , Alerter
-      , Horn
-      , Whistle
-      , Bell
-      , Headlight
-      , CabLight
-      , Wipers
-      , ChangeCab
-      , Odometer
-      // Train Devices
-      , DoorsLeft
-      , DoorsRight
-      , Mirror
-      // Track Devices
-      , SwitchAhead
-      , SwitchBehind
-      // Simulation
-      , SimulationSpeed
-      , Uncouple
-      , Activity
-      , Replay
-      , GearBox
-      , SignalMode
-      // Freight Load
-      , FreightLoad
-      , CabRadio
-    }
-
-    public enum CabSetting {
-        Name        // name of control
-        , Off       // 2 or 3 state control/reset/initialise
-        , Neutral   // 2 or 3 state control
-        , On        // 2 or 3 state control/apply/change
-        , Decrease  // continuous control
-        , Increase  // continuous control
-        , Warn1
-        , Warn2
-        , Range1    // sub-range
-        , Range2
-        , Range3
-        , Range4
-    }
 
     public class DisplayMessageEventArgs : EventArgs
     {
@@ -326,7 +225,7 @@ namespace Orts.Simulation
 
 		public void MSG(string message)
 		{
-			Message(CabControl.None, ConfirmLevel.MSG, message);
+			Message(CabControl.None, ConfirmLevel.Message, message);
 		}
 		
         public void Warning(string message)
@@ -361,7 +260,7 @@ namespace Orts.Simulation
                 format = "{1} - " + format;
 			var duration = DefaultDurationS;
 			if (level >= ConfirmLevel.Warning) duration *= 2;
-			if (level >= ConfirmLevel.MSG) duration *= 5;
+			if (level >= ConfirmLevel.Message) duration *= 5;
             DisplayMessage?.Invoke(this, new DisplayMessageEventArgs($"{control}/{level}", string.Format(format, ConfirmText[(int)control][0], Simulator.Catalog.GetString(level.GetDescription()), message), duration));
         }
     }

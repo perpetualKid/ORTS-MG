@@ -31,7 +31,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+
 using Microsoft.Xna.Framework;
+
 using Orts.Common;
 using Orts.Common.Calc;
 using Orts.Common.Position;
@@ -43,7 +45,6 @@ using Orts.Formats.Msts.Parsers;
 using Orts.MultiPlayer;
 using Orts.Simulation.AIs;
 using Orts.Simulation.Physics;
-using Event = Orts.Common.Event;
 
 namespace Orts.Simulation.Signalling
 {
@@ -10560,18 +10561,18 @@ namespace Orts.Simulation.Signalling
             if (internalBlockState == InternalBlockstate.OccupiedSameDirection && hasPermission == Permission.Requested && !isPropagated)
             {
                 hasPermission = Permission.Granted;
-                if (sound) signalRef.Simulator.SoundNotify = Event.PermissionGranted;
+                if (sound) signalRef.Simulator.SoundNotify = TrainEvent.PermissionGranted;
             }
             else
             {
                 if (enabledTrain != null && enabledTrain.Train.ControlMode == Train.TRAIN_CONTROL.MANUAL &&
                     internalBlockState <= InternalBlockstate.OccupiedSameDirection && hasPermission == Permission.Requested)
                 {
-                    signalRef.Simulator.SoundNotify = Event.PermissionGranted;
+                    signalRef.Simulator.SoundNotify = TrainEvent.PermissionGranted;
                 }
                 else if (hasPermission == Permission.Requested)
                 {
-                    if (sound) signalRef.Simulator.SoundNotify = Event.PermissionDenied;
+                    if (sound) signalRef.Simulator.SoundNotify = TrainEvent.PermissionDenied;
                 }
 
                 if (enabledTrain != null && enabledTrain.Train.ControlMode == Train.TRAIN_CONTROL.MANUAL && signalState == SignalAspectState.Stop &&

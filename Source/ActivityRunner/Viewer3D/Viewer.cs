@@ -39,6 +39,7 @@ using Orts.Settings;
 using Orts.Settings.Util;
 using Orts.Simulation;
 using Orts.Simulation.AIs;
+using Orts.Simulation.Commanding;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
 
@@ -50,8 +51,6 @@ using System.Linq;
 using System.Management;
 using System.Threading;
 using System.Windows.Forms;
-
-using Event = Orts.Common.Event;
 
 namespace Orts.ActivityRunner.Viewer3D
 {
@@ -439,7 +438,7 @@ namespace Orts.ActivityRunner.Viewer3D
             Simulator.Confirmer.PlayErrorSound += (s, e) =>
             {
                 if (World.GameSounds != null)
-                    World.GameSounds.HandleEvent(Event.ControlError);
+                    World.GameSounds.HandleEvent(TrainEvent.ControlError);
             };
             Simulator.Confirmer.DisplayMessage += (s, e) => MessagesWindow.AddMessage(e.Key, e.Text, e.Duration);
 
@@ -1578,9 +1577,9 @@ namespace Orts.ActivityRunner.Viewer3D
                 foreach (var movingTable in Simulator.MovingTables)
                 {
 
-                    if (movingTable.WorldPosition.XNAMatrix.M44 != 100000000)
+                    if (movingTable.WorldPosition.XNAMatrix.M44 != 100_000_000)
                     {
-                        var distanceSquared = WorldLocation.GetDistanceSquared(movingTable.WorldPosition.WorldLocation, Camera.CameraWorldLocation);
+                        var distanceSquared = (float)WorldLocation.GetDistanceSquared(movingTable.WorldPosition.WorldLocation, Camera.CameraWorldLocation);
                         if (distanceSquared <= minDistanceSquared && distanceSquared < 160000) //must be the nearest one, but must also be near!
                         {
                             minDistanceSquared = distanceSquared;
@@ -1766,7 +1765,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 // Hide MessageWindow
                 MessagesWindow.Visible = false;
                 // Audible confirmation that screenshot taken
-                if (World.GameSounds != null) World.GameSounds.HandleEvent(Event.ControlError);
+                if (World.GameSounds != null) World.GameSounds.HandleEvent(TrainEvent.ControlError);
             }
 
             // Use IsDown() not IsPressed() so users can take multiple screenshots as fast as possible by holding down the key.

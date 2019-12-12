@@ -19,7 +19,8 @@ using System.IO;
 using Orts.Common;
 using Orts.Common.Calc;
 using Orts.Formats.Msts.Parsers;
-using ORTS.Scripting.Api;
+using Orts.Scripting.Api;
+using Orts.Scripting.Api.PowerSupply;
 
 namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
 {
@@ -107,8 +108,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
             {
                 if (ScriptName != null && ScriptName != "Default")
                 {
-                    var pathArray = new string[] { Path.Combine(Path.GetDirectoryName(Locomotive.WagFilePath), "Script") };
-                    Script = Simulator.ScriptManager.Load(pathArray, ScriptName) as ElectricPowerSupply;
+                    Script = Simulator.ScriptManager.Load(Path.Combine(Path.GetDirectoryName(Locomotive.WagFilePath), "Script"), ScriptName) as ElectricPowerSupply;
                 }
                 if (Script == null)
                 {

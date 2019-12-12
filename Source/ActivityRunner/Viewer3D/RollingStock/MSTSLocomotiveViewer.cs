@@ -17,6 +17,12 @@
 
 // This file is the responsibility of the 3D & Environment Team. 
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 
@@ -31,20 +37,10 @@ using Orts.Common.Xna;
 using Orts.Formats.Msts;
 using Orts.Formats.Msts.Files;
 using Orts.Formats.Msts.Models;
-using Orts.Simulation;
+using Orts.Simulation.Commanding;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
 using Orts.Simulation.RollingStocks.SubSystems.Controllers;
-
-using ORTS.Scripting.Api;
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-
-using Event = Orts.Common.Event;
 
 namespace Orts.ActivityRunner.Viewer3D.RollingStock
 {
@@ -199,8 +195,8 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                 Locomotive.ShowCab = !Locomotive.ShowCab;
 
             // By Matej Pacha
-            if (UserInput.IsPressed(UserCommand.DebugResetWheelSlip)) { Locomotive.Train.SignalEvent(Event._ResetWheelSlip); }
-            if (UserInput.IsPressed(UserCommand.DebugToggleAdvancedAdhesion)) { Locomotive.Train.SignalEvent(Event._ResetWheelSlip); Locomotive.Simulator.UseAdvancedAdhesion = !Locomotive.Simulator.UseAdvancedAdhesion; }
+            if (UserInput.IsPressed(UserCommand.DebugResetWheelSlip)) { Locomotive.Train.SignalEvent(TrainEvent._ResetWheelSlip); }
+            if (UserInput.IsPressed(UserCommand.DebugToggleAdvancedAdhesion)) { Locomotive.Train.SignalEvent(TrainEvent._ResetWheelSlip); Locomotive.Simulator.UseAdvancedAdhesion = !Locomotive.Simulator.UseAdvancedAdhesion; }
 
             if (UserInput.Raildriver.Active)
             {
@@ -220,9 +216,9 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                         Locomotive.SetDirection(Direction.N);
                         Locomotive.SetEmergency(UserInput.Raildriver.Emergency);
                     if (UserInput.Raildriver.Wipers == 1 && Locomotive.Wiper)
-                        Locomotive.SignalEvent(Event.WiperOff);
+                        Locomotive.SignalEvent(TrainEvent.WiperOff);
                     else if (UserInput.Raildriver.Wipers != 1 && !Locomotive.Wiper)
-                        Locomotive.SignalEvent(Event.WiperOn);
+                        Locomotive.SignalEvent(TrainEvent.WiperOn);
                     // changing Headlight more than one step at a time doesn't work for some reason
                     if (Locomotive.Headlight < UserInput.Raildriver.Lights - 1)
                         Locomotive.Headlight++;
@@ -409,7 +405,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                                         car.WorldPosition.TileX, car.WorldPosition.TileZ,
                                         intakePosition.X, intakePosition.Y, -intakePosition.Z);
 
-                                    var d2 = WorldLocation.GetDistanceSquared(intakeLocation, pickup.WorldPosition.WorldLocation);
+                                    var d2 = (float)WorldLocation.GetDistanceSquared(intakeLocation, pickup.WorldPosition.WorldLocation);
                                     if (d2 < shortestD2)
                                     {
                                         shortestD2 = d2;

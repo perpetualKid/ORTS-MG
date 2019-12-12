@@ -624,16 +624,16 @@ namespace ORTS.TrackViewer.Drawing
                 WorldLocation midLocation = FindLocationInSection(tvs, trackSection, trackSectionLength/2);
 
                 // (deltaX, deltaZ) is a vector from begin to end.
-                float deltaX = (endLocation.Location.X - endLocation.Location.X);
-                float deltaZ = (endLocation.Location.Z - endLocation.Location.Z);
-                deltaX += 2048 * (endLocation.TileX - endLocation.TileX); 
-                deltaZ += 2048 * (endLocation.TileZ - endLocation.TileZ);
+                double deltaX = (endLocation.Location.X - endLocation.Location.X);
+                double deltaZ = (endLocation.Location.Z - endLocation.Location.Z);
+                deltaX += WorldLocation.TileSize * (endLocation.TileX - endLocation.TileX); 
+                deltaZ += WorldLocation.TileSize * (endLocation.TileZ - endLocation.TileZ);
 
                 WorldLocation begin2Location = new WorldLocation(midLocation.TileX, midLocation.TileZ, 
-                    midLocation.Location.X - deltaX / 2, midLocation.Location.Y, midLocation.Location.Z - deltaZ / 2);
+                    (float)(midLocation.Location.X - deltaX / 2), midLocation.Location.Y, (float)(midLocation.Location.Z - deltaZ / 2));
 
                 WorldLocation end2Location = new WorldLocation(midLocation.TileX, midLocation.TileZ,
-                    midLocation.Location.X + deltaX / 2, midLocation.Location.Y, midLocation.Location.Z + deltaZ / 2);
+                    (float)(midLocation.Location.X + deltaX / 2), midLocation.Location.Y, (float)(midLocation.Location.Z + deltaZ / 2));
 
                 boxList.Add(begin2Location);
                 boxList.Add(end2Location);

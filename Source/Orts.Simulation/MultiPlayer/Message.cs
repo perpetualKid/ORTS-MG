@@ -18,17 +18,6 @@
 // #define DEBUG_MULTIPLAYER
 // DEBUG flag for debug prints
 
-using Orts.Common;
-using Orts.Common.Position;
-using Orts.Formats.Msts;
-using Orts.Formats.Msts.Models;
-using Orts.Simulation;
-using Orts.Simulation.Physics;
-using Orts.Simulation.RollingStocks;
-using Orts.Simulation.Signalling;
-
-using ORTS.Scripting.Api;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -37,7 +26,15 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 
-using Event = Orts.Common.Event;
+using Orts.Common;
+using Orts.Common.Position;
+using Orts.Formats.Msts;
+using Orts.Formats.Msts.Models;
+using Orts.Simulation;
+using Orts.Simulation.Commanding;
+using Orts.Simulation.Physics;
+using Orts.Simulation.RollingStocks;
+using Orts.Simulation.Signalling;
 
 namespace Orts.MultiPlayer
 {
@@ -1369,7 +1366,7 @@ namespace Orts.MultiPlayer
             if (train.Cars[0].CarID.StartsWith("AI"))
             {
                 // It's an AI train for the server, raise pantos and light lights
-                if (train.LeadLocomotive != null) train.LeadLocomotive.SignalEvent(Event._HeadlightOn);
+                if (train.LeadLocomotive != null) train.LeadLocomotive.SignalEvent(TrainEvent._HeadlightOn);
                 foreach (TrainCar car in train.Cars)
                 {
                     if (car is MSTSElectricLocomotive)
@@ -2090,7 +2087,7 @@ namespace Orts.MultiPlayer
             {
                 if (t.LeadLocomotive != null)
                 {
-                    t.LeadLocomotive.SignalEvent(EventState == 0 ? Event.HornOff : Event.HornOn);
+                    t.LeadLocomotive.SignalEvent(EventState == 0 ? TrainEvent.HornOff : TrainEvent.HornOn);
                     MPManager.BroadCast(this.ToString()); //if the server, will broadcast
                 }
             }
@@ -2123,13 +2120,13 @@ namespace Orts.MultiPlayer
                 if (t.LeadLocomotive != null && t.LeadLocomotive is MSTSLocomotive)
                 {
                     (t.LeadLocomotive as MSTSLocomotive).Bell = (EventState == 0 ? false : true);
-                    t.LeadLocomotive.SignalEvent(EventState == 0 ? Event.BellOff : Event.BellOn);
+                    t.LeadLocomotive.SignalEvent(EventState == 0 ? TrainEvent.BellOff : TrainEvent.BellOn);
                     MPManager.BroadCast(this.ToString()); //if the server, will broadcast
                 }
             }
             else if (EventName == "WIPER")
             {
-                if (t.LeadLocomotive != null) t.LeadLocomotive.SignalEvent(EventState == 0 ? Event.WiperOff : Event.WiperOn);
+                if (t.LeadLocomotive != null) t.LeadLocomotive.SignalEvent(EventState == 0 ? TrainEvent.WiperOff : TrainEvent.WiperOn);
                 MPManager.BroadCast(this.ToString()); //if the server, will broadcast
             }
             else if (EventName == "DOORL")
@@ -2149,9 +2146,9 @@ namespace Orts.MultiPlayer
             }
             else if (EventName == "HEADLIGHT")
             {
-                if (t.LeadLocomotive != null && EventState == 0) t.LeadLocomotive.SignalEvent(Event._HeadlightOff);
-                if (t.LeadLocomotive != null && EventState == 1) t.LeadLocomotive.SignalEvent(Event._HeadlightDim);
-                if (t.LeadLocomotive != null && EventState == 2) t.LeadLocomotive.SignalEvent(Event._HeadlightOn);
+                if (t.LeadLocomotive != null && EventState == 0) t.LeadLocomotive.SignalEvent(TrainEvent._HeadlightOff);
+                if (t.LeadLocomotive != null && EventState == 1) t.LeadLocomotive.SignalEvent(TrainEvent._HeadlightDim);
+                if (t.LeadLocomotive != null && EventState == 2) t.LeadLocomotive.SignalEvent(TrainEvent._HeadlightOn);
                 MPManager.BroadCast(this.ToString()); //if the server, will broadcast
             }
             else return;

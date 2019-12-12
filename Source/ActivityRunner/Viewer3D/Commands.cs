@@ -21,6 +21,7 @@ using System;
 using Orts.Common;
 using Orts.ActivityRunner.Viewer3D.Popups;
 using Orts.ActivityRunner.Viewer3D.RollingStock;
+using Orts.Simulation.Commanding;
 
 namespace Orts.ActivityRunner.Viewer3D
 {
@@ -76,14 +77,14 @@ namespace Orts.ActivityRunner.Viewer3D
         public RefillCommand(CommandLog log, float? target, double startTime)
             : base(log, true, target, startTime)
         {
-            Target = target;        // Fraction from 0 to 1.0
+            base.target = target;        // Fraction from 0 to 1.0
             this.Time = startTime;  // Continuous commands are created at end of change, so overwrite time when command was created
         }
 
         public override void Redo()
         {
             if (Receiver == null) return;
-            Receiver.RefillChangeTo(Target);
+            Receiver.RefillChangeTo(target);
             // Report();
         }
     }
@@ -156,7 +157,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public override void Redo()
         {
-            Receiver.ToggleAnySwitch(Index);
+            Receiver.ToggleAnySwitch(index);
             // Report();
         }
     }

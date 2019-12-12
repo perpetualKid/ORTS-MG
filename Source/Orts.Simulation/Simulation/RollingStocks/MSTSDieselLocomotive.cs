@@ -46,8 +46,6 @@ using Orts.Simulation.RollingStocks.SubSystems.Controllers;
 using Orts.Simulation.RollingStocks.SubSystems.PowerSupplies;
 using Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions;
 
-using Event = Orts.Common.Event;
-
 namespace Orts.Simulation.RollingStocks
 {
     ///////////////////////////////////////////////////
@@ -424,7 +422,7 @@ namespace Orts.Simulation.RollingStocks
                 if (DieselLevelL <= 0.0f)
                 {
                     PowerOn = false;
-                    SignalEvent(Event.EnginePowerOff);
+                    SignalEvent(TrainEvent.EnginePowerOff);
                     foreach (DieselEngine de in DieselEngines)
                     {
                         if (de.EngineStatus != DieselEngine.Status.Stopping || de.EngineStatus != DieselEngine.Status.Stopped)
@@ -597,13 +595,13 @@ namespace Orts.Simulation.RollingStocks
             {
                 foreach (DieselEngine engine in DieselEngines)
                     engine.Start();
-                SignalEvent(Event.EnginePowerOn);
+                SignalEvent(TrainEvent.EnginePowerOn);
             }
             else
             {
                 foreach (DieselEngine engine in DieselEngines)
                     engine.Stop();
-                SignalEvent(Event.EnginePowerOff);
+                SignalEvent(TrainEvent.EnginePowerOff);
             }
 
             base.SetPower(ToState);
@@ -745,12 +743,12 @@ namespace Orts.Simulation.RollingStocks
                 if (DieselEngines[0].EngineStatus == DieselEngine.Status.Stopped)
                 {
                     DieselEngines[0].Start();
-                    SignalEvent(Event.EnginePowerOn); // power on sound hook
+                    SignalEvent(TrainEvent.EnginePowerOn); // power on sound hook
                 }
                 if (DieselEngines[0].EngineStatus == DieselEngine.Status.Running)
                 {
                     DieselEngines[0].Stop();
-                    SignalEvent(Event.EnginePowerOff); // power off sound hook
+                    SignalEvent(TrainEvent.EnginePowerOff); // power off sound hook
                 }
                 Simulator.Confirmer.Confirm(CabControl.PlayerDiesel, DieselEngines.PowerOn ? CabSetting.On : CabSetting.Off);
             }

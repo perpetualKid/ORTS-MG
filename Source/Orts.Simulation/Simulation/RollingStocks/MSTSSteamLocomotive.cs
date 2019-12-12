@@ -79,11 +79,10 @@ using Orts.Common.Xna;
 using Orts.Formats.Msts;
 using Orts.Formats.Msts.Models;
 using Orts.Formats.Msts.Parsers;
+using Orts.Simulation.Commanding;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS;
 using Orts.Simulation.RollingStocks.SubSystems.Controllers;
-
-using Event = Orts.Common.Event;
 
 namespace Orts.Simulation.RollingStocks
 {
@@ -2045,7 +2044,7 @@ namespace Orts.Simulation.RollingStocks
 
             if (PulseTracker > (float)NextPulse - dPulseTracker / 2)
             {
-                SignalEvent((Event)((int)Event.SteamPulse1 + NextPulse - 1));
+                SignalEvent((TrainEvent)((int)TrainEvent.SteamPulse1 + NextPulse - 1));
                 PulseTracker %= numPulses;
                 NextPulse %= numPulses;
                 NextPulse++;
@@ -2153,9 +2152,9 @@ namespace Orts.Simulation.RollingStocks
                 if (FireboxDoorController.UpdateValue < 0.0)
                     Simulator.Confirmer.UpdateWithPerCent(CabControl.FireboxDoor, CabSetting.Decrease, FireboxDoorController.CurrentValue * 100);
                 if (oldFireboxDoorValue == 0 && FireboxDoorController.CurrentValue > 0)
-                    SignalEvent(Event.FireboxDoorOpen);
+                    SignalEvent(TrainEvent.FireboxDoorOpen);
                 else if (oldFireboxDoorValue > 0 && FireboxDoorController.CurrentValue == 0)
-                    SignalEvent(Event.FireboxDoorClose);
+                    SignalEvent(TrainEvent.FireboxDoorClose);
             }
 
             FuelController.Update(elapsedClockSeconds);
@@ -2705,7 +2704,7 @@ namespace Orts.Simulation.RollingStocks
                 {
                     if (!SafetyIsOn)
                     {
-                        SignalEvent(Event.SteamSafetyValveOn);
+                        SignalEvent(TrainEvent.SteamSafetyValveOn);
                         SafetyIsOn = true;
                     }
                 }
@@ -2713,7 +2712,7 @@ namespace Orts.Simulation.RollingStocks
                 {
                     if (SafetyIsOn)
                     {
-                        SignalEvent(Event.SteamSafetyValveOff);
+                        SignalEvent(TrainEvent.SteamSafetyValveOff);
                         SafetyIsOn = false;
                         SafetyValveUsage1LBpS = 0.0f; // if safety valve closed, then zero discharge rate
                     }
@@ -2827,14 +2826,14 @@ namespace Orts.Simulation.RollingStocks
                 // turn safety valves on if boiler heat is excessive, and fireman is not trying to raise steam for rising gradient by using the AI fire override
                 if (AIFireOverride && BoilerPressurePSI > MaxBoilerPressurePSI + SafetyValveStartPSI)
                 {
-                    SignalEvent(Event.SteamSafetyValveOn);
+                    SignalEvent(TrainEvent.SteamSafetyValveOn);
                     SafetyIsOn = true;
                 }
 
                 // turn safety vales off if boiler heat has returned to "normal", fitreman is no longer in override mode
                 else if (!AIFireOverride && BoilerPressurePSI < MaxBoilerPressurePSI - SafetyValveDropPSI)
                 {
-                    SignalEvent(Event.SteamSafetyValveOff);
+                    SignalEvent(TrainEvent.SteamSafetyValveOff);
                     SafetyIsOn = false;
                 }
 
@@ -5417,8 +5416,8 @@ namespace Orts.Simulation.RollingStocks
                 }
 
                 // Put sound triggers in for the injectors in AI Fireman mode
-                SignalEvent(Injector1IsOn ? Event.WaterInjector1On : Event.WaterInjector1Off); // hook for sound trigger
-                SignalEvent(Injector2IsOn ? Event.WaterInjector2On : Event.WaterInjector2Off); // hook for sound trigger
+                SignalEvent(Injector1IsOn ? TrainEvent.WaterInjector1On : TrainEvent.WaterInjector1Off); // hook for sound trigger
+                SignalEvent(Injector2IsOn ? TrainEvent.WaterInjector2On : TrainEvent.WaterInjector2Off); // hook for sound trigger
 
                 float BoilerHeatCheck = BoilerHeatOutBTUpS / BoilerHeatInBTUpS;
                 BoilerHeatExcess = BoilerHeatBTU / MaxBoilerHeatBTU;
@@ -6522,7 +6521,7 @@ public void SteamStartGearBoxIncrease()
             if (IsPlayerTrain)
                 Simulator.Confirmer.ConfirmWithPerCent(CabControl.SmallEjector, CabSetting.Increase, SmallEjectorController.CurrentValue * 100);
             SmallEjectorController.StartIncrease(target);
-            SignalEvent(Event.SmallEjectorChange);
+            SignalEvent(TrainEvent.SmallEjectorChange);
         }
 
         public void StopSmallEjectorIncrease()
@@ -6536,7 +6535,7 @@ public void SteamStartGearBoxIncrease()
             if (IsPlayerTrain)
                 Simulator.Confirmer.ConfirmWithPerCent(CabControl.SmallEjector, CabSetting.Decrease, SmallEjectorController.CurrentValue * 100);
             SmallEjectorController.StartDecrease(target);
-            SignalEvent(Event.SmallEjectorChange);
+            SignalEvent(TrainEvent.SmallEjectorChange);
         }
 
         public void StopSmallEjectorDecrease()
@@ -6589,7 +6588,7 @@ public void SteamStartGearBoxIncrease()
                 case Direction.N: Simulator.Confirmer.Confirm(CabControl.SteamLocomotiveReverser, CabSetting.Neutral); break;
                 case Direction.Forward: Simulator.Confirmer.ConfirmWithPerCent(CabControl.SteamLocomotiveReverser, Math.Abs(Train.MUReverserPercent), CabSetting.On); break;
             }
-            SignalEvent(Event.ReverserChange);
+            SignalEvent(TrainEvent.ReverserChange);
         }
 
         public void StopReverseIncrease()
@@ -6608,7 +6607,7 @@ public void SteamStartGearBoxIncrease()
                 case Direction.N: Simulator.Confirmer.Confirm(CabControl.SteamLocomotiveReverser, CabSetting.Neutral); break;
                 case Direction.Forward: Simulator.Confirmer.ConfirmWithPerCent(CabControl.SteamLocomotiveReverser, Math.Abs(Train.MUReverserPercent), CabSetting.On); break;
             }
-            SignalEvent(Event.ReverserChange);
+            SignalEvent(TrainEvent.ReverserChange);
         }
 
         public void StopReverseDecrease()
@@ -6643,7 +6642,7 @@ public void SteamStartGearBoxIncrease()
             if (change != 0)
             {
                 new ContinuousReverserCommand(Simulator.Log, change > 0, controller.CurrentValue, Simulator.GameTime);
-                SignalEvent(Event.ReverserChange);
+                SignalEvent(TrainEvent.ReverserChange);
             }
             if (oldValue != controller.IntermediateValue)
                 Simulator.Confirmer.UpdateWithPerCent(CabControl.SteamLocomotiveReverser, oldValue < controller.IntermediateValue ? CabSetting.Increase : CabSetting.Decrease, controller.CurrentValue * 100);
@@ -6779,7 +6778,7 @@ public void SteamStartGearBoxIncrease()
             if (IsPlayerTrain)
                 Simulator.Confirmer.ConfirmWithPerCent(CabControl.Blower, CabSetting.Increase, BlowerController.CurrentValue * 100);
             BlowerController.StartIncrease(target);
-            SignalEvent(Event.BlowerChange);
+            SignalEvent(TrainEvent.BlowerChange);
         }
         public void StopBlowerIncrease()
         {
@@ -6793,7 +6792,7 @@ public void SteamStartGearBoxIncrease()
             if (IsPlayerTrain)
                 Simulator.Confirmer.ConfirmWithPerCent(CabControl.Blower, CabSetting.Decrease, BlowerController.CurrentValue * 100);
             BlowerController.StartDecrease(target);
-            SignalEvent(Event.BlowerChange);
+            SignalEvent(TrainEvent.BlowerChange);
         }
         public void StopBlowerDecrease()
         {
@@ -6828,7 +6827,7 @@ public void SteamStartGearBoxIncrease()
             if (change != 0)
             {
                 new ContinuousBlowerCommand(Simulator.Log, change > 0, controller.CurrentValue, Simulator.GameTime);
-                SignalEvent(Event.BlowerChange);
+                SignalEvent(TrainEvent.BlowerChange);
             }
             if (oldValue != controller.IntermediateValue)
                 Simulator.Confirmer.UpdateWithPerCent(CabControl.Blower, oldValue < controller.IntermediateValue ? CabSetting.Increase : CabSetting.Decrease, controller.CurrentValue * 100);
@@ -6840,7 +6839,7 @@ public void SteamStartGearBoxIncrease()
             if (IsPlayerTrain)
                 Simulator.Confirmer.ConfirmWithPerCent(CabControl.Damper, CabSetting.Increase, DamperController.CurrentValue * 100);
             DamperController.StartIncrease(target);
-            SignalEvent(Event.DamperChange);
+            SignalEvent(TrainEvent.DamperChange);
         }
         public void StopDamperIncrease()
         {
@@ -6854,7 +6853,7 @@ public void SteamStartGearBoxIncrease()
             if (IsPlayerTrain)
                 Simulator.Confirmer.ConfirmWithPerCent(CabControl.Damper, CabSetting.Decrease, DamperController.CurrentValue * 100);
             DamperController.StartDecrease(target);
-            SignalEvent(Event.DamperChange);
+            SignalEvent(TrainEvent.DamperChange);
         }
         public void StopDamperDecrease()
         {
@@ -6889,7 +6888,7 @@ public void SteamStartGearBoxIncrease()
             if (change != 0)
             {
                 new ContinuousDamperCommand(Simulator.Log, change > 0, controller.CurrentValue, Simulator.GameTime);
-                SignalEvent(Event.DamperChange);
+                SignalEvent(TrainEvent.DamperChange);
             }
             if (oldValue != controller.IntermediateValue)
                 Simulator.Confirmer.UpdateWithPerCent(CabControl.Damper, oldValue < controller.IntermediateValue ? CabSetting.Increase : CabSetting.Decrease, controller.CurrentValue * 100);
@@ -6901,7 +6900,7 @@ public void SteamStartGearBoxIncrease()
             if (IsPlayerTrain)
                 Simulator.Confirmer.ConfirmWithPerCent(CabControl.FireboxDoor, CabSetting.Increase, FireboxDoorController.CurrentValue * 100);
             FireboxDoorController.StartIncrease(target);
-            SignalEvent(Event.FireboxDoorChange);
+            SignalEvent(TrainEvent.FireboxDoorChange);
         }
         public void StopFireboxDoorIncrease()
         {
@@ -6915,7 +6914,7 @@ public void SteamStartGearBoxIncrease()
             if (IsPlayerTrain)
                 Simulator.Confirmer.ConfirmWithPerCent(CabControl.FireboxDoor, CabSetting.Decrease, FireboxDoorController.CurrentValue * 100);
             FireboxDoorController.StartDecrease(target);
-            SignalEvent(Event.FireboxDoorChange);
+            SignalEvent(TrainEvent.FireboxDoorChange);
         }
         public void StopFireboxDoorDecrease()
         {
@@ -6950,7 +6949,7 @@ public void SteamStartGearBoxIncrease()
             if (change != 0)
             {
                 new ContinuousFireboxDoorCommand(Simulator.Log, change > 0, controller.CurrentValue, Simulator.GameTime);
-                SignalEvent(Event.FireboxDoorChange);
+                SignalEvent(TrainEvent.FireboxDoorChange);
             }
             if (oldValue != controller.IntermediateValue)
                 Simulator.Confirmer.UpdateWithPerCent(CabControl.FireboxDoor, oldValue < controller.IntermediateValue ? CabSetting.Increase : CabSetting.Decrease, controller.CurrentValue * 100);
@@ -7013,11 +7012,11 @@ public void SteamStartGearBoxIncrease()
         public void ToggleCylinderCocks()
         {
             CylinderCocksAreOpen = !CylinderCocksAreOpen;
-            SignalEvent(Event.CylinderCocksToggle);
+            SignalEvent(TrainEvent.CylinderCocksToggle);
             if (CylinderCocksAreOpen)
-                SignalEvent(Event.CylinderCocksOpen);
+                SignalEvent(TrainEvent.CylinderCocksOpen);
             else
-                SignalEvent(Event.CylinderCocksClose);
+                SignalEvent(TrainEvent.CylinderCocksClose);
 
             if (IsPlayerTrain)
                 Simulator.Confirmer.Confirm(CabControl.CylinderCocks, CylinderCocksAreOpen ? CabSetting.On : CabSetting.Off);
@@ -7029,7 +7028,7 @@ public void SteamStartGearBoxIncrease()
             if (SteamEngineType == SteamEngineTypes.Compound)  // only use this control if a compound locomotive
             {
                 CylinderCompoundOn = !CylinderCompoundOn;
-                SignalEvent(Event.CylinderCompoundToggle);
+                SignalEvent(TrainEvent.CylinderCompoundToggle);
                 if (IsPlayerTrain)
                 {
                     Simulator.Confirmer.Confirm(CabControl.CylinderCompound, CylinderCompoundOn ? CabSetting.On : CabSetting.Off);
@@ -7052,7 +7051,7 @@ public void SteamStartGearBoxIncrease()
             if (!FiringIsManual)
                 return;
             Injector1IsOn = !Injector1IsOn;
-            SignalEvent(Injector1IsOn ? Event.WaterInjector1On : Event.WaterInjector1Off); // hook for sound trigger
+            SignalEvent(Injector1IsOn ? TrainEvent.WaterInjector1On : TrainEvent.WaterInjector1Off); // hook for sound trigger
             if (IsPlayerTrain)
                 Simulator.Confirmer.Confirm(CabControl.Injector1, Injector1IsOn ? CabSetting.On : CabSetting.Off);
         }
@@ -7062,7 +7061,7 @@ public void SteamStartGearBoxIncrease()
             if (!FiringIsManual)
                 return;
             Injector2IsOn = !Injector2IsOn;
-            SignalEvent(Injector2IsOn ? Event.WaterInjector2On : Event.WaterInjector2Off); // hook for sound trigger
+            SignalEvent(Injector2IsOn ? TrainEvent.WaterInjector2On : TrainEvent.WaterInjector2Off); // hook for sound trigger
             if (IsPlayerTrain)
                 Simulator.Confirmer.Confirm(CabControl.Injector2, Injector2IsOn ? CabSetting.On : CabSetting.Off);
         }

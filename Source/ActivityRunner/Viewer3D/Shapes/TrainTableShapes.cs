@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+
 using Microsoft.Xna.Framework;
+
+using Orts.ActivityRunner.Viewer3D.Sound;
 using Orts.Common;
 using Orts.Common.Position;
 using Orts.Common.Xna;
@@ -40,7 +43,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                 var soundPath = viewer.Simulator.RoutePath + @"\\sound\\" + viewer.Simulator.TRK.Route.DefaultTurntableSMS;
                 try
                 {
-                    Sound = new SoundSource(viewer, WorldPosition.WorldLocation, Events.Source.ORTSTurntable, soundPath);
+                    Sound = new SoundSource(viewer, WorldPosition.WorldLocation, SoundEventSource.Turntable, soundPath);
                     viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { Sound });
                 }
                 catch
@@ -48,7 +51,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                     soundPath = viewer.Simulator.BasePath + @"\\sound\\" + viewer.Simulator.TRK.Route.DefaultTurntableSMS;
                     try
                     {
-                        Sound = new SoundSource(viewer, WorldPosition.WorldLocation, Events.Source.ORTSTurntable, soundPath);
+                        Sound = new SoundSource(viewer, WorldPosition.WorldLocation, SoundEventSource.Turntable, soundPath);
                         viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { Sound });
                     }
                     catch (Exception error)
@@ -88,12 +91,12 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
             {
                 Rotating = true;
                 if (Sound != null) Sound.HandleEvent(Turntable.TrainsOnMovingTable.Count == 1 &&
-                    Turntable.TrainsOnMovingTable[0].FrontOnBoard && Turntable.TrainsOnMovingTable[0].BackOnBoard ? Event.MovingTableMovingLoaded : Event.MovingTableMovingEmpty);
+                    Turntable.TrainsOnMovingTable[0].FrontOnBoard && Turntable.TrainsOnMovingTable[0].BackOnBoard ? TrainEvent.MovingTableMovingLoaded : TrainEvent.MovingTableMovingEmpty);
             }
             else if ((!Turntable.Clockwise && !Turntable.Counterclockwise && Rotating))
             {
                 Rotating = false;
-                if (Sound != null) Sound.HandleEvent(Event.MovingTableStopped);
+                if (Sound != null) Sound.HandleEvent(TrainEvent.MovingTableStopped);
             }
 
             // Update the pose for each matrix
@@ -135,7 +138,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                 var soundPath = viewer.Simulator.RoutePath + @"\\sound\\" + viewer.Simulator.TRK.Route.DefaultTurntableSMS;
                 try
                 {
-                    Sound = new SoundSource(viewer, WorldPosition.WorldLocation, Events.Source.ORTSTurntable, soundPath);
+                    Sound = new SoundSource(viewer, WorldPosition.WorldLocation, SoundEventSource.Turntable, soundPath);
                     viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { Sound });
                 }
                 catch
@@ -143,7 +146,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                     soundPath = viewer.Simulator.BasePath + @"\\sound\\" + viewer.Simulator.TRK.Route.DefaultTurntableSMS;
                     try
                     {
-                        Sound = new SoundSource(viewer, WorldPosition.WorldLocation, Events.Source.ORTSTurntable, soundPath);
+                        Sound = new SoundSource(viewer, WorldPosition.WorldLocation, SoundEventSource.Turntable, soundPath);
                         viewer.SoundProcess.AddSoundSources(this, new List<SoundSourceBase>() { Sound });
                     }
                     catch (Exception error)
@@ -183,12 +186,12 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
             {
                 Translating = true;
                 if (Sound != null) Sound.HandleEvent(Transfertable.TrainsOnMovingTable.Count == 1 &&
-                    Transfertable.TrainsOnMovingTable[0].FrontOnBoard && Transfertable.TrainsOnMovingTable[0].BackOnBoard ? Event.MovingTableMovingLoaded : Event.MovingTableMovingEmpty);
+                    Transfertable.TrainsOnMovingTable[0].FrontOnBoard && Transfertable.TrainsOnMovingTable[0].BackOnBoard ? TrainEvent.MovingTableMovingLoaded : TrainEvent.MovingTableMovingEmpty);
             }
             else if ((!Transfertable.Forward && !Transfertable.Reverse && Translating))
             {
                 Translating = false;
-                if (Sound != null) Sound.HandleEvent(Event.MovingTableStopped);
+                if (Sound != null) Sound.HandleEvent(TrainEvent.MovingTableStopped);
             }
 
             // Update the pose for each matrix

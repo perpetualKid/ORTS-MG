@@ -39,7 +39,7 @@ namespace Orts.Simulation.RollingStocks
                 {
                     // TODO search the path list
                     string wagFolder = Path.GetDirectoryName(wagFilePath);
-                    string dllPath = ORTSPaths.FindTrainCarPlugin(wagFolder, wagFile.OpenRails.DLL);
+                    string dllPath = FindTrainCarPlugin(wagFolder, wagFile.OpenRails.DLL);
                     Assembly customDLL = Assembly.LoadFrom(dllPath);
                     object[] args = new object[] { wagFilePath };
                     car = (TrainCar)customDLL.CreateInstance("ORTS.CustomCar", true, BindingFlags.CreateInstance, null, args, null, null);
@@ -84,6 +84,21 @@ namespace Orts.Simulation.RollingStocks
             }
 
             return car;
+        }
+
+        private static string FindTrainCarPlugin(string initialFolder, string fileName)
+        {
+            string dllPath = Path.Combine(initialFolder, fileName);  // search in trainset folder
+            if (File.Exists(dllPath))
+                return dllPath;
+            string rootFolder = Path.GetFullPath(Path.Combine(initialFolder, @"..\..\..", "OpenRails"));
+            if (Directory.Exists(rootFolder))
+            {
+                dllPath = Path.Combine(rootFolder, fileName);
+                if (File.Exists(dllPath))
+                    return dllPath;
+            }
+            return fileName;   // then search in OpenRails program folder
         }
 
         public static void Save(BinaryWriter outf, TrainCar car)

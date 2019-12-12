@@ -17,11 +17,13 @@
 
 using System;
 using System.IO;
+
 using Orts.Common;
 using Orts.Formats.Msts.Parsers;
+using Orts.Scripting.Api;
+using Orts.Scripting.Api.PowerSupply;
 using Orts.Simulation.AIs;
 using Orts.Simulation.Physics;
-using ORTS.Scripting.Api;
 
 namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
 {
@@ -123,8 +125,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
                             break;
 
                         default:
-                            var pathArray = new string[] { Path.Combine(Path.GetDirectoryName(Locomotive.WagFilePath), "Script") };
-                            Script = Simulator.ScriptManager.Load(pathArray, ScriptName) as CircuitBreaker;
+                            Script = Simulator.ScriptManager.Load(Path.Combine(Path.GetDirectoryName(Locomotive.WagFilePath), "Script"), ScriptName) as CircuitBreaker;
                             break;
                     }
                 }
@@ -135,8 +136,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
                 }
 
                 // AbstractScriptClass
-                Script.ClockTime = () => (float)Simulator.ClockTime;
-                Script.GameTime = () => (float)Simulator.GameTime;
+                Script.ClockTime = () => Simulator.ClockTime;
+                Script.GameTime = () => Simulator.GameTime;
                 Script.DistanceM = () => Locomotive.DistanceM;
                 Script.Confirm = Locomotive.Simulator.Confirmer.Confirm;
                 Script.Message = Locomotive.Simulator.Confirmer.Message;
@@ -288,15 +289,15 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
                 switch (CurrentState())
                 {
                     case CircuitBreakerState.Open:
-                        SignalEvent(Event.CircuitBreakerOpen);
+                        SignalEvent(TrainEvent.CircuitBreakerOpen);
                         break;
 
                     case CircuitBreakerState.Closing:
-                        SignalEvent(Event.CircuitBreakerClosing);
+                        SignalEvent(TrainEvent.CircuitBreakerClosing);
                         break;
 
                     case CircuitBreakerState.Closed:
-                        SignalEvent(Event.CircuitBreakerClosed);
+                        SignalEvent(TrainEvent.CircuitBreakerClosed);
                         break;
                 }
             }
@@ -370,15 +371,15 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
                 switch (CurrentState())
                 {
                     case CircuitBreakerState.Open:
-                        SignalEvent(Event.CircuitBreakerOpen);
+                        SignalEvent(TrainEvent.CircuitBreakerOpen);
                         break;
 
                     case CircuitBreakerState.Closing:
-                        SignalEvent(Event.CircuitBreakerClosing);
+                        SignalEvent(TrainEvent.CircuitBreakerClosing);
                         break;
 
                     case CircuitBreakerState.Closed:
-                        SignalEvent(Event.CircuitBreakerClosed);
+                        SignalEvent(TrainEvent.CircuitBreakerClosed);
                         break;
                 }
             }
@@ -393,7 +394,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
                 case PowerSupplyEvent.CloseCircuitBreaker:
                     SetDriverClosingOrder(true);
                     SetDriverOpeningOrder(false);
-                    SignalEvent(Event.CircuitBreakerClosingOrderOn);
+                    SignalEvent(TrainEvent.CircuitBreakerClosingOrderOn);
 
                     Confirm(CabControl.CircuitBreakerClosingOrder, CabSetting.On);
                     if (!ClosingAuthorization())
@@ -405,7 +406,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
                 case PowerSupplyEvent.OpenCircuitBreaker:
                     SetDriverClosingOrder(false);
                     SetDriverOpeningOrder(true);
-                    SignalEvent(Event.CircuitBreakerClosingOrderOff);
+                    SignalEvent(TrainEvent.CircuitBreakerClosingOrderOff);
 
                     Confirm(CabControl.CircuitBreakerClosingOrder, CabSetting.Off);
                     break;

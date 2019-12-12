@@ -36,6 +36,11 @@
 // Debug for Freight Animation Variable Mass
 //#define DEBUG_VARIABLE_MASS
 
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+
 using Microsoft.Xna.Framework;
 
 using Orts.Common;
@@ -47,15 +52,6 @@ using Orts.Simulation.RollingStocks.SubSystems;
 using Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS;
 using Orts.Simulation.RollingStocks.SubSystems.Controllers;
 using Orts.Simulation.RollingStocks.SubSystems.PowerSupplies;
-
-using ORTS.Scripting.Api;
-
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-
-using Event = Orts.Common.Event;
 
 namespace Orts.Simulation.RollingStocks
 {
@@ -2043,7 +2039,7 @@ namespace Orts.Simulation.RollingStocks
                 
                     if (!HotBoxSoundActivated)
                     {
-                         SignalEvent(Event.HotBoxBearingOn);
+                         SignalEvent(TrainEvent.HotBoxBearingOn);
                          HotBoxSoundActivated = true;
                     }
 
@@ -2094,7 +2090,7 @@ namespace Orts.Simulation.RollingStocks
                         InitialWheelBearingRiseTemperatureDegC = WheelBearingTemperatureDegC;
                         
                         // Turn off Hotbox sounds
-                        SignalEvent(Event.HotBoxBearingOff);
+                        SignalEvent(TrainEvent.HotBoxBearingOff);
                         HotBoxSoundActivated = false;
                         
                 }
@@ -2493,33 +2489,33 @@ namespace Orts.Simulation.RollingStocks
             }
         }
 
-        public override void SignalEvent(Event evt)
+        public override void SignalEvent(TrainEvent evt)
         {
             switch (evt)
             {
                 // Compatibility layer for MSTS events
-                case Event.Pantograph1Up:
+                case TrainEvent.Pantograph1Up:
                     SignalEvent(PowerSupplyEvent.RaisePantograph, 1);
                     break;
-                case Event.Pantograph1Down:
+                case TrainEvent.Pantograph1Down:
                     SignalEvent(PowerSupplyEvent.LowerPantograph, 1);
                     break;
-                case Event.Pantograph2Up:
+                case TrainEvent.Pantograph2Up:
                     SignalEvent(PowerSupplyEvent.RaisePantograph, 2);
                     break;
-                case Event.Pantograph2Down:
+                case TrainEvent.Pantograph2Down:
                     SignalEvent(PowerSupplyEvent.LowerPantograph, 2);
                     break;
-                case Event.Pantograph3Up:
+                case TrainEvent.Pantograph3Up:
                     SignalEvent(PowerSupplyEvent.RaisePantograph, 3);
                     break;
-                case Event.Pantograph3Down:
+                case TrainEvent.Pantograph3Down:
                     SignalEvent(PowerSupplyEvent.LowerPantograph, 3);
                     break;
-                case Event.Pantograph4Up:
+                case TrainEvent.Pantograph4Up:
                     SignalEvent(PowerSupplyEvent.RaisePantograph, 4);
                     break;
-                case Event.Pantograph4Down:
+                case TrainEvent.Pantograph4Down:
                     SignalEvent(PowerSupplyEvent.LowerPantograph, 4);
                     break;
             }
@@ -2542,7 +2538,7 @@ namespace Orts.Simulation.RollingStocks
                         if (Pantographs != null)
                         {
                             Pantographs.HandleEvent(evt);
-                            SignalEvent(Event.PantographToggle);
+                            SignalEvent(TrainEvent.PantographToggle);
                         }
                         break;
                 }
@@ -2562,7 +2558,7 @@ namespace Orts.Simulation.RollingStocks
                         if (Pantographs != null)
                         {
                             Pantographs.HandleEvent(evt, id);
-                            SignalEvent(Event.PantographToggle);
+                            SignalEvent(TrainEvent.PantographToggle);
                         }
                         break;
                 }
@@ -2584,17 +2580,17 @@ namespace Orts.Simulation.RollingStocks
                         if (!car.Flipped ^ Flipped)
                         {
                             mstsWagon.DoorLeftOpen = DoorLeftOpen;
-                            mstsWagon.SignalEvent(DoorLeftOpen ? Event.DoorOpen : Event.DoorClose); // hook for sound trigger
+                            mstsWagon.SignalEvent(DoorLeftOpen ? TrainEvent.DoorOpen : TrainEvent.DoorClose); // hook for sound trigger
                         }
                         else
                         {
                             mstsWagon.DoorRightOpen = DoorLeftOpen;
-                            mstsWagon.SignalEvent(DoorLeftOpen ? Event.DoorOpen : Event.DoorClose); // hook for sound trigger
+                            mstsWagon.SignalEvent(DoorLeftOpen ? TrainEvent.DoorOpen : TrainEvent.DoorClose); // hook for sound trigger
                         }
                     }
                 }
-                if (DoorLeftOpen) SignalEvent(Event.DoorOpen); // hook for sound trigger
-                else SignalEvent(Event.DoorClose);
+                if (DoorLeftOpen) SignalEvent(TrainEvent.DoorOpen); // hook for sound trigger
+                else SignalEvent(TrainEvent.DoorClose);
                 if (Simulator.PlayerLocomotive == this)
                 {
                     if (!GetCabFlipped()) Simulator.Confirmer.Confirm(CabControl.DoorsLeft, DoorLeftOpen ? CabSetting.On : CabSetting.Off);
@@ -2616,17 +2612,17 @@ namespace Orts.Simulation.RollingStocks
                         if (!car.Flipped ^ Flipped)
                         {
                             mstsWagon.DoorRightOpen = DoorRightOpen;
-                            mstsWagon.SignalEvent(DoorRightOpen ? Event.DoorOpen : Event.DoorClose); // hook for sound trigger
+                            mstsWagon.SignalEvent(DoorRightOpen ? TrainEvent.DoorOpen : TrainEvent.DoorClose); // hook for sound trigger
                         }
                         else
                         {
                             mstsWagon.DoorLeftOpen = DoorRightOpen;
-                            mstsWagon.SignalEvent(DoorRightOpen ? Event.DoorOpen : Event.DoorClose); // hook for sound trigger
+                            mstsWagon.SignalEvent(DoorRightOpen ? TrainEvent.DoorOpen : TrainEvent.DoorClose); // hook for sound trigger
                         }
                     }
                 }
-                if (DoorRightOpen) SignalEvent(Event.DoorOpen); // hook for sound trigger
-                else SignalEvent(Event.DoorClose);
+                if (DoorRightOpen) SignalEvent(TrainEvent.DoorOpen); // hook for sound trigger
+                else SignalEvent(TrainEvent.DoorClose);
                 if (Simulator.PlayerLocomotive == this)
                 {
                     if (!GetCabFlipped()) Simulator.Confirmer.Confirm(CabControl.DoorsRight, DoorRightOpen ? CabSetting.On : CabSetting.Off);
@@ -2638,8 +2634,8 @@ namespace Orts.Simulation.RollingStocks
         public void ToggleMirrors()
         {
             MirrorOpen = !MirrorOpen;
-            if (MirrorOpen) SignalEvent(Event.MirrorOpen); // hook for sound trigger
-            else SignalEvent(Event.MirrorClose);
+            if (MirrorOpen) SignalEvent(TrainEvent.MirrorOpen); // hook for sound trigger
+            else SignalEvent(TrainEvent.MirrorClose);
             if (Simulator.PlayerLocomotive == this) Simulator.Confirmer.Confirm(CabControl.Mirror, MirrorOpen ? CabSetting.On : CabSetting.Off);
         }
 

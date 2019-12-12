@@ -47,8 +47,6 @@ using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
 using Orts.Simulation.Signalling;
 
-using Event = Orts.Common.Event;
-
 namespace Orts.Simulation.Timetables
 {
     public class TTTrain : AITrain
@@ -10609,7 +10607,7 @@ namespace Orts.Simulation.Timetables
                                     MayDepart = true;
                                     if (!StationStops[0].EndStop)
                                     {
-                                        if (!DriverOnlyOperation) Simulator.SoundNotify = Event.PermissionToDepart;  // sound departure if not doo
+                                        if (!DriverOnlyOperation) Simulator.SoundNotify = TrainEvent.PermissionToDepart;  // sound departure if not doo
                                         DisplayMessage = Simulator.Catalog.GetString("Passenger boarding completed. You may depart now.");
                                     }
                                 }
@@ -11667,7 +11665,7 @@ namespace Orts.Simulation.Timetables
 
             // set various items
             attachTrain.CheckFreight();
-            attachCar.SignalEvent(Event.Couple);
+            attachCar.SignalEvent(TrainEvent.Couple);
             attachTrain.ProcessSpeedSettings();
 
             // if not static, reassess signals if coupled at front (no need to reassess signals if coupled to rear)
@@ -12072,7 +12070,7 @@ namespace Orts.Simulation.Timetables
             }
 
             // signal event
-            detachCar.SignalEvent(Event.Uncouple);
+            detachCar.SignalEvent(TrainEvent.Uncouple);
 
             // update positions train
             TrackNode tn = FrontTDBTraveller.TN;

@@ -18,7 +18,10 @@
 // This file is the responsibility of the 3D & Environment Team. 
 
 using System.Collections.Generic;
+
 using Microsoft.Xna.Framework;
+
+using Orts.ActivityRunner.Viewer3D.Sound;
 using Orts.Common;
 
 namespace Orts.ActivityRunner.Viewer3D
@@ -78,7 +81,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 // Keep it silent while loading.
                 ALSoundSource.MuteAll();
                 // TODO: This looks kinda evil; do something about it.
-                GameSounds = new SoundSource(viewer, Events.Source.MSTSInGame, viewer.Simulator.RoutePath + "\\Sound\\ingame.sms", true);
+                GameSounds = new SoundSource(viewer, SoundEventSource.InGame, viewer.Simulator.RoutePath + "\\Sound\\ingame.sms", true);
                 Viewer.SoundProcess.AddSoundSources(GameSounds.SMSFolder + "\\" + GameSounds.SMSFileName, new List<SoundSourceBase>() { GameSounds });
                 Sounds = new WorldSounds(viewer);
             }

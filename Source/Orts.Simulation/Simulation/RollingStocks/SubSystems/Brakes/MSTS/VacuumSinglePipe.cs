@@ -21,11 +21,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+
 using Microsoft.Xna.Framework;
+
 using Orts.Common;
 using Orts.Common.Calc;
 using Orts.Formats.Msts.Parsers;
-using ORTS.Scripting.Api;
 
 namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
 {
@@ -351,9 +352,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                     if (!TrainBrakePressureChanging)
                     {
                         if (CylPressurePSIA > prevCylPressurePSIA)
-                            Car.SignalEvent(Event.TrainBrakePressureIncrease);
+                            Car.SignalEvent(TrainEvent.TrainBrakePressureIncrease);
                         else
-                            Car.SignalEvent(Event.TrainBrakePressureDecrease);
+                            Car.SignalEvent(TrainEvent.TrainBrakePressureDecrease);
                         TrainBrakePressureChanging = !TrainBrakePressureChanging;
                     }
 
@@ -361,7 +362,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                 else if (TrainBrakePressureChanging)
                 {
                     TrainBrakePressureChanging = !TrainBrakePressureChanging;
-                    Car.SignalEvent(Event.TrainBrakePressureStoppedChanging);
+                    Car.SignalEvent(TrainEvent.TrainBrakePressureStoppedChanging);
                 }
 
                 if ( Math.Abs(BrakeLine1PressurePSI-prevBrakePipePressurePSI)> 0.05f /*BrakeLine1PressurePSI > prevBrakePipePressurePSI*/)
@@ -369,9 +370,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                     if (!BrakePipePressureChanging)
                     {
                         if (BrakeLine1PressurePSI > prevBrakePipePressurePSI)
-                            Car.SignalEvent(Event.BrakePipePressureIncrease);
+                            Car.SignalEvent(TrainEvent.BrakePipePressureIncrease);
                         else
-                            Car.SignalEvent(Event.BrakePipePressureDecrease);
+                            Car.SignalEvent(TrainEvent.BrakePipePressureDecrease);
                         BrakePipePressureChanging = !BrakePipePressureChanging;
                     }
 
@@ -379,7 +380,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                 else if (BrakePipePressureChanging)
                 {
                     BrakePipePressureChanging = !BrakePipePressureChanging;
-                    Car.SignalEvent(Event.BrakePipePressureStoppedChanging);
+                    Car.SignalEvent(TrainEvent.BrakePipePressureStoppedChanging);
                 }
                 prevCylPressurePSIA = CylPressurePSIA;
                 prevBrakePipePressurePSI = BrakeLine1PressurePSI;
