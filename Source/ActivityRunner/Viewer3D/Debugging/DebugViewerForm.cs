@@ -304,7 +304,8 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
                         DebugVector A = new DebugVector(trackJunctionNode.UiD.Location);
                         DebugVector B = new DebugVector(item.Location);
                         var x = DebugVector.DistanceSqr(A, B);
-                        if (x < 0.1) continue;
+                        if (x < 0.1)
+                            continue;
                         segments.Add(new LineSegment(B, A, item));
                     }
                     switches.Add(new SwitchWidget(trackJunctionNode));

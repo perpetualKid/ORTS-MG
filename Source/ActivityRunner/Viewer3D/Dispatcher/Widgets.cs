@@ -17,7 +17,7 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         protected static Vector2 VectorFromLocation(in WorldLocation location)
         {
-            return new Vector2((location.TileX * WorldLocation.TileSize + location.Location.X), (location.TileZ * WorldLocation.TileSize + location.Location.Z));
+            return new Vector2((float)(location.TileX * WorldLocation.TileSize + location.Location.X), (float)(location.TileZ * WorldLocation.TileSize + location.Location.Z));
         }
 
     }

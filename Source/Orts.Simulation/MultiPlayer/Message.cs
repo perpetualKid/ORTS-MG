@@ -3805,6 +3805,8 @@ namespace Orts.MultiPlayer
             for (var i = 0; i < cars.Length; i++)
             {
                 var c = cars[i];
+                if (c == null)
+                    continue;
                 var index = c.LastIndexOf("\\trains\\trainset\\", StringComparison.OrdinalIgnoreCase);
                 if (index > 0)
                 {
