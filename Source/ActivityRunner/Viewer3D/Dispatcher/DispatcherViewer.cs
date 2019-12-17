@@ -6,9 +6,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
-using Orts.ActivityRunner.Viewer3D.Dispatcher.Controls;
 using Orts.Common;
-using Orts.Common.Native;
+using Orts.Common.Calc;
 using Orts.Settings;
 
 namespace Orts.ActivityRunner.Viewer3D.Dispatcher
@@ -25,23 +24,28 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         private Point clientRectangleOffset;
         private bool syncMode;
         private DispatcherViewControl dispatcherView;
+        private SmoothedData frameRate;
+
+        private DispatcherContent content;
+        private readonly DispatcherUpdater dispatcherUpdater;
+        private CancellationTokenSource ctsDispatcher;
 
         public DispatcherViewer(UserSettings settings)
         {
             dispatcherForm = (Form)Control.FromHandle(Window.Handle);
             this.settings = settings;
             Window.Title = "Open Rails Dispatcher";
-            // Run at 10FPS fixed-time-step.
-            IsFixedTimeStep = true;
-            TargetElapsedTime = TimeSpan.FromMilliseconds(50);
-            InactiveSleepTime = TimeSpan.FromMilliseconds(50);
 
             graphicsDeviceManager = new GraphicsDeviceManager(this)
             {
                 SynchronizeWithVerticalRetrace = settings.VerticalSync,
+                //PreferredBackBufferFormat = SurfaceFormat.Color,
+                //PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8,
+                //PreferMultiSampling = settings.MultisamplingCount > 0,
+                //GraphicsProfile = GraphicsProfile.HiDef,
                 PreferredBackBufferFormat = SurfaceFormat.Color,
-                PreferredDepthStencilFormat = DepthFormat.Depth24Stencil8,
-                PreferMultiSampling = settings.MultisamplingCount > 0,
+                PreferredDepthStencilFormat = DepthFormat.None,
+                PreferMultiSampling = false,
                 GraphicsProfile = GraphicsProfile.HiDef,
             };
             graphicsDeviceManager.PreparingDeviceSettings += GraphicsDeviceManager_PreparingDeviceSettings;
@@ -59,23 +63,29 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
                 dispatcherForm.Height - dispatcherForm.ClientRectangle.Height);
 
             SynchronizeGraphicsDeviceManager(ScreenMode.WindowedPresetResolution);
-
             Window.ClientSizeChanged += Window_ClientSizeChanged;
 
-            dispatcherView = new DispatcherViewControl
+            content = new DispatcherContent(Program.Simulator);
+            ctsDispatcher = new CancellationTokenSource();
+            dispatcherUpdater = new DispatcherUpdater(ctsDispatcher.Token, content);
+
+            dispatcherView = new DispatcherViewControl(content)
             {
                 Dock = DockStyle.Fill,
             };
             Control.FromHandle(Window.Handle).Controls.Add(dispatcherView);
-            dispatcherView.Initialize(Program.Simulator);
+            frameRate = new SmoothedData();
         }
 
         private void GraphicsDeviceManager_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
         {
             // This stops ResolveBackBuffer() clearing the back buffer.
-            e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
-            e.GraphicsDeviceInformation.PresentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
-            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = settings.MultisamplingCount;
+            //e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.PreserveContents;
+            //e.GraphicsDeviceInformation.PresentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
+            //e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = settings.MultisamplingCount;
+            e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.DiscardContents;
+            e.GraphicsDeviceInformation.PresentationParameters.DepthStencilFormat = DepthFormat.None;
+            e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = 0;
         }
 
         private void Window_ClientSizeChanged(object sender, EventArgs e)
@@ -96,7 +106,6 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
                 windowPosition = new Point(
                     currentScreen.WorkingArea.Left + (currentScreen.WorkingArea.Size.Width - windowSize.X) / 2,
                     currentScreen.WorkingArea.Top + (currentScreen.WorkingArea.Size.Height - windowSize.Y) / 2);
-
             }
         }
 
@@ -115,6 +124,7 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
                     graphicsDeviceManager.PreferredBackBufferWidth = windowSize.X;
                     graphicsDeviceManager.PreferredBackBufferHeight = windowSize.Y;
                     graphicsDeviceManager.ApplyChanges();
+                    dispatcherView?.UpdateStatusbarVisibility(true);
                     break;
                 case ScreenMode.FullscreenPresetResolution:
                     graphicsDeviceManager.PreferredBackBufferWidth = currentScreen.WorkingArea.Width - clientRectangleOffset.X;
@@ -123,6 +133,7 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
                     dispatcherForm.FormBorderStyle = FormBorderStyle.FixedSingle;
                     Window.Position = new Point(currentScreen.WorkingArea.Location.X, currentScreen.WorkingArea.Location.Y);
                     graphicsDeviceManager.ApplyChanges();
+                    dispatcherView?.UpdateStatusbarVisibility(false);
                     break;
                 case ScreenMode.FullscreenNativeResolution:
                     graphicsDeviceManager.PreferredBackBufferWidth = currentScreen.Bounds.Width;
@@ -131,6 +142,7 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
                     dispatcherForm.FormBorderStyle = FormBorderStyle.None;
                     Window.Position = new Point(currentScreen.Bounds.X, currentScreen.Bounds.Y);
                     graphicsDeviceManager.ApplyChanges();
+                    dispatcherView?.UpdateStatusbarVisibility(false);
                     break;
             }
             currentScreenMode = targetMode;
@@ -149,7 +161,10 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         protected override void Draw(GameTime gameTime)
         {
-            dispatcherView.GenerateView();
+            double elapsedRealTime = gameTime.ElapsedGameTime.TotalSeconds;
+            frameRate.Update(elapsedRealTime, 1.0 / elapsedRealTime);
+
+            dispatcherView.Draw(content.Foreground);
             // other draw code here
             base.Draw(gameTime);
         }
@@ -161,20 +176,41 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         protected override void EndRun()
         {
+            ctsDispatcher.Cancel();
             base.EndRun();
         }
 
-        protected override void Initialize()
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                ctsDispatcher.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        protected override async void Initialize()
         {
             Window.Position = windowPosition;
+            await content.Initialize().ConfigureAwait(false);
+            dispatcherUpdater.Initialize();
+            dispatcherView.Initialize(Program.Simulator, content);
             base.Initialize();
         }
 
-        private Debugging.DispatchViewer viewer;
+        public static Debugging.DispatchViewer viewer;
         private MouseState previous;
 
         protected override void Update(GameTime gameTime)
         {
+            //if (backgound.FinishedUpdate)
+            //{
+            //    (backgound, foreground) = (foreground, backgound);
+            //}
+            //backgound.Update();
+            dispatcherUpdater.StartUpdate();
+            dispatcherView.Update(frameRate.SmoothedValue);
+
             if (IsActive)
             {
                 KeyboardState state = Keyboard.GetState();

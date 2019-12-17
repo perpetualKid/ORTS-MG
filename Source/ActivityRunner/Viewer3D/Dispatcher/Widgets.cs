@@ -4,6 +4,7 @@ using System.Drawing;
 using Microsoft.Xna.Framework;
 
 using Orts.Common.Position;
+using Orts.Common.Xna;
 using Orts.Formats.Msts;
 using Orts.Formats.Msts.Models;
 using Orts.Simulation.Signalling;
@@ -131,22 +132,18 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
     /// <summary>
     /// Defines a geometric line segment.
     /// </summary>
-    public class LineSegment
+    public class TrackSegment
     {
-        public ref PointF StartPoint => ref CurvePoints[0];
-        public ref PointF EndPoint => ref CurvePoints[2];
-        public ref  PointF MidPoint => ref CurvePoints[1];
+        private Vector2D[] curvePoints = new Vector2D[3];
 
         public PointF[] CurvePoints { get; } = new PointF[3];
 
         public bool IsCurved { get; private set; }
 
-        const double TileSize = 2048.0;
-
-        public LineSegment(in WorldLocation start, in WorldLocation end, uint? sectionIndex)
+        public TrackSegment(in WorldLocation start, in WorldLocation end, uint? sectionIndex)
         {
-            CurvePoints[0] = new PointF((float)(start.TileX * TileSize + start.Location.X), (float)(start.TileZ * TileSize + start.Location.Z));
-            CurvePoints[2] = new PointF((float)(end.TileX * TileSize + end.Location.X), (float)(end.TileZ * TileSize + end.Location.Z));
+            curvePoints[0] = new Vector2D(start.TileX * WorldLocation.TileSize + start.Location.X, start.TileZ * WorldLocation.TileSize + start.Location.Z);
+            curvePoints[2] = new Vector2D(end.TileX * WorldLocation.TileSize + end.Location.X, end.TileZ * WorldLocation.TileSize + end.Location.Z);
 
             if (!sectionIndex.HasValue)
                 return;
@@ -155,42 +152,32 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             {
                 if (ts.Curved)
                 {
-                    double offset = ts.Radius * (1 - Math.Cos(ts.Angle * Math.PI / 360.0));
+                    double offset = (ts.Radius * (1 - Math.Cos(ts.Angle * Math.PI / 360.0)));
                     if (offset < 3)
                         return;
-                    Vector3 v = new Vector3((float)((end.TileX - start.TileX) * TileSize + end.Location.X - start.Location.X), 0,
-                        (float)((end.TileZ - start.TileZ) * TileSize + end.Location.Z - start.Location.Z));
+                    Vector3 v = new Vector3((float)((end.TileX - start.TileX) * WorldLocation.TileSize + end.Location.X - start.Location.X), 0,
+                        (float)((end.TileZ - start.TileZ) * WorldLocation.TileSize + end.Location.Z - start.Location.Z));
                     IsCurved = true;
                     Vector3 v2 = Vector3.Cross(Vector3.Up, v);
                     v2.Normalize();
                     v = v / 2;
-                    v.X += (float)(start.TileX * TileSize + start.Location.X);
-                    v.Z += (float)(start.TileZ * TileSize + start.Location.Z);
+                    v.X += (float)(start.TileX * WorldLocation.TileSize + start.Location.X);
+                    v.Z += (float)(start.TileZ * WorldLocation.TileSize + start.Location.Z);
                     if (ts.Angle > 0)
                         v = v2 * -(float)offset + v;
                     else
                         v = v2 * (float)offset + v;
-                    CurvePoints[1] = new PointF(v.X, v.Z);
+                    curvePoints[1] = new Vector2D(v.X, v.Z);
                 }
             }
         }
 
-        public PointF[] ScaledPoints(float scale, float startx, float starty)
-        {
-            PointF[] result = new PointF[3];
-            for (int i = 0; i < CurvePoints.Length; i++)
-            {
-                result[i].X = (CurvePoints[i].X - startx) * scale;
-                result[i].Y = (CurvePoints[i].Y - starty) * scale;
-            }
-            return result;
-        }
-
         public void Normalize(PointF origin)
         {
-            CurvePoints[0] = new PointF(CurvePoints[0].X - origin.X, CurvePoints[0].Y - origin.Y);
-            CurvePoints[1] = new PointF(CurvePoints[1].X - origin.X, CurvePoints[1].Y - origin.Y);
-            CurvePoints[2] = new PointF(CurvePoints[2].X - origin.X, CurvePoints[2].Y - origin.Y);
+            CurvePoints[0] = new PointF((float)(curvePoints[0].X - origin.X), (float)(curvePoints[0].Y - origin.Y));
+            CurvePoints[1] = new PointF((float)(curvePoints[1].X - origin.X), (float)(curvePoints[1].Y - origin.Y));
+            CurvePoints[2] = new PointF((float)(curvePoints[2].X - origin.X), (float)(curvePoints[2].Y - origin.Y));
+            curvePoints = null; //no longer needed from here
         }
     }
 
