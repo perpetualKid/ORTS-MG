@@ -45,10 +45,10 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
                     content.UpdateLocation(new PointF(-1, 0));
                     break;
                 case Keys.Up:
-                    content.UpdateLocation(new PointF(0, 1));
+                    content.UpdateLocation(new PointF(0, -1));
                     break;
                 case Keys.Down:
-                    content.UpdateLocation(new PointF(0, -1));
+                    content.UpdateLocation(new PointF(0, 1));
                     break;
             }
         }

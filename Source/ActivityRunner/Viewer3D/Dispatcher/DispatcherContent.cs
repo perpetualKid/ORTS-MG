@@ -73,14 +73,17 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         public void UpdateScale(double factor)
         {
-            viewPort.Size = new SizeF((float)(viewPort.Width * factor), (float)(viewPort.Height * factor));
+            SizeF scaledSize = new SizeF((float)(viewPort.Width * factor), (float)(viewPort.Height * factor));
+            PointF offset = new PointF((viewPort.Width - scaledSize.Width) / 2, (viewPort.Height - scaledSize.Height) / 2);
+            viewPort.Size = scaledSize;
+            viewPort.Offset(offset);
             UpdateScale();
         }
 
         public void UpdateLocation(PointF delta)
         {
-            delta.X *= 40;
-            delta.Y *= 40;
+            delta.X *= (int)(40 / Scale);
+            delta.Y *= (int)(40 / Scale);
             viewPort.Offset(delta);
             UpdateScale();
         }

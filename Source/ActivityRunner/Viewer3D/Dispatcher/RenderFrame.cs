@@ -77,9 +77,11 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             g.Clear(Color.White);
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
+            //draw anything here which has fixed location and/or does not need to scale
             //ruler
             ruler.Draw(g, dimensions, scale, viewPort);
 
+            //
             g.TranslateTransform(-viewPoint.X, -viewPoint.Y, System.Drawing.Drawing2D.MatrixOrder.Append);
             g.ScaleTransform((float)scale, (float)-scale, System.Drawing.Drawing2D.MatrixOrder.Append);
             g.TranslateTransform(dimensions.Width / 2f, dimensions.Height / 2f, System.Drawing.Drawing2D.MatrixOrder.Append);
