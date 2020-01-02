@@ -1,9 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 {
@@ -11,7 +7,6 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
     {
         private CancellationToken token;
         private Thread updaterThread;
-        private readonly ManualResetEventSlim waitForContentDone = new ManualResetEventSlim(true);
         private readonly ManualResetEventSlim waitToUpdate = new ManualResetEventSlim();
 
         private RenderFrame currentFrame;

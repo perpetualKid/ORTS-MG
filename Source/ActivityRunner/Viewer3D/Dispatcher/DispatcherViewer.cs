@@ -203,11 +203,6 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         protected override void Update(GameTime gameTime)
         {
-            //if (backgound.FinishedUpdate)
-            //{
-            //    (backgound, foreground) = (foreground, backgound);
-            //}
-            //backgound.Update();
             dispatcherUpdater.StartUpdate();
             dispatcherView.Update(frameRate.SmoothedValue);
 

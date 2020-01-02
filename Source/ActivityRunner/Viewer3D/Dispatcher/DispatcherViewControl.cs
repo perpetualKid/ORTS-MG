@@ -1,13 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-using Orts.Common.Position;
-using Orts.Formats.Msts.Models;
 using Orts.Simulation;
 
 namespace Orts.ActivityRunner.Viewer3D.Dispatcher
@@ -15,9 +9,6 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
     public partial class DispatcherViewControl : UserControl
     {
         private Simulator simulator;
-
-        private RectangleF viewPort;
-        private PointF viewPoint;
 
         private DispatcherContent content;
 
@@ -42,22 +33,22 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             switch(e.KeyCode)
             {
                 case Keys.PageDown:
-                    content.UpdateScale(.9);
-                    break;
-                case Keys.PageUp:
                     content.UpdateScale(1/.9);
                     break;
+                case Keys.PageUp:
+                    content.UpdateScale(.9);
+                    break;
                 case Keys.Left:
-                    viewPoint.X += (float)(viewPort.Width / content.Scale / 40);
+                    content.UpdateLocation(new PointF(1, 0));
                     break;
                 case Keys.Right:
-                    viewPoint.X -= (float)(viewPort.Width / content.Scale / 40);
+                    content.UpdateLocation(new PointF(-1, 0));
                     break;
                 case Keys.Up:
-                    viewPoint.Y += (float)(viewPort.Height / content.Scale / 40);
+                    content.UpdateLocation(new PointF(0, 1));
                     break;
                 case Keys.Down:
-                    viewPoint.Y -= (float)(viewPort.Height / content.Scale / 40);
+                    content.UpdateLocation(new PointF(0, -1));
                     break;
             }
         }
@@ -74,10 +65,15 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             toolStripSize.Text = $"{pbDispatcherView.Width / content.Scale:N2}x{pbDispatcherView.Height / content.Scale:N2}";
         }
 
+        private int viewVersion;
         internal void Draw(RenderFrame currentFrame)
         {
-            pbDispatcherView.Image = currentFrame.Image;
-            pbDispatcherView.Invalidate();
+            if (currentFrame.ViewVersion != viewVersion)
+            {
+                pbDispatcherView.Image = currentFrame.Image;
+                pbDispatcherView.Invalidate();
+                viewVersion = currentFrame.ViewVersion;
+            }
         }
 
         private void PictureBoxDispatcherView_SizeChanged(object sender, EventArgs e)

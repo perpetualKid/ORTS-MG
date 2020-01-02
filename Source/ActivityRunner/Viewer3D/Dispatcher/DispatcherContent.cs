@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Orts.Common.Position;
+using Orts.Formats.Msts.Models;
+using Orts.Simulation;
+
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Orts.Common.Position;
-using Orts.Formats.Msts.Models;
-using Orts.Simulation;
 
 namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 {
@@ -20,7 +20,7 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         public RectangleF ViewPort => viewPort;
 
-        public PointF ViewPoint { get; private set; }
+        //public PointF ViewPoint => new PointF(viewPort.X + viewPort.Width / 2f, viewPort.Y + viewPort.Height / 2f);
 
         public double Scale { get; private set; }
 
@@ -28,16 +28,20 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         private readonly Simulator simulator;
 
-        private RenderFrame foreground, background;
+        public bool MetricUnits { get; private set; }
 
-        public RenderFrame Foreground => foreground;
-        public RenderFrame Background => background;
+        public RenderFrame Foreground { get; private set; }
+        public RenderFrame Background { get; private set; }
+
+        internal int ViewVersion { get; private set; }
 
         public DispatcherContent(Simulator simulator)
         {
             this.simulator = simulator;
-            foreground = new RenderFrame(this);
-            background = new RenderFrame(this);
+            MetricUnits = simulator.Settings.Units == "Metric" || simulator.Settings.Units == "Automatic" && System.Globalization.RegionInfo.CurrentRegion.IsMetric ||
+                simulator.Settings.Units == "Route" && simulator.TRK.Route.MilepostUnitsMetric;
+            Foreground = new RenderFrame(this);
+            Background = new RenderFrame(this);
         }
 
         public async Task Initialize()
@@ -50,14 +54,13 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             await Task.WhenAll(initializer).ConfigureAwait(false);
 
             viewPort = new RectangleF(0, 0, Bounds.Width - Bounds.X, Bounds.Height - Bounds.Y);
-            ViewPoint = new PointF(ViewPort.Width / 2, ViewPort.Height / 2);
             UpdateScale();
 
         }
 
         internal void SwapFrames()
         {
-            (background, foreground) = (foreground, background);
+            (Background, Foreground) = (Foreground, Background);
         }
 
         private void UpdateScale()
@@ -65,11 +68,20 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             double xScale = Size.Width / viewPort.Width;
             double yScale = Size.Height / viewPort.Height;
             Scale = Math.Min(xScale, yScale);
+            ViewVersion++;
         }
 
         public void UpdateScale(double factor)
         {
             viewPort.Size = new SizeF((float)(viewPort.Width * factor), (float)(viewPort.Height * factor));
+            UpdateScale();
+        }
+
+        public void UpdateLocation(PointF delta)
+        {
+            delta.X *= 40;
+            delta.Y *= 40;
+            viewPort.Offset(delta);
             UpdateScale();
         }
 

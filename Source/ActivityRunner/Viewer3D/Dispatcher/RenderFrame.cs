@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Orts.ActivityRunner.Viewer3D.Dispatcher.Drawing;
+using System.Diagnostics;
 using System.Drawing;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,11 +10,16 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
     {
         public Image Image { get; private set; }
 
-        private static Image staticContentImage = new Bitmap(1, 1);
-        private static Size staticContentSize;
-        private long imageTag;
+        #region shared fields
+        private static Image sharedContentImage = new Bitmap(1, 1);
+        private static int sharedContentUpdate;
+        private static volatile int sharedViewVersion;
 
-        public RectangleF ViewPort { get; private set; }
+        private static readonly Pen sharedGrayPen = new Pen(Color.Gray);
+        private readonly ScaleRuler ruler;
+        #endregion
+
+        public int ViewVersion { get; private set; }
 
         private DispatcherContent content;
 
@@ -27,44 +30,37 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         private readonly Pen orangePen = new Pen(Color.Orange);
         private readonly Pen trainPen = new Pen(Color.DarkGreen);
         private readonly Pen pathPen = new Pen(Color.DeepPink);
-        private static readonly Pen staticGrayPen = new Pen(Color.Gray);
-
-        private AutoResetEvent preRenderEvent = new AutoResetEvent(true);
-
-        private double scale;
-        private RectangleF viewPort;
 
         static RenderFrame()
         {
-            staticContentImage.Tag = 0L;
+            sharedContentImage.Tag = 0L;
         }
 
         public RenderFrame(DispatcherContent content)
         {
-            staticContentSize = Size.Empty;
+            sharedContentUpdate = 0;
+            sharedViewVersion = 0;
             this.content = content;
+            ruler = new ScaleRuler(content.MetricUnits);
         }
 
         public bool Update()
         {
-            if ((content.Size != Size.Empty && content.Size != staticContentSize))
+            if (content.ViewVersion != sharedViewVersion && (Interlocked.CompareExchange(ref sharedContentUpdate, 1, 0) == 0))
             {
-                if (preRenderEvent.WaitOne(0))
+                Task.Run(async () =>
                 {
-                    staticContentSize = content.Size;
-                    Task.Run(async () =>
-                    {
-                        await PrepareStaticImage(content, content.Size, content.Scale, content.ViewPoint).ConfigureAwait(false);
-                        preRenderEvent.Set();
-                    });
-                }
+                    Debug.Assert(content.Size != Size.Empty);
+                    await PrepareStaticImage(content, content.Size, content.Scale, content.ViewPort).ConfigureAwait(false);
+                    sharedViewVersion = content.ViewVersion;
+                    sharedContentUpdate = 0;
+                });
             }
-            viewPort = content.ViewPort;
-            if (((long)staticContentImage.Tag) != imageTag)
+            if (ViewVersion != sharedViewVersion)
             {
                 Image?.Dispose();
-                Image = (Image)staticContentImage?.Clone();
-                imageTag = (long)staticContentImage.Tag;
+                ViewVersion = sharedViewVersion;
+                Image = (Image)sharedContentImage?.Clone();
                 return true;
             }
             return false;
@@ -73,31 +69,36 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             //signal done
         }
 
-        private static Task PrepareStaticImage(DispatcherContent content, Size dimensions, double scale, PointF viewPoint)
+        private Task PrepareStaticImage(DispatcherContent content, Size dimensions, double scale, RectangleF viewPort)
         {
+            PointF viewPoint = new PointF(viewPort.X + viewPort.Width / 2f, viewPort.Y + viewPort.Height / 2f);
             Bitmap result = new Bitmap(dimensions.Width, dimensions.Height);
             Graphics g = Graphics.FromImage(result);
             g.Clear(Color.White);
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+            //ruler
+            ruler.Draw(g, dimensions, scale, viewPort);
+
             g.TranslateTransform(-viewPoint.X, -viewPoint.Y, System.Drawing.Drawing2D.MatrixOrder.Append);
             g.ScaleTransform((float)scale, (float)-scale, System.Drawing.Drawing2D.MatrixOrder.Append);
             g.TranslateTransform(dimensions.Width / 2f, dimensions.Height / 2f, System.Drawing.Drawing2D.MatrixOrder.Append);
 
-            staticGrayPen.Width = 0.2f;
+            sharedGrayPen.Width = 0.2f;
+
             foreach (var segment in content.TrackSegments)
             {
                 //TODO check if out of visible bounds
                 if (segment.IsCurved)
                 {
-                    g.DrawCurve(staticGrayPen, segment.CurvePoints);
+                    g.DrawCurve(sharedGrayPen, segment.CurvePoints);
                 }
                 else
                 {
-                    g.DrawLine(staticGrayPen, segment.CurvePoints[0], segment.CurvePoints[2]);
+                    g.DrawLine(sharedGrayPen, segment.CurvePoints[0], segment.CurvePoints[2]);
                 }
             }
-            result.Tag = DateTime.UtcNow.Ticks;
-            staticContentImage = result;
+            sharedContentImage = result;
             return Task.CompletedTask;
         }
     }
