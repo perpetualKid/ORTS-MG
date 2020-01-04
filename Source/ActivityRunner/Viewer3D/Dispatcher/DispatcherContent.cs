@@ -18,13 +18,11 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         private RectangleF viewPort;
 
-        public RectangleF ViewPort => viewPort;
-
-        //public PointF ViewPoint => new PointF(viewPort.X + viewPort.Width / 2f, viewPort.Y + viewPort.Height / 2f);
+        public RectangleF DisplayPort { get; private set; }
 
         public double Scale { get; private set; }
 
-        public Size Size { get; private set; }
+        public Size WindowSize { get; private set; }
 
         private readonly Simulator simulator;
 
@@ -65,14 +63,19 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         private void UpdateScale()
         {
-            double xScale = Size.Width / viewPort.Width;
-            double yScale = Size.Height / viewPort.Height;
+            double xScale = WindowSize.Width / viewPort.Width;
+            double yScale = WindowSize.Height / viewPort.Height;
             Scale = Math.Min(xScale, yScale);
+            //update displayport from viewport to match windows dimensions
+            SizeF scaledViewportSize = new SizeF((float)(WindowSize.Width / Scale), (float)(WindowSize.Height / Scale));
+            PointF location = new PointF(viewPort.Left + (viewPort.Width - scaledViewportSize.Width) / 2, viewPort.Top + (viewPort.Height - scaledViewportSize.Height) / 2);
+            DisplayPort = new RectangleF(location, scaledViewportSize);
             ViewVersion++;
         }
 
         public void UpdateScale(double factor)
         {
+            //TODO 2020-01-03 check for min/max scale
             SizeF scaledSize = new SizeF((float)(viewPort.Width * factor), (float)(viewPort.Height * factor));
             PointF offset = new PointF((viewPort.Width - scaledSize.Width) / 2, (viewPort.Height - scaledSize.Height) / 2);
             viewPort.Size = scaledSize;
@@ -82,15 +85,16 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         public void UpdateLocation(PointF delta)
         {
+            //TODO 20200103 check for bounds (all tracks out of view)
             delta.X *= (int)(40 / Scale);
             delta.Y *= (int)(40 / Scale);
             viewPort.Offset(delta);
             UpdateScale();
         }
 
-        public void UpdateSize(Size size)
+        public void UpdateSize(Size windowSize)
         {
-            Size = size;
+            WindowSize = windowSize;
             UpdateScale();
         }
 

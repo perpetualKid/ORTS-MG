@@ -106,7 +106,8 @@
     </Compile>
     <Compile Include="Viewer3D\Dispatcher\DispatcherViewer.cs" />
     <Compile Include="Viewer3D\Dispatcher\Drawing\BaseDraw.cs" />
-    <Compile Include="Viewer3D\Dispatcher\Drawing\ScaleRuler.cs" />
+    <Compile Include="Viewer3D\Dispatcher\Drawing\ScaleRulerDraw.cs" />
+    <Compile Include="Viewer3D\Dispatcher\Drawing\TrackSegmentDraw.cs" />
     <Compile Include="Viewer3D\Dispatcher\RenderFrame.cs" />
     <Compile Include="Viewer3D\Dispatcher\Widgets.cs" />
     <Compile Include="Viewer3D\DriverMachineInterface.cs" />

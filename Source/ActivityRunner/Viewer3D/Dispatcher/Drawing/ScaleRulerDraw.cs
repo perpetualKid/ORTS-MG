@@ -6,7 +6,7 @@ using Orts.Common;
 
 namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Drawing
 {
-    internal class ScaleRuler: BaseDraw
+    internal class ScaleRulerDraw: BaseDraw
     {
         private static readonly Pen rulerPen = new Pen(Color.Gray, 1);
         private static readonly Point rulerPositionDelta = new Point(15, 20);
@@ -59,15 +59,16 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Drawing
             [Description("50mi")]   i50_000 = 16,
         }
 
-        public ScaleRuler(bool metric)
+        public ScaleRulerDraw(DispatcherContent content):
+            base(content)
         {
-            this.metric = metric;
+            this.metric = content.MetricUnits;
         }
 
-        internal override void Draw(Graphics g, Size dimensions, double scale, RectangleF viewPort)
+        internal override void Draw(Graphics g, Size windowSize, double scale)
         {
             //max size (length) of the ruler. if less than 50px available, don't draw
-            int maxLength = Math.Min(200, dimensions.Width - rulerPositionDelta.X * 2);
+            int maxLength = Math.Min(200, windowSize.Width - rulerPositionDelta.X * 2);
             if (maxLength < 50)
                 return;
             MetricRuler metricRuler = MetricRuler.m100_000;
@@ -90,26 +91,26 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Drawing
                 rulerLength = (int)(imperialRulerData[(int)imperialRuler] * scale);
             }
 
-            g.DrawLine(rulerPen, rulerPositionDelta.X, dimensions.Height - rulerPositionDelta.Y, rulerPositionDelta.X + rulerLength, dimensions.Height - rulerPositionDelta.Y);
-            g.DrawLine(rulerPen, rulerPositionDelta.X, dimensions.Height - rulerPositionDelta.Y + markerLength, rulerPositionDelta.X, dimensions.Height - rulerPositionDelta.Y - markerLength);
-            g.DrawLine(rulerPen, rulerPositionDelta.X + rulerLength, dimensions.Height - rulerPositionDelta.Y + markerLength, rulerPositionDelta.X + rulerLength, dimensions.Height - rulerPositionDelta.Y - markerLength);
-            g.DrawLine(rulerPen, rulerPositionDelta.X + rulerLength *0.5f, dimensions.Height - rulerPositionDelta.Y + markerLength, rulerPositionDelta.X + rulerLength * 0.5f, dimensions.Height - rulerPositionDelta.Y - markerLength);
+            g.DrawLine(rulerPen, rulerPositionDelta.X, windowSize.Height - rulerPositionDelta.Y, rulerPositionDelta.X + rulerLength, windowSize.Height - rulerPositionDelta.Y);
+            g.DrawLine(rulerPen, rulerPositionDelta.X, windowSize.Height - rulerPositionDelta.Y + markerLength, rulerPositionDelta.X, windowSize.Height - rulerPositionDelta.Y - markerLength);
+            g.DrawLine(rulerPen, rulerPositionDelta.X + rulerLength, windowSize.Height - rulerPositionDelta.Y + markerLength, rulerPositionDelta.X + rulerLength, windowSize.Height - rulerPositionDelta.Y - markerLength);
+            g.DrawLine(rulerPen, rulerPositionDelta.X + rulerLength *0.5f, windowSize.Height - rulerPositionDelta.Y + markerLength, rulerPositionDelta.X + rulerLength * 0.5f, windowSize.Height - rulerPositionDelta.Y - markerLength);
             //g.DrawLine(rulerPen, rulerPositionDelta.X + rulerLength * 0.25f, dimensions.Height - rulerPositionDelta.Y - markerLength, rulerPositionDelta.X + rulerLength * 0.25f, dimensions.Height - rulerPositionDelta.Y);
             //g.DrawLine(rulerPen, rulerPositionDelta.X + rulerLength * 0.75f, dimensions.Height - rulerPositionDelta.Y - markerLength, rulerPositionDelta.X + rulerLength * 0.75f, dimensions.Height - rulerPositionDelta.Y);
 
             if (metric)
             {
                 SizeF textSize = g.MeasureString(MetricRuler.m0_0.GetDescription(), markerFont);
-                g.DrawString(MetricRuler.m0_0.GetDescription(), markerFont, new SolidBrush(Color.Black), rulerPositionDelta.X - textSize.Width / 2, dimensions.Height - rulerPositionDelta.Y + 5);
+                g.DrawString(MetricRuler.m0_0.GetDescription(), markerFont, new SolidBrush(Color.Black), rulerPositionDelta.X - textSize.Width / 2, windowSize.Height - rulerPositionDelta.Y + 5);
                 textSize = g.MeasureString(metricRuler.GetDescription(), markerFont);
-                g.DrawString(metricRuler.GetDescription(), markerFont, new SolidBrush(Color.Black), rulerPositionDelta.X + rulerLength - textSize.Width / 2, dimensions.Height - rulerPositionDelta.Y + 5);
+                g.DrawString(metricRuler.GetDescription(), markerFont, new SolidBrush(Color.Black), rulerPositionDelta.X + rulerLength - textSize.Width / 2, windowSize.Height - rulerPositionDelta.Y + 5);
             }
             else
             {
                 SizeF textSize = g.MeasureString(ImperialRuler.i0_0.GetDescription(), markerFont);
-                g.DrawString(ImperialRuler.i0_0.GetDescription(), markerFont, new SolidBrush(Color.Black), rulerPositionDelta.X - textSize.Width / 2, dimensions.Height - rulerPositionDelta.Y + 5);
+                g.DrawString(ImperialRuler.i0_0.GetDescription(), markerFont, new SolidBrush(Color.Black), rulerPositionDelta.X - textSize.Width / 2, windowSize.Height - rulerPositionDelta.Y + 5);
                 textSize = g.MeasureString(imperialRuler.GetDescription(), markerFont);
-                g.DrawString(imperialRuler.GetDescription(), markerFont, new SolidBrush(Color.Black), rulerPositionDelta.X + rulerLength - textSize.Width / 2, dimensions.Height - rulerPositionDelta.Y + 5);
+                g.DrawString(imperialRuler.GetDescription(), markerFont, new SolidBrush(Color.Black), rulerPositionDelta.X + rulerLength - textSize.Width / 2, windowSize.Height - rulerPositionDelta.Y + 5);
             }
         }
     }

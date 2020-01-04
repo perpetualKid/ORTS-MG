@@ -14,9 +14,8 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         private static Image sharedContentImage = new Bitmap(1, 1);
         private static int sharedContentUpdate;
         private static volatile int sharedViewVersion;
-
-        private static readonly Pen sharedGrayPen = new Pen(Color.Gray);
-        private readonly ScaleRuler ruler;
+        private readonly ScaleRulerDraw rulerDraw;
+        private readonly TrackSegmentDraw trackDraw;
         #endregion
 
         public int ViewVersion { get; private set; }
@@ -25,15 +24,8 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         public bool FinishedUpdate { get; private set; }
 
-        private readonly Pen redPen = new Pen(Color.Red);
-        private readonly Pen greenPen = new Pen(Color.Green);
-        private readonly Pen orangePen = new Pen(Color.Orange);
-        private readonly Pen trainPen = new Pen(Color.DarkGreen);
-        private readonly Pen pathPen = new Pen(Color.DeepPink);
-
         static RenderFrame()
         {
-            sharedContentImage.Tag = 0L;
         }
 
         public RenderFrame(DispatcherContent content)
@@ -41,7 +33,8 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             sharedContentUpdate = 0;
             sharedViewVersion = 0;
             this.content = content;
-            ruler = new ScaleRuler(content.MetricUnits);
+            rulerDraw = new ScaleRulerDraw(content);
+            trackDraw = new TrackSegmentDraw(content);
         }
 
         public bool Update()
@@ -50,8 +43,8 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             {
                 Task.Run(async () =>
                 {
-                    Debug.Assert(content.Size != Size.Empty);
-                    await PrepareStaticImage(content, content.Size, content.Scale, content.ViewPort).ConfigureAwait(false);
+                    Debug.Assert(content.WindowSize != Size.Empty);
+                    await PrepareStaticImage(content, content.WindowSize, content.Scale, content.DisplayPort).ConfigureAwait(false);
                     sharedViewVersion = content.ViewVersion;
                     sharedContentUpdate = 0;
                 });
@@ -69,37 +62,25 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             //signal done
         }
 
-        private Task PrepareStaticImage(DispatcherContent content, Size dimensions, double scale, RectangleF viewPort)
+        private Task PrepareStaticImage(DispatcherContent content, Size windowSize, double scale, RectangleF viewPort)
         {
             PointF viewPoint = new PointF(viewPort.X + viewPort.Width / 2f, viewPort.Y + viewPort.Height / 2f);
-            Bitmap result = new Bitmap(dimensions.Width, dimensions.Height);
+            Bitmap result = new Bitmap(windowSize.Width, windowSize.Height);
             Graphics g = Graphics.FromImage(result);
             g.Clear(Color.White);
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
             //draw anything here which has fixed location and/or does not need to scale
             //ruler
-            ruler.Draw(g, dimensions, scale, viewPort);
+            rulerDraw.Draw(g, windowSize, scale);
 
             //
             g.TranslateTransform(-viewPoint.X, -viewPoint.Y, System.Drawing.Drawing2D.MatrixOrder.Append);
             g.ScaleTransform((float)scale, (float)-scale, System.Drawing.Drawing2D.MatrixOrder.Append);
-            g.TranslateTransform(dimensions.Width / 2f, dimensions.Height / 2f, System.Drawing.Drawing2D.MatrixOrder.Append);
+            g.TranslateTransform(windowSize.Width / 2f, windowSize.Height / 2f, System.Drawing.Drawing2D.MatrixOrder.Append);
 
-            sharedGrayPen.Width = 0.2f;
+            trackDraw.Draw(g, windowSize, scale);
 
-            foreach (var segment in content.TrackSegments)
-            {
-                //TODO check if out of visible bounds
-                if (segment.IsCurved)
-                {
-                    g.DrawCurve(sharedGrayPen, segment.CurvePoints);
-                }
-                else
-                {
-                    g.DrawLine(sharedGrayPen, segment.CurvePoints[0], segment.CurvePoints[2]);
-                }
-            }
             sharedContentImage = result;
             return Task.CompletedTask;
         }
