@@ -78,7 +78,8 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         private void PictureBoxDispatcherView_SizeChanged(object sender, EventArgs e)
         {
-            content?.UpdateSize(pbDispatcherView.Size);
+            if (pbDispatcherView.Size != Size.Empty)
+                content?.UpdateSize(pbDispatcherView.Size);
         }
     }
 }

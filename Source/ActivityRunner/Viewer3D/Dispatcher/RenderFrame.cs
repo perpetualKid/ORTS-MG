@@ -1,8 +1,10 @@
-﻿using Orts.ActivityRunner.Viewer3D.Dispatcher.Drawing;
+﻿
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets;
 
 namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 {
@@ -14,8 +16,6 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         private static Image sharedContentImage = new Bitmap(1, 1);
         private static int sharedContentUpdate;
         private static volatile int sharedViewVersion;
-        private readonly ScaleRulerDraw rulerDraw;
-        private readonly TrackSegmentDraw trackDraw;
         #endregion
 
         public int ViewVersion { get; private set; }
@@ -24,17 +24,11 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         public bool FinishedUpdate { get; private set; }
 
-        static RenderFrame()
-        {
-        }
-
         public RenderFrame(DispatcherContent content)
         {
             sharedContentUpdate = 0;
             sharedViewVersion = 0;
             this.content = content;
-            rulerDraw = new ScaleRulerDraw(content);
-            trackDraw = new TrackSegmentDraw(content);
         }
 
         public bool Update()
@@ -72,15 +66,21 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
             //draw anything here which has fixed location and/or does not need to scale
             //ruler
-            rulerDraw.Draw(g, windowSize, scale);
+            //rulerDraw.Draw(g, windowSize, scale);
+            content.scaleRuler.Draw(g);
 
             //
-            g.TranslateTransform(-viewPoint.X, -viewPoint.Y, System.Drawing.Drawing2D.MatrixOrder.Append);
-            g.ScaleTransform((float)scale, (float)-scale, System.Drawing.Drawing2D.MatrixOrder.Append);
+            g.TranslateTransform(-viewPoint.X, viewPoint.Y, System.Drawing.Drawing2D.MatrixOrder.Append);
+            g.ScaleTransform((float)scale, (float)scale, System.Drawing.Drawing2D.MatrixOrder.Append);
             g.TranslateTransform(windowSize.Width / 2f, windowSize.Height / 2f, System.Drawing.Drawing2D.MatrixOrder.Append);
-
-            trackDraw.Draw(g, windowSize, scale);
-
+            foreach (TrackSegment segment in content.TrackSegments)
+                segment.Draw(g);
+            foreach (SwitchWidget trackSwitch in content.Switches)
+                trackSwitch.Draw(g);
+            foreach (SignalWidget signal in content.Signals)
+                signal.Draw(g);
+            foreach (SidingWidget siding in content.Sidings)
+                siding.Draw(g);
             sharedContentImage = result;
             return Task.CompletedTask;
         }

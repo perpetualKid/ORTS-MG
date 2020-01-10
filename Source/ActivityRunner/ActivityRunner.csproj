@@ -105,11 +105,13 @@
       <DependentUpon>DispatcherViewControl.cs</DependentUpon>
     </Compile>
     <Compile Include="Viewer3D\Dispatcher\DispatcherViewer.cs" />
-    <Compile Include="Viewer3D\Dispatcher\Drawing\BaseDraw.cs" />
-    <Compile Include="Viewer3D\Dispatcher\Drawing\ScaleRulerDraw.cs" />
-    <Compile Include="Viewer3D\Dispatcher\Drawing\TrackSegmentDraw.cs" />
     <Compile Include="Viewer3D\Dispatcher\RenderFrame.cs" />
-    <Compile Include="Viewer3D\Dispatcher\Widgets.cs" />
+    <Compile Include="Viewer3D\Dispatcher\Widgets\ScaleRulerWidget.cs" />
+    <Compile Include="Viewer3D\Dispatcher\Widgets\SidingWidget.cs" />
+    <Compile Include="Viewer3D\Dispatcher\Widgets\SignalWidget.cs" />
+    <Compile Include="Viewer3D\Dispatcher\Widgets\SwitchWidget.cs" />
+    <Compile Include="Viewer3D\Dispatcher\Widgets\TrackSegment.cs" />
+    <Compile Include="Viewer3D\Dispatcher\Widgets\WidgetBase.cs" />
     <Compile Include="Viewer3D\DriverMachineInterface.cs" />
     <Compile Include="Viewer3D\DynamicTrack.cs" />
     <Compile Include="Viewer3D\Forest.cs" />

@@ -1,30 +1,34 @@
-﻿using Orts.Common.Position;
-using Orts.Formats.Msts.Models;
-using Orts.Simulation;
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
+using Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets;
+using Orts.Common.Position;
+using Orts.Formats.Msts.Models;
+using Orts.Simulation;
+using Orts.Simulation.Signalling;
+
 namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 {
     internal class DispatcherContent
     {
-        public List<TrackSegment> TrackSegments = new List<TrackSegment>();
-
-        public RectangleF Bounds { get; private set; }
-
+        internal List<TrackSegment> TrackSegments = new List<TrackSegment>();
+        internal List<SwitchWidget> Switches = new List<SwitchWidget>();
+        internal List<SignalWidget> Signals = new List<Widgets.SignalWidget>();
+        internal List<SidingWidget> Sidings = new List<SidingWidget>();
+        internal ScaleRulerWidget scaleRuler = new ScaleRulerWidget();
+        private readonly Simulator simulator;
+        private RectangleF bounds;
         private RectangleF viewPort;
+        private SizeF displayPortSize;
 
         public RectangleF DisplayPort { get; private set; }
 
         public double Scale { get; private set; }
 
         public Size WindowSize { get; private set; }
-
-        private readonly Simulator simulator;
 
         public bool MetricUnits { get; private set; }
 
@@ -36,8 +40,10 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         public DispatcherContent(Simulator simulator)
         {
             this.simulator = simulator;
+            //TODO 2020-01-05 this really should be a property of simulator (or viewer)
             MetricUnits = simulator.Settings.Units == "Metric" || simulator.Settings.Units == "Automatic" && System.Globalization.RegionInfo.CurrentRegion.IsMetric ||
                 simulator.Settings.Units == "Route" && simulator.TRK.Route.MilepostUnitsMetric;
+            WidgetBase.SetContent(this);
             Foreground = new RenderFrame(this);
             Background = new RenderFrame(this);
         }
@@ -46,12 +52,12 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         {
             List<Task> initializer = new List<Task>
             {
-                Task.Run(async () => Bounds = await InitializeTrackSegments())
+                Task.Run(async () => await InitializeTrackSegments())
             };
 
             await Task.WhenAll(initializer).ConfigureAwait(false);
 
-            viewPort = new RectangleF(0, 0, Bounds.Width - Bounds.X, Bounds.Height - Bounds.Y);
+            viewPort = new RectangleF(PointF.Empty, bounds.Size);
             UpdateScale();
 
         }
@@ -85,9 +91,13 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         public void UpdateLocation(PointF delta)
         {
-            //TODO 20200103 check for bounds (all tracks out of view)
             delta.X *= (int)(40 / Scale);
             delta.Y *= (int)(40 / Scale);
+            //TODO 2020-01-03 check for bounds (all tracks out of view)
+            //            if ((DisplayPort.Location.X > 0 && delta.X > 0) || (-DisplayPort.Location.X > DisplayPort.Width && delta.X < 0))
+            ////                if ((-DisplayPort.Location.Y > DisplayPort.Height && delta.Y < 0) || (DisplayPort.Location.Y > DisplayPort.Height && delta.Y > 0))
+            //                    //                (viewPort.Bottom + delta.Y < 0 ) || (viewPort.Top + delta.Y > displayPortSize.Height))
+            //                    return;
             viewPort.Offset(delta);
             UpdateScale();
         }
@@ -96,21 +106,92 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         {
             WindowSize = windowSize;
             UpdateScale();
+            displayPortSize = new SizeF((float)(windowSize.Width / Scale), (float)(windowSize.Height / Scale));
         }
 
-        private Task<RectangleF> InitializeTrackSegments()
+        private async Task InitializeTrackSegments()
         {
-            List<Task<RectangleF>> segmentBounds = new List<Task<RectangleF>>();
+            List<Task> renderItems = new List<Task>
+            {
+                Task.Run(() => AddTrackSegments()),
+                Task.Run(() => AddTrackItems()), 
+            };
+
+            await Task.WhenAll(renderItems).ConfigureAwait(false);
+            //normalize all segments to the top left corner of this route
+            foreach (TrackSegment segment in TrackSegments)
+                segment.Normalize(bounds.Location);
+            foreach (SwitchWidget switchWidget in Switches)
+                switchWidget.Normalize(bounds.Location);
+            foreach (SignalWidget signalWidget in Signals)
+                signalWidget.Normalize(bounds.Location);
+            foreach (SidingWidget sidingWidget in Sidings)
+                sidingWidget.Normalize(bounds.Location);
+        }
+
+        private Task AddTrackItems()
+        {
+            foreach (TrackItem item in simulator.TDB.TrackDB.TrackItems)
+            {
+                if (item is SignalItem signalItem)
+                {
+                    if (signalItem.SignalObject >= 0 && signalItem.SignalObject < simulator.Signals.SignalObjects.Length)
+                    {
+                        Signal signal = simulator.Signals.SignalObjects[signalItem.SignalObject];
+                        if (/*signal != null && */signal.isSignal && signal.isSignalNormal())
+                            Signals.Add(new Widgets.SignalWidget(signalItem, signal));
+                    }
+                }
+                if (item is SidingItem || item is PlatformItem)
+                {
+                    Sidings.Add(new SidingWidget(item));
+                }
+            }
+            return Task.CompletedTask;
+        }
+
+    private Task AddTrackSegments()
+        {
+            double minX = double.MaxValue, minY = double.MaxValue, maxX = double.MinValue, maxY = double.MinValue;
+
+            /// update bounds 
+            void UpdateBounds(in WorldLocation location)
+            {
+                minX = Math.Min(minX, location.TileX * WorldLocation.TileSize + location.Location.X);
+                minY = Math.Min(minY, location.TileZ * WorldLocation.TileSize + location.Location.Z);
+                maxX = Math.Max(maxX, location.TileX * WorldLocation.TileSize + location.Location.X);
+                maxY = Math.Max(maxY, location.TileZ * WorldLocation.TileSize + location.Location.Z);
+            }
+
             foreach (TrackNode trackNode in simulator.TDB.TrackDB.TrackNodes)
             {
                 switch (trackNode)
                 {
                     case TrackEndNode trackEndNode:
+                        TrackVectorNode connectedVectorNode = simulator.TDB.TrackDB.TrackNodes[trackEndNode.TrackPins[0].Link] as TrackVectorNode;
+                        if (connectedVectorNode.TrackPins[0].Link == trackEndNode.Index)
+                        {
+                            TrackSegments.Add(new TrackSegment(trackEndNode.UiD.Location, connectedVectorNode.TrackVectorSections[0].Location, null));
+                        }
+                        else if (connectedVectorNode.TrackPins.Last().Link == trackEndNode.Index)
+                        {
+                            TrackSegments.Add(new TrackSegment(trackEndNode.UiD.Location, connectedVectorNode.TrackVectorSections.Last().Location, null));
+                        }
+                        else
+                            throw new ArgumentOutOfRangeException($"Unlinked track end node {trackEndNode.Index}");
+                        UpdateBounds(trackEndNode.UiD.Location);
                         break;
                     case TrackVectorNode trackVectorNode:
                         if (trackVectorNode.TrackVectorSections.Length > 1)
                         {
-                            segmentBounds.Add(AddSegments(trackVectorNode.TrackVectorSections));
+                            for (int i = 0; i < trackVectorNode.TrackVectorSections.Length - 1; i++)
+                            {
+                                ref readonly WorldLocation start = ref trackVectorNode.TrackVectorSections[i].Location;
+                                UpdateBounds(start);
+                                ref readonly WorldLocation end = ref trackVectorNode.TrackVectorSections[i + 1].Location;
+                                UpdateBounds(end);
+                                TrackSegments.Add(new TrackSegment(start, end, trackVectorNode.TrackVectorSections[i].SectionIndex));
+                            }
                         }
                         else
                         {
@@ -120,6 +201,8 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
                             {
                                 TrackNode connectedNode = simulator.TDB.TrackDB.TrackNodes[pin.Link];
                                 TrackSegments.Add(new TrackSegment(section.Location, connectedNode.UiD.Location, null));
+                                UpdateBounds(section.Location);
+                                UpdateBounds(connectedNode.UiD.Location);
                             }
                         }
                         break;
@@ -132,48 +215,17 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
                                 item = pin.Direction == 1 ? vectorNode.TrackVectorSections.First() : vectorNode.TrackVectorSections.Last();
                                 if (WorldLocation.GetDistanceSquared(trackJunctionNode.UiD.Location, item.Location) >= 0.1)
                                     TrackSegments.Add(new TrackSegment(item.Location, trackJunctionNode.UiD.Location, item.SectionIndex));
+                                UpdateBounds(item.Location);
+                                UpdateBounds(trackJunctionNode.UiD.Location);
+
                             }
                         }
-                        //TODO switches.Add(new SwitchWidget(trackJunctionNode));
+                        Switches.Add(new SwitchWidget(trackJunctionNode));
                         break;
                 }
             }
-            var result = Task.WhenAll(segmentBounds).ConfigureAwait(false).GetAwaiter().GetResult();
-            //find the bounds of this route
-            float maxX = 0f, minX = 0f, maxY = 0f, minY = 0f;
-            maxX = result.Max((r) => r.Location.X + r.Size.Width);
-            maxY = result.Max((r) => r.Location.Y + r.Size.Height);
-            minX = result.Min((r) => r.Location.X);
-            minY = result.Min((r) => r.Location.Y);
-            RectangleF bounds = new RectangleF(minX, minY, maxX, maxY);
-            //normalize all segments to the top left corner of this route
-            foreach (TrackSegment segment in TrackSegments)
-                segment.Normalize(bounds.Location);
-            return Task.FromResult(bounds);
+            bounds = new RectangleF((float)minX, (float)minY, (float)(maxX - minX), (float)(maxY - minY));
+            return Task.CompletedTask;
         }
-
-        /// Generates track segments from an array of TrVectorSection. returns the bounds of this segment 
-        private Task<RectangleF> AddSegments(TrackVectorSection[] items)
-        {
-            double minX = double.MaxValue, minY = double.MaxValue, maxX = double.MinValue, maxY = double.MinValue;
-            for (int i = 0; i < items.Length - 1; i++)
-            {
-                ref readonly WorldLocation start = ref items[i].Location;
-                ref readonly WorldLocation end = ref items[i + 1].Location;
-
-                minX = Math.Min(minX, start.TileX * WorldLocation.TileSize + start.Location.X);
-                minX = Math.Min(minX, end.TileX * WorldLocation.TileSize + end.Location.X);
-                minY = Math.Min(minY, start.TileZ * WorldLocation.TileSize + start.Location.Z);
-                minY = Math.Min(minY, end.TileZ * WorldLocation.TileSize + end.Location.Z);
-                maxX = Math.Max(maxX, start.TileX * WorldLocation.TileSize + start.Location.X);
-                maxX = Math.Max(maxX, end.TileX * WorldLocation.TileSize + end.Location.X);
-                maxY = Math.Max(maxY, start.TileZ * WorldLocation.TileSize + start.Location.Z);
-                maxY = Math.Max(maxY, end.TileZ * WorldLocation.TileSize + end.Location.Z);
-
-                TrackSegments.Add(new TrackSegment(start, end, items[i].SectionIndex));
-            }
-            return Task.FromResult(new RectangleF((float)minX, (float)minY, (float)(maxX - minX), (float)(maxY - minY)));
-        }
-
     }
 }

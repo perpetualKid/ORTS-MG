@@ -662,7 +662,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 			PointF scaledB = new PointF(0, 0);
 			PointF scaledC = new PointF(0, 0);
 
-			foreach (var line in segments)
+            foreach (var line in segments)
             {
                     scaledA = line.A.Scale(xScale, yScale, subX, subY);
                     scaledA.Y = pictureBox1.Height - scaledA.Y;
@@ -766,7 +766,6 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 					 }
 				 }
 			 }
-
             if (true/*showPlayerTrain.Checked*/)
             {
 
