@@ -79,6 +79,18 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             ViewVersion++;
         }
 
+        public void UpdateScaleAt(Point location, int steps)
+        {
+            //TODO 2020-01-13 need to scale around the current mouse position
+            double factor = Math.Pow((steps > 0 ? 0.9 : 1 / 0.9), Math.Abs(steps)); 
+                //TODO 2020-01-03 check for min/max scale
+            SizeF scaledSize = new SizeF((float)(viewPort.Width * factor), (float)(viewPort.Height * factor));
+            PointF offset = new PointF((viewPort.Width - scaledSize.Width) / 2, (viewPort.Height - scaledSize.Height) / 2);
+            viewPort.Size = scaledSize;
+            viewPort.Offset(offset);
+            UpdateScale();
+        }
+
         public void UpdateScale(double factor)
         {
             //TODO 2020-01-03 check for min/max scale

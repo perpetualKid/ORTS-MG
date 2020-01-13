@@ -81,5 +81,12 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             if (pbDispatcherView.Size != Size.Empty)
                 content?.UpdateSize(pbDispatcherView.Size);
         }
+
+        protected override void OnMouseWheel(MouseEventArgs e)
+        {
+            if (e.X > pbDispatcherView.Left && e.X < pbDispatcherView.Right && e.Y > pbDispatcherView.Top && e.Y < pbDispatcherView.Bottom)
+                content.UpdateScaleAt(e.Location, Math.Sign(e.Delta));
+            base.OnMouseWheel(e);
+        }
     }
 }

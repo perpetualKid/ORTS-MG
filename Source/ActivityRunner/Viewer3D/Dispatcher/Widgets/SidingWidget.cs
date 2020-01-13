@@ -6,7 +6,7 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets
 {
     internal class SidingWidget : PointWidget
     {
-        private static readonly Font sidingFont = new Font("Arial", 12, FontStyle.Bold);
+        private static readonly Font sidingFont = new Font("Arial", 8, FontStyle.Bold);
         private static readonly Brush sidingBrush = new SolidBrush(Color.Blue);
 
 
