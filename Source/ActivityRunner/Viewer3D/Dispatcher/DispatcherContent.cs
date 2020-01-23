@@ -22,7 +22,6 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         private readonly Simulator simulator;
         private RectangleF bounds;
         private RectangleF viewPort;
-        private SizeF displayPortSize;
 
         public RectangleF DisplayPort { get; private set; }
 
@@ -58,7 +57,7 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             await Task.WhenAll(initializer).ConfigureAwait(false);
 
             viewPort = new RectangleF(PointF.Empty, bounds.Size);
-            UpdateScale();
+            UpdateView();
 
         }
 
@@ -67,7 +66,7 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             (Background, Foreground) = (Foreground, Background);
         }
 
-        private void UpdateScale()
+        private void UpdateView()
         {
             double xScale = WindowSize.Width / viewPort.Width;
             double yScale = WindowSize.Height / viewPort.Height;
@@ -79,26 +78,17 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             ViewVersion++;
         }
 
-        public void UpdateScaleAt(Point location, int steps)
+        public void UpdateScaleAt(Point centerPoint, int steps)
         {
-            //TODO 2020-01-13 need to scale around the current mouse position
-            double factor = Math.Pow((steps > 0 ? 0.9 : 1 / 0.9), Math.Abs(steps)); 
-                //TODO 2020-01-03 check for min/max scale
-            SizeF scaledSize = new SizeF((float)(viewPort.Width * factor), (float)(viewPort.Height * factor));
-            PointF offset = new PointF((viewPort.Width - scaledSize.Width) / 2, (viewPort.Height - scaledSize.Height) / 2);
-            viewPort.Size = scaledSize;
-            viewPort.Offset(offset);
-            UpdateScale();
-        }
-
-        public void UpdateScale(double factor)
-        {
+            double factor = Math.Pow((steps > 0 ? 0.9 : 1 / 0.9), Math.Abs(steps));
             //TODO 2020-01-03 check for min/max scale
             SizeF scaledSize = new SizeF((float)(viewPort.Width * factor), (float)(viewPort.Height * factor));
-            PointF offset = new PointF((viewPort.Width - scaledSize.Width) / 2, (viewPort.Height - scaledSize.Height) / 2);
+            //need to offset proportionaly to mouse position within the picturebox area
+            PointF offset = new PointF((viewPort.Width - scaledSize.Width) * ((float)centerPoint.X / WindowSize.Width), 
+                (viewPort.Height - scaledSize.Height) * ((WindowSize.Height - (float)centerPoint.Y) / WindowSize.Height));
             viewPort.Size = scaledSize;
             viewPort.Offset(offset);
-            UpdateScale();
+            UpdateView();
         }
 
         public void UpdateLocation(PointF delta)
@@ -111,14 +101,19 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             //                    //                (viewPort.Bottom + delta.Y < 0 ) || (viewPort.Top + delta.Y > displayPortSize.Height))
             //                    return;
             viewPort.Offset(delta);
-            UpdateScale();
+            UpdateView();
+        }
+
+        public void ResetView()
+        {
+            viewPort = new RectangleF(PointF.Empty, bounds.Size);
+            UpdateView();
         }
 
         public void UpdateSize(Size windowSize)
         {
             WindowSize = windowSize;
-            UpdateScale();
-            displayPortSize = new SizeF((float)(windowSize.Width / Scale), (float)(windowSize.Height / Scale));
+            UpdateView();
         }
 
         private async Task InitializeTrackSegments()
@@ -221,10 +216,9 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
                     case TrackJunctionNode trackJunctionNode:
                         foreach (TrackPin pin in trackJunctionNode.TrackPins)
                         {
-                            TrackVectorSection item = null;
                             if (simulator.TDB.TrackDB.TrackNodes[pin.Link] is TrackVectorNode vectorNode && vectorNode.TrackVectorSections.Length > 0)
                             {
-                                item = pin.Direction == 1 ? vectorNode.TrackVectorSections.First() : vectorNode.TrackVectorSections.Last();
+                                TrackVectorSection item = pin.Direction == 1 ? vectorNode.TrackVectorSections.First() : vectorNode.TrackVectorSections.Last();
                                 if (WorldLocation.GetDistanceSquared(trackJunctionNode.UiD.Location, item.Location) >= 0.1)
                                     TrackSegments.Add(new TrackSegment(item.Location, trackJunctionNode.UiD.Location, item.SectionIndex));
                                 UpdateBounds(item.Location);
@@ -239,5 +233,11 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             bounds = new RectangleF((float)minX, (float)minY, (float)(maxX - minX), (float)(maxY - minY));
             return Task.CompletedTask;
         }
+
+        private PointF LocationFromDisplayCoordinates(Point location)
+        {
+            return new PointF((float)(location.X / Scale + DisplayPort.X), (float)((WindowSize.Height - location.Y) / Scale + DisplayPort.Y));
+        }
+
     }
 }

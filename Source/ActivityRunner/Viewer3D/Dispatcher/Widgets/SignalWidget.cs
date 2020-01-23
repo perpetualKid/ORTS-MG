@@ -105,7 +105,7 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets
                         pen = redPen;
                         break;
                 }
-                g.FillEllipse(colorBrush, GetRect(Location));
+                g.FillEllipse(colorBrush, CenterRectangle(Location));
                 if (hasDirection)
                 {
                     g.DrawLine(pen, Location, direction);

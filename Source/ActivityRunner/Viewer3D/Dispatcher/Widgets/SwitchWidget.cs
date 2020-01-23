@@ -19,9 +19,9 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets
         internal override void Draw(Graphics g)
         {
             if (item.SelectedRoute == mainRoute)
-                g.FillEllipse(Brushes.Black, GetRect(Location));
+                g.FillEllipse(Brushes.Black, CenterRectangle(Location));
             else
-                g.FillEllipse(Brushes.Gray, GetRect(Location));
+                g.FillEllipse(Brushes.Gray, CenterRectangle(Location));
         }
     }
 }

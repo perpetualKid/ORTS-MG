@@ -10,33 +10,25 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
     {
         private Simulator simulator;
 
-        private DispatcherContent content;
+        private readonly DispatcherContent content;
+        private Point pbCenter;
 
         public DispatcherViewControl()
         {
             InitializeComponent();
+            pbDispatcherView.MouseWheel += PictureBoxDispatcherView_MouseWheel;
+            pbDispatcherView.PreviewKeyDown += PbDispatcherView_PreviewKeyDown;
         }
 
-        internal DispatcherViewControl(DispatcherContent content): this()
+        private void PbDispatcherView_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            this.content = content;
-        }
-
-        internal void Initialize(Simulator simulator, DispatcherContent content)
-        {
-            this.simulator = simulator;
-            PictureBoxDispatcherView_SizeChanged(this, new EventArgs());
-        }
-
-        private void DispatcherViewControl_KeyUp(object sender, KeyEventArgs e)
-        {
-            switch(e.KeyCode)
+            switch (e.KeyCode)
             {
                 case Keys.PageDown:
-                    content.UpdateScale(1/.9);
+                    content.UpdateScaleAt(pbCenter, -1);
                     break;
                 case Keys.PageUp:
-                    content.UpdateScale(.9);
+                    content.UpdateScaleAt(pbCenter, 1);
                     break;
                 case Keys.Left:
                     content.UpdateLocation(new PointF(1, 0));
@@ -51,6 +43,22 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
                     content.UpdateLocation(new PointF(0, 1));
                     break;
             }
+        }
+
+        private void PictureBoxDispatcherView_MouseWheel(object sender, MouseEventArgs e)
+        {
+            content.UpdateScaleAt(e.Location, Math.Sign(e.Delta));
+        }
+
+        internal DispatcherViewControl(DispatcherContent content): this()
+        {
+            this.content = content;
+        }
+
+        internal void Initialize(Simulator simulator, DispatcherContent content)
+        {
+            this.simulator = simulator;
+            PictureBoxDispatcherView_SizeChanged(this, new EventArgs());
         }
 
         public void UpdateStatusbarVisibility(bool show)
@@ -78,15 +86,28 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         private void PictureBoxDispatcherView_SizeChanged(object sender, EventArgs e)
         {
+            pbCenter = new Point(pbDispatcherView.Width / 2, pbDispatcherView.Height / 2);
             if (pbDispatcherView.Size != Size.Empty)
                 content?.UpdateSize(pbDispatcherView.Size);
         }
 
-        protected override void OnMouseWheel(MouseEventArgs e)
+        private void DispatcherViewControl_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.X > pbDispatcherView.Left && e.X < pbDispatcherView.Right && e.Y > pbDispatcherView.Top && e.Y < pbDispatcherView.Bottom)
-                content.UpdateScaleAt(e.Location, Math.Sign(e.Delta));
-            base.OnMouseWheel(e);
+#if DEBUG
+            //debug only
+            toolStripPosition.Text = $"{(e.X) / content.Scale + content.DisplayPort.X}x{(pbDispatcherView.Height - e.Y) / content.Scale + content.DisplayPort.Y}";
+#endif
+        }
+
+        private void PictureBoxDispatcherView_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            content.ResetView();
+        }
+
+        private void PictureBoxDispatcherView_MouseEnter(object sender, EventArgs e)
+        {
+            //ensure to set the focus to make MouseWheel event work
+            pbDispatcherView.Focus();
         }
     }
 }

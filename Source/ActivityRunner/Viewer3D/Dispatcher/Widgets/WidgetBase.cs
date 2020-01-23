@@ -51,9 +51,20 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets
         /// <param name="p">Center point of the dot, in pixels.</param>
         /// <param name="size">Size of the dot's diameter, in pixels</param>
         /// <returns></returns>
-        protected static RectangleF GetRect(PointF p)
+        protected static RectangleF CenterRectangle(PointF center)
         {
-            return new RectangleF(p.X - itemSize / 2f, p.Y - itemSize / 2f, itemSize, itemSize);
+            return CenterRectangle(center, itemSize);
+        }
+
+        /// <summary>
+        /// Generates a rectangle representing a dot being drawn.
+        /// </summary>
+        /// <param name="p">Center point of the dot, in pixels.</param>
+        /// <param name="size">Size of the dot's diameter, in pixels</param>
+        /// <returns></returns>
+        protected static RectangleF CenterRectangle(PointF center, float size)
+        {
+            return new RectangleF(center.X - size / 2f, center.Y - size/ 2f, size, size);
         }
 
         protected bool CheckVisibility()
