@@ -29,7 +29,7 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets
             return new PointF((float)(location.TileX * WorldLocation.TileSize + location.Location.X), (float)(location.TileZ * WorldLocation.TileSize + location.Location.Z));
         }
 
-        internal abstract void Normalize(PointF origin);
+        internal abstract void Normalize(in RectangleF bounds);
 
         internal abstract void Draw(Graphics g);
 
@@ -40,9 +40,9 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets
         public PointF Location { get; protected set; }
 
 
-        internal override void Normalize(PointF origin)
+        internal override void Normalize(in RectangleF bounds)
         {
-            Location = new PointF(Location.X - origin.X, -(Location.Y - origin.Y));
+            Location = new PointF(Location.X - bounds.Location.X, bounds.Size.Height - (Location.Y - bounds.Location.Y));
         }
 
         /// <summary>

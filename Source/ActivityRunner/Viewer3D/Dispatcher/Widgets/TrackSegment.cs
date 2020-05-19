@@ -56,22 +56,22 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets
             }
         }
 
-        internal override void Normalize(PointF origin)
+        internal override void Normalize(in RectangleF bounds)
         {
-            CurvePoints[0] = new PointF((float)(curvePoints[0].X - origin.X), -(float)(curvePoints[0].Y - origin.Y));
-            CurvePoints[1] = new PointF((float)(curvePoints[1].X - origin.X), -(float)(curvePoints[1].Y - origin.Y));
-            CurvePoints[2] = new PointF((float)(curvePoints[2].X - origin.X), -(float)(curvePoints[2].Y - origin.Y));
+            CurvePoints[0] = new PointF((float)(curvePoints[0].X - bounds.Location.X), bounds.Size.Height - (float)(curvePoints[0].Y - bounds.Location.Y));
+            CurvePoints[1] = new PointF((float)(curvePoints[1].X - bounds.Location.X), bounds.Size.Height - (float)(curvePoints[1].Y - bounds.Location.Y));
+            CurvePoints[2] = new PointF((float)(curvePoints[2].X - bounds.Location.X), bounds.Size.Height - (float)(curvePoints[2].Y - bounds.Location.Y));
             curvePoints = null; //no longer needed from here
         }
 
         internal override void Draw(Graphics g)
         {
-            //skip segments which are outside bounds. 
-            if ((CurvePoints[0].X < content.DisplayPort.X && CurvePoints[2].X < content.DisplayPort.X) ||
-                (CurvePoints[0].X > content.DisplayPort.X + content.DisplayPort.Width && CurvePoints[2].X > content.DisplayPort.X + content.DisplayPort.Width) ||
-                (-CurvePoints[0].Y < content.DisplayPort.Y && -CurvePoints[2].Y < content.DisplayPort.Y) ||
-                (-CurvePoints[0].Y > content.DisplayPort.Y + content.DisplayPort.Height && -CurvePoints[2].Y > content.DisplayPort.Y + content.DisplayPort.Height))
-                return;
+            ////skip segments which are outside bounds. 
+            //if ((CurvePoints[0].X < content.DisplayPort.X && CurvePoints[2].X < content.DisplayPort.X) ||
+            //    (CurvePoints[0].X > content.DisplayPort.X + content.DisplayPort.Width && CurvePoints[2].X > content.DisplayPort.X + content.DisplayPort.Width) ||
+            //    (-CurvePoints[0].Y < content.DisplayPort.Y && -CurvePoints[2].Y < content.DisplayPort.Y) ||
+            //    (-CurvePoints[0].Y > content.DisplayPort.Y + content.DisplayPort.Height && -CurvePoints[2].Y > content.DisplayPort.Y + content.DisplayPort.Height))
+            //    return;
             if (IsCurved)
             {
                 g.DrawCurve(trackSegmentPen, CurvePoints);

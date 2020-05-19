@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Reflection;
 using System.Windows.Forms;
 
 using Orts.Simulation;
@@ -11,13 +12,53 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         private Simulator simulator;
 
         private readonly DispatcherContent content;
+        private bool panning;
         private Point pbCenter;
+        private PointF panStart;
+        private PointF offsetPanStart;
+        private DateTime updateTimestamp;
+
 
         public DispatcherViewControl()
         {
             InitializeComponent();
+//            typeof(Panel).InvokeMember("DoubleBuffered", BindingFlags.SetProperty | BindingFlags.Instance | BindingFlags.NonPublic, null, pnlDispatcherView, new object[] { true });
             pbDispatcherView.MouseWheel += PictureBoxDispatcherView_MouseWheel;
             pbDispatcherView.PreviewKeyDown += PbDispatcherView_PreviewKeyDown;
+            pbDispatcherView.MouseDown += PbDispatcherView_MouseDown;
+            pbDispatcherView.MouseUp += PbDispatcherView_MouseUp;
+            pbDispatcherView.MouseMove += PbDispatcherView_MouseMove;
+        }
+
+        private void PbDispatcherView_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (panning && DateTime.UtcNow > updateTimestamp)
+            {
+                if (((offsetPanStart.X - (panStart.X - e.X) / content.Scale) > (pbDispatcherView.Width - 10) / content.Scale) || ((offsetPanStart.X + content.Size.Width - (panStart.X - e.X) / content.Scale) < 10)
+                    || ((offsetPanStart.Y - (panStart.Y - e.Y) / content.Scale) > (pbDispatcherView.Height- 10) / content.Scale) || ((offsetPanStart.Y + content.Size.Height - (panStart.Y - e.Y) / content.Scale) < 10))
+                {
+                    panning = false;
+                    return;
+                }
+                PointF offset = new PointF((float)(offsetPanStart.X - (panStart.X - e.X) / content.Scale), (float)(offsetPanStart.Y - (panStart.Y - e.Y) / content.Scale));
+                content.UpdateLocationAbsolute(offset);
+                updateTimestamp = updateTimestamp.AddMilliseconds(200);
+            }
+        }
+
+        private void PbDispatcherView_MouseUp(object sender, MouseEventArgs e)
+        {
+            panning = false;
+        }
+
+        private void PbDispatcherView_MouseDown(object sender, MouseEventArgs e)
+        {
+            if ((e.Button & MouseButtons.Left) == MouseButtons.Left)
+            {
+                panning = true;
+                panStart = e.Location;
+                offsetPanStart = content.Offset;
+            }
         }
 
         private void PbDispatcherView_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
@@ -70,7 +111,7 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         {
             toolStripFPS.Text = $"{fps:F1} FPS";
             if (null != content)
-            toolStripSize.Text = $"{pbDispatcherView.Width / content.Scale:N2}x{pbDispatcherView.Height / content.Scale:N2}";
+            toolStripSize.Text = $"{pbDispatcherView.Width / content.Scale:N2}x{pbDispatcherView.Height / content.Scale:N2}, Scale {content.Scale}";
         }
 
         private int viewVersion;

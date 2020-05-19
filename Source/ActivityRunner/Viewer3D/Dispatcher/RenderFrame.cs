@@ -38,7 +38,7 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
                 Task.Run(async () =>
                 {
                     Debug.Assert(content.WindowSize != Size.Empty);
-                    await PrepareStaticImage(content, content.WindowSize, content.Scale, content.DisplayPort).ConfigureAwait(false);
+                    await PrepareStaticImage(content, content.WindowSize, content.Scale, content.Offset).ConfigureAwait(false);
                     sharedViewVersion = content.ViewVersion;
                     sharedContentUpdate = 0;
                 });
@@ -56,23 +56,21 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             //signal done
         }
 
-        private Task PrepareStaticImage(DispatcherContent content, Size windowSize, double scale, RectangleF viewPort)
+        private Task PrepareStaticImage(DispatcherContent content, Size windowSize, double scale, PointF offset)
         {
-            PointF viewPoint = new PointF(viewPort.X + viewPort.Width / 2f, viewPort.Y + viewPort.Height / 2f);
             Bitmap result = new Bitmap(windowSize.Width, windowSize.Height);
             Graphics g = Graphics.FromImage(result);
-            g.Clear(Color.White);
+            g.Clear(Color.AntiqueWhite);
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
 
             //draw anything here which has fixed location and/or does not need to scale
             //ruler
-            //rulerDraw.Draw(g, windowSize, scale);
             content.scaleRuler.Draw(g);
 
             //
-            g.TranslateTransform(-viewPoint.X, viewPoint.Y, System.Drawing.Drawing2D.MatrixOrder.Append);
-            g.ScaleTransform((float)scale, (float)scale, System.Drawing.Drawing2D.MatrixOrder.Append);
-            g.TranslateTransform(windowSize.Width / 2f, windowSize.Height / 2f, System.Drawing.Drawing2D.MatrixOrder.Append);
+            g.ScaleTransform((float)scale, (float)scale);
+            g.TranslateTransform(offset.X, offset.Y);
+
             foreach (TrackSegment segment in content.TrackSegments)
                 segment.Draw(g);
             foreach (SwitchWidget trackSwitch in content.Switches)

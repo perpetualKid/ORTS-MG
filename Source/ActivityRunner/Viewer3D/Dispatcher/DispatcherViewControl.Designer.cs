@@ -58,10 +58,10 @@
             this.toolStripFPS,
             this.toolStripSize,
             this.toolStripPosition});
-            this.statusStripDispatcher.Location = new System.Drawing.Point(0, 552);
+            this.statusStripDispatcher.Location = new System.Drawing.Point(0, 553);
             this.statusStripDispatcher.Name = "statusStripDispatcher";
             this.statusStripDispatcher.Padding = new System.Windows.Forms.Padding(1, 0, 19, 0);
-            this.statusStripDispatcher.Size = new System.Drawing.Size(1000, 26);
+            this.statusStripDispatcher.Size = new System.Drawing.Size(1000, 25);
             this.statusStripDispatcher.TabIndex = 15;
             this.statusStripDispatcher.Text = "statusStrip1";
             // 
@@ -90,7 +90,7 @@
             this.pnlAvatar.Location = new System.Drawing.Point(752, 123);
             this.pnlAvatar.Margin = new System.Windows.Forms.Padding(4);
             this.pnlAvatar.Name = "pnlAvatar";
-            this.pnlAvatar.Size = new System.Drawing.Size(248, 429);
+            this.pnlAvatar.Size = new System.Drawing.Size(248, 430);
             this.pnlAvatar.TabIndex = 16;
             // 
             // pnlDispatcherView
@@ -100,7 +100,7 @@
             this.pnlDispatcherView.Location = new System.Drawing.Point(0, 123);
             this.pnlDispatcherView.Margin = new System.Windows.Forms.Padding(4);
             this.pnlDispatcherView.Name = "pnlDispatcherView";
-            this.pnlDispatcherView.Size = new System.Drawing.Size(752, 429);
+            this.pnlDispatcherView.Size = new System.Drawing.Size(752, 430);
             this.pnlDispatcherView.TabIndex = 17;
             // 
             // pbDispatcherView
@@ -110,7 +110,7 @@
             this.pbDispatcherView.Location = new System.Drawing.Point(0, 0);
             this.pbDispatcherView.Margin = new System.Windows.Forms.Padding(4);
             this.pbDispatcherView.Name = "pbDispatcherView";
-            this.pbDispatcherView.Size = new System.Drawing.Size(752, 429);
+            this.pbDispatcherView.Size = new System.Drawing.Size(752, 430);
             this.pbDispatcherView.TabIndex = 0;
             this.pbDispatcherView.TabStop = false;
             this.pbDispatcherView.SizeChanged += new System.EventHandler(this.PictureBoxDispatcherView_SizeChanged);

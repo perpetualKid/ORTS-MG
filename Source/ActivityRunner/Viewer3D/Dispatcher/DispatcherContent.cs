@@ -21,7 +21,11 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         internal ScaleRulerWidget scaleRuler = new ScaleRulerWidget();
         private readonly Simulator simulator;
         private RectangleF bounds;
-        private RectangleF viewPort;
+        private double maxScale;
+
+        public PointF Offset { get; private set; }
+
+        public SizeF Size => bounds.Size;
 
         public RectangleF DisplayPort { get; private set; }
 
@@ -56,9 +60,9 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
             await Task.WhenAll(initializer).ConfigureAwait(false);
 
-            viewPort = new RectangleF(PointF.Empty, bounds.Size);
-            UpdateView();
-
+            ScaleToFit();
+            CenterView();
+            ViewVersion++;
         }
 
         internal void SwapFrames()
@@ -66,29 +70,42 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             (Background, Foreground) = (Foreground, Background);
         }
 
-        private void UpdateView()
+        private void CenterView()
         {
-            double xScale = WindowSize.Width / viewPort.Width;
-            double yScale = WindowSize.Height / viewPort.Height;
+            Offset = new PointF((float)(WindowSize.Width  / Scale - bounds.Size.Width) / 2f, (float)(WindowSize.Height / Scale - bounds.Size.Height) / 2f);
+        }
+
+        private void CenterViewAt()
+        {
+            //TODO tbd
+        }
+
+        private void ScaleToFit()
+        {
+            double xScale = WindowSize.Width / bounds.Width;
+            double yScale = WindowSize.Height / bounds.Height;
             Scale = Math.Min(xScale, yScale);
-            //update displayport from viewport to match windows dimensions
-            SizeF scaledViewportSize = new SizeF((float)(WindowSize.Width / Scale), (float)(WindowSize.Height / Scale));
-            PointF location = new PointF(viewPort.Left + (viewPort.Width - scaledViewportSize.Width) / 2, viewPort.Top + (viewPort.Height - scaledViewportSize.Height) / 2);
-            DisplayPort = new RectangleF(location, scaledViewportSize);
+            maxScale = Scale * 0.75;
+        }
+
+        public void UpdateLocationAbsolute(PointF offset)
+        {
+            Offset = offset;
             ViewVersion++;
         }
 
-        public void UpdateScaleAt(Point centerPoint, int steps)
+        public void UpdateScaleAt(Point focusPoint, int steps)
         {
-            double factor = Math.Pow((steps > 0 ? 0.9 : 1 / 0.9), Math.Abs(steps));
-            //TODO 2020-01-03 check for min/max scale
-            SizeF scaledSize = new SizeF((float)(viewPort.Width * factor), (float)(viewPort.Height * factor));
-            //need to offset proportionaly to mouse position within the picturebox area
-            PointF offset = new PointF((viewPort.Width - scaledSize.Width) * ((float)centerPoint.X / WindowSize.Width), 
-                (viewPort.Height - scaledSize.Height) * ((WindowSize.Height - (float)centerPoint.Y) / WindowSize.Height));
-            viewPort.Size = scaledSize;
-            viewPort.Offset(offset);
-            UpdateView();
+            double factor = Math.Pow((steps > 0 ? 1 / 0.9 : (steps < 0 ? 0.9 : 1)), Math.Abs(steps));
+            if (Scale * factor < maxScale || Scale * factor > 200)
+                return;
+
+            PointF location = LocationFromDisplayCoordinates(focusPoint);
+            Scale *= factor;
+            location = DisplayCoordinatesFromLocation(in location);
+
+            Offset = new PointF((float)(Offset.X + (focusPoint.X - location.X) / Scale), (float)(Offset.Y + (focusPoint.Y - location.Y) / Scale));
+            ViewVersion++;
         }
 
         public void UpdateLocation(PointF delta)
@@ -100,20 +117,32 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             ////                if ((-DisplayPort.Location.Y > DisplayPort.Height && delta.Y < 0) || (DisplayPort.Location.Y > DisplayPort.Height && delta.Y > 0))
             //                    //                (viewPort.Bottom + delta.Y < 0 ) || (viewPort.Top + delta.Y > displayPortSize.Height))
             //                    return;
-            viewPort.Offset(delta);
-            UpdateView();
+//            viewPort.Offset(delta);
+            ScaleToFit();
         }
 
         public void ResetView()
         {
-            viewPort = new RectangleF(PointF.Empty, bounds.Size);
-            UpdateView();
+            ScaleToFit();
+            CenterView();
+            ViewVersion++;
         }
 
         public void UpdateSize(Size windowSize)
         {
             WindowSize = windowSize;
-            UpdateView();
+            ScaleToFit();
+            ViewVersion++;
+        }
+
+        private PointF LocationFromDisplayCoordinates(in PointF location)
+        {
+            return new PointF((float)(location.X / Scale - Offset.X), (float)((location.Y) / Scale - Offset.Y));
+        }
+
+        private PointF DisplayCoordinatesFromLocation(in PointF location)
+        {
+            return new PointF((float)((Offset.X + location.X) * Scale), (float)((Offset.Y + location.Y) * Scale));
         }
 
         private async Task InitializeTrackSegments()
@@ -127,13 +156,13 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             await Task.WhenAll(renderItems).ConfigureAwait(false);
             //normalize all segments to the top left corner of this route
             foreach (TrackSegment segment in TrackSegments)
-                segment.Normalize(bounds.Location);
+                segment.Normalize(bounds);
             foreach (SwitchWidget switchWidget in Switches)
-                switchWidget.Normalize(bounds.Location);
+                switchWidget.Normalize(bounds);
             foreach (SignalWidget signalWidget in Signals)
-                signalWidget.Normalize(bounds.Location);
+                signalWidget.Normalize(bounds);
             foreach (SidingWidget sidingWidget in Sidings)
-                sidingWidget.Normalize(bounds.Location);
+                sidingWidget.Normalize(bounds);
         }
 
         private Task AddTrackItems()
@@ -232,11 +261,6 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             }
             bounds = new RectangleF((float)minX, (float)minY, (float)(maxX - minX), (float)(maxY - minY));
             return Task.CompletedTask;
-        }
-
-        private PointF LocationFromDisplayCoordinates(Point location)
-        {
-            return new PointF((float)(location.X / Scale + DisplayPort.X), (float)((WindowSize.Height - location.Y) / Scale + DisplayPort.Y));
         }
 
     }

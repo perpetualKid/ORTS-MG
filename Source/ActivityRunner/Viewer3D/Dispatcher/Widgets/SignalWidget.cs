@@ -77,11 +77,11 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets
             }
         }
 
-        internal override void Normalize(PointF origin)
+        internal override void Normalize(in RectangleF bounds)
         {
-            base.Normalize(origin);
+            base.Normalize(bounds);
             if (hasDirection)
-                direction = new PointF(direction.X - origin.X, -(direction.Y - origin.Y));
+                direction = new PointF(direction.X - bounds.Location.X, bounds.Size.Height - (direction.Y - bounds.Location.Y));
         }
 
         internal override void Draw(Graphics g)
