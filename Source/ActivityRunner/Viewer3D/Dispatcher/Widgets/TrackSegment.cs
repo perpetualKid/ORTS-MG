@@ -66,12 +66,13 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets
 
         internal override void Draw(Graphics g)
         {
+            RectangleF bounds = g.VisibleClipBounds;
             ////skip segments which are outside bounds. 
-            //if ((CurvePoints[0].X < content.DisplayPort.X && CurvePoints[2].X < content.DisplayPort.X) ||
-            //    (CurvePoints[0].X > content.DisplayPort.X + content.DisplayPort.Width && CurvePoints[2].X > content.DisplayPort.X + content.DisplayPort.Width) ||
-            //    (-CurvePoints[0].Y < content.DisplayPort.Y && -CurvePoints[2].Y < content.DisplayPort.Y) ||
-            //    (-CurvePoints[0].Y > content.DisplayPort.Y + content.DisplayPort.Height && -CurvePoints[2].Y > content.DisplayPort.Y + content.DisplayPort.Height))
-            //    return;
+            if ((CurvePoints[0].X < bounds.Left && CurvePoints[2].X < bounds.Left) ||
+                (CurvePoints[0].X > bounds.Right && CurvePoints[2].X > bounds.Right) ||
+                (CurvePoints[0].Y < bounds.Top && CurvePoints[2].Y < bounds.Top) ||
+                (CurvePoints[0].Y > bounds.Bottom && CurvePoints[2].Y > bounds.Bottom))
+                return;
             if (IsCurved)
             {
                 g.DrawCurve(trackSegmentPen, CurvePoints);

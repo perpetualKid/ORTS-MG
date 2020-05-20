@@ -34,14 +34,9 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         {
             if (panning && DateTime.UtcNow > updateTimestamp)
             {
-                if (((offsetPanStart.X - (panStart.X - e.X) / content.Scale) > (pbDispatcherView.Width - 10) / content.Scale) || ((offsetPanStart.X + content.Size.Width - (panStart.X - e.X) / content.Scale) < 10)
-                    || ((offsetPanStart.Y - (panStart.Y - e.Y) / content.Scale) > (pbDispatcherView.Height- 10) / content.Scale) || ((offsetPanStart.Y + content.Size.Height - (panStart.Y - e.Y) / content.Scale) < 10))
-                {
-                    panning = false;
-                    return;
-                }
                 PointF offset = new PointF((float)(offsetPanStart.X - (panStart.X - e.X) / content.Scale), (float)(offsetPanStart.Y - (panStart.Y - e.Y) / content.Scale));
-                content.UpdateLocationAbsolute(offset);
+                if (!content.UpdateLocationAbsolute(offset))
+                    panning = false;
                 updateTimestamp = updateTimestamp.AddMilliseconds(200);
             }
         }
@@ -72,16 +67,16 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
                     content.UpdateScaleAt(pbCenter, 1);
                     break;
                 case Keys.Left:
-                    content.UpdateLocation(new PointF(1, 0));
+                    content.UpdateLocationRelative(new Size(-1, 0));
                     break;
                 case Keys.Right:
-                    content.UpdateLocation(new PointF(-1, 0));
+                    content.UpdateLocationRelative(new Size(1, 0));
                     break;
                 case Keys.Up:
-                    content.UpdateLocation(new PointF(0, -1));
+                    content.UpdateLocationRelative(new Size(0, -1));
                     break;
                 case Keys.Down:
-                    content.UpdateLocation(new PointF(0, 1));
+                    content.UpdateLocationRelative(new Size(0, 1));
                     break;
             }
         }

@@ -66,11 +66,5 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets
         {
             return new RectangleF(center.X - size / 2f, center.Y - size/ 2f, size, size);
         }
-
-        protected bool CheckVisibility()
-        {
-            return !(Location.X < content.DisplayPort.X || (Location.X > content.DisplayPort.X + content.DisplayPort.Width) ||
-                -Location.Y < content.DisplayPort.Y || (-Location.Y > content.DisplayPort.Y + content.DisplayPort.Height));
-        }
     }
 }

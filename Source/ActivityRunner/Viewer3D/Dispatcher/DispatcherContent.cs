@@ -25,8 +25,6 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
 
         public PointF Offset { get; private set; }
 
-        public SizeF Size => bounds.Size;
-
         public RectangleF DisplayPort { get; private set; }
 
         public double Scale { get; private set; }
@@ -88,37 +86,40 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
             maxScale = Scale * 0.75;
         }
 
-        public void UpdateLocationAbsolute(PointF offset)
+        public bool UpdateLocationAbsolute(PointF offset)
         {
+            // checking bounds
+            if (CheckBoundsOutsideWindow(in offset))
+                return false;
+
             Offset = offset;
             ViewVersion++;
+            return true;
+        }
+
+        public bool UpdateLocationRelative(Size delta)
+        {
+            PointF offset = PointF.Add(Offset, new SizeF((float)(delta.Width * 40 / Scale), (float)(delta.Height * 40 / Scale)));
+            if (CheckBoundsOutsideWindow(in offset))
+                return false;
+
+            Offset = offset;
+            ViewVersion++;
+            return true;
         }
 
         public void UpdateScaleAt(Point focusPoint, int steps)
         {
-            double factor = Math.Pow((steps > 0 ? 1 / 0.9 : (steps < 0 ? 0.9 : 1)), Math.Abs(steps));
-            if (Scale * factor < maxScale || Scale * factor > 200)
+            double scale = Scale * Math.Pow((steps > 0 ? 1 / 0.9 : (steps < 0 ? 0.9 : 1)), Math.Abs(steps));
+            if (scale < maxScale || scale > 200)
                 return;
 
             PointF location = LocationFromDisplayCoordinates(focusPoint);
-            Scale *= factor;
+            Scale = scale;
             location = DisplayCoordinatesFromLocation(in location);
 
             Offset = new PointF((float)(Offset.X + (focusPoint.X - location.X) / Scale), (float)(Offset.Y + (focusPoint.Y - location.Y) / Scale));
             ViewVersion++;
-        }
-
-        public void UpdateLocation(PointF delta)
-        {
-            delta.X *= (int)(40 / Scale);
-            delta.Y *= (int)(40 / Scale);
-            //TODO 2020-01-03 check for bounds (all tracks out of view)
-            //            if ((DisplayPort.Location.X > 0 && delta.X > 0) || (-DisplayPort.Location.X > DisplayPort.Width && delta.X < 0))
-            ////                if ((-DisplayPort.Location.Y > DisplayPort.Height && delta.Y < 0) || (DisplayPort.Location.Y > DisplayPort.Height && delta.Y > 0))
-            //                    //                (viewPort.Bottom + delta.Y < 0 ) || (viewPort.Top + delta.Y > displayPortSize.Height))
-            //                    return;
-//            viewPort.Offset(delta);
-            ScaleToFit();
         }
 
         public void ResetView()
@@ -143,6 +144,11 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher
         private PointF DisplayCoordinatesFromLocation(in PointF location)
         {
             return new PointF((float)((Offset.X + location.X) * Scale), (float)((Offset.Y + location.Y) * Scale));
+        }
+
+        private bool CheckBoundsOutsideWindow(in PointF offset)
+        {
+            return ((offset.X > (WindowSize.Width - 10) / Scale) || (offset.X + bounds.Size.Width < 10) || (offset.Y > (WindowSize.Height - 10) / Scale) || (offset.Y + bounds.Height < 10));
         }
 
         private async Task InitializeTrackSegments()

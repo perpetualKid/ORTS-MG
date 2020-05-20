@@ -18,6 +18,10 @@ namespace Orts.ActivityRunner.Viewer3D.Dispatcher.Widgets
 
         internal override void Draw(Graphics g)
         {
+            RectangleF bounds = g.VisibleClipBounds;
+            if (Location.X < bounds.Left || Location.X > bounds.Right
+                || Location.Y < bounds.Top || Location.Y > bounds.Bottom)
+                return;
             if (item.SelectedRoute == mainRoute)
                 g.FillEllipse(Brushes.Black, CenterRectangle(Location));
             else
