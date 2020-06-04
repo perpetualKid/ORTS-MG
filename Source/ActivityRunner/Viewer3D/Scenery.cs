@@ -320,6 +320,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
                 var shadowCaster = (worldObject.StaticFlags & (uint)StaticFlag.AnyShadow) != 0 || viewer.Settings.ShadowAllShapes;
                 var animated = (worldObject.StaticFlags & (uint)StaticFlag.Animate) != 0;
+                var isAnalogORClock = OrClockType(worldObject.FileName) == ClockType.Analog; //check if worldObject is analog OR-Clock
                 var global = (worldObject is TrackObject) || (worldObject is HazardObject) || (worldObject.StaticFlags & (uint)StaticFlag.Global) != 0;
 
                 // TransferObj have a FileName but it is not a shape, so we need to avoid sanity-checking it as if it was.
@@ -473,16 +474,17 @@ namespace Orts.ActivityRunner.Viewer3D
                     }
                     else if (worldObject.GetType() == typeof(StaticObject))
                     {
-                        if (animated)
+                        if (isAnalogORClock) //worldObject of type StaticObj is analog OR-Clock
+                        {
+                            sceneryObjects.Add(new AnalogClockShape(shapeFilePath, new FixedWorldPositionSource(worldMatrix), shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
+                        }
+                        else if (animated)
                             sceneryObjects.Add(new AnimatedShape(shapeFilePath, new FixedWorldPositionSource(worldMatrix), shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
                         else
                             sceneryObjects.Add(new StaticShape(shapeFilePath, worldMatrix, shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None));
                     }
                     else if (worldObject.GetType() == typeof(PickupObject))
                     {
-                        if (animated)
-                            sceneryObjects.Add(new FuelPickupItemShape(shapeFilePath, new FixedWorldPositionSource(worldMatrix), shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None, (PickupObject)worldObject));
-                        else
                             sceneryObjects.Add(new FuelPickupItemShape(shapeFilePath, new FixedWorldPositionSource(worldMatrix), shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None, (PickupObject)worldObject));
                         PickupList.Add((PickupObject)worldObject);
                     }
@@ -556,6 +558,18 @@ namespace Orts.ActivityRunner.Viewer3D
 
             if (viewer.Simulator.UseSuperElevation > 0) SuperElevationManager.DecomposeStaticSuperElevation(Viewer, dTrackList, TileX, TileZ);
             if (Viewer.World.Sounds != null) Viewer.World.Sounds.AddByTile(TileX, TileZ);
+        }
+
+        //Method to check a shape name is listed in "openrails\clocks.dat"
+        public ClockType OrClockType(string shape)
+        {
+            if (null != Program.Simulator.Clocks)
+                foreach (var clock in Program.Simulator.Clocks)
+                {
+                    if (Path.GetFileName(clock.Name).Equals(shape, StringComparison.OrdinalIgnoreCase))
+                        return clock.ClockType;
+                }
+            return ClockType.Unknown;
         }
 
         //[CallOnThread("Loader")]

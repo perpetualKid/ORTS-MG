@@ -635,7 +635,7 @@ namespace Orts.Simulation
             foreach (TrainCar trainCar in train.Cars)
             {
                 var relativeCarPosition = Matrix.Identity;
-                        trainCar.WorldPosition = trainCar.WorldPosition.NormalizeTo(WorldPosition.TileX, WorldPosition.TileZ);
+                trainCar.WorldPosition = trainCar.WorldPosition.NormalizeTo(WorldPosition.TileX, WorldPosition.TileZ);
                 relativeCarPosition = Matrix.Multiply(trainCar.WorldPosition.XNAMatrix, invAnimationXNAMatrix);
                 RelativeCarPositions.Add(relativeCarPosition);
             }

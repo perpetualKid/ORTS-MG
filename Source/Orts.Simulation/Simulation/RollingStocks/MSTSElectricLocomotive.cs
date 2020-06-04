@@ -395,6 +395,12 @@ namespace Orts.Simulation.RollingStocks
             return data;
         }
 
+        public override void SwitchToAutopilotControl()
+        {
+            SetDirection(Direction.Forward);
+            base.SwitchToAutopilotControl();
+        }
+
         public override string GetStatus()
         {
             var status = new StringBuilder();

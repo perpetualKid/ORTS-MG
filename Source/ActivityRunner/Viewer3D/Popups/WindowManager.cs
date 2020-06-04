@@ -52,8 +52,12 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 		public readonly Viewer Viewer;
         public readonly WindowTextManager TextManager;
         public readonly WindowTextFont TextFontDefault;
+        public readonly WindowTextFont TextFontDefaultBold;
         public readonly WindowTextFont TextFontDefaultOutlined;
+
+        public readonly WindowTextFont TextFontMonoSpacedBold;
         public readonly WindowTextFont TextFontMonoSpacedOutlined;
+
         public readonly WindowTextFont TextFontSmall;
         public readonly WindowTextFont TextFontSmallOutlined;
 
@@ -77,7 +81,9 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             PopupWindowMaterial = (PopupWindowMaterial)Viewer.MaterialManager.Load("PopupWindow");
             TextManager = new WindowTextManager();
             TextFontDefault = TextManager.GetScaled("Arial", 10, System.Drawing.FontStyle.Regular);
+            TextFontDefaultBold = TextManager.GetScaled("Arial", 10, System.Drawing.FontStyle.Bold);
             TextFontDefaultOutlined = TextManager.GetScaled("Arial", 10, System.Drawing.FontStyle.Regular, 1);
+            TextFontMonoSpacedBold = TextManager.GetScaled("Consolas", 11.29f, System.Drawing.FontStyle.Bold);
             TextFontMonoSpacedOutlined = TextManager.GetScaled("Consolas", 10, System.Drawing.FontStyle.Regular, 1);
             TextFontSmall = TextManager.GetScaled("Arial", 8, System.Drawing.FontStyle.Regular);
             TextFontSmallOutlined = TextManager.GetScaled("Arial", 8, System.Drawing.FontStyle.Regular, 1);
@@ -292,7 +298,15 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                     BringWindowToTop(mouseActiveWindow);
 			}
 
-			if (mouseActiveWindow != null)
+            if (UserInput.IsMouseWheelChanged)
+            {
+                mouseActiveWindow = VisibleWindows.LastOrDefault(w => w.Interactive && w.Location.Contains(mouseDownPosition));
+                
+                if (mouseActiveWindow != null)
+                    mouseActiveWindow.HandleUserInput();
+            }
+
+            if (mouseActiveWindow != null)
 			{
 				if (UserInput.IsMouseLeftButtonPressed)
 					mouseActiveWindow.MouseDown();
@@ -302,7 +316,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 				if (UserInput.IsMouseMoved)
 					mouseActiveWindow.MouseMove();
 
-				if (Viewer.RealTime - LastUpdateRealTime >= 0.1)
+                if (Viewer.RealTime - LastUpdateRealTime >= 0.1)
 				{
 					LastUpdateRealTime = Viewer.RealTime;
 					mouseActiveWindow.HandleUserInput();
@@ -310,7 +324,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 
 				if (UserInput.IsMouseLeftButtonReleased)
 					mouseActiveWindow = null;
-			}
+            }
 		}
 
         public void BringWindowToTop(Window mouseActiveWindow)

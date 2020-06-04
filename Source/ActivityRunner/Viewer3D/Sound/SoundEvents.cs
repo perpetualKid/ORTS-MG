@@ -155,6 +155,7 @@ namespace Orts.ActivityRunner.Viewer3D.Sound
                         case 157: return TrainEvent.CircuitBreakerClosingAuthorizationOn;
                         case 158: return TrainEvent.CircuitBreakerClosingAuthorizationOff;
 
+                        case 159: return TrainEvent.LargeEjectorChange;
                         case 160: return TrainEvent.SmallEjectorChange;
 
                         case 161: return TrainEvent.CabLightSwitchToggle;

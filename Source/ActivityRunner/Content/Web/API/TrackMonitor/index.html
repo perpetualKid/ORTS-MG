@@ -1,0 +1,28 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>OR: Track Monitor API</title>
+	<link rel="shortcut icon" type="image/png" href="/or_logo.png"><!-- This icon appears in the page's tab and its bookmark. -->
+    <link rel="stylesheet" type="text/css" href="/index.css"><!-- share styles with home page -->
+	<script src="index.js"></script>
+</head>
+
+<body onload="poll(500)" ><!-- 500 mSec is the default and may be omitted -->
+  <div id=menu><a href="/">Back to Menu</a></div>
+  <h1>Open Rails - Track Monitor (F4)</h1>
+
+  <div>
+    <table style="padding-left: 50px;">
+      <tr><td>Speed:          </td><td id=speedMpS>               </td><td>mph</td></tr>
+      <tr><td>Projected:      </td><td id=projectedSpeedMpS>      </td><td>mph</td></tr>
+      <tr><td>Limit:          </td><td id=allowedSpeedMpS>        </td><td>mph</td></tr>
+      <tr><td>Mode:           </td><td id=controlMode>            </td><td>   </td></tr>
+      <tr><td>Inclination:    </td><td id=currentElevationPercent></td><td>%  </td></tr>
+      <tr><td>Direction:      </td><td id=direction>              </td><td>   </td></tr>
+      <tr><td>Cab Orientation:</td><td id=cabOrientation>         </td><td>   </td></tr>
+      <tr><td>On Path:        </td><td id=isOnPath>               </td><td>   </td></tr>
+    </table>
+  </div>
+
+</body>
+</html>

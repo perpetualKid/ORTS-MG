@@ -24,8 +24,8 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+
 using Orts.Common;
-using Orts.Common.Logging;
 using Orts.Settings;
 
 namespace Orts.ActivityRunner.Viewer3D.Processes
@@ -66,10 +66,17 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
         /// </summary>
         public LoaderProcess LoaderProcess { get; private set; }
 
+
+
         /// <summary>
         /// Exposes access to the <see cref="SoundProcess"/> for the game.
         /// </summary>
         public SoundProcess SoundProcess { get; private set; }
+
+        /// <summary>
+        /// Exposes access to the <see cref="WebServer"/> for the game.
+        /// </summary>
+        public WebServerProcess WebServerProcess { get; private set; }
 
         /// <summary>
         /// Gets the current <see cref="GameState"/>, if there is one, or <c>null</c>.
@@ -92,12 +99,14 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
             UpdaterProcess = new UpdaterProcess(this);
             LoaderProcess = new LoaderProcess(this);
             SoundProcess = new SoundProcess(this);
+            WebServerProcess = new WebServerProcess(this);
             States = new Stack<GameState>();
         }
 
         protected override void BeginRun()
         {
             // At this point, GraphicsDevice is initialized and set up.
+            WebServerProcess.Start();
             SoundProcess.Start();
             LoaderProcess.Start();
             UpdaterProcess.Start();
@@ -147,6 +156,8 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
             UpdaterProcess.Stop();
             LoaderProcess.Stop();
             SoundProcess.Stop();
+            // WebServerProcess.Stop(); Again
+            WebServerProcess.Stop();
         }
 
         void Game_Exiting(object sender, EventArgs e)

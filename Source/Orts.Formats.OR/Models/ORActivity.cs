@@ -34,6 +34,8 @@ namespace Orts.Formats.OR.Models
             public int TunnelResistanceDependent { get; internal set; } = -1;
             public int WindResistanceDependent { get; internal set; } = -1;
             public int HotStart { get; internal set; } = -1;
+            public int SimpleControlPhysics { get; internal set; } = -1;
+
 
             // Experimental TAB
             public int UseLocationPassingPaths { get; internal set; } = -1;
@@ -45,6 +47,11 @@ namespace Orts.Formats.OR.Models
             public int SuperElevationLevel { get; internal set; } = -1;
             public int SuperElevationMinimumLength { get; internal set; } = -1;
             public int SuperElevationGauge { get; internal set; } = -1;
+
+
+            // Data Logger TAB
+            public int VerboseConfigurationMessages { get; internal set; } = -1;
+
         }
 
         public OptionsSettings Options { get; } = new OptionsSettings();
@@ -76,6 +83,10 @@ namespace Orts.Formats.OR.Models
                 new STFReader.TokenProcessor("ortstunnelresistancedependent", ()=>{ Options.TunnelResistanceDependent = stf.ReadIntBlock(Options.TunnelResistanceDependent); IsActivityOverride = true; }),
                 new STFReader.TokenProcessor("ortswindresistancedependent", ()=>{ Options.WindResistanceDependent = stf.ReadIntBlock(Options.WindResistanceDependent); IsActivityOverride = true; }),
                 new STFReader.TokenProcessor("ortshotstart", ()=>{ Options.HotStart = stf.ReadIntBlock(Options.HotStart); IsActivityOverride = true; }),
+                new STFReader.TokenProcessor("ortssimplecontrolphysics", ()=>{ Options.SimpleControlPhysics = stf.ReadIntBlock(Options.SimpleControlPhysics); IsActivityOverride = true; }),
+
+                // Data Logger TAB
+                new STFReader.TokenProcessor("ortsverboseconfigurationmessages", ()=>{ Options.VerboseConfigurationMessages = stf.ReadIntBlock(Options.VerboseConfigurationMessages); IsActivityOverride = true; }),
 
                 // Experimental TAB
                 new STFReader.TokenProcessor("ortslocationlinkedpassingpaths", ()=>{ Options.UseLocationPassingPaths = stf.ReadIntBlock(Options.UseLocationPassingPaths); IsActivityOverride = true; }),

@@ -149,6 +149,13 @@ namespace Orts.Common
         Clockwise = 1,
     }
 
+    public enum ClockType
+    {
+        Unknown,
+        Analog,
+        Digital,
+    }
+
     public enum TrackMonitorSignalAspect
     {
         None,
@@ -230,6 +237,7 @@ namespace Orts.Common
         FireShovelfull,
         CylinderCocks,
         CylinderCompound,
+        LargeEjector,
         SmallEjector,
         TenderCoal,
         TenderWater,
@@ -329,9 +337,13 @@ namespace Orts.Common
         GearUp,
         HornOff,
         HornOn,
+        LargeEjectorChange,
         LightSwitchToggle,
         MirrorClose,
         MirrorOpen,
+        MovingTableMovingEmpty,
+        MovingTableMovingLoaded,
+        MovingTableStopped,
         Pantograph1Down,
         PantographToggle,
         Pantograph1Up,
@@ -388,9 +400,6 @@ namespace Orts.Common
         TrainControlSystemPenalty2,
         TrainControlSystemWarning1,
         TrainControlSystemWarning2,
-        MovingTableMovingEmpty,
-        MovingTableMovingLoaded,
-        MovingTableStopped,
         Uncouple,
         UncoupleB, // NOTE: Currently not used in Open Rails.
         UncoupleC, // NOTE: Currently not used in Open Rails.
@@ -554,7 +563,11 @@ namespace Orts.Common
         [Description("TCS Full Service Braking")]
         TCSFullServ,        // TCS Full Service Braking
         [Description("Vac. Cont. Service")]
-        VacContServ         // VacuumContinuousServiceStart
+        VacContServ,         // VacuumContinuousServiceStart
+        [Description("Vac. Apply Cont.Service")]
+        VacApplyContServ,    // TrainBrakesControllerVacuumApplyContinuousServiceStart
+        [Description("Notch")]
+        BrakeNotch           // EngineBrakesControllerBrakeNotchStart
     }
 
 

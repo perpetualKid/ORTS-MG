@@ -573,7 +573,8 @@ namespace Orts.Formats.Msts
 
 #endif
                 #endregion
-                while (statementLine < maxCount && (((script.Tokens[statementLine] as Statement)?.Tokens[0].Token == "EXTERN" && (script.Tokens[statementLine] as Statement)?.Tokens[1].Token == "FLOAT") 
+
+                while (statementLine < maxCount && (((script.Tokens[statementLine] as Statement)?.Tokens[0].Token == "EXTERN" && (script.Tokens[statementLine] as Statement)?.Tokens[1].Token == "FLOAT")
                     || (script.Tokens[statementLine] as Statement)?.Tokens[0].Token == "FLOAT"))
                 {
                     // Skip external floats (exist automatically)

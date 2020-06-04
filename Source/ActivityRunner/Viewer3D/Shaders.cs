@@ -19,13 +19,11 @@
 
 using System;
 using System.IO;
+
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Content.Pipeline;
-using Microsoft.Xna.Framework.Content.Pipeline.Graphics;
-using Microsoft.Xna.Framework.Content.Pipeline.Processors;
 using Microsoft.Xna.Framework.Graphics;
+
 using Orts.ActivityRunner.Viewer3D.Processes;
-using Orts.Common;
 using Orts.Common.Xna;
 
 namespace Orts.ActivityRunner.Viewer3D
@@ -39,56 +37,18 @@ namespace Orts.ActivityRunner.Viewer3D
 
         static byte[] GetEffectCode(string filename)
         {
-            var basePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "Content");
-            var effectFileName = System.IO.Path.Combine(basePath, filename + ".fx");
+            var basePath = Path.Combine(Path.GetDirectoryName(System.Windows.Forms.Application.ExecutablePath), "Content");
+            return File.ReadAllBytes(Path.Combine(basePath, filename + ".mgfx"));
+            //var effectFileName = System.IO.Path.Combine(basePath, filename + ".fx");
 
-            EffectContent effectSource = new EffectContent
-            {
-                Identity = new ContentIdentity(effectFileName),
-                EffectCode = File.ReadAllText(effectFileName),
-            };
-            EffectProcessor processor = new EffectProcessor();
-            CompiledEffectContent compiledEffect = processor.Process(effectSource, new ProcessorContext());
-            return compiledEffect.GetEffectCode();
-        }
-    }
-
-    class ProcessorContext : ContentProcessorContext
-    {
-        public override TargetPlatform TargetPlatform { get { return TargetPlatform.Windows; } }
-        public override GraphicsProfile TargetProfile { get { return GraphicsProfile.HiDef; } }
-        public override string BuildConfiguration { get { return string.Empty; } }
-        public override string IntermediateDirectory { get { return string.Empty; } }
-        public override string OutputDirectory { get { return string.Empty; } }
-        public override string OutputFilename { get { return string.Empty; } }
-        public override ContentIdentity SourceIdentity { get { return new ContentIdentity(""); } }
-
-        public override OpaqueDataDictionary Parameters { get { return parameters; } }
-        OpaqueDataDictionary parameters = new OpaqueDataDictionary();
-
-        public override ContentBuildLogger Logger { get { return logger; } }
-        ContentBuildLogger logger = new Logger();
-
-        public override void AddDependency(string filename) { }
-        public override void AddOutputFile(string filename) { }
-
-        public override TOutput Convert<TInput, TOutput>(TInput input, string processorName, OpaqueDataDictionary processorParameters) { throw new NotImplementedException(); }
-        public override TOutput BuildAndLoadAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName, OpaqueDataDictionary processorParameters, string importerName) { throw new NotImplementedException(); }
-        public override ExternalReference<TOutput> BuildAsset<TInput, TOutput>(ExternalReference<TInput> sourceAsset, string processorName, OpaqueDataDictionary processorParameters, string importerName, string assetName) { throw new NotImplementedException(); }
-    }
-
-    class Logger : ContentBuildLogger
-    {
-        public override void LogMessage(string message, params object[] messageArgs) { Console.WriteLine(message, messageArgs); }
-        public override void LogImportantMessage(string message, params object[] messageArgs) { Console.WriteLine(message, messageArgs); }
-        public override void LogWarning(string helpLink, ContentIdentity contentIdentity, string message, params object[] messageArgs)
-        {
-            var warning = "";
-            if (messageArgs != null && messageArgs.Length != 0)
-                warning += string.Format(message, messageArgs);
-            else if (!string.IsNullOrEmpty(message))
-                warning += message;
-            Console.WriteLine("{0}({1}): {2}", Path.GetFileName(contentIdentity.SourceFilename), contentIdentity.FragmentIdentifier, warning);
+            //EffectContent effectSource = new EffectContent
+            //{
+            //    Identity = new ContentIdentity(effectFileName),
+            //    EffectCode = File.ReadAllText(effectFileName),                
+            //};
+            //EffectProcessor processor = new EffectProcessor();
+            //CompiledEffectContent compiledEffect = processor.Process(effectSource, new ProcessorContext());
+            //return compiledEffect.GetEffectCode();
         }
     }
 

@@ -21,6 +21,7 @@ using System;
 using Orts.Common;
 using Orts.Common.Input;
 using Orts.Simulation.Commanding;
+using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
 
 namespace Orts.ActivityRunner.Viewer3D.RollingStock
@@ -34,6 +35,13 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             : base(viewer, car)
         {
             ElectricLocomotive = car;
+            if (ElectricLocomotive.Train != null && car.Train.TrainType == Train.TRAINTYPE.AI)
+            {
+                ElectricLocomotive.SignalEvent(TrainEvent.Pantograph1Up);
+                ElectricLocomotive.SignalEvent(TrainEvent.EnginePowerOn);
+                ElectricLocomotive.SignalEvent(TrainEvent.ReverserToForwardBackward);
+                ElectricLocomotive.SignalEvent(TrainEvent.ReverserChange);
+            }
         }
 
         /// <summary>

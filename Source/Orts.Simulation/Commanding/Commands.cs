@@ -953,6 +953,28 @@ namespace Orts.Simulation.Commanding
         }
     }
 
+    // Large Ejector command
+    [Serializable()]
+    public sealed class ContinuousLargeEjectorCommand : ContinuousCommand
+    {
+        public static MSTSSteamLocomotive Receiver { get; set; }
+
+        public ContinuousLargeEjectorCommand(CommandLog log, int injector, bool toState, float? target, double startTime)
+            : base(log, toState, target, startTime)
+        {
+            Redo();
+        }
+
+        public override void Redo()
+        {
+            if (Receiver == null) return;
+            {
+                Receiver.LargeEjectorChangeTo(targetState, target);
+            }
+            // Report();
+        }
+    }
+
     [Serializable()]
     public sealed class ContinuousSmallEjectorCommand : ContinuousCommand
     {
@@ -1263,6 +1285,7 @@ namespace Orts.Simulation.Commanding
         }
     }
 
+    // Cylinder Cocks command
     [Serializable()]
     public sealed class ToggleWaterScoopCommand : Command
     {

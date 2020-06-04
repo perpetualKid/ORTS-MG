@@ -6758,27 +6758,26 @@ namespace Orts.Simulation.Timetables
                         File.AppendAllText(@"C:\temp\checktrain.txt", "Train " + Name + "(" +
                              Number.ToString() + ") exits to pool " + ExitPool + "; pool claimed, path not extended \n");
                     }
-
                     validPool = true;
                 }
 
                 // if pool is not valid, reset pool info
                 else
                 {
-                    if (CheckTrain)
-                    {
-                        File.AppendAllText(@"C:\temp\checktrain.txt", "Train " + Name + "(" +
-                             Number.ToString() + ") exits to pool " + ExitPool + "; pool overflow, pool exit removed \n");
+                        if (CheckTrain)
+                        {
+                            File.AppendAllText(@"C:\temp\checktrain.txt", "Train " + Name + "(" +
+                                 Number.ToString() + ") exits to pool " + ExitPool + "; pool overflow, pool exit removed \n");
+                        }
+
+                        // reset pool access
+                        PoolAccessSection = -1;
+                        ExitPool = String.Empty;
                     }
-
-                    // reset pool access
-                    PoolAccessSection = -1;
-                    ExitPool = String.Empty;
                 }
-            }
 
-            return (validPool);
-        }
+                return (validPool);
+            }
 
         //================================================================================================//
         /// <summary>
@@ -11255,6 +11254,11 @@ namespace Orts.Simulation.Timetables
             if (!SpeedSettings.detachSpeedMpS.HasValue)
             {
                 SpeedSettings.detachSpeedMpS = TTTrain.couplingSpeedMpS;
+            }
+
+            if (!SpeedSettings.movingtableSpeedMpS.HasValue)
+            {
+                SpeedSettings.movingtableSpeedMpS = TTTrain.movingtableSpeedMpS;
             }
 
             if (!SpeedSettings.movingtableSpeedMpS.HasValue)

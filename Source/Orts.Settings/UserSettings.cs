@@ -84,6 +84,12 @@ namespace Orts.Settings
         public int Multiplayer_Port { get; set; }
 
         // General settings:
+
+        [Default(false)]
+        public bool WebServer { get; set; }
+        [Default(2150)]
+        public int WebServerPort { get; set; }
+
         [Default(false)]
         public bool Alerter { get; set; }
         [Default(true)]
@@ -176,6 +182,8 @@ namespace Orts.Settings
         public bool OverrideNonElectrifiedRoutes { get; set; }
         [Default(true)]
         public bool HotStart { get; set; }
+        [Default(true)]
+        public bool SimpleControlPhysics { get; set; }
         [Default(false)]
         public bool Autopilot { get; set; }
 
@@ -194,8 +202,9 @@ namespace Orts.Settings
         public bool DataLogMisc { get; set; }
         [Default(false)]
         public bool DataLogSteamPerformance { get; set; }
-        
-        
+        [Default(false)]
+        public bool VerboseConfigurationMessages { get; set; }
+
         // Evaluation settings:
         [Default(false)]
         public bool DataLogTrainSpeed { get; set; }
@@ -335,6 +344,8 @@ namespace Orts.Settings
         public int[] WindowPosition_Help { get; set; }
         [Default(new[] { 75, 0 })]
         public int[] WindowPosition_HUDScroll { get; set; }
+        [Default(new[] { 50, 50 })]
+        public int[] WindowPosition_TrainDriving { get; set; }
         [Default(new[] { 0, 100 })]
         public int[] WindowPosition_NextStation { get; set; }
         [Default(new[] { 50, 50 })]

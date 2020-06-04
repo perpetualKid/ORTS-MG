@@ -26,7 +26,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
     {
         private readonly IWorldPosition positionSource;
 
-        static Dictionary<string, bool> SeenShapeAnimationError = new Dictionary<string, bool>();
+        protected static Dictionary<string, bool> SeenShapeAnimationError = new Dictionary<string, bool>();
 
         public Matrix[] XNAMatrices = new Matrix[0];  // the positions of the subobjects
 
@@ -62,7 +62,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
         /// <summary>
         /// Adjust the pose of the specified node to the frame position specifed by key.
         /// </summary>
-        public void AnimateMatrix(int iMatrix, double key)
+        public virtual void AnimateMatrix(int iMatrix, double key)
         {
             // Animate the given matrix.
             AnimateOneMatrix(iMatrix, key);
@@ -186,6 +186,134 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
                     AnimateMatrix(matrix, animationKey);
             }
             SharedShape.PrepareFrame(frame, WorldPosition, XNAMatrices, Flags);
+        }
+    }
+
+    //Class AnalogClockShape to animate analog OR-Clocks as child of AnimatedShape <- PoseableShape <- StaticShape
+    public class AnalogClockShape : AnimatedShape
+    {
+        public AnalogClockShape(string path, IWorldPosition positionSource, ShapeFlags flags, float frameRateDivisor = 1.0f)
+            : base(path, positionSource, flags, frameRateDivisor)
+        {
+        }
+
+        /// <summary>
+        /// Adjust the pose of the specified ORClock hand node to the frame position specifed by key.
+        /// </summary>
+        public override void AnimateMatrix(int iMatrix, double key)
+        {
+            AnimateORClock(iMatrix, key);                      //animate matrix of analog ORClock hand
+
+            // Animate all child nodes in the hierarchy too.
+            for (var i = 0; i < Hierarchy.Length; i++)
+                if (Hierarchy[i] == iMatrix)
+                    AnimateMatrix(i, key);
+        }
+
+        private void AnimateORClock(int iMatrix, double key)
+        {
+            if (SharedShape.Animations == null || SharedShape.Animations.Count == 0)
+            {
+                if (!SeenShapeAnimationError.ContainsKey(SharedShape.FilePath))
+                    Trace.TraceInformation("Ignored missing animations data in shape {0}", SharedShape.FilePath);
+                SeenShapeAnimationError[SharedShape.FilePath] = true;
+                return;  // animation is missing
+            }
+
+            if (iMatrix < 0 || iMatrix >= SharedShape.Animations[0].AnimationNodes.Count || iMatrix >= XNAMatrices.Length)
+            {
+                if (!SeenShapeAnimationError.ContainsKey(SharedShape.FilePath))
+                    Trace.TraceInformation("Ignored out of bounds matrix {1} in shape {0}", SharedShape.FilePath, iMatrix);
+                SeenShapeAnimationError[SharedShape.FilePath] = true;
+                return;  // mismatched matricies
+            }
+
+            var anim_node = SharedShape.Animations[0].AnimationNodes[iMatrix];
+            if (anim_node.Controllers.Count == 0)
+                return;  // missing controllers
+
+            // Start with the intial pose in the shape file.
+            var xnaPose = SharedShape.Matrices[iMatrix];
+
+            foreach (Controller controller in anim_node.Controllers)
+            {
+                // Determine the frame index from the current frame ('key'). We will be interpolating between two key
+                // frames (the items in 'controller') so we need to find the last one LESS than the current frame
+                // and interpolate with the one after it.
+                var index = 0;
+                for (var i = 0; i < controller.Count; i++)
+                    if (controller[i].Frame <= key)
+                        index = i;
+                    else if (controller[i].Frame > key) // Optimisation, not required for algorithm.
+                        break;
+
+                //OR-Clock-hands Animation -------------------------------------------------------------------------------------------------------------
+                if (anim_node.Name.ToLowerInvariant().IndexOf("hand_clock") > -1)           //anim_node seems to be an OR-Clock-hand-matrix of an analog OR-Clock
+                {
+                    TimeSpan current = TimeSpan.FromSeconds(viewer.Simulator.ClockTime);
+                    int clockQuadrant = 0;                                                  //Preset: Start with Anim-Control 0 (first quadrant of OR-Clock)
+                    bool calculateClockHand = false;                                        //Preset: No drawing of a new matrix by default
+                    float quadrantAmount = 1;                                               //Preset: Represents part of the way from position1 to position2 (float Value between 0 and 1)
+                    if (anim_node.Name.ToLowerInvariant().IndexOf("orts_chand_clock") > -1) //Shape matrix is a CentiSecond Hand (continuous moved second hand) of an analog OR-clock
+                    {
+                        clockQuadrant = current.Seconds / 15;                              //Quadrant of the clock / Key-Index of anim_node (int Values: 0, 1, 2, 3)
+                        quadrantAmount = (float)(current.Seconds - (clockQuadrant * 15)) / 15;  //Seconds      Percentage quadrant related (float Value between 0 and 1) 
+                        quadrantAmount = quadrantAmount + ((float)current.Milliseconds / 1000 / 15);   //CentiSeconds Percentage quadrant related (float Value between 0 and 0.0666666)
+                        if (controller.Count == 0 || clockQuadrant < 0 || clockQuadrant + 1 > controller.Count - 1) clockQuadrant = 0; //If controller.Count dosen't match
+                        calculateClockHand = true;                                          //Calculate the new Hand position (Quaternion) below
+                    }
+                    if (anim_node.Name.ToLowerInvariant().IndexOf("orts_shand_clock") > -1) //Shape matrix is a Second Hand of an analog OR-clock
+                    {
+                        clockQuadrant = current.Seconds / 15;                              //Quadrant of the clock / Key-Index of anim_node (int Values: 0, 1, 2, 3)
+                        quadrantAmount = (float)(current.Seconds - (clockQuadrant * 15)) / 15;  //Percentage quadrant related (float Value between 0 and 1) 
+                        if (controller.Count == 0 || clockQuadrant < 0 || clockQuadrant + 1 > controller.Count - 1) clockQuadrant = 0; //If controller.Count dosen't match
+                        calculateClockHand = true;                                          //Calculate the new Hand position (Quaternion) below
+                    }
+                    if (anim_node.Name.ToLowerInvariant().IndexOf("orts_mhand_clock") > -1) //Shape matrix is a Minute Hand of an analog OR-clock
+                    {
+                        clockQuadrant = current.Minutes / 15;                              //Quadrant of the clock / Key-Index of anim_node (Values: 0, 1, 2, 3)
+                        quadrantAmount = (float)(current.Minutes - (clockQuadrant * 15)) / 15;  //Percentage quadrant related (Value between 0 and 1)
+                        if (controller.Count == 0 || clockQuadrant < 0 || clockQuadrant + 1 > controller.Count - 1) clockQuadrant = 0; //If controller.Count dosen't match
+                        calculateClockHand = true;                                          //Calculate the new Hand position (Quaternion) below
+                    }
+                    if (anim_node.Name.ToLowerInvariant().IndexOf("orts_hhand_clock") > -1) //Shape matrix is an Hour Hand of an analog OR-clock
+                    {
+                        clockQuadrant = (current.Hours % 12) / 3;                                 //Quadrant of the clock / Key-Index of anim_node (Values: 0, 1, 2, 3)
+                        quadrantAmount = (float)(current.Hours % 12 - (clockQuadrant * 3)) / 3;      //Percentage quadrant related (Value between 0 and 1)
+                        quadrantAmount = quadrantAmount + (((float)1 / 3) * ((float)current.Minutes / 60)); //add fine minute-percentage for Hour Hand between the full hours
+                        if (controller.Count == 0 || clockQuadrant < 0 || clockQuadrant + 1 > controller.Count - 1) clockQuadrant = 0; //If controller.Count dosen't match
+                        calculateClockHand = true;                                          //Calculate the new Hand position (Quaternion) below
+                    }
+                    if (calculateClockHand == true & controller.Count > 0)                  //Calculate new Hand position as usual OR-style (Slerp-animation with Quaternions)
+                    {
+                        var position1 = controller[clockQuadrant];
+                        var position2 = controller[clockQuadrant + 1];
+                        if (position1 is SlerpRotation slerp1 && position2 is SlerpRotation slerp2)  //OR-Clock anim.node has slerp keys
+                        {
+                            ref readonly Quaternion slerp1Quaternion = ref slerp1.Quaternion;
+                            ref readonly Quaternion slerp2Quaternion = ref slerp2.Quaternion;
+                            Quaternion q = Quaternion.Slerp(slerp1Quaternion, slerp2Quaternion, quadrantAmount);
+                            Vector3 location = xnaPose.Translation;
+                            xnaPose = Matrix.CreateFromQuaternion(q);
+                            xnaPose.Translation = location;
+                        }
+                        else if (position1 is LinearKey key1 && position2 is LinearKey key2) //OR-Clock anim.node has tcb keys
+                        {
+                            xnaPose.Translation = Vector3.Lerp(key1.Position, key2.Position, quadrantAmount);
+                        }
+                        else if (position1 is TcbKey tcbkey1 && position2 is TcbKey tcbkey2) //OR-Clock anim.node has tcb keys
+                        {
+                            ref readonly Quaternion tcb1Quaternion = ref tcbkey1.Quaternion;
+                            ref readonly Quaternion tcb2Quaternion = ref tcbkey2.Quaternion;
+                            Quaternion q = Quaternion.Slerp(tcb1Quaternion, tcb2Quaternion, quadrantAmount);
+                            Vector3 location = xnaPose.Translation;
+                            xnaPose = Matrix.CreateFromQuaternion(q);
+                            xnaPose.Translation = location;
+                        }
+                    }
+                }
+            }
+            XNAMatrices[iMatrix] = xnaPose;  // update the matrix
         }
     }
 
@@ -420,6 +548,12 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
             // TODO: Make this use AddAutoPrimitive instead.
             frame.AddPrimitive(shapePrimitive.Material, shapePrimitive, RenderPrimitiveGroup.World, ref xnaXfmWrtCamTile, ShapeFlags.None);
 
+            // if there is no animation, that's normal and so no animation missing error is displayed
+            if (SharedShape.Animations == null || SharedShape.Animations.Count == 0)
+            {
+                if (!SeenShapeAnimationError.ContainsKey(SharedShape.FilePath))
+                    SeenShapeAnimationError[SharedShape.FilePath] = true;
+            }
             // Update the pose
             for (int iMatrix = 0; iMatrix < SharedShape.Matrices.Length; ++iMatrix)
                 AnimateMatrix(iMatrix, animationKey);

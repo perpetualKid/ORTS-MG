@@ -405,9 +405,10 @@ namespace Orts.Simulation.AIs
                 }
             }
 #endif
-            // check deadlocks
+            // check deadlocks; do it after placing for player train, like done for it when autopilot option unchecked
 
-            CheckDeadlock(ValidRoute[0], Number);
+            if (!IsActualPlayerTrain)
+                CheckDeadlock(ValidRoute[0], Number);
 
             // set initial position and state
 
@@ -467,6 +468,8 @@ namespace Orts.Simulation.AIs
                 }
 
                 InitializeSignals(false);           // Get signal information
+                if (IsActualPlayerTrain)
+                    CheckDeadlock(ValidRoute[0], Number);
                 TCRoute.SetReversalOffset(Length, false);  // set reversal information for first subpath
                 SetEndOfRouteAction();              // set action to ensure train stops at end of route
 
@@ -490,6 +493,9 @@ namespace Orts.Simulation.AIs
                     }
                 }
             }
+
+            if (IsActualPlayerTrain)
+                SetTrainSpeedLoggingFlag();
 
             if (CheckTrain)
             {
@@ -6286,7 +6292,7 @@ namespace Orts.Simulation.AIs
         public bool SwitchToAutopilotControl()
         {
             bool success = false;
-            MUDirection = Direction.Forward;
+            // MUDirection set within following method call
             Simulator.PlayerLocomotive.SwitchToAutopilotControl();
             LeadLocomotive = null;
             LeadLocomotiveIndex = -1;
@@ -6316,7 +6322,7 @@ namespace Orts.Simulation.AIs
             ResetActions(true, true);
             if (SpeedMpS != 0) MovementState = AI_MOVEMENT_STATE.BRAKING;
             else if (this == Simulator.OriginalPlayerTrain && Simulator.ActivityRun != null && Simulator.ActivityRun.Current is ActivityTaskPassengerStopAt && ((ActivityTaskPassengerStopAt)Simulator.ActivityRun.Current).IsAtStation(this) &&
-                ((ActivityTaskPassengerStopAt)Simulator.ActivityRun.Current).BoardingS > 0)
+                ((ActivityTaskPassengerStopAt)Simulator.ActivityRun.Current).BoardingEndS > Simulator.ClockTime)
             {
                 StationStops[0].ActualDepart = (int)((ActivityTaskPassengerStopAt)Simulator.ActivityRun.Current).BoardingEndS;
                 StationStops[0].ActualArrival = -(int)(new DateTime().Add(TimeSpan.FromSeconds(0.0)) - ((ActivityTaskPassengerStopAt)Simulator.ActivityRun.Current).ActArrive).Value.TotalSeconds;

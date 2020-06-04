@@ -44,8 +44,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuxActionRef.cs" />
+    <Compile Include="Files\ClockFile.cs" />
     <Compile Include="Files\ORActivitySettingsFile.cs" />
     <Compile Include="Files\ORCarSpawnerFile.cs" />
+    <Compile Include="Models\Clock.cs" />
     <Compile Include="Models\ORActivity.cs" />
     <Compile Include="Models\TimeTable.cs" />
     <Compile Include="Models\Weather.cs" />

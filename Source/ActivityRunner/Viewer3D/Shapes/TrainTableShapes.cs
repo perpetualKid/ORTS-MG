@@ -29,6 +29,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
         {
             Turntable = turntable;
             Turntable.StartingY = (float)startingY;
+            Turntable.TurntableFrameRate = SharedShape.Animations[0].FrameRate;
             animationKey = (Turntable.YAngle / (float)Math.PI * 1800.0f + 3600) % 3600.0f;
             for (var imatrix = 0; imatrix < SharedShape.Matrices.Length; ++imatrix)
             {
@@ -69,7 +70,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
 
         public override void PrepareFrame(RenderFrame frame, in ElapsedTime elapsedTime)
         {
-            if (Turntable.GoToTarget)
+            if (Turntable.GoToTarget || Turntable.GoToAutoTarget)
             {
                 animationKey = (Turntable.TargetY / Math.PI * 1800.0 + 3600) % 3600.0;
             }
@@ -87,13 +88,13 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
 
             Turntable.YAngle = (float)MathHelperD.WrapAngle(animationKey / 1800.0 * Math.PI);
 
-            if ((Turntable.Clockwise || Turntable.Counterclockwise) && !Rotating)
+            if ((Turntable.Clockwise || Turntable.Counterclockwise || Turntable.AutoClockwise || Turntable.AutoCounterclockwise) && !Rotating)
             {
                 Rotating = true;
                 if (Sound != null) Sound.HandleEvent(Turntable.TrainsOnMovingTable.Count == 1 &&
                     Turntable.TrainsOnMovingTable[0].FrontOnBoard && Turntable.TrainsOnMovingTable[0].BackOnBoard ? TrainEvent.MovingTableMovingLoaded : TrainEvent.MovingTableMovingEmpty);
             }
-            else if ((!Turntable.Clockwise && !Turntable.Counterclockwise && Rotating))
+            else if ((!Turntable.Clockwise && !Turntable.Counterclockwise && !Turntable.AutoClockwise && !Turntable.AutoCounterclockwise && Rotating))
             {
                 Rotating = false;
                 if (Sound != null) Sound.HandleEvent(TrainEvent.MovingTableStopped);

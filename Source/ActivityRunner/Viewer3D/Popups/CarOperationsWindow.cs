@@ -87,7 +87,12 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 
         public override void PrepareFrame(in ElapsedTime elapsedTime, bool updateFull)
         {
-            if (updateFull)
+            var MovingCurrentWindow = UserInput.IsMouseLeftButtonDown &&
+                  UserInput.MouseX >= Location.X && UserInput.MouseX <= Location.X + Location.Width &&
+                  UserInput.MouseY >= Location.Y && UserInput.MouseY <= Location.Y + Location.Height ?
+                  true : false;
+
+            if (!MovingCurrentWindow && updateFull)
             {
                 Layout();
             }

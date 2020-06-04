@@ -78,6 +78,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         List<string> stringStatus = new List<string>();
         public static bool BrakeInfoVisible = false;
 
+        public int WebServerPageNo = 0;
         int TextPage;
         int LocomotivePage = 2;
         int LastTextPage;
@@ -285,13 +286,26 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             {
                 var table = new TableData() { Cells = new string[TextTable.Cells.GetLength(0), TextTable.Cells.GetLength(1)] };
                 //Normal screen or full screen
-                if (!hudWindowFullScreen)
+                if (!hudWindowFullScreen || (Viewer.HUDScrollWindow.Visible && TextPage == 0)) 
                     TextPages[0](table);
 
                 if (TextPage > 0)
                     TextPages[TextPage](table);
                 TextTable = table;
             }
+        }
+
+        // ==========================================================================================================================================
+        //      Method to construct the various Heads Up Display pages for use by the WebServer 
+        //      Replaces the Prepare Frame Method
+        //      djr - 20171221
+        // ==========================================================================================================================================
+        public TableData PrepareTable(int PageNo)
+        {
+            var table = new TableData() { Cells = new string[1, 1] };
+            WebServerPageNo = PageNo;
+            TextPages[PageNo](table);
+            return (table);
         }
 
         public override void Draw(SpriteBatch spriteBatch)
@@ -342,7 +356,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         }
 
 #region Table handling
-        sealed class TableData
+        public sealed class TableData
         {
             public string[,] Cells;
             public int CurrentRow;
@@ -426,12 +440,8 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             var bunched = !stretched && playerTrain.Cars.Count > 1 && playerTrain.NPush == playerTrain.Cars.Count - 1;
             
             //Disable Hudscroll.
-            if(Viewer.HUDScrollWindow.Visible && TextPage == 0)
-                Viewer.HUDScrollWindow.Visible = false;
-
-            //Disable Hudscroll.
-            if (Viewer.HUDScrollWindow.Visible && TextPage == 0)
-                Viewer.HUDScrollWindow.Visible = false;
+            if(Viewer.HUDScrollWindow.Visible)
+                Viewer.HUDScrollWindow.Visible = TextPage == 0 && WebServerPageNo == 0 ? false : true;
 
             TableSetLabelValueColumns(table, 0, 2);
             TableAddLabelValue(table, Viewer.Catalog.GetString("Version"), VersionInfo.VersionOrBuild);
@@ -633,6 +643,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             var locomotive = Viewer.PlayerLocomotive;
             var train = locomotive.Train;
             ResetHudScroll();//Reset Hudscroll.
+            Viewer.HUDScrollWindow.Visible = WebServerPageNo > 0 ? true : false;//HudScroll
 
             //HudScroll
             //Store status for each locomotive
@@ -659,7 +670,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             //Disable loco nav scroll button when only one loco.
             hudWindowSteamLocoLead = LocomotiveID.Count == 1 && IsSteamLocomotive ? true : false;
 
-            //PlayerLoco
+            //PlayerLoco data to display
             statusHeader.Add(String.Format("{8}\t{0}\t{4}\t{1}\t{5:F0}%\t{2}\t{6:F0}%\t{3}\t\t{7}\n",
                 //0
                 Viewer.Catalog.GetString("Direction"),
@@ -989,7 +1000,6 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             string[] stringStatusToList;//Allow to change data from TableAddLines to TableSetCell
             hudWindowLocoPagesCount = 0;
             int n = train.Cars.Count;
-            int maxColumns = 0;
 
             // Different display depending upon whether vacuum braked or air braked
             for (var i = 0; i < n; i++)
@@ -1219,7 +1229,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                         TableAddLabelValue(table, Viewer.Catalog.GetString("Axle drive force"), "{0}", FormatStrings.FormatForce(mstsLocomotive.LocomotiveAxle.DriveForceN, mstsLocomotive.IsMetric));
                         TableAddLabelValue(table, Viewer.Catalog.GetString("Axle brake force"), "{0}", FormatStrings.FormatForce(mstsLocomotive.LocomotiveAxle.BrakeRetardForceN, mstsLocomotive.IsMetric));
                         TableAddLabelValue(table, Viewer.Catalog.GetString("Number of substeps"), "{0:F0} ({1})", mstsLocomotive.LocomotiveAxle.AxleRevolutionsInt.NumOfSubstepsPS,
-                                                                                                    Viewer.Catalog.GetStringFmt("filtered by {0:F0}", mstsLocomotive.LocomotiveAxle.FilterMovingAverage.Size));
+                                                  Viewer.Catalog.GetStringFmt("filtered by {0:F0}", mstsLocomotive.LocomotiveAxle.FilterMovingAverage.Size));
                         TableAddLabelValue(table, Viewer.Catalog.GetString("Solver"), "{0}", mstsLocomotive.LocomotiveAxle.AxleRevolutionsInt.Method.ToString());
                         TableAddLabelValue(table, Viewer.Catalog.GetString("Stability correction"), "{0:F0}", mstsLocomotive.LocomotiveAxle.AdhesionK);
                         TableAddLabelValue(table, Viewer.Catalog.GetString("Axle out force"), "{0} ({1})",
@@ -1305,7 +1315,11 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 Viewer.Catalog.GetString("Brk Slide"),
                 Viewer.Catalog.GetString("Bear Temp")
 
-                //Add new header data here, if adding additional column.
+                // Possibly needed for buffing forces
+                //                Viewer.Catalog.GetString("VertD"),
+                //                Viewer.Catalog.GetString("VertL"),
+                //                Viewer.Catalog.GetString("BuffExc"),
+                //                Viewer.Catalog.GetString("CplAng")
 
                 );
             }
@@ -1335,8 +1349,12 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 
                     TableSetCell(table, 9, car.Flipped ? Viewer.Catalog.GetString("Flipped") : "");
 
-                    //Add new column data here, if adding additional column.
+                    // Possibly needed for buffing forces
+                    //                TableSetCell(table, 17, "{0}", FormatStrings.FormatForce(car.WagonVerticalDerailForceN, car.IsMetric));
+                    //                TableSetCell(table, 18, "{0}", FormatStrings.FormatForce(car.TotalWagonLateralDerailForceN, car.IsMetric));
+                    //                TableSetCell(table, 19, car.BuffForceExceeded ? Viewer.Catalog.GetString("Yes") : "No");
 
+                    //                TableSetCell(table, 20, "{0:F2}", MathHelper.ToDegrees(car.WagonFrontCouplerAngleRad));
                     TableAddLine(table);
                     TableSetCell(table, 1, "Tot.Slack:");
                     TableSetCell(table, 2, "{0}", FormatStrings.FormatVeryShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric));
@@ -1344,7 +1362,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 else
                 {
                     TableSetCell(table, 1, "{0}", FormatStrings.FormatForce(car.TotalForceN, car.IsMetric));
-                    TableSetCell(table, 2, "{0}", FormatStrings.FormatForce(car.MotiveForceN, car.IsMetric));
+                    TableSetCell(table, 2, "{0}{1}", FormatStrings.FormatForce(car.MotiveForceN, car.IsMetric), car.WheelSlip ? "!!!" : car.WheelSlipWarning ? "???" : "");
                     TableSetCell(table, 3, "{0}", FormatStrings.FormatForce(car.BrakeForceN + car.DynamicBrakeForceN, car.IsMetric));
                     TableSetCell(table, 4, "{0}", FormatStrings.FormatForce(car.FrictionForceN, car.IsMetric));
                     TableSetCell(table, 5, "{0}", FormatStrings.FormatForce(car.GravityForceN, car.IsMetric));
@@ -1363,9 +1381,8 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 
                     TableSetCell(table, 18, car.Flipped ? Viewer.Catalog.GetString("Flipped") : "");
 
-                    //Add new column data here, if adding additional column.
-
                     TableAddLine(table);
+                    //TableSetCell(table, 11, "Tot {0}", FormatStrings.FormatShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric));
                     TableSetCell(table, 10, "Tot.Slack:");
                     TableSetCell(table, 11, "{0}", FormatStrings.FormatVeryShortDistanceDisplay(train.TotalCouplerSlackM, mstsLocomotive.IsMetric));
                 }
@@ -1628,8 +1645,11 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             TextPageHeading(table, Viewer.Catalog.GetString("WEATHER INFORMATION"));
 
             //Disable Hudscroll.
-            Viewer.HUDScrollWindow.Visible = false;//HudScroll
+            Viewer.HUDScrollWindow.Visible = WebServerPageNo > 0? true: false;//HudScroll
          
+            if (hudWindowFullScreen)
+                TableSetLabelValueColumns(table, 0, 2);
+
             TableAddLabelValue(table, Viewer.Catalog.GetString("Visibility"), Viewer.Catalog.GetStringFmt("{0:N0} m", Viewer.Simulator.Weather.FogDistance));
             TableAddLabelValue(table, Viewer.Catalog.GetString("Cloud cover"), Viewer.Catalog.GetStringFmt("{0:F0} %", Viewer.Simulator.Weather.OvercastFactor * 100));
             TableAddLabelValue(table, Viewer.Catalog.GetString("Intensity"), Viewer.Catalog.GetStringFmt("{0:F4} p/s/m^2", Viewer.Simulator.Weather.PricipitationIntensityPPSPM2));
@@ -1643,7 +1663,10 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             TextPageHeading(table, Viewer.Catalog.GetString("DEBUG INFORMATION"));
 
             //Disable Hudscroll.
-            Viewer.HUDScrollWindow.Visible = false;//HudScroll
+            Viewer.HUDScrollWindow.Visible = WebServerPageNo > 0 ? true : false;//HudScroll
+
+            if (hudWindowFullScreen)
+                TableSetLabelValueColumns(table, 0, 2);
 
             var allocatedBytesPerSecond = AllocatedBytesPerSecCounter == null ? 0 : AllocatedBytesPerSecCounter.NextValue();
             if (allocatedBytesPerSecond >= 1 && AllocatedBytesPerSecLastValue != allocatedBytesPerSecond)
@@ -1722,9 +1745,9 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             hudWindowColumnsPagesCount = (statusPathLenght < charFitPerLine) ? 0 : (int)Math.Ceiling(Convert.ToDouble(statusPathLenght / charFitPerLine) + 0.5);
 
             //Hide - Show HUDScrollWindow
-            if (Viewer.HUDScrollWindow.Visible && (hudWindowLinesActualPage == 1 && hudWindowLinesPagesCount == 1 && hudWindowColumnsActualPage == 0 && hudWindowColumnsPagesCount == 0) && TextPages[TextPage] != TextPageLocomotiveInfo && !hudWindowFullScreen)
+            if (Viewer.HUDScrollWindow.Visible && WebServerPageNo == 0 && (hudWindowLinesActualPage == 1 && hudWindowLinesPagesCount == 1 && hudWindowColumnsActualPage == 0 && hudWindowColumnsPagesCount == 0) && TextPages[TextPage] != TextPageLocomotiveInfo && !hudWindowFullScreen)
                 Viewer.HUDScrollWindow.Visible = false;
-            if (!Viewer.HUDScrollWindow.Visible && (hudWindowLinesPagesCount > 1 || hudWindowColumnsPagesCount > 0))
+            if (!Viewer.HUDScrollWindow.Visible && WebServerPageNo > 0 && (hudWindowLinesPagesCount > 1 || hudWindowColumnsPagesCount > 0))
                 Viewer.HUDScrollWindow.Visible = true;
         }
 
@@ -1902,6 +1925,16 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                     cumulativeTextString = "";
                 }
 
+                //Add '\n' to all stringStatus when 'PlayerLoco' Header
+                if (stringStatus.Count > 0 && stringStatus[0].Contains(Viewer.Catalog.GetString("PlayerLoco")) && stringStatus[stringStatus.Count-1].EndsWith("\n"))
+                {//TO DO: rewrite this code using LINQ
+                    for (int n = 0; n < stringStatus.Count-1 ;n++)
+                    {
+                        if (!stringStatus[n].EndsWith("\n"))
+                            stringStatus[n] = stringStatus[n] + "\n";
+                    }
+                }
+
                 //Update 'page right' and 'page left' labels.
                 if (stringStatus.Count > 1 && stringStatus.Count > hudWindowColumnsPagesCount)
                     hudWindowColumnsPagesCount = stringStatus.Count;
@@ -1937,9 +1970,9 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             //Hide - Show HUDScrollWindow
             var locomotive = Viewer.PlayerLocomotive;
             var train = locomotive.Train;
-            if (Viewer.HUDScrollWindow.Visible && hudWindowColumnsPagesCount == 0 && hudWindowLinesPagesCount == 1 && TextPages[TextPage] != TextPageLocomotiveInfo && !hudWindowFullScreen)
+            if (Viewer.HUDScrollWindow.Visible && WebServerPageNo == 0 && hudWindowColumnsPagesCount == 0 && hudWindowLinesPagesCount == 1 && TextPages[TextPage] != TextPageLocomotiveInfo && !hudWindowFullScreen)
                 Viewer.HUDScrollWindow.Visible = false;
-            if (!Viewer.HUDScrollWindow.Visible && hudWindowColumnsPagesCount > 0 || (TextPages[TextPage] == TextPageLocomotiveInfo && (IsSteamLocomotive || hudWindowLocoPagesCount > 1)))
+            if (!Viewer.HUDScrollWindow.Visible && WebServerPageNo > 0 && hudWindowColumnsPagesCount > 0 || (TextPages[TextPage] == TextPageLocomotiveInfo && (IsSteamLocomotive || hudWindowLocoPagesCount > 1)))
                 Viewer.HUDScrollWindow.Visible = true;
         }
 

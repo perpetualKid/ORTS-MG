@@ -389,6 +389,7 @@ namespace Orts.Formats.Msts
         Orts_Pantograph3,
         Orts_Pantograph4,
         Orts_Water_Scoop,
+        Orts_Large_Ejector,
         Orts_HourDial,
         Orts_MinuteDial,
         Orts_SecondDial,

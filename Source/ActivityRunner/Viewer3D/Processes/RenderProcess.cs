@@ -387,14 +387,12 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
             toggleScreenRequested = true;
         }
 
-        //[CallOnThread("Render")]
-        //[CallOnThread("Updater")]
-        public void ComputeFPS(float elapsedRealTime)
+        public void ComputeFPS(double elapsedRealTime)
         {
             if (elapsedRealTime < 0.001)
                 return;
 
-            FrameRate.Update(elapsedRealTime, 1f / elapsedRealTime);
+            FrameRate.Update(elapsedRealTime, 1.0 / elapsedRealTime);
             FrameTime.Update(elapsedRealTime, elapsedRealTime);
         }
     }

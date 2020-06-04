@@ -118,7 +118,7 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
             }
 
             // TODO: ComputeFPS should be called in UpdaterProcess.Update() but needs delta time.
-            Game.RenderProcess.ComputeFPS((float)elapsedRealTime);
+            Game.RenderProcess.ComputeFPS(elapsedRealTime);
             Viewer.Update(frame, elapsedRealTime);
         }
 
@@ -130,7 +130,7 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
         internal override void Dispose()
         {
             Viewer.Terminate();
-            if (MPManager.Server != null)
+           if (MPManager.Server != null)
                 MPManager.Server.Stop();
             if (MPManager.Client != null)
                 MPManager.Client.Stop();

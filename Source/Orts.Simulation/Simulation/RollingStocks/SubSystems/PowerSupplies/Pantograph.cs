@@ -17,6 +17,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -359,9 +360,16 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
 
             if (soundEvent != TrainEvent.None)
             {
-                foreach (var eventHandler in Wagon.EventHandlers)
+                try
                 {
-                    eventHandler.HandleEvent(soundEvent);
+                    foreach (var eventHandler in Wagon.EventHandlers)
+                    {
+                        eventHandler.HandleEvent(soundEvent);
+                    }
+                }
+                catch (Exception error)
+                {
+                    Trace.TraceInformation("Sound event skipped due to thread safety problem" + error.Message);
                 }
             }
         }

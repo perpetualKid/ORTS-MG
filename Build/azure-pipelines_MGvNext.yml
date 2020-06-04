@@ -9,6 +9,9 @@ trigger:
   branches:
     include:
     - master
+  paths:
+    exclude:
+      - Build/*
 
 pool:
   vmImage: 'VS2017-Win2016'
@@ -20,15 +23,24 @@ variables:
   outputFile: '$(Build.BuildId)'
 
 steps:
+#- checkout: none
 - task: NuGetToolInstaller@1
   inputs:
     versionSpec: 
-
+    
 - task: NuGetCommand@2
   inputs:
     command: 'restore'
+    restoreSolution: '**/*.sln'
     feedsToUse: 'select'
-    restoreSolution: '$(solution)'
+    vstsFeed: '283d8d46-b3e8-423b-b1fc-4cf79c2aff85/c4b6a39f-ba16-4ca3-bd44-6112137242ac'
+    includeNuGetOrg: true
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'custom'
+    custom: 'tool'
+    arguments: 'install -g dotnet-mgfxc --version 3.8.0.1368-develop --add-source https://pkgs.dev.azure.com/perpetualKid/ORTS-MG/_packaging/Monogame_vNext/nuget/v3/index.json'
 
 - task: VSBuild@1
   inputs:

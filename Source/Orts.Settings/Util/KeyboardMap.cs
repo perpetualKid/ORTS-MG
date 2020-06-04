@@ -86,7 +86,7 @@ namespace Orts.Settings.Util
                     if (command.ToString().StartsWith(prefixToColor.Key))
                         return prefixToColor.Value;
 
-            return Color.TransparentBlack;
+            return Color.Transparent;
         }
 
         public static void DumpToText(this InputSettings input, string filePath)
@@ -117,7 +117,7 @@ namespace Orts.Settings.Util
 
                     var keyColor = input.GetScanCodeColor(keyScanCode);
                     var keyTextColor = System.Drawing.Brushes.Black;
-                    if (keyColor == Color.TransparentBlack)
+                    if (keyColor == Color.Transparent)
                     {
                         keyColor = Color.White;
                     }

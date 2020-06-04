@@ -202,12 +202,12 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             {
                     Locomotive.AlerterReset();
 
-                    Locomotive.SetThrottlePercent(UserInput.Raildriver.ThrottlePercent);
+                    Locomotive.SetThrottlePercentWithSound(UserInput.Raildriver.ThrottlePercent);
                     Locomotive.SetTrainBrakePercent(UserInput.Raildriver.TrainBrakePercent);
                     Locomotive.SetEngineBrakePercent(UserInput.Raildriver.EngineBrakePercent);
                     Locomotive.SetBailOff(UserInput.Raildriver.BailOff);
                     if (Locomotive.CombinedControlType != MSTSLocomotive.CombinedControl.ThrottleAir)
-                        Locomotive.SetDynamicBrakePercent(UserInput.Raildriver.DynamicBrakePercent);
+                        Locomotive.SetDynamicBrakePercentWithSound(UserInput.Raildriver.DynamicBrakePercent);
                     if (UserInput.Raildriver.DirectionPercent > 50)
                         Locomotive.SetDirection(Direction.Forward);
                     else if (UserInput.Raildriver.DirectionPercent < -50)
@@ -221,9 +221,15 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                         Locomotive.SignalEvent(TrainEvent.WiperOn);
                     // changing Headlight more than one step at a time doesn't work for some reason
                     if (Locomotive.Headlight < UserInput.Raildriver.Lights - 1)
+                    {
                         Locomotive.Headlight++;
+                        Locomotive.SignalEvent(TrainEvent.LightSwitchToggle);
+                    }
                     if (Locomotive.Headlight > UserInput.Raildriver.Lights - 1)
+                    {
                         Locomotive.Headlight--;
+                        Locomotive.SignalEvent(TrainEvent.LightSwitchToggle);
+                    }
             }
 
             foreach (var command in UserInputCommands.Keys)
@@ -1002,30 +1008,14 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             //Sequence = RenderPrimitiveSequence.CabView;
             _Viewer = viewer;
             _Locomotive = car;
-            _Viewer.AdjustCabHeight(_Viewer.DisplaySize.X, _Viewer.DisplaySize.Y);
-            
-            _Viewer.CabCamera.ScreenChanged();
-            
-                                    // _Viewer.DisplaySize intercepted to adjust cab view height
+            // _Viewer.DisplaySize intercepted to adjust cab view height
             Point DisplaySize = _Viewer.DisplaySize;
-            DisplaySize.Y = _Viewer.CabHeightPixels;
-            
-                        // Use same shader for both front-facing and rear-facing cabs.
-                        if (_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF != null)
-                           {
-               _Shader = new CabShader(viewer.RenderProcess.GraphicsDevice,
-                ExtendedCVF.TranslatedPosition(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light1Position, DisplaySize),
-                ExtendedCVF.TranslatedPosition(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light2Position, DisplaySize),
-                ExtendedCVF.TranslatedColor(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light1Color),
-                ExtendedCVF.TranslatedColor(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light2Color));
-                            }
-            _PrevScreenSize = DisplaySize;
-            _SpriteShader2DCabView = (CabSpriteBatchMaterial)viewer.MaterialManager.Load("CabSpriteBatch", null, 0, 0, ShaderKey, _Shader);            
 
             #region Create Control renderers
             ControlMap = new Dictionary<int, CabViewControlRenderer>();
             int[] count = new int[256];//enough to hold all types, count the occurence of each type
             var i = 0;
+            bool firstOne = true;
             foreach (var cabView in car.CabViewList)
             {
                 if (cabView.CVFFile != null)
@@ -1034,6 +1024,25 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                     foreach (var cabfile in cabView.CVFFile.Views2D)
                     {
                         HasCabLightDirectory = CABTextureManager.LoadTextures(viewer, cabfile);
+                    }
+
+                    if (firstOne)
+                    {
+                        _Viewer.AdjustCabHeight(_Viewer.DisplaySize.X, _Viewer.DisplaySize.Y);
+
+                        _Viewer.CabCamera.ScreenChanged();
+                        DisplaySize.Y = _Viewer.CabHeightPixels;
+                        // Use same shader for both front-facing and rear-facing cabs.
+                        if (_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF != null)
+                        {
+                            _Shader = new CabShader(viewer.RenderProcess.GraphicsDevice,
+                            ExtendedCVF.TranslatedPosition(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light1Position, DisplaySize),
+                            ExtendedCVF.TranslatedPosition(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light2Position, DisplaySize),
+                            ExtendedCVF.TranslatedColor(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light1Color),
+                            ExtendedCVF.TranslatedColor(_Locomotive.CabViewList[(int)CabViewType.Front].ExtendedCVF.Light2Color));
+                        }
+                        _SpriteShader2DCabView = (CabSpriteBatchMaterial)viewer.MaterialManager.Load("CabSpriteBatch", null, 0, 0, ShaderKey, _Shader);
+                        firstOne = false;
                     }
 
                     if (cabView.CVFFile.CabViewControls == null)
@@ -1123,6 +1132,8 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                 i++;
             }
             #endregion
+
+            _PrevScreenSize = DisplaySize;
         }
 
         public CabRenderer(Viewer viewer, MSTSLocomotive car, CabViewFile CVFFile) //used by 3D cab as a refrence, thus many can be eliminated
@@ -1560,7 +1571,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                     {
                         DestinationRectangle.X = (int)(xratio * Control.Bounds.X) - Viewer.CabXOffsetPixels;
                         if (Gauge.Direction != 1 && !IsFire)
-                        DestinationRectangle.Y = (int)(yratio * (Control.Bounds.Y + (zeropos > ypos ? zeropos : 2 * zeropos - ypos))) - Viewer.CabYOffsetPixels;
+                        DestinationRectangle.Y = (int)(yratio * (Control.Bounds.Y + (zeropos > ypos ? zeropos : 2 * zeropos - ypos))) + Viewer.CabYOffsetPixels;
                         else
                         DestinationRectangle.Y = (int)(yratio * (Control.Bounds.Y + (zeropos < ypos ? zeropos : ypos))) + Viewer.CabYOffsetPixels;
                         DestinationRectangle.Width = (int)(xratio * xpos);
@@ -1746,6 +1757,8 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                 case CabViewControlType.Orts_Water_Scoop:
                 case CabViewControlType.Water_Injector1:
                 case CabViewControlType.Water_Injector2:
+                case CabViewControlType.Small_Ejector:
+                case CabViewControlType.Orts_Large_Ejector:
                 case CabViewControlType.FireHole:
                     index = PercentToIndex(data);
                     break;
@@ -1831,7 +1844,6 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                 case CabViewControlType.Orts_Cyl_Comp:
                 case CabViewControlType.Steam_Inj1:
                 case CabViewControlType.Steam_Inj2:
-                case CabViewControlType.Small_Ejector:
                 case CabViewControlType.Gears_Display:
                 case CabViewControlType.Cab_Radio:
                 case CabViewControlType.Orts_Player_Diesel_Engine:
@@ -1924,7 +1936,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                     }
                     break;
                 case CabViewControlType.Steam_Heat: Locomotive.SetSteamHeatValue(ChangedValue(Locomotive.SteamHeatController.IntermediateValue)); break;
-                case CabViewControlType.Orts_Water_Scoop: if (((Locomotive as MSTSSteamLocomotive).WaterScoopDown ? 1 : 0) != ChangedValue(Locomotive.WaterScoopDown ? 1 : 0)) ; break;
+                case CabViewControlType.Orts_Water_Scoop: if (((Locomotive as MSTSSteamLocomotive).WaterScoopDown ? 1 : 0) != ChangedValue(Locomotive.WaterScoopDown ? 1 : 0)) new ToggleWaterScoopCommand(Viewer.Log); break;
                 case CabViewControlType.Orts_Circuit_Breaker_Driver_Closing_Order:
                     new CircuitBreakerClosingOrderCommand(Viewer.Log, ChangedValue((Locomotive as MSTSElectricLocomotive).PowerSupply.CircuitBreaker.DriverClosingOrder ? 1 : 0) > 0);
                     new CircuitBreakerClosingOrderButtonCommand(Viewer.Log, ChangedValue(UserInput.IsMouseLeftButtonPressed ? 1 : 0) > 0);
@@ -1947,6 +1959,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                 case CabViewControlType.Steam_Inj1: if (((Locomotive as MSTSSteamLocomotive).Injector1IsOn ? 1 : 0) != ChangedValue((Locomotive as MSTSSteamLocomotive).Injector1IsOn ? 1 : 0)) new ToggleInjectorCommand(Viewer.Log, 1); break;
                 case CabViewControlType.Steam_Inj2: if (((Locomotive as MSTSSteamLocomotive).Injector2IsOn ? 1 : 0) != ChangedValue((Locomotive as MSTSSteamLocomotive).Injector2IsOn ? 1 : 0)) new ToggleInjectorCommand(Viewer.Log, 2); break;
                 case CabViewControlType.Small_Ejector: (Locomotive as MSTSSteamLocomotive).SetSmallEjectorValue(ChangedValue((Locomotive as MSTSSteamLocomotive).SmallEjectorController.IntermediateValue)); break;
+                case CabViewControlType.Orts_Large_Ejector: (Locomotive as MSTSSteamLocomotive).SetLargeEjectorValue(ChangedValue((Locomotive as MSTSSteamLocomotive).LargeEjectorController.IntermediateValue)); break;
                 //
                 case CabViewControlType.Cab_Radio: new CabRadioCommand(Viewer.Log, ChangedValue(Locomotive.CabRadioOn ? 1 : 0) > 0); break;
                 case CabViewControlType.Wipers: new WipersCommand(Viewer.Log, ChangedValue(Locomotive.Wiper ? 1 : 0) > 0); break;
@@ -2076,6 +2089,8 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             var digital = Control as CabViewDigitalControl;
 
             Num = Locomotive.GetDataOf(Control);
+            if (digital.ScaleRangeMin < digital.ScaleRangeMax)
+                Num = MathHelper.Clamp(Num, digital.ScaleRangeMin, digital.ScaleRangeMax);
             if (Math.Abs(Num) < digital.AccuracySwitch)
                 Format = Format2;
             else
