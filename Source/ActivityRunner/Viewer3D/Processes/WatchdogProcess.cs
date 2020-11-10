@@ -282,6 +282,8 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
             {
 #if NETCOREAPP3_1
                 throw new NotImplementedException();
+#elif NET5_0
+                throw new NotImplementedException();
 #else
                 return new StackTrace(Thread, true);
 #endif
