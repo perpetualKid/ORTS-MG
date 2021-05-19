@@ -24,6 +24,7 @@ using Orts.View;
 using Orts.View.DrawableComponents;
 using Orts.View.Track;
 using Orts.View.Track.Shapes;
+using Orts.View.Window;
 using Orts.View.Xna;
 
 using UserCommand = Orts.TrackViewer.Control.UserCommand;
@@ -154,6 +155,7 @@ namespace Orts.TrackViewer
             windowForm.FormClosing += WindowForm_FormClosing;
             LoadLanguage();
 
+            WindowBase.SetGraphicsDevice(GraphicsDevice);
         }
 
         private void WindowForm_FormClosing(object sender, System.Windows.Forms.FormClosingEventArgs e)
@@ -311,6 +313,7 @@ namespace Orts.TrackViewer
 
         private void GraphicsPreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
         {
+            e.GraphicsDeviceInformation.GraphicsProfile = GraphicsProfile.HiDef;
             e.GraphicsDeviceInformation.PresentationParameters.RenderTargetUsage = RenderTargetUsage.DiscardContents;
             e.GraphicsDeviceInformation.PresentationParameters.DepthStencilFormat = DepthFormat.Depth24Stencil8;
             e.GraphicsDeviceInformation.PresentationParameters.MultiSampleCount = Settings.UserSettings.MultisamplingCount;
@@ -403,6 +406,9 @@ namespace Orts.TrackViewer
             await Task.WhenAll(initTasks).ConfigureAwait(false);
             await PreSelectRoute(Settings.RouteSelection).ConfigureAwait(false);
             ContentArea?.PresetPosition(Settings.LastLocation);
+
+            window = new TestWindow();
+
         }
         private static void GameWindowThread(object data)
         {
@@ -434,6 +440,8 @@ namespace Orts.TrackViewer
         int drawTime;
 
         public bool InputCaptured { get; internal set; }
+
+        public TestWindow window;
 
         protected override void Draw(GameTime gameTime)
         {
@@ -472,7 +480,7 @@ namespace Orts.TrackViewer
                 TextDrawShape.DrawString(centerPoint, Color.Red, StatusMessage, drawfont, Vector2.One, TextHorizontalAlignment.Center);
 
             spriteBatch.End();
-
+            window?.Draw();
             base.Draw(gameTime);
         }
     }
