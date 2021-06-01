@@ -8,7 +8,7 @@ namespace Orts.Formats.Msts.Signalling
     #region Script Tokens
     internal class ScriptToken
     {
-        protected static int indent = 0;
+        protected static int indent;
 
         public virtual string Token { get; set; }
 
@@ -106,7 +106,7 @@ namespace Orts.Formats.Msts.Signalling
             LineNumber = lineNumber;
         }
 
-        protected virtual void AddNestedBlock(BlockBase block)
+        protected void AddNestedBlock(BlockBase block)
         {
             Current = block;
             Tokens.Add(block);
@@ -117,7 +117,7 @@ namespace Orts.Formats.Msts.Signalling
             return returnBlockId == BlockId ? this : Parent.FindAlternateReturn(returnBlockId);
         }
 
-        public override string Token { get { return ToString(); } }
+        public override string Token => ToString();
 
         public override string ToString()
         {
@@ -256,17 +256,16 @@ namespace Orts.Formats.Msts.Signalling
             if (Tokens.Count == 0)
                 return "()";
             StringBuilder builder = new StringBuilder();
-            builder.Append("(");
+            builder.Append('(');
             foreach (ScriptToken token in Tokens)
             {
-                string statement = token.ToString();
-                statement.TrimEnd('\r', '\n');
+                string statement = token.ToString().TrimEnd('\r', '\n');
                 builder.Append(statement);
                 builder.Append(' ');
             }
             if (builder.Length > 1)
                 builder.Length--;
-            builder.Append(")");
+            builder.Append(')');
             return builder.ToString();
         }
     }

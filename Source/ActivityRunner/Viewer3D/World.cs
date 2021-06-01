@@ -28,7 +28,7 @@ namespace Orts.ActivityRunner.Viewer3D
 {
     public class World
     {
-        readonly Viewer Viewer;
+        private readonly Viewer Viewer;
         public WeatherControl WeatherControl;
         public readonly SkyViewer Sky;
         public readonly MSTSSkyDrawer MSTSSky;
@@ -39,15 +39,13 @@ namespace Orts.ActivityRunner.Viewer3D
         public readonly RoadCarViewer RoadCars;
         public readonly SoundSource GameSounds;
         public readonly WorldSounds Sounds;
-
-        readonly int PerformanceInitialViewingDistance;
-        readonly int PerformanceInitialLODBias;
-
-        int TileX;
-        int TileZ;
-        int VisibleTileX;
-        int VisibleTileZ;
-        bool PerformanceTune;
+        private readonly int PerformanceInitialViewingDistance;
+        private readonly int PerformanceInitialLODBias;
+        private int TileX;
+        private int TileZ;
+        private int VisibleTileX;
+        private int VisibleTileZ;
+        private bool PerformanceTune;
 
         public World(Viewer viewer, double gameTime)
         {

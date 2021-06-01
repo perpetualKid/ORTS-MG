@@ -23,7 +23,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .cvf files
     /// </summary>
-    class CabviewLoader : Loader
+    internal class CabviewLoader : Loader
     {
         /// <summary>
         /// Try to load the file.
@@ -32,7 +32,7 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            var cabview = new CabViewFile(file);
+            _ = new CabViewFile(file);
         }
     }
 }

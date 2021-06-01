@@ -318,10 +318,10 @@ namespace ORTS.TrackViewer.Editing
         public int SidingTvn { get { return TrackDB.TrackNodes[JunctionIndex].SidingTvn(); } }
         /// <summary>Return the vector node index of the trailing path leaving this junction</summary>
         public int TrailingTvn { get { return TrackDB.TrackNodes[JunctionIndex].TrailingTvn(); } }
-       
+
 
         /// <summary>The maximum distance a junction node is allowed from its closest junction before it is said to be broken</summary>
-        const float maxDistanceAway = 2.5f;
+        private const float maxDistanceAway = 2.5f;
 
         /// <summary>
         /// Basic constructor using another node for the trackDB and tsectionDB
@@ -635,7 +635,7 @@ namespace ORTS.TrackViewer.Editing
     public class TrainpathVectorNode : TrainpathNode
     {
         /// <summary>Angle that denotes the forward direction of track where this node is</summary>
-        float trackAngleForward;
+        private float trackAngleForward;
 
         //For non-junction nodes:
         /// <summary>track Vector Node index of the non-junction node. 0 means no TVN found</summary>

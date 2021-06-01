@@ -28,7 +28,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class OSDCars : LayeredWindow
     {
-        Matrix Identity = Matrix.Identity;
+        private Matrix Identity = Matrix.Identity;
 
         internal const float MaximumDistance = OSDLocations.MaximumDistanceSiding;
         internal const float MinimumDistance = OSDLocations.MinimumDistance;
@@ -38,9 +38,9 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             Trains = 0x1,
             Cars = 0x2,
         }
-        DisplayState State = DisplayState.Trains;
 
-        Dictionary<TrainCar, LabelPrimitive> Labels = new Dictionary<TrainCar, LabelPrimitive>();
+        private DisplayState State = DisplayState.Trains;
+        private Dictionary<TrainCar, LabelPrimitive> Labels = new Dictionary<TrainCar, LabelPrimitive>();
 
         public OSDCars(WindowManager owner)
             : base(owner, 0, 0, "OSD Cars")

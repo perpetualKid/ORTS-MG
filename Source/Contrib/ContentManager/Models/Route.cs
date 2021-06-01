@@ -38,7 +38,7 @@ namespace Orts.ContentManager.Models
             }
         }
 
-        static string GetTRKFileName(string folderPath)
+        private static string GetTRKFileName(string folderPath)
         {
             if (!Directory.Exists(folderPath))
                 throw new DirectoryNotFoundException(folderPath);

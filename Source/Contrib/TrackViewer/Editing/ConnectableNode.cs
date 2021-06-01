@@ -26,7 +26,7 @@ namespace ORTS.TrackViewer.Editing
     /// In particular, it will contain the information on the Junction to connect from (either the node itself or the nearest
     /// junction in the right direction
     /// </summary>
-    class ConnectableNode
+    internal class ConnectableNode
     {
         /// <summary>The corresponding trainpath node</summary>
         public TrainpathNode OriginalNode { get; private set; }
@@ -123,15 +123,15 @@ namespace ORTS.TrackViewer.Editing
     /// <summary>
     /// Contains a list of connectable nodes that are available for reconnection during an auto-connect action on an editable path.
     /// </summary>
-    class ReconnectNodeOptions
+    internal class ReconnectNodeOptions
     {
         /// <summary>There is a good connection</summary>
         public bool ConnectionIsGood { get { return (ActualReconnectNode != null); } }
         /// <summary>The actual reconnect point in case there is a good connection. Null otherwise</summary>
         public ConnectableNode ActualReconnectNode { get; private set; }
 
-        List<ConnectableNode> connectableNodeOptions;
-        bool isForwardConnecting;
+        private List<ConnectableNode> connectableNodeOptions;
+        private bool isForwardConnecting;
 
         /// <summary>
         /// Constructor.

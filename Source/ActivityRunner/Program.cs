@@ -27,7 +27,6 @@ using Orts.ActivityRunner.Viewer3D.Processes;
 using Orts.Common.Info;
 using Orts.Common.Native;
 using Orts.Settings;
-using Orts.Simulation;
 
 namespace Orts.ActivityRunner
 {
@@ -42,11 +41,7 @@ namespace Orts.ActivityRunner
         /// </summary>
         private static void Main(string[] args)
         {
-#if NETCOREAPP
             Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
-#else
-            NativeMethods.SetProcessDpiAwareness(NativeMethods.PROCESS_DPI_AWARENESS.Process_Per_Monitor_DPI_Aware);
-#endif
 
             IEnumerable<string> options = args.Where(a => a.StartsWith("-", StringComparison.OrdinalIgnoreCase) || a.StartsWith("/", StringComparison.OrdinalIgnoreCase)).Select(a => a.Substring(1));
             UserSettings settings = new UserSettings(options);

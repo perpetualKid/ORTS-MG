@@ -15,9 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
-// Uncomment this define to enable debug logging for the Content.Get(string, ContentType) method.
-//#define DEBUG_CONTENT_GET_SCAN
-
 using System;
 using System.Collections.Generic;
 
@@ -92,36 +89,25 @@ namespace Orts.ContentManager
 
         public override string ToString()
         {
-            return string.Format("{0}({1})", Type, PathName);
+            return $"{Type}({PathName})";
         }
 
         public virtual IEnumerable<Content> Get(ContentType type)
         {
-            return new Content[0];
+            return Array.Empty<Content>();
         }
 
         public virtual Content Get(string name, ContentType type)
         {
             // This is a very naive implementation which is meant only for prototyping and maybe as a final backstop.
             var children = Get(type);
-#if DEBUG_CONTENT_GET_SCAN
-            if (children.Any())
+            foreach (var child in children)
             {
-                Debug.WriteLine(String.Format("{0} naively scanning for {2} '{1}'", this, name, type));
-#endif
-                foreach (var child in children)
+                if (child.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (child.Name.Equals(name, StringComparison.OrdinalIgnoreCase))
-                    {
-#if DEBUG_CONTENT_GET_SCAN
-                        Debug.WriteLine(String.Format("{0} naive scan found match for {2} '{1}'", this, name, type));
-#endif
-                        return child;
-                    }
+                    return child;
                 }
-#if DEBUG_CONTENT_GET_SCAN
             }
-#endif
             // This is how Get(name, type) is meant to work: stepping up the hierarchy as needed.
             if (Parent != null)
                 return Parent.Get(name, type);

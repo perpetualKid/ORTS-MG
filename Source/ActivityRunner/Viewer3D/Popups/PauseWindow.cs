@@ -25,14 +25,13 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class PauseWindow : LayeredWindow
     {
-        const double AnimationLength = 0.4;
-        const double AnimationFade = 0.1;
-        const double AnimationSize = 0.2;
-
-        bool GamePaused;
-        bool Animation;
-        double AnimationStart = -1;
-        Rectangle AnimationSource;
+        private const double AnimationLength = 0.4;
+        private const double AnimationFade = 0.1;
+        private const double AnimationSize = 0.2;
+        private bool GamePaused;
+        private bool Animation;
+        private double AnimationStart = -1;
+        private Rectangle AnimationSource;
 
         public PauseWindow(WindowManager owner)
             : base(owner, 10, 10, "Pause")

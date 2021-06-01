@@ -32,14 +32,14 @@ namespace Orts.ActivityRunner.Viewer3D
 {
     public class TrainDrawer
     {
-        readonly Viewer Viewer;
+        private readonly Viewer Viewer;
 
         // THREAD SAFETY:
         //   All accesses must be done in local variables. No modifications to the objects are allowed except by
         //   assignment of a new instance (possibly cloned and then modified).
         public Dictionary<TrainCar, TrainCarViewer> Cars = new Dictionary<TrainCar, TrainCarViewer>();
-        List<TrainCar> VisibleCars = new List<TrainCar>();
-        TrainCar PlayerCar;
+        private List<TrainCar> VisibleCars = new List<TrainCar>();
+        private TrainCar PlayerCar;
 
         public TrainDrawer(Viewer viewer)
         {
@@ -47,7 +47,7 @@ namespace Orts.ActivityRunner.Viewer3D
             Viewer.Simulator.QueryCarViewerLoaded += Simulator_QueryCarViewerLoaded;
         }
 
-        void Simulator_QueryCarViewerLoaded(object sender, Simulator.QueryCarViewerLoadedEventArgs e)
+        private void Simulator_QueryCarViewerLoaded(object sender, Simulator.QueryCarViewerLoadedEventArgs e)
         {
             var cars = Cars;
             if (cars.ContainsKey(e.Car))
@@ -144,7 +144,7 @@ namespace Orts.ActivityRunner.Viewer3D
                     car.lightDrawer.PrepareFrame(frame, elapsedTime);
         }
 
-        TrainCarViewer LoadCar(TrainCar car)
+        private TrainCarViewer LoadCar(TrainCar car)
         {
             Trace.Write("C");
             TrainCarViewer carViewer =
@@ -158,7 +158,7 @@ namespace Orts.ActivityRunner.Viewer3D
             return carViewer;
         }
 
-        static float ApproximateDistance(in WorldLocation a, in WorldLocation b)
+        private static float ApproximateDistance(in WorldLocation a, in WorldLocation b)
         {
             var dx = a.Location.X - b.Location.X;
             var dz = a.Location.Z - b.Location.Z;

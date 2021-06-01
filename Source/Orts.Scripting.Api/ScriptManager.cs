@@ -34,10 +34,9 @@ namespace Orts.Scripting.Api
             MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Runtime.InteropServices.RuntimeInformation.dll")),
             MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Collections.dll")),
             MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Linq.dll")),
-#if NETCOREAPP
+
             MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "netstandard.dll")),
             MetadataReference.CreateFromFile(Path.Combine(runtimeDirectory, "System.Private.CoreLib.dll"))
-#endif
         };
 
         private static readonly IEnumerable<string> DefaultNamespaces = new[]

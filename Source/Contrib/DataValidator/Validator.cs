@@ -23,7 +23,7 @@ using System.Text;
 
 namespace Orts.DataValidator
 {
-    abstract class Validator
+    internal abstract class Validator
     {
         protected readonly string File;
 

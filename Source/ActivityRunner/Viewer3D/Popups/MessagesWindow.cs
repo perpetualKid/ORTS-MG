@@ -29,16 +29,16 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class MessagesWindow : LayeredWindow
     {
-        const int HorizontalPadding = 160; // Wider than Track Monitor.
-        const int VerticalPadding = 150; // Taller than Next Station.
-        const int TextSize = 16;
-        const double FadeTime = 2.0;
+        private const int HorizontalPadding = 160; // Wider than Track Monitor.
+        private const int VerticalPadding = 150; // Taller than Next Station.
+        private const int TextSize = 16;
+        private const double FadeTime = 2.0;
 
         // THREAD SAFETY:
         //   All accesses must be done in local variables. No modifications to the objects are allowed except by
         //   assignment of a new instance (possibly cloned and then modified).
-        List<Message> Messages = new List<Message>();
-        bool MessagesChanged;
+        private List<Message> Messages = new List<Message>();
+        private bool MessagesChanged;
 
 		public List<string> GetTextMessages()
 		{
@@ -59,7 +59,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             Visible = true;
         }
 
-        protected internal override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter outf)
         {
             var messages = Messages;
             base.Save(outf);
@@ -68,7 +68,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 message.Save(outf);
         }
 
-        protected internal override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader inf)
         {
             base.Restore(inf);
             var messages = new List<Message>(inf.ReadInt32());
@@ -142,7 +142,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 message.LabelShadow.Color.A = message.LabelText.Color.A = (byte)MathHelper.Lerp(255, 0, MathHelper.Clamp((float)((Owner.Viewer.Simulator.GameTime - message.EndTime) / FadeTime), 0, 1));
         }
 
-        class Message
+        private class Message
         {
             public readonly string Key;
             public readonly string Text;
@@ -200,7 +200,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                select m).ToList();
 
                 // Add the new message.
-                newMessages.Add(new Message(key, String.Format("{0} {1}", FormatStrings.FormatTime(clockTime), text), existingMessage != null ? existingMessage.StartTime : gameTime, gameTime + duration));
+                newMessages.Add(new Message(key, $"{FormatStrings.FormatTime(clockTime)} {text}", existingMessage != null ? existingMessage.StartTime : gameTime, gameTime + duration));
 
                 // Sort the messages.
                 newMessages = (from m in newMessages

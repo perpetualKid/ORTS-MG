@@ -530,7 +530,7 @@ namespace ORTS.TrackViewer.Editing
     /// </summary>
     public abstract class EditorActionOtherExit : EditorAction
     {
-        const int maxNumberNodesToCheckForReconnect = 10; // maximum number of nodes we will try before we conclude not reconnection is possible.
+        private const int maxNumberNodesToCheckForReconnect = 10; // maximum number of nodes we will try before we conclude not reconnection is possible.
         /// <summary>Store the node where we might be able to reconnect during a take-other-exit</summary>
         protected TrainpathJunctionNode ReconnectNode { get; private set; }
         /// <summary>The index of the new TrackVectorNode</summary>
@@ -827,7 +827,7 @@ namespace ORTS.TrackViewer.Editing
         /// determine if the new siding node would itself be immediately on the main track.
         /// </summary>
         /// <returns>true if the new siding node is on the main track.</returns>
-        bool NewNodeWouldBeOnMainTrack()
+        private bool NewNodeWouldBeOnMainTrack()
         {
             //first find the junction index off the would-be new node
             int junctionIndexNewNode = ActiveNode.GetNextJunctionIndex(NewTvnIndex);
@@ -991,13 +991,16 @@ namespace ORTS.TrackViewer.Editing
     public class EditorActionAutoFixBrokenNodes : EditorAction
     {
         /// <summary>The node from which we will start the autofix procedure</summary>
-        TrainpathNode autoFixStartNode;
+        private TrainpathNode autoFixStartNode;
+
         /// <summary>The node to which we need to reconnect during autofix</summary>
-        TrainpathNode autoFixReconnectNode;
+        private TrainpathNode autoFixReconnectNode;
+
         /// <summary>The amount of nodes that will be removed if we succeed</summary>
-        int numberOfNodesThatWillBeRemoved;
+        private int numberOfNodesThatWillBeRemoved;
+
         /// <summary>Tooling to do auto connect</summary>
-        AutoConnectTools autoConnectTools;
+        private AutoConnectTools autoConnectTools;
 
         /// <summary>Constructor</summary>
         public EditorActionAutoFixBrokenNodes()
@@ -1048,7 +1051,7 @@ namespace ORTS.TrackViewer.Editing
         /// Find (and store) a non-broken node that predecesses the activeNode.
         /// Also count the number of intermediate broken nodes that will be removed if we succeed in autofixing the path.
         /// </summary>
-        void FindNonBrokenPredecessor()
+        private void FindNonBrokenPredecessor()
         {
             autoFixStartNode = null;
             TrainpathNode predecessor = ActiveNode.PrevNode;
@@ -1068,7 +1071,7 @@ namespace ORTS.TrackViewer.Editing
         /// Find (and store) a non-broken node that comes after the activeNode.
         /// Also count the number of intermediate broken nodes that will be removed if we succeed in autofixing the path.
         /// </summary>
-        void FindNonBrokenSuccessor()
+        private void FindNonBrokenSuccessor()
         {
             autoFixReconnectNode = null;
             TrainpathNode successor = ActiveNode.NextMainNode;
@@ -1105,7 +1108,7 @@ namespace ORTS.TrackViewer.Editing
     public class EditorActionAutoConnectTail : EditorAction
     {
         /// <summary>Tooling to do auto connect</summary>
-        AutoConnectTools autoConnectTools;
+        private AutoConnectTools autoConnectTools;
 
         /// <summary>Constructor</summary>
         public EditorActionAutoConnectTail()
@@ -1144,7 +1147,7 @@ namespace ORTS.TrackViewer.Editing
         /// </summary>
         /// <param name="node">Node to start with (will not be counted)</param>
         /// <returns>Amount of (main) nodes counted</returns>
-        static int CountSuccessors(TrainpathNode node)
+        private static int CountSuccessors(TrainpathNode node)
         {
             int result = 0;
             TrainpathNode currentNode = node.NextMainNode;
@@ -1164,9 +1167,10 @@ namespace ORTS.TrackViewer.Editing
     /// </summary>
     public class EditorActionReconnectPassingPath : EditorAction
     {
-        TrainpathNode sidingStartNode;
+        private TrainpathNode sidingStartNode;
+
         // <summary>Tooling to do auto connect</summary>
-        AutoConnectTools autoConnectTools;
+        private AutoConnectTools autoConnectTools;
 
         /// <summary>Constructor</summary>
         public EditorActionReconnectPassingPath()
@@ -1192,7 +1196,7 @@ namespace ORTS.TrackViewer.Editing
         /// This action can only be done if there is a passing path stub, that is, a start of a passing path
         /// that contains only a single siding node that is broken and not reconnected.
         /// </summary>
-        void FindPassingPathStub() {
+        private void FindPassingPathStub() {
             sidingStartNode = null;
             autoConnectTools.ResetDisallowedJunctions();
 
@@ -1265,9 +1269,10 @@ namespace ORTS.TrackViewer.Editing
     /// </summary>
     public class EditorActionTakeOtherExitPassingPath : EditorAction
     {
-        TrainpathNode sidingEndNode;
+        private TrainpathNode sidingEndNode;
+
         // <summary>Tooling to do auto connect</summary>
-        AutoConnectTools autoConnectTools;
+        private AutoConnectTools autoConnectTools;
 
 
         /// <summary>Constructor</summary>
@@ -1303,7 +1308,7 @@ namespace ORTS.TrackViewer.Editing
         /// This action can only be done if there is a passing path stub, that is, a start of a passing path
         /// that contains only a single siding node that is broken and not reconnected.
         /// </summary>
-        void FindSidingEnd()
+        private void FindSidingEnd()
         {
             TrainpathNode sidingNode = ActiveNode;
             while (sidingNode != null)
@@ -1323,7 +1328,7 @@ namespace ORTS.TrackViewer.Editing
         /// as well as the single junction index on the current siding path that we cannot take because we want the other exit.
         /// </summary>
         /// <returns>false if there was something really wrong</returns>
-        bool FindDisAllowedJunctionIndexes()
+        private bool FindDisAllowedJunctionIndexes()
         {
             autoConnectTools.ResetDisallowedJunctions();
 
@@ -1463,8 +1468,8 @@ namespace ORTS.TrackViewer.Editing
     /// </summary>
     public class EditorActionMouseDragVectorNode : EditorActionMouseDrag
     {
-        TrainpathNode dragLimitNode1, dragLimitNode2; // the dragging node must be between these two limits
-        TrainpathVectorNode nodeBeingDragged;               // link to the node (new) that is being dragged.
+        private TrainpathNode dragLimitNode1, dragLimitNode2; // the dragging node must be between these two limits
+        private TrainpathVectorNode nodeBeingDragged;               // link to the node (new) that is being dragged.
 
         /// <summary>Constructor</summary>
         public EditorActionMouseDragVectorNode() : base("Drag a special node", "") { }
@@ -1534,7 +1539,7 @@ namespace ORTS.TrackViewer.Editing
             }
         }
 
-        void FindDraggingLimitsStart()
+        private void FindDraggingLimitsStart()
         {
             dragLimitNode1 = LimitingJunctionNode(false);
             if (nodeBeingDragged.NextMainNode == null)
@@ -1546,14 +1551,14 @@ namespace ORTS.TrackViewer.Editing
                 dragLimitNode2 = nodeBeingDragged.NextMainNode;
             }
         }
-        
-        void FindDraggingLimitsEnd()
+
+        private void FindDraggingLimitsEnd()
         {
             dragLimitNode1 = nodeBeingDragged.PrevNode;
             dragLimitNode2 = LimitingJunctionNode(true);
         }
 
-        void FindDraggingLimitsReverse()
+        private void FindDraggingLimitsReverse()
         {
             if (nodeBeingDragged.NextMainNode == null)
             {
@@ -1586,7 +1591,7 @@ namespace ORTS.TrackViewer.Editing
             dragLimitNode2 = LimitingJunctionNode(false); // direction of reverse is after the reverse. 
         }
 
-        void FindDraggingLimitsStop()
+        private void FindDraggingLimitsStop()
         {
             dragLimitNode1 = nodeBeingDragged.PrevNode;
             if (nodeBeingDragged.NextMainNode == null)
@@ -1599,7 +1604,7 @@ namespace ORTS.TrackViewer.Editing
             }
         }
 
-        TrainpathJunctionNode LimitingJunctionNode(bool afterNode)
+        private TrainpathJunctionNode LimitingJunctionNode(bool afterNode)
         {
             TrainpathJunctionNode newJunctionNode = new TrainpathJunctionNode(nodeBeingDragged);
 
@@ -1939,7 +1944,7 @@ namespace ORTS.TrackViewer.Editing
     /// </summary>
     public class EditorActionDrawUntilHere : EditorAction
     {
-        AfterEditDelegate callback;
+        private AfterEditDelegate callback;
 
         /// <summary>Constructor</summary>
         public EditorActionDrawUntilHere(AfterEditDelegate callback)
@@ -1970,7 +1975,7 @@ namespace ORTS.TrackViewer.Editing
     /// </summary>
     public class EditorActionDrawToNextBrokenPoint : EditorAction
     {
-        AfterEditDelegate callback;
+        private AfterEditDelegate callback;
 
         /// <summary>Constructor</summary>
         public EditorActionDrawToNextBrokenPoint(AfterEditDelegate callback)

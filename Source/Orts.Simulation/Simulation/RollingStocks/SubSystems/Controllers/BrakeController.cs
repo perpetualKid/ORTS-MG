@@ -29,12 +29,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
 {
     public class ScriptedBrakeController : IController
     {
-        readonly MSTSLocomotive Locomotive;
-        readonly Simulator Simulator;
+        private readonly MSTSLocomotive Locomotive;
+        private readonly Simulator Simulator;
 
         private readonly bool activated;
         private string scriptName = "MSTS";
-        BrakeController Script;
+        private BrakeController Script;
         public List<INotchController> Notches { get; } = new List<INotchController>();
 
         private bool emergencyBrakingPushButton;
@@ -520,17 +520,17 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 string state = Script.GetState().GetLocalizedDescription();
                 string fraction = GetStateFractionScripted();
 
-                if (String.IsNullOrEmpty(state) && String.IsNullOrEmpty(fraction))
-                    return String.Empty;
-                else if (!String.IsNullOrEmpty(state) && String.IsNullOrEmpty(fraction))
+                if (string.IsNullOrEmpty(state) && string.IsNullOrEmpty(fraction))
+                    return string.Empty;
+                else if (!string.IsNullOrEmpty(state) && string.IsNullOrEmpty(fraction))
                     return state;
-                else if (String.IsNullOrEmpty(state) && !String.IsNullOrEmpty(fraction))
+                else if (string.IsNullOrEmpty(state) && !string.IsNullOrEmpty(fraction))
                     return fraction;
                 else
-                    return String.Format("{0} {1}", state, fraction);
+                    return $"{state} {fraction}";
             }
             else
-                return String.Empty;
+                return string.Empty;
         }
 
         public string GetStateFractionScripted()
@@ -540,13 +540,13 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
                 float? fraction = Script.GetStateFraction();
 
                 if (fraction != null)
-                    return String.Format("{0:F0}%", 100 * (fraction ?? 0));
+                    return $"{100 * (fraction):F0}%";
                 else
-                    return String.Empty;
+                    return string.Empty;
             }
             else
             {
-                return String.Empty;
+                return string.Empty;
             }
         }
 

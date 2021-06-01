@@ -30,16 +30,14 @@ namespace Orts.ActivityRunner.Viewer3D
     [DebuggerDisplay("TileX = {TileX}, TileZ = {TileZ}, Size = {Size}")]
     public class WaterPrimitive : RenderPrimitive
     {
-        static KeyValuePair<float, Material>[] WaterLayers;
-
-        readonly Viewer Viewer;
-        readonly int TileX, TileZ, Size;
-        readonly VertexBuffer VertexBuffer;
-        readonly IndexBuffer IndexBuffer;
-        readonly int PrimitiveCount;
-        readonly VertexBufferBinding[] VertexBufferBindings;
-
-        Matrix xnaMatrix = Matrix.Identity;
+        private static KeyValuePair<float, Material>[] WaterLayers;
+        private readonly Viewer Viewer;
+        private readonly int TileX, TileZ, Size;
+        private readonly VertexBuffer VertexBuffer;
+        private readonly IndexBuffer IndexBuffer;
+        private readonly int PrimitiveCount;
+        private readonly VertexBufferBinding[] VertexBufferBindings;
+        private Matrix xnaMatrix = Matrix.Identity;
 
         public WaterPrimitive(Viewer viewer, Tile tile)
         {
@@ -81,7 +79,7 @@ namespace Orts.ActivityRunner.Viewer3D
             graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, PrimitiveCount);
         }
 
-        void LoadGeometry(GraphicsDevice graphicsDevice, Tile tile, out int primitiveCount, out IndexBuffer indexBuffer, out VertexBuffer vertexBuffer)
+        private void LoadGeometry(GraphicsDevice graphicsDevice, Tile tile, out int primitiveCount, out IndexBuffer indexBuffer, out VertexBuffer vertexBuffer)
         {
             primitiveCount = 0;
             var waterLevels = new Matrix2x2(tile.WaterNW, tile.WaterNE, tile.WaterSW, tile.WaterSE);

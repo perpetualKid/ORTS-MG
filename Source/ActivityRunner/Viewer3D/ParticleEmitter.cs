@@ -43,12 +43,10 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public const float MaxParticlesPerSecond = 50f;
         public const float MaxParticleDuration = 50f;
-
-        readonly Viewer Viewer;
-        readonly float EmissionHoleM2 = 1;
-        readonly ParticleEmitterPrimitive Emitter;
-
-        ParticleEmitterMaterial Material;
+        private readonly Viewer Viewer;
+        private readonly float EmissionHoleM2 = 1;
+        private readonly ParticleEmitterPrimitive Emitter;
+        private ParticleEmitterMaterial Material;
 
 #if DEBUG_EMITTER_INPUT
         const int InputCycleLimit = 600;
@@ -154,19 +152,17 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class ParticleEmitterPrimitive : RenderPrimitive
     {
-        const int IndiciesPerParticle = 6;
-        const int VerticiesPerParticle = 4;
-        const int PrimitivesPerParticle = 2;
+        private const int IndiciesPerParticle = 6;
+        private const int VerticiesPerParticle = 4;
+        private const int PrimitivesPerParticle = 2;
+        private readonly int MaxParticles;
+        private readonly ParticleVertex[] Vertices;
+        private readonly VertexDeclaration VertexDeclaration;
+        private readonly DynamicVertexBuffer VertexBuffer;
+        private readonly IndexBuffer IndexBuffer;
+        private readonly float[] PerlinStart;
 
-        readonly int MaxParticles;
-        readonly ParticleVertex[] Vertices;
-        readonly VertexDeclaration VertexDeclaration;
-        readonly DynamicVertexBuffer VertexBuffer;
-        readonly IndexBuffer IndexBuffer;
-
-        readonly float[] PerlinStart;
-
-        struct ParticleVertex
+        private struct ParticleVertex
         {
             public Vector4 StartPosition_StartTime;
             public Vector4 InitialVelocity_EndTime;
@@ -203,18 +199,15 @@ namespace Orts.ActivityRunner.Viewer3D
         //   |                    |
         //   +--<retired---<free--+
 
-        int FirstActiveParticle;
-        int FirstNewParticle;
-        int FirstFreeParticle;
-        int FirstRetiredParticle;
-
-        float TimeParticlesLastEmitted;
-        int DrawCounter;
-
-        Viewer viewer;
-        
-        static float windDisplacementX;
-        static float windDisplacementZ;
+        private int FirstActiveParticle;
+        private int FirstNewParticle;
+        private int FirstFreeParticle;
+        private int FirstRetiredParticle;
+        private float TimeParticlesLastEmitted;
+        private int DrawCounter;
+        private Viewer viewer;
+        private static float windDisplacementX;
+        private static float windDisplacementZ;
 
         public ParticleEmitterPrimitive(Viewer viewer, ParticleEmitterData data, IWorldPosition positionSource)
         {
@@ -248,12 +241,12 @@ namespace Orts.ActivityRunner.Viewer3D
             };
         }
 
-        void VertexBuffer_ContentLost()
+        private void VertexBuffer_ContentLost()
         {
             VertexBuffer.SetData(0, Vertices, 0, Vertices.Length, ParticleVertex.VertexStride, SetDataOptions.NoOverwrite);
         }
 
-        static IndexBuffer InitIndexBuffer(GraphicsDevice graphicsDevice, int numIndicies)
+        private static IndexBuffer InitIndexBuffer(GraphicsDevice graphicsDevice, int numIndicies)
         {
             var indices = new ushort[numIndicies];
             var index = 0;
@@ -279,7 +272,7 @@ namespace Orts.ActivityRunner.Viewer3D
             get { return EmitterData.NozzleWidth; }
         }
 
-        void RetireActiveParticles(float currentTime)
+        private void RetireActiveParticles(float currentTime)
         {
             while (FirstActiveParticle != FirstNewParticle)
             {
@@ -296,7 +289,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        void FreeRetiredParticles()
+        private void FreeRetiredParticles()
         {
             while (FirstRetiredParticle != FirstActiveParticle)
             {
@@ -311,7 +304,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        int GetCountFreeParticles()
+        private int GetCountFreeParticles()
         {
             var nextFree = (FirstFreeParticle + 1) % MaxParticles;
 
@@ -406,7 +399,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        void AddNewParticlesToVertexBuffer()
+        private void AddNewParticlesToVertexBuffer()
         {
             if (FirstNewParticle < FirstFreeParticle)
             {

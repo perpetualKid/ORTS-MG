@@ -75,9 +75,9 @@ namespace Orts.Simulation.Timetables
             invalid,
         }
 
-        Dictionary<string, AIPath> Paths = new Dictionary<string, AIPath>();                                  // original path referenced by path name
-        List<string> reportedPaths = new List<string>();                                                      // reported path fails
-        Dictionary<int, string> TrainRouteXRef = new Dictionary<int, string>();                               // path name referenced from train index    
+        private Dictionary<string, AIPath> Paths = new Dictionary<string, AIPath>();                                  // original path referenced by path name
+        private List<string> reportedPaths = new List<string>();                                                      // reported path fails
+        private Dictionary<int, string> TrainRouteXRef = new Dictionary<int, string>();                               // path name referenced from train index    
 
         public bool BinaryPaths = false;
 

@@ -39,7 +39,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         // THREAD SAFETY:
         //   All accesses must be done in local variables. No modifications to the objects are allowed except by
         //   assignment of a new instance (possibly cloned and then modified).
-        Dictionary<string, WindowTextFont> Fonts = new Dictionary<string, WindowTextFont>();
+        private Dictionary<string, WindowTextFont> Fonts = new Dictionary<string, WindowTextFont>();
 
         /// <summary>
         /// Provides a <see cref="WindowTextFont"/> for the specified <paramref name="fontFamily"/>,
@@ -113,7 +113,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         public WindowTextFont GetExact(string fontFamily, float sizeInPt, FontStyle style, int outlineSize)
         {
             var fonts = Fonts;
-            var key = String.Format("{0}:{1:F}:{2}:{3}", fontFamily, sizeInPt, style, outlineSize);
+            var key = $"{fontFamily}:{sizeInPt:F}:{style}:{outlineSize}";
             if (!fonts.ContainsKey(key))
             {
                 fonts = new Dictionary<string, WindowTextFont>(fonts);
@@ -133,14 +133,14 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 
     public sealed class WindowTextFont
     {
-        readonly Font Font;
-        readonly int FontHeight;
-        readonly int OutlineSize;
+        private readonly Font Font;
+        private readonly int FontHeight;
+        private readonly int OutlineSize;
 
         // THREAD SAFETY:
         //   All accesses must be done in local variables. No modifications to the objects are allowed except by
         //   assignment of a new instance (possibly cloned and then modified).
-        CharacterGroup Characters;
+        private CharacterGroup Characters;
 
         internal WindowTextFont(string fontFamily, float sizeInPt, FontStyle style, int outlineSize)
         {
@@ -222,7 +222,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             Draw(spriteBatch, offset, rotation, position.Width, text, align, color, outline);
         }
 
-        void Draw(SpriteBatch spriteBatch, Point position, float rotation, int width, string text, LabelAlignment align, Color color, Color outline)
+        private void Draw(SpriteBatch spriteBatch, Point position, float rotation, int width, string text, LabelAlignment align, Color color, Color outline)
         {
             EnsureCharacterData(text);
             var characters = Characters;
@@ -364,7 +364,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             Characters.Load(graphicsDevice);
         }
 
-        void EnsureCharacterData(string text)
+        private void EnsureCharacterData(string text)
         {
             var characters = Characters;
 
@@ -397,14 +397,13 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         }
 #endif
 
-        sealed internal class CharacterGroup
+        internal sealed class CharacterGroup
         {
-            const int BoxSpacing = 1;
-            const System.Windows.Forms.TextFormatFlags Flags = System.Windows.Forms.TextFormatFlags.NoPadding | System.Windows.Forms.TextFormatFlags.NoPrefix | System.Windows.Forms.TextFormatFlags.SingleLine | System.Windows.Forms.TextFormatFlags.Top;
-
-            readonly Font Font;
-            readonly int OutlineSize;
-            readonly char[] Characters;
+            private const int BoxSpacing = 1;
+            private const System.Windows.Forms.TextFormatFlags Flags = System.Windows.Forms.TextFormatFlags.NoPadding | System.Windows.Forms.TextFormatFlags.NoPrefix | System.Windows.Forms.TextFormatFlags.SingleLine | System.Windows.Forms.TextFormatFlags.Top;
+            private readonly Font Font;
+            private readonly int OutlineSize;
+            private readonly char[] Characters;
             public readonly Rectangle[] Boxes;
             public readonly int BoxesMaxRight;
             public readonly int BoxesMaxBottom;
@@ -427,7 +426,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             {
             }
 
-            CharacterGroup(char[] characters, Font mergeFont, int mergeOutlineSize, char[] mergeCharacters, Rectangle[] mergeBoxes, Vector3[] mergeAbcWidths)
+            private CharacterGroup(char[] characters, Font mergeFont, int mergeOutlineSize, char[] mergeCharacters, Rectangle[] mergeBoxes, Vector3[] mergeAbcWidths)
             {
                 Font = mergeFont;
                 OutlineSize = mergeOutlineSize;
@@ -466,7 +465,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                         else
                         {
                             // This is a bit of a cheat, but is used when the chosen font does not have the character itself but it will render anyway (e.g. through font fallback).
-                            AbcWidths[i] = new Vector3(0, System.Windows.Forms.TextRenderer.MeasureText(String.Format(" {0} ", Characters[i]), Font, System.Drawing.Size.Empty, Flags).Width - System.Windows.Forms.TextRenderer.MeasureText("  ", Font, System.Drawing.Size.Empty, Flags).Width, 0);
+                            AbcWidths[i] = new Vector3(0, System.Windows.Forms.TextRenderer.MeasureText($" {Characters[i]} ", Font, System.Drawing.Size.Empty, Flags).Width - System.Windows.Forms.TextRenderer.MeasureText("  ", Font, System.Drawing.Size.Empty, Flags).Width, 0);
                         }
                         Boxes[i] = new Rectangle(x, y, (int)(Math.Max(0, AbcWidths[i].X) + AbcWidths[i].Y + Math.Max(0, AbcWidths[i].Z) + 2 * OutlineSize), height + 2 * OutlineSize);
                         x += Boxes[i].Width + BoxSpacing;
@@ -498,7 +497,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 return Array.BinarySearch(Characters, character);
             }
 
-            byte[] GetBitmapData(System.Drawing.Rectangle rectangle)
+            private byte[] GetBitmapData(System.Drawing.Rectangle rectangle)
             {
                 var bitmap = new System.Drawing.Bitmap(rectangle.Width, rectangle.Height, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
                 var buffer = new byte[4 * rectangle.Width * rectangle.Height];

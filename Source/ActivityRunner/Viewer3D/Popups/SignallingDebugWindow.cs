@@ -46,15 +46,14 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             Stop,
         }
 
-        const float SignalErrorDistance = 100;
-        const float SignalWarningDistance = 500;
-        const float DisplayDistance = 1000;
-        const float DisplaySegmentLength = 10;
-        const float MaximumSectionDistance = 10000;
-
-        Viewport Viewport;
-        Dictionary<int, TrackSectionCacheEntry> Cache = new Dictionary<int, TrackSectionCacheEntry>();
-        List<DispatcherPrimitive> Primitives = new List<DispatcherPrimitive>();
+        private const float SignalErrorDistance = 100;
+        private const float SignalWarningDistance = 500;
+        private const float DisplayDistance = 1000;
+        private const float DisplaySegmentLength = 10;
+        private const float MaximumSectionDistance = 10000;
+        private Viewport Viewport;
+        private Dictionary<int, TrackSectionCacheEntry> Cache = new Dictionary<int, TrackSectionCacheEntry>();
+        private List<DispatcherPrimitive> Primitives = new List<DispatcherPrimitive>();
 
         public SignallingDebugWindow(WindowManager owner)
             : base(owner, 1, 1, "Dispatcher Debug")
@@ -259,7 +258,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 line.Draw(spriteBatch);
         }
 
-        TrackSectionCacheEntry GetCacheEntry(Traveller position)
+        private TrackSectionCacheEntry GetCacheEntry(Traveller position)
         {
             TrackSectionCacheEntry rv;
             if (Cache.TryGetValue(position.TrackNodeIndex, out rv) && (rv.Direction == position.Direction))
@@ -327,7 +326,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             return rv;
         }
 
-        static DebugWindowSignalAspect GetAspect(Signal signal)
+        private static DebugWindowSignalAspect GetAspect(Signal signal)
         {
             var aspect = signal.SignalLR(SignalFunction.Normal);
 
@@ -338,7 +337,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             return DebugWindowSignalAspect.Stop;
         }
 
-        enum DistanceToType
+        private enum DistanceToType
         {
             Nothing,
             EndOfLine,
@@ -398,15 +397,14 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 
     public class DispatcherLineSegment : DispatcherPrimitive
     {
-        WorldLocation Start;
-        WorldLocation End;
-        Color Color;
-        float Width;
-
-        bool Visible;
-        Vector2 Start2D;
-        float Angle;
-        float Length;
+        private WorldLocation Start;
+        private WorldLocation End;
+        private Color Color;
+        private float Width;
+        private bool Visible;
+        private Vector2 Start2D;
+        private float Angle;
+        private float Length;
 
         public DispatcherLineSegment(in WorldLocation start, in WorldLocation end, Color color, float width)
         {
@@ -440,19 +438,17 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 
     public class DispatcherLabel : DispatcherPrimitive
     {
-        const int TextOffsetX = 2;
-        const int TextOffsetY = -2;
-
-        WorldLocation Position;
-        Color Color;
-        string Text;
-        WindowTextFont Font;
-        Vector2 TextSize;
-
-        bool Visible;
-        float LabelOffset;
-        Vector2 Position2D;
-        Point Position2DText;
+        private const int TextOffsetX = 2;
+        private const int TextOffsetY = -2;
+        private WorldLocation Position;
+        private Color Color;
+        private string Text;
+        private WindowTextFont Font;
+        private Vector2 TextSize;
+        private bool Visible;
+        private float LabelOffset;
+        private Vector2 Position2D;
+        private Point Position2DText;
 
         public DispatcherLabel(in WorldLocation position, Color color, string text, WindowTextFont font)
         {

@@ -20,6 +20,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -28,6 +29,7 @@ using Microsoft.Xna.Framework.Graphics;
 
 using Orts.ActivityRunner.Viewer3D.Common;
 using Orts.ActivityRunner.Viewer3D.Popups;
+using Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs;
 using Orts.ActivityRunner.Viewer3D.Shapes;
 using Orts.Common;
 using Orts.Common.Calc;
@@ -47,7 +49,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 {
     public class MSTSLocomotiveViewer : MSTSWagonViewer
     {
-        MSTSLocomotive Locomotive;
+        private MSTSLocomotive Locomotive;
 
         protected MSTSLocomotive MSTSLocomotive { get { return (MSTSLocomotive)Car; } }
 
@@ -597,7 +599,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         /// </summary>
         #region Refill loco or tender from pickup points
 
-        WagonAndMatchingPickup MatchedWagonAndPickup;
+        private WagonAndMatchingPickup MatchedWagonAndPickup;
 
 
         /// <summary>
@@ -620,7 +622,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         /// <param name="train"></param>
         /// <returns>a combination of intake point and pickup that are closest</returns>
         // <CJComment> Might be better in the MSTSLocomotive class, but can't see the World objects from there. </CJComment>
-        WagonAndMatchingPickup GetMatchingPickup(Train train)
+        private WagonAndMatchingPickup GetMatchingPickup(Train train)
         {
             var worldFiles = Viewer.World.Scenery.WorldFiles;
             var shortestD2 = float.MaxValue;
@@ -693,7 +695,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         /// </summary>
         /// <param name="match"></param>
         /// <returns></returns>
-        float GetDistanceToM(WagonAndMatchingPickup match)
+        private float GetDistanceToM(WagonAndMatchingPickup match)
         {
             VectorExtension.Transform(new Vector3(0, 0, -match.IntakePoint.OffsetM), match.Wagon.WorldPosition.XNAMatrix, out Vector3 intakePosition);
 
@@ -964,7 +966,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             return Directory.Exists(lightdirectory);
         }
 
-        static Texture2D[] Disassemble(GraphicsDevice graphicsDevice, Texture2D texture, int frameCount, Point frameGrid, string fileName)
+        private static Texture2D[] Disassemble(GraphicsDevice graphicsDevice, Texture2D texture, int frameCount, Point frameGrid, string fileName)
         {
             if (frameGrid.X < 1 || frameGrid.Y < 1 || frameCount < 1)
             {
@@ -1007,7 +1009,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             return frames;
         }
 
-        static int DisassembleFrames<T>(GraphicsDevice graphicsDevice, Texture2D texture, int frameCount, Point frameGrid, Texture2D[] frames, Point frameSize, Point copySize, Point controlSize, T[] buffer) where T : struct
+        private static int DisassembleFrames<T>(GraphicsDevice graphicsDevice, Texture2D texture, int frameCount, Point frameGrid, Texture2D[] frames, Point frameSize, Point copySize, Point controlSize, T[] buffer) where T : struct
         {
             //Trace.TraceInformation("Disassembling {0} {1} frames in {2}x{3}; control {4}x{5}, frame {6}x{7}, copy {8}x{9}.", texture.Format, frameCount, frameGrid.X, frameGrid.Y, controlSize.X, controlSize.Y, frameSize.X, frameSize.Y, copySize.X, copySize.Y);
             var frameIndex = 0;
@@ -1378,7 +1380,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                         {
                             CabViewDigitalRenderer cvdr;
                             if (viewer.Settings.CircularSpeedGauge && digital.ControlStyle == CabViewControlStyle.Needle)
-                                cvdr = new CabViewCircularSpeedGaugeRenderer(viewer, car, digital, _Shader);
+                                cvdr = new CircularSpeedGaugeRenderer(viewer, car, digital, _Shader);
                             else
                                 cvdr = new CabViewDigitalRenderer(viewer, car, digital, _Shader);
                             cvdr.SortIndex = controlSortIndex;
@@ -1386,6 +1388,19 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                             if (!ControlMap.ContainsKey(key)) ControlMap.Add(key, cvdr);
                             count[(int)cvc.ControlType]++;
                             continue;
+                        }
+                        CabViewScreenControl screen = cvc as CabViewScreenControl;
+                        if (screen != null)
+                        {
+                            if (screen.ControlType == CabViewControlType.Orts_Etcs)
+                            {
+                                var cvr = new DriverMachineInterfaceRenderer(viewer, car, screen, _Shader);
+                                cvr.SortIndex = controlSortIndex;
+                                CabViewControlRenderersList[i].Add(cvr);
+                                if (!ControlMap.ContainsKey(key)) ControlMap.Add(key, cvr);
+                                count[(int)cvc.ControlType]++;
+                                continue;
+                            }
                         }
                     }
                 }
@@ -1476,7 +1491,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                 {
                     CabViewDigitalRenderer cvdr;
                     if (viewer.Settings.CircularSpeedGauge && digital.ControlStyle == CabViewControlStyle.Needle)
-                        cvdr = new CabViewCircularSpeedGaugeRenderer(viewer, car, digital, _Shader);
+                        cvdr = new CircularSpeedGaugeRenderer(viewer, car, digital, _Shader);
                     else
                         cvdr = new CabViewDigitalRenderer(viewer, car, digital, _Shader);
                     cvdr.SortIndex = controlSortIndex;
@@ -1484,6 +1499,19 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                     if (!ControlMap.ContainsKey(key)) ControlMap.Add(key, cvdr);
                     count[(int)cvc.ControlType]++;
                     continue;
+                }
+                CabViewScreenControl screen = cvc as CabViewScreenControl;
+                if (screen != null)
+                {
+                    if (screen.ControlType == CabViewControlType.Orts_Etcs)
+                    {
+                        var cvr = new DriverMachineInterfaceRenderer(viewer, car, screen, _Shader);
+                        cvr.SortIndex = controlSortIndex;
+                        CabViewControlRenderersList[i].Add(cvr);
+                        if (!ControlMap.ContainsKey(key)) ControlMap.Add(key, cvr);
+                        count[(int)cvc.ControlType]++;
+                        continue;
+                    }
                 }
             }
             #endregion
@@ -1593,17 +1621,16 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
     {
         protected readonly Viewer Viewer;
         protected readonly MSTSLocomotive Locomotive;
-        protected internal readonly CabViewControl Control;
+        internal protected readonly CabViewControl Control;
         protected readonly CabShader Shader;
         protected readonly int ShaderKey = 1;
-        protected readonly CabSpriteBatchMaterial CabShaderControlView;
+        protected readonly CabSpriteBatchMaterial ControlView;
 
         protected Vector2 Position;
         protected Texture2D Texture;
         protected bool IsNightTexture;
         protected bool HasCabLightDirectory;
-
-        Matrix Matrix = Matrix.Identity;
+        private Matrix Matrix = Matrix.Identity;
 
         public CabViewControlRenderer(Viewer viewer, MSTSLocomotive locomotive, CabViewControl control, CabShader shader)
         {
@@ -1612,7 +1639,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             Control = control;
             Shader = shader;
 
-            CabShaderControlView = (CabSpriteBatchMaterial)viewer.MaterialManager.Load("CabSpriteBatch", null, 0, 0, Shader);
+            ControlView = (CabSpriteBatchMaterial)viewer.MaterialManager.Load("CabSpriteBatch", null, 0, 0, Shader);
 
             HasCabLightDirectory = CABTextureManager.LoadTextures(Viewer, Control.AceFile);
         }
@@ -1646,7 +1673,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 
         public virtual void PrepareFrame(RenderFrame frame, in ElapsedTime elapsedTime)
         {
-            frame.AddPrimitive(CabShaderControlView, this, RenderPrimitiveGroup.Cab, ref Matrix);
+            frame.AddPrimitive(ControlView, this, RenderPrimitiveGroup.Cab, ref Matrix);
         }
 
         internal void Mark()
@@ -1656,25 +1683,39 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
     }
 
     /// <summary>
+    /// Interface for mouse controllable CabViewControls
+    /// </summary>
+    public interface ICabViewMouseControlRenderer
+    {
+        bool IsMouseWithin(Point mousePoint);
+        void HandleUserInput(GenericButtonEventType buttonEventType, Point position, Vector2 delta);
+        string GetControlName(Point mousePoint);
+
+    }
+
+    /// <summary>
     /// Dial Cab Control Renderer
     /// Problems with aspect ratio
     /// </summary>
     public class CabViewDialRenderer : CabViewControlRenderer
     {
-        readonly CabViewDialControl ControlDial;
+        private readonly CabViewDialControl ControlDial;
+
         /// <summary>
         /// Rotation center point, in unscaled texture coordinates
         /// </summary>
-        readonly Vector2 Origin;
+        private readonly Vector2 Origin;
+
         /// <summary>
         /// Scale factor. Only downscaling is allowed by MSTS, so the value is in 0-1 range
         /// </summary>
-        readonly float Scale = 1;
+        private readonly float Scale = 1;
+
         /// <summary>
         /// 0° is 12 o'clock, 90° is 3 o'clock
         /// </summary>
-        float Rotation;
-        float ScaleToScreen = 1;
+        private float Rotation;
+        private float ScaleToScreen = 1;
 
         public CabViewDialRenderer(Viewer viewer, MSTSLocomotive locomotive, CabViewDialControl control, CabShader shader)
             : base(viewer, locomotive, control, shader)
@@ -1717,7 +1758,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             {
                 Shader.SetTextureData(Position.X, Position.Y, Texture.Width * ScaleToScreen, Texture.Height * ScaleToScreen);
             }
-            CabShaderControlView.SpriteBatch.Draw(Texture, Position, null, Color.White, Rotation, Origin, ScaleToScreen, SpriteEffects.None, 0);
+            ControlView.SpriteBatch.Draw(Texture, Position, null, Color.White, Rotation, Origin, ScaleToScreen, SpriteEffects.None, 0);
         }
     }
 
@@ -1728,15 +1769,15 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
     /// </summary>
     public class CabViewGaugeRenderer : CabViewControlRenderer
     {
-        readonly CabViewGaugeControl Gauge;
-        readonly Rectangle SourceRectangle;
+        private readonly CabViewGaugeControl Gauge;
+        private readonly Rectangle SourceRectangle;
+        private Rectangle DestinationRectangle = new Rectangle();
 
-        Rectangle DestinationRectangle = new Rectangle();
         //      bool LoadMeterPositive = true;
-        Color DrawColor;
-        float DrawRotation;
-        Double Num;
-        bool IsFire;
+        private Color DrawColor;
+        private float DrawRotation;
+        private Double Num;
+        private bool IsFire;
 
         public CabViewGaugeRenderer(Viewer viewer, MSTSLocomotive locomotive, CabViewGaugeControl control, CabShader shader)
             : base(viewer, locomotive, control, shader)
@@ -1946,21 +1987,21 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             {
                 Shader.SetTextureData(DestinationRectangle.Left, DestinationRectangle.Top, DestinationRectangle.Width, DestinationRectangle.Height);
             }
-            CabShaderControlView.SpriteBatch.Draw(Texture, DestinationRectangle, SourceRectangle, DrawColor, DrawRotation, Vector2.Zero, SpriteEffects.None, 0);
+            ControlView.SpriteBatch.Draw(Texture, DestinationRectangle, SourceRectangle, DrawColor, DrawRotation, Vector2.Zero, SpriteEffects.None, 0);
         }
     }
 
     /// <summary>
     /// Discrete renderer for Lever, Twostate, Tristate, Multistate, Signal
     /// </summary>
-    public class CabViewDiscreteRenderer : CabViewControlRenderer
+    public class CabViewDiscreteRenderer : CabViewControlRenderer, ICabViewMouseControlRenderer
     {
-        readonly CabViewFramedControl ControlDiscrete;
-        readonly Rectangle SourceRectangle;
-        Rectangle DestinationRectangle = new Rectangle();
+        private readonly CabViewFramedControl ControlDiscrete;
+        private readonly Rectangle SourceRectangle;
+        private Rectangle DestinationRectangle = new Rectangle();
         public readonly float CVCFlashTimeOn = 0.75f;
         public readonly float CVCFlashTimeTotal = 1.5f;
-        float CumulativeTime;
+        private float CumulativeTime;
 
         /// <summary>
         /// Accumulated mouse movement. Used for controls with no assigned notch controllers, e.g. headlight and reverser.
@@ -2013,7 +2054,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             {
                 Shader.SetTextureData(DestinationRectangle.Left, DestinationRectangle.Top, DestinationRectangle.Width, DestinationRectangle.Height);
             }
-            CabShaderControlView.SpriteBatch.Draw(Texture, DestinationRectangle, SourceRectangle, Color.White);
+            ControlView.SpriteBatch.Draw(Texture, DestinationRectangle, SourceRectangle, Color.White);
         }
 
         /// <summary>
@@ -2232,6 +2273,11 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             }
         }
 
+        public string GetControlName(Point mousePoint)
+        {
+            return Locomotive.TrainControlSystem.GetDisplayString(GetControlType().ToString());
+        }
+
         /// <summary>
         /// Handles cabview mouse events, and changes the corresponding locomotive control values.
         /// </summary>
@@ -2346,16 +2392,16 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                         {
                             if (car == Viewer.Simulator.PlayerLocomotive && dieselLoco.DieselEngines.Count > 1)
                             {
-                                if ((dieselLoco.DieselEngines[1].EngineStatus == Orts.Simulation.RollingStocks.SubSystems.PowerSupplies.DieselEngine.Status.Running ||
-                                            dieselLoco.DieselEngines[1].EngineStatus == Orts.Simulation.RollingStocks.SubSystems.PowerSupplies.DieselEngine.Status.Stopped) &&
+                                if ((dieselLoco.DieselEngines[1].EngineStatus == Simulation.RollingStocks.SubSystems.PowerSupplies.DieselEngine.Status.Running ||
+                                            dieselLoco.DieselEngines[1].EngineStatus == Simulation.RollingStocks.SubSystems.PowerSupplies.DieselEngine.Status.Stopped) &&
                                             UpdateCommandValue(1, buttonEventType, delta) == 0)
                                     _ = new ToggleHelpersEngineCommand(Viewer.Log);
                                 break;
                             }
                             else if (car != Viewer.Simulator.PlayerLocomotive)
                             {
-                                if ((dieselLoco.DieselEngines[0].EngineStatus == Orts.Simulation.RollingStocks.SubSystems.PowerSupplies.DieselEngine.Status.Running ||
-                                            dieselLoco.DieselEngines[0].EngineStatus == Orts.Simulation.RollingStocks.SubSystems.PowerSupplies.DieselEngine.Status.Stopped) &&
+                                if ((dieselLoco.DieselEngines[0].EngineStatus == Simulation.RollingStocks.SubSystems.PowerSupplies.DieselEngine.Status.Running ||
+                                            dieselLoco.DieselEngines[0].EngineStatus == Simulation.RollingStocks.SubSystems.PowerSupplies.DieselEngine.Status.Stopped) &&
                                             UpdateCommandValue(1, buttonEventType, delta) == 0)
                                     _ = new ToggleHelpersEngineCommand(Viewer.Log);
                                 break;
@@ -2449,7 +2495,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         /// </summary>
         /// <param name="percent">Percent to be translated</param>
         /// <returns>The calculated display index by the Control's Values</returns>
-        int PercentToIndex(float percent)
+        private int PercentToIndex(float percent)
         {
             var index = 0;
 
@@ -2488,17 +2534,16 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
     /// </summary>
     public class CabViewDigitalRenderer : CabViewControlRenderer
     {
-        readonly LabelAlignment Alignment;
-        string Format = "{0}";
-        readonly string Format1 = "{0}";
-        readonly string Format2 = "{0}";
-
-        float Num;
-        WindowTextFont DrawFont;
+        private readonly LabelAlignment Alignment;
+        private string Format = "{0}";
+        private readonly string Format1 = "{0}";
+        private readonly string Format2 = "{0}";
+        private float Num;
+        private WindowTextFont DrawFont;
         protected Rectangle DrawPosition;
-        string DrawText;
-        Color DrawColor;
-        float DrawRotation;
+        private string DrawText;
+        private Color DrawColor;
+        private float DrawRotation;
 
         public CabViewDigitalRenderer(Viewer viewer, MSTSLocomotive car, CabViewDigitalControl digital, CabShader shader)
             : base(viewer, car, digital, shader)
@@ -2557,17 +2602,17 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                     if (hour == 0)
                         hour = 12;
                 }
-                DrawText = String.Format(digital.Accuracy > 0 ? "{0:D2}:{1:D2}:{2:D2}" : "{0:D2}:{1:D2}", hour, minute, seconds);
+                DrawText = digital.Accuracy > 0 ? $"{hour:D2}:{minute:D2}:{seconds:D2}" : $"{hour:D2}:{minute:D2}";
                 DrawColor = digital.PositiveColors[0];
             }
             else if (digital.PreviousValue != 0 && digital.PreviousValue > Num && digital.DecreaseColor.A != 0)
             {
-                DrawText = String.Format(Format, Math.Abs(Num));
+                DrawText = string.Format(CultureInfo.CurrentCulture, Format, Math.Abs(Num));
                 DrawColor = new Color(digital.DecreaseColor.R, digital.DecreaseColor.G, digital.DecreaseColor.B, digital.DecreaseColor.A);
             }
             else if (Num < 0 && digital.NegativeColors[0].A != 0)
             {
-                DrawText = String.Format(Format, Math.Abs(Num));
+                DrawText = string.Format(CultureInfo.CurrentCulture, Format, Math.Abs(Num));
                 if ((digital.NegativeColors.Length >= 2) && (Num < digital.NegativeTrigger))
                     DrawColor = digital.NegativeColors[1];
                 else
@@ -2575,7 +2620,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             }
             else if (digital.PositiveColors[0].A != 0)
             {
-                DrawText = String.Format(Format, Num);
+                DrawText = string.Format(CultureInfo.CurrentCulture, Format, Num);
                 if ((digital.PositiveColors.Length >= 2) && (Num > digital.PositiveTrigger))
                     DrawColor = digital.PositiveColors[1];
                 else
@@ -2583,7 +2628,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             }
             else
             {
-                DrawText = String.Format(Format, Num);
+                DrawText = string.Format(CultureInfo.CurrentCulture, Format, Num);
                 DrawColor = Color.White;
             }
             //          <CSComment> Now speedometer is handled like the other digitals
@@ -2593,7 +2638,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 
         public override void Draw()
         {
-            DrawFont.Draw(CabShaderControlView.SpriteBatch, DrawPosition, Point.Zero, DrawRotation, DrawText, Alignment, DrawColor, Color.Black);
+            DrawFont.Draw(ControlView.SpriteBatch, DrawPosition, Point.Zero, DrawRotation, DrawText, Alignment, DrawColor, Color.Black);
         }
 
         public string GetDigits(out Color DrawColor)
@@ -2629,17 +2674,17 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                         if (hour == 0)
                             hour = 12;
                     }
-                    displayedText = String.Format(digital.Accuracy > 0 ? "{0:D2}:{1:D2}:{2:D2}" : "{0:D2}:{1:D2}", hour, minute, seconds);
+                    displayedText = digital.Accuracy > 0 ? $"{hour:D2}:{minute:D2}:{seconds:D2}" : $"{hour:D2}:{minute:D2}";
                     DrawColor = digital.PositiveColors[0];
                 }
                 else if (digital.PreviousValue != 0 && digital.PreviousValue > Num && digital.DecreaseColor.A != 0)
                 {
-                    displayedText = String.Format(Format, Math.Abs(Num));
+                    displayedText = string.Format(CultureInfo.CurrentCulture, Format, Math.Abs(Num));
                     DrawColor = new Color(digital.DecreaseColor.R, digital.DecreaseColor.G, digital.DecreaseColor.B, digital.DecreaseColor.A);
                 }
                 else if (Num < 0 && digital.NegativeColors[0].A != 0)
                 {
-                    displayedText = String.Format(Format, Math.Abs(Num));
+                    displayedText = string.Format(CultureInfo.CurrentCulture, Format, Math.Abs(Num));
                     if ((digital.NegativeColors.Length >= 2) && (Num < digital.NegativeTrigger))
                         DrawColor = digital.NegativeColors[1];
                     else
@@ -2647,14 +2692,14 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                 }
                 else if (digital.PositiveColors[0].A != 0)
                 {
-                    displayedText = String.Format(Format, Num);
+                    displayedText = string.Format(CultureInfo.CurrentCulture, Format, Num);
                     if ((digital.PositiveColors.Length >= 2) && (Num > digital.PositiveTrigger))
                         DrawColor = digital.PositiveColors[1];
                     else DrawColor = digital.PositiveColors[0];
                 }
                 else
                 {
-                    displayedText = String.Format(Format, Num);
+                    displayedText = string.Format(CultureInfo.CurrentCulture, Format, Num);
                     DrawColor = Color.White;
                 }
                 // <CSComment> Speedometer is now managed like the other digitals
@@ -2705,27 +2750,27 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                         if (hour == 0)
                             hour = 12;
                     }
-                    displayedText = String.Format(digital.Accuracy > 0 ? "{0:D2}:{1:D2}:{2:D2}" : "{0:D2}:{1:D2}", hour, minute, seconds) + displayedText;
+                    displayedText = (digital.Accuracy > 0 ? $"{hour:D2}:{minute:D2}:{seconds:D2}" : $"{hour:D2}:{minute:D2}") + displayedText;
                 }
                 else if (digital.PreviousValue != 0 && digital.PreviousValue > Num && digital.DecreaseColor.A != 0)
                 {
-                    displayedText = String.Format(Format, Math.Abs(Num));
+                    displayedText = string.Format(CultureInfo.CurrentCulture, Format, Math.Abs(Num));
                 }
                 else if (Num < 0 && digital.NegativeColors[0].A != 0)
                 {
-                    displayedText = String.Format(Format, Math.Abs(Num));
+                    displayedText = string.Format(CultureInfo.CurrentCulture, Format, Math.Abs(Num));
                     if ((digital.NegativeColors.Length >= 2) && (Num < digital.NegativeTrigger))
                         Alert = true;
                 }
                 else if (digital.PositiveColors[0].A != 0)
                 {
-                    displayedText = String.Format(Format, Num);
+                    displayedText = string.Format(CultureInfo.CurrentCulture, Format, Num);
                     if ((digital.PositiveColors.Length >= 2) && (Num > digital.PositiveTrigger))
                         Alert = true;
                 }
                 else
                 {
-                    displayedText = String.Format(Format, Num);
+                    displayedText = string.Format(CultureInfo.CurrentCulture, Format, Num);
                 }
                 // <CSComment> Speedometer is now managed like the other digitals
 
@@ -2746,17 +2791,19 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
     /// </summary>
     public class ThreeDimentionCabViewer : TrainCarViewer
     {
-        MSTSLocomotive Locomotive;
+        private MSTSLocomotive Locomotive;
 
         public PoseableShape TrainCarShape = null;
         public Dictionary<int, AnimatedPartMultiState> AnimateParts = null;
-        Dictionary<int, ThreeDimCabGaugeNative> Gauges = null;
-        Dictionary<int, AnimatedPart> OnDemandAnimateParts = null; //like external wipers, and other parts that will be switched on by mouse in the future
-                                                                   //Dictionary<int, DigitalDisplay> DigitParts = null;
-        Dictionary<int, ThreeDimCabDigit> DigitParts3D = null;
-        AnimatedPart ExternalWipers = null; // setting to zero to prevent a warning. Probably this will be used later. TODO
+        private Dictionary<int, ThreeDimCabGaugeNative> Gauges = null;
+        private Dictionary<int, AnimatedPart> OnDemandAnimateParts = null; //like external wipers, and other parts that will be switched on by mouse in the future
+                                                                          //Dictionary<int, DigitalDisplay> DigitParts = null;
+
+        private Dictionary<int, ThreeDimCabDigit> DigitParts3D = null;
+        private AnimatedPart ExternalWipers = null; // setting to zero to prevent a warning. Probably this will be used later. TODO
         protected MSTSLocomotive MSTSLocomotive { get { return (MSTSLocomotive)Car; } }
-        MSTSLocomotiveViewer LocoViewer;
+
+        private MSTSLocomotiveViewer LocoViewer;
         private SpriteBatchMaterial _Sprite2DCabView;
         public ThreeDimentionCabViewer(Viewer viewer, MSTSLocomotive car, MSTSLocomotiveViewer locoViewer)
             : base(viewer, car)
@@ -2943,20 +2990,20 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 
     public class ThreeDimCabDigit
     {
-        const int MaxDigits = 6;
-        PoseableShape TrainCarShape;
-        VertexPositionNormalTexture[] VertexList;
-        int NumVertices;
-        int NumIndices;
+        private const int MaxDigits = 6;
+        private PoseableShape TrainCarShape;
+        private VertexPositionNormalTexture[] VertexList;
+        private int NumVertices;
+        private int NumIndices;
         public short[] TriangleListIndices;// Array of indices to vertices for triangles
-        Matrix XNAMatrix;
-        Viewer Viewer;
-        MutableShapePrimitive shapePrimitive;
-        CabViewDigitalRenderer CVFR;
-        Material Material;
-        Material AlertMaterial;
-        float Size;
-        string AceFile;
+        private Matrix XNAMatrix;
+        private Viewer Viewer;
+        private MutableShapePrimitive shapePrimitive;
+        private CabViewDigitalRenderer CVFR;
+        private Material Material;
+        private Material AlertMaterial;
+        private float Size;
+        private string AceFile;
         public ThreeDimCabDigit(Viewer viewer, int iMatrix, string size, string aceFile, PoseableShape trainCarShape, CabViewControlRenderer c)
         {
 
@@ -3043,7 +3090,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 
         }
 
-        Material FindMaterial(bool Alert)
+        private Material FindMaterial(bool Alert)
         {
             string imageName = "";
             string globalText = Viewer.Simulator.BasePath + @"\GLOBAL\TEXTURES\";
@@ -3158,7 +3205,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         // 4 5 6 7
         // 8 9 : 
         // . - a p
-        static float GetTextureCoordX(char c)
+        private static float GetTextureCoordX(char c)
         {
             float x = (c - '0') % 4 * 0.25f;
             if (c == '.') x = 0;
@@ -3172,7 +3219,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             return x;
         }
 
-        static float GetTextureCoordY(char c)
+        private static float GetTextureCoordY(char c)
         {
             if (c == '0' || c == '1' || c == '2' || c == '3') return 0.25f;
             if (c == '4' || c == '5' || c == '6' || c == '7') return 0.5f;
@@ -3201,19 +3248,19 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 
     public class ThreeDimCabGaugeNative
     {
-        PoseableShape TrainCarShape;
-        VertexPositionNormalTexture[] VertexList;
-        int NumVertices;
-        int NumIndices;
+        private PoseableShape TrainCarShape;
+        private VertexPositionNormalTexture[] VertexList;
+        private int NumVertices;
+        private int NumIndices;
         public short[] TriangleListIndices;// Array of indices to vertices for triangles
-        Matrix XNAMatrix;
-        Viewer Viewer;
-        MutableShapePrimitive shapePrimitive;
-        CabViewGaugeRenderer CVFR;
-        Material PositiveMaterial;
-        Material NegativeMaterial;
-        float width, maxLen; //width of the gauge, and the max length of the gauge
-        int Direction, Orientation;
+        private Matrix XNAMatrix;
+        private Viewer Viewer;
+        private MutableShapePrimitive shapePrimitive;
+        private CabViewGaugeRenderer CVFR;
+        private Material PositiveMaterial;
+        private Material NegativeMaterial;
+        private float width, maxLen; //width of the gauge, and the max length of the gauge
+        private int Direction, Orientation;
         public ThreeDimCabGaugeNative(Viewer viewer, int iMatrix, string size, string len, PoseableShape trainCarShape, CabViewControlRenderer c)
         {
             if (size != string.Empty) width = float.Parse(size) / 1000f; //in mm
@@ -3272,7 +3319,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 
         }
 
-        Material FindMaterial()
+        private Material FindMaterial()
         {
             bool Positive;
             Color c = this.CVFR.GetColor(out Positive);
@@ -3359,7 +3406,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         // 4 5 6 7
         // 8 9 : 
         // . - a p
-        static float GetTextureCoordX(char c)
+        private static float GetTextureCoordX(char c)
         {
             float x = (c - '0') % 4 * 0.25f;
             if (c == '.') x = 0;
@@ -3373,7 +3420,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             return x;
         }
 
-        static float GetTextureCoordY(char c)
+        private static float GetTextureCoordY(char c)
         {
             if (c == '0' || c == '1' || c == '2' || c == '3') return 0.25f;
             if (c == '4' || c == '5' || c == '6' || c == '7') return 0.5f;
@@ -3412,13 +3459,13 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
     } // class ThreeDimCabDigit
     public class ThreeDimCabGauge
     {
-        PoseableShape TrainCarShape;
+        private PoseableShape TrainCarShape;
         public short[] TriangleListIndices;// Array of indices to vertices for triangles
-        Viewer Viewer;
-        int matrixIndex;
-        CabViewGaugeRenderer CVFR;
-        Matrix XNAMatrix;
-        float GaugeSize;
+        private Viewer Viewer;
+        private int matrixIndex;
+        private CabViewGaugeRenderer CVFR;
+        private Matrix XNAMatrix;
+        private float GaugeSize;
         public ThreeDimCabGauge(Viewer viewer, int iMatrix, float gaugeSize, PoseableShape trainCarShape, CabViewControlRenderer c)
         {
             CVFR = (CabViewGaugeRenderer)c;
@@ -3455,14 +3502,14 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 
     public class DigitalDisplay
     {
-        Viewer Viewer;
+        private Viewer Viewer;
         private SpriteBatchMaterial _Sprite2DCabView;
-        WindowTextFont _Font;
-        PoseableShape TrainCarShape = null;
-        int digitPart;
-        int height;
-        Point coor = new Point(0, 0);
-        CabViewDigitalRenderer CVFR;
+        private WindowTextFont _Font;
+        private PoseableShape TrainCarShape = null;
+        private int digitPart;
+        private int height;
+        private Point coor = new Point(0, 0);
+        private CabViewDigitalRenderer CVFR;
         //		Color color;
         public DigitalDisplay(Viewer viewer, PoseableShape t, int d, int h, CabViewControlRenderer c)
         {

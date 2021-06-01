@@ -30,12 +30,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
 
     public class ScriptedCircuitBreaker
     {
-        readonly MSTSElectricLocomotive Locomotive;
-        readonly Simulator Simulator;
+        private readonly MSTSElectricLocomotive Locomotive;
+        private readonly Simulator Simulator;
 
         public bool Activated = false;
-        string ScriptName = "Automatic";
-        CircuitBreaker Script;
+        private string ScriptName = "Automatic";
+        private CircuitBreaker Script;
 
         private float DelayS = 0f;
 
@@ -233,7 +233,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
         }
     }
 
-    class AutomaticCircuitBreaker : CircuitBreaker
+    internal class AutomaticCircuitBreaker : CircuitBreaker
     {
         private Timer ClosingTimer;
         private CircuitBreakerState PreviousState;
@@ -317,7 +317,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
         }
     }
 
-    class ManualCircuitBreaker : CircuitBreaker
+    internal class ManualCircuitBreaker : CircuitBreaker
     {
         private Timer ClosingTimer;
         private CircuitBreakerState PreviousState;

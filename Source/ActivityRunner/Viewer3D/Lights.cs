@@ -43,10 +43,10 @@ namespace Orts.ActivityRunner.Viewer3D
 {
     public class LightViewer
     {
-        readonly Viewer Viewer;
-        readonly TrainCar Car;
-        readonly Material LightGlowMaterial;
-        readonly Material LightConeMaterial;
+        private readonly Viewer Viewer;
+        private readonly TrainCar Car;
+        private readonly Material LightGlowMaterial;
+        private readonly Material LightConeMaterial;
         private IWorldPosition positionSource;
 
         public int TrainHeadlight;
@@ -62,9 +62,9 @@ namespace Orts.ActivityRunner.Viewer3D
         public bool CarCoupledRear;
 
         public bool IsLightConeActive { get { return ActiveLightCone != null; } }
-        List<LightPrimitive> LightPrimitives = new List<LightPrimitive>();
 
-        LightConePrimitive ActiveLightCone;
+        private List<LightPrimitive> LightPrimitives = new List<LightPrimitive>();
+        private LightConePrimitive ActiveLightCone;
         public bool HasLightCone;
         public float LightConeFadeIn;
         public float LightConeFadeOut;
@@ -105,7 +105,7 @@ namespace Orts.ActivityRunner.Viewer3D
             UpdateActiveLightCone();
         }
 
-        void UpdateActiveLightCone()
+        private void UpdateActiveLightCone()
         {
             var newLightCone = (LightConePrimitive)LightPrimitives.FirstOrDefault(lm => lm is LightConePrimitive && lm.Enabled);
 
@@ -213,7 +213,7 @@ namespace Orts.ActivityRunner.Viewer3D
         public const string PrimitiveStateFormat = "{0,-10  }  {1,-10   }  {2,-10   }  {3,-10   }  {4,-10   }  {5,-10   }  {6,-10   }  {7,-10   }  {8,-10   }  {9,-10   }  {10,-10  }";
 #endif
 
-        bool UpdateState()
+        private bool UpdateState()
         {
 			Debug.Assert(Viewer.PlayerTrain.LeadLocomotive == Viewer.PlayerLocomotive ||Viewer.PlayerTrain.TrainType == TrainType.AiPlayerHosting ||
                 Viewer.PlayerTrain.TrainType == TrainType.Remote || Viewer.PlayerTrain.TrainType == TrainType.Static, "PlayerTrain.LeadLocomotive must be PlayerLocomotive.");
@@ -497,9 +497,9 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class LightGlowPrimitive : LightPrimitive
     {
-        static VertexDeclaration VertexDeclaration;
-        VertexBuffer VertexBuffer;
-        static IndexBuffer IndexBuffer;
+        private static VertexDeclaration VertexDeclaration;
+        private VertexBuffer VertexBuffer;
+        private static IndexBuffer IndexBuffer;
 
         public LightGlowPrimitive(LightViewer lightViewer, RenderProcess renderProcess, Light light)
             : base(light)
@@ -560,7 +560,7 @@ namespace Orts.ActivityRunner.Viewer3D
         }
     }
 
-    struct LightGlowVertex
+    internal struct LightGlowVertex
     {
         public Vector3 PositionO;
         public Vector3 PositionT;
@@ -600,12 +600,11 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class LightConePrimitive : LightPrimitive
     {
-        const int CircleSegments = 16;
-
-        static VertexDeclaration VertexDeclaration;
-        VertexBuffer VertexBuffer;
-        static IndexBuffer IndexBuffer;
-        static BlendState BlendState_SourceZeroDestOne;
+        private const int CircleSegments = 16;
+        private static VertexDeclaration VertexDeclaration;
+        private VertexBuffer VertexBuffer;
+        private static IndexBuffer IndexBuffer;
+        private static BlendState BlendState_SourceZeroDestOne;
 
         public LightConePrimitive(LightViewer lightViewer, RenderProcess renderProcess, Light light)
             : base(light)
@@ -717,7 +716,7 @@ namespace Orts.ActivityRunner.Viewer3D
         }
     }
 
-    struct LightConeVertex
+    internal struct LightConeVertex
     {
         public Vector3 PositionO;
         public Vector3 PositionT;

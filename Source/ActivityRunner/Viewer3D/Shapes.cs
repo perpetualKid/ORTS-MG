@@ -45,11 +45,11 @@ namespace Orts.ActivityRunner.Viewer3D
         public int[] Hierarchy { get; protected set; } // the hierarchy from the sub_object
         public int HierarchyIndex { get; protected set; } // index into the hiearchy array which provides pose for this primitive
 
-        protected internal VertexBuffer VertexBuffer;
-        protected internal IndexBuffer IndexBuffer;
-        protected internal int MinVertexIndex;
-        protected internal int NumVerticies;
-        protected internal int PrimitiveCount;
+        internal protected VertexBuffer VertexBuffer;
+        internal protected IndexBuffer IndexBuffer;
+        internal protected int MinVertexIndex;
+        internal protected int NumVerticies;
+        internal protected int PrimitiveCount;
         private readonly VertexBufferBinding[] VertexBufferBindings;
 
         public ShapePrimitive()
@@ -123,7 +123,7 @@ namespace Orts.ActivityRunner.Viewer3D
         }
     }
 
-    struct ShapeInstanceData
+    internal struct ShapeInstanceData
     {
 #pragma warning disable 0649
         public Matrix World;

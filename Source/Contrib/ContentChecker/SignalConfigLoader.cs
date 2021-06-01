@@ -24,7 +24,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .eng files
     /// </summary>
-    class SignalConfigLoader : Loader
+    internal class SignalConfigLoader : Loader
     {
         private SignalConfigurationFile sigcfg;
 
@@ -35,8 +35,8 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            var subdirname = Path.GetFileName(Path.GetDirectoryName(file)).ToLowerInvariant();
-            sigcfg = new SignalConfigurationFile(file, subdirname == "openrails");
+            string subdirname = Path.GetFileName(Path.GetDirectoryName(file));
+            sigcfg = new SignalConfigurationFile(file, subdirname.Equals("openrails", System.StringComparison.OrdinalIgnoreCase));
         }
 
         protected override void AddDependentFiles()

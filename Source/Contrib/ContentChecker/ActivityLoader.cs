@@ -23,7 +23,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .act files
     /// </summary>
-    class ActivityLoader : Loader
+    internal class ActivityLoader : Loader
     {
         /// <summary>
         /// Try to load the file.
@@ -32,7 +32,7 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            var act = new ActivityFile(file);
+            _ = new ActivityFile(file);
         }
     }
 }

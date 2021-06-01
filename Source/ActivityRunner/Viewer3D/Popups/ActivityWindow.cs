@@ -28,18 +28,17 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class ActivityWindow : Window
     {
-        int WindowHeightMin = 0;
-        int WindowHeightMax = 0;
-
-        Activity Activity;
-        ControlLayoutScrollbox MessageScroller;
-        TextFlow Message;
-        Label EventNameLabel;
-        Label ResumeLabel;
-        Label CloseLabel;
-        Label QuitLabel;
-        Label StatusLabel;
-        DateTime PopupTime;
+        private int WindowHeightMin = 0;
+        private int WindowHeightMax = 0;
+        private Activity Activity;
+        private ControlLayoutScrollbox MessageScroller;
+        private TextFlow Message;
+        private Label EventNameLabel;
+        private Label ResumeLabel;
+        private Label CloseLabel;
+        private Label QuitLabel;
+        private Label StatusLabel;
+        private DateTime PopupTime;
 
         public ActivityWindow(WindowManager owner)
             : base(owner, Window.DecorationSize.X + owner.TextFontDefault.Height * 40, Window.DecorationSize.Y + owner.TextFontDefault.Height * 12 /* 10 lines + 2 lines of controls */ + ControlLayout.SeparatorSize * 2, Viewer.Catalog.GetString("Activity Events"))
@@ -88,7 +87,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             return vbox;
         }
 
-        void ResumeActivity_Click(Control arg1, Point arg2)
+        private void ResumeActivity_Click(Control arg1, Point arg2)
         {
             TimeSpan diff = DateTime.UtcNow - PopupTime;
             if (Owner.Viewer.Simulator.Paused)
@@ -98,13 +97,13 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 new PauseActivityCommand(Owner.Viewer.Log, EventNameLabel.Text, diff.TotalMilliseconds / 1000);
         }
 
-        void CloseBox_Click(Control arg1, Point arg2)
+        private void CloseBox_Click(Control arg1, Point arg2)
         {
             TimeSpan diff = DateTime.UtcNow - PopupTime;
             new CloseAndResumeActivityCommand(Owner.Viewer.Log, EventNameLabel.Text, diff.TotalMilliseconds / 1000);
         }
 
-        void QuitActivity_Click(Control arg1, Point arg2)
+        private void QuitActivity_Click(Control arg1, Point arg2)
         {
             TimeSpan diff = DateTime.UtcNow - PopupTime;
             new QuitActivityCommand(Owner.Viewer.Log, EventNameLabel.Text, diff.TotalMilliseconds / 1000);
@@ -289,7 +288,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         // and change it later to see-through, if box is left on-screen when simulator resumes.
         // Don't know how.
         // </CJComment>
-        void ResumeMenu()
+        private void ResumeMenu()
         {
             ResumeLabel.Text = Owner.Viewer.Simulator.Paused ? Viewer.Catalog.GetString("Resume") : Viewer.Catalog.GetString("Pause");
             CloseLabel.Text = Owner.Viewer.Simulator.Paused ? Viewer.Catalog.GetString("Resume and close box") : Viewer.Catalog.GetString("Close box");
@@ -301,7 +300,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         // <CJComment> At this point, would like to change dialog box background from solid to see-through,
         // but don't know how.
         // </CJComment>
-        void CloseMenu()
+        private void CloseMenu()
         {
             ResumeLabel.Text = "";
             CloseLabel.Text = Viewer.Catalog.GetString("Close box");
@@ -310,7 +309,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             StatusLabel.Color = Color.LightGreen;
         }
 
-        void EndMenu()
+        private void EndMenu()
         {
             ResumeLabel.Text = "";
             CloseLabel.Text = Viewer.Catalog.GetString("Resume and close box");
@@ -319,7 +318,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             StatusLabel.Color = Color.LightSalmon;
         }
 
-        void NoPauseMenu()
+        private void NoPauseMenu()
         {
             ResumeLabel.Text = Viewer.Catalog.GetString("Pause");
             CloseLabel.Text = Viewer.Catalog.GetString("Close box");
@@ -328,7 +327,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             StatusLabel.Color = Color.LightGreen;
         }
 
-        void ComposeMenu(string eventLabel, string message)
+        private void ComposeMenu(string eventLabel, string message)
         {
             EventNameLabel.Text = Viewer.Catalog.GetString("Event: {0}", eventLabel);
             MessageScroller.SetScrollPosition(0);
@@ -336,7 +335,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             ResizeDialog();
         }
 
-        void ComposeActualPlayerTrainMenu(string trainName, string message)
+        private void ComposeActualPlayerTrainMenu(string trainName, string message)
         {
             EventNameLabel.Text = Viewer.Catalog.GetString("Train: {0}", trainName.Substring(0, Math.Min(trainName.Length, 20)));
             MessageScroller.SetScrollPosition(0);
@@ -344,7 +343,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             ResizeDialog();
         }
 
-        void ResizeDialog()
+        private void ResizeDialog()
         {
             var desiredHeight = Location.Height + Message.Position.Height - MessageScroller.Position.Height;
             var newHeight = (int)MathHelper.Clamp(desiredHeight, WindowHeightMin, WindowHeightMax);

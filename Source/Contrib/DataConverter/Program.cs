@@ -23,9 +23,9 @@ using System.Runtime.Serialization;
 
 namespace Orts.DataConverter
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var converters = new List<IDataConverter>()
             {
@@ -76,7 +76,7 @@ namespace Orts.DataConverter
             }
         }
 
-        static void ShowHelp(List<IDataConverter> converters)
+        private static void ShowHelp(List<IDataConverter> converters)
         {
             Console.WriteLine("Open Rails Data Converter utility");
             Console.WriteLine();
@@ -96,7 +96,7 @@ namespace Orts.DataConverter
             }
         }
 
-        static List<DataConversion> GetConversions(string[] args)
+        private static List<DataConversion> GetConversions(string[] args)
         {
             var conversions = new List<DataConversion>();
             for (var i = 0; i < args.Length; i++)

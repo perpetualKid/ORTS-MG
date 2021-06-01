@@ -35,15 +35,18 @@ namespace ORTS.TrackViewer.Drawing
     /// </summary>
     public class DrawMultiplePaths
     {
-        
+
         /// <summary>For each path name, store the full file name of the .pat file</summary>
-        Dictionary<string, string> fullPathNames;
+        private Dictionary<string, string> fullPathNames;
+
         /// <summary>The paths that have already been loaded (.pat file has been read and parsed)</summary>
-        Dictionary<string, Trainpath> loadedPaths;
+        private Dictionary<string, Trainpath> loadedPaths;
+
         /// <summary>For each trainpath we have it is own DrawPath (each with their own color)</summary>
-        Dictionary<Trainpath, DrawPath> drawPaths;
+        private Dictionary<Trainpath, DrawPath> drawPaths;
+
         /// <summary>List of trainpaths that have been selected</summary>
-        List<Trainpath> selectedTrainpaths;
+        private List<Trainpath> selectedTrainpaths;
     
         private TrackDB trackDB;
         private TrackSectionsFile tsectionDat;
@@ -79,7 +82,7 @@ namespace ORTS.TrackViewer.Drawing
         /// Return the Trainpath given a pathName. This will load the path if it has not been loaded before.
         /// </summary>
         /// <param name="pathName">The name of the path</param>
-        Trainpath TrainpathFromName(string pathName)
+        private Trainpath TrainpathFromName(string pathName)
         {
             Trainpath newTrainpath;
             if (!loadedPaths.TryGetValue(pathName, out newTrainpath))
@@ -127,7 +130,7 @@ namespace ORTS.TrackViewer.Drawing
         /// Recalculate and store the colors of all paths.
         /// Coloring is done automatically depending on the order and amount of selected paths.
         /// </summary>
-        void ReColorAll()
+        private void ReColorAll()
         {
             int count = selectedTrainpaths.Count;
             for (int index = 0; index < count; index++)

@@ -58,8 +58,8 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
 
         public GraphicsDeviceManager GraphicsDeviceManager { get; private set; }
 
-        RenderFrame CurrentFrame;   // a frame contains a list of primitives to draw at a specified time
-        RenderFrame NextFrame;      // we prepare the next frame in the background while the current one is rendering,
+        private RenderFrame CurrentFrame;   // a frame contains a list of primitives to draw at a specified time
+        private RenderFrame NextFrame;      // we prepare the next frame in the background while the current one is rendering,
 
         public bool IsMouseVisible { get; set; }  // handles cross thread issues by signalling RenderProcess of a change
         public Cursor ActualCursor = Cursors.Default;
@@ -139,7 +139,7 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
             }
         }
 
-        void GDM_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
+        private void GDM_PreparingDeviceSettings(object sender, PreparingDeviceSettingsEventArgs e)
         {
             e.GraphicsDeviceInformation.GraphicsProfile = GraphicsProfile.HiDef;
             // This stops ResolveBackBuffer() clearing the back buffer.
@@ -176,7 +176,7 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
             NextFrame = new RenderFrame(game);
         }
 
-        void InitializeShadowMapLocations()
+        private void InitializeShadowMapLocations()
         {
             float ratio = (float)DisplaySize.X / DisplaySize.Y;
             float fov = MathHelper.ToRadians(game.Settings.ViewingFOV);
@@ -258,7 +258,7 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
             }
         }
 
-        void SynchronizeGraphicsDeviceManager(ScreenMode targetMode)
+        private void SynchronizeGraphicsDeviceManager(ScreenMode targetMode)
         {
             gameForm.LocationChanged -= GameForm_LocationChanged;
             switch (targetMode)
@@ -366,7 +366,7 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
         {
         }
 
-        static void SwapFrames(ref RenderFrame frame1, ref RenderFrame frame2)
+        private static void SwapFrames(ref RenderFrame frame1, ref RenderFrame frame2)
         {
             RenderFrame temp = frame1;
             frame1 = frame2;

@@ -168,7 +168,7 @@ namespace ORTS.TrackViewer.UserInterface
         /// <summary>
         /// Update the (user) settings based on menu state
         /// </summary>
-        void UpdateMenuSettings()
+        private void UpdateMenuSettings()
         {
             menuShowPATfile.IsEnabled = !menuEnableEditing.IsChecked;
             if (!menuShowPATfile.IsEnabled) {
@@ -1012,7 +1012,7 @@ namespace ORTS.TrackViewer.UserInterface
             GC.SuppressFinalize(this);
         }
 
-        void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposed)
             {
@@ -1072,7 +1072,7 @@ namespace ORTS.TrackViewer.UserInterface
         /// <summary>
         /// For preference that can be added from other places, we need to store both a callback and a name
         /// </summary>
-        class PreferenceData
+        private class PreferenceData
         {
             /// <summary>The callback for a preference</summary>
             public StringPreferenceDelegate Callback;
@@ -1191,13 +1191,13 @@ namespace ORTS.TrackViewer.UserInterface
         /// <param name="callback">The callback that will be called upon a change in the preference</param>
         void AddStringPreference(string name, string description, string[] options, string defaultOption, StringPreferenceDelegate callback);
     }
-    #endregion 
+    #endregion
 
     #region SaveableSettingsDictionary
     /// <summary>
     /// Dictionary that supports saving to stored user settings.
     /// </summary>
-    class SaveableSettingsDictionary : Dictionary<string,string>
+    internal class SaveableSettingsDictionary : Dictionary<string,string>
     {
         /// <summary>
         /// Constructor. Also loads the values from stored settings.

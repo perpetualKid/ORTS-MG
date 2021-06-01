@@ -87,47 +87,45 @@ namespace ORTS.TrackViewer.Editing
         #endregion
 
         #region Private members
-        DrawTrackDB drawTrackDB; // We need to know what has been drawn, especially to get track closest to mouse
-        TrackDB trackDB;
-        TrackSectionsFile tsectionDat;
-        
-        DrawPath drawPath;      // drawing of the path itself
+        private DrawTrackDB drawTrackDB; // We need to know what has been drawn, especially to get track closest to mouse
+        private TrackDB trackDB;
+        private TrackSectionsFile tsectionDat;
+        private DrawPath drawPath;      // drawing of the path itself
 
-        TrainpathNode activeNode;           // active Node (if present) for which actions can be performed
-        TrainpathVectorNode activeTrackLocation;  // dynamic node that follows the mouse and is on track, but is not part of path
+        private TrainpathNode activeNode;           // active Node (if present) for which actions can be performed
+        private TrainpathVectorNode activeTrackLocation;  // dynamic node that follows the mouse and is on track, but is not part of path
 
-        List<EditorAction> editorActionsActiveNode;
-        List<EditorAction> editorActionsActiveTrack;
-        List<EditorAction> editorActionsBroken;
-        List<EditorAction> editorActionsOthers;
-        Separator separatorActiveNode;
-        Separator separatorActiveTrack;
-        Separator separatorBroken;
+        private List<EditorAction> editorActionsActiveNode;
+        private List<EditorAction> editorActionsActiveTrack;
+        private List<EditorAction> editorActionsBroken;
+        private List<EditorAction> editorActionsOthers;
+        private Separator separatorActiveNode;
+        private Separator separatorActiveTrack;
+        private Separator separatorBroken;
+        private const int practicalInfinityInt = int.MaxValue/2; // large, but not close to overflow
+        private int numberToDraw = practicalInfinityInt; // number of nodes to draw, start with all
+        private int maxNodesToAdd;  // if at end of path, how many nodes do we allow to be added
 
-        const int practicalInfinityInt = int.MaxValue/2; // large, but not close to overflow
-        int numberToDraw = practicalInfinityInt; // number of nodes to draw, start with all
-        int maxNodesToAdd;  // if at end of path, how many nodes do we allow to be added
+        private ContextMenu contextMenu;
 
-        ContextMenu contextMenu;
         /// <summary>If context menu is open, updating active node and track is disabled</summary>
-        bool enableMouseUpdate;
-        MenuItem noActionPossibleMenuItem;
+        private bool enableMouseUpdate;
+        private MenuItem noActionPossibleMenuItem;
 
         // Editor actions that are not via the menu
-        EditorActionNonInteractive nonInteractiveAction;
-        EditorActionMouseDrag activeMouseDragAction;
-        EditorAction activeMouseClickAction;
-        List<EditorActionMouseDrag> editorDragActionsMouseClicked;
-        List<EditorAction> editorActionsMouseClicked;
+        private EditorActionNonInteractive nonInteractiveAction;
+        private EditorActionMouseDrag activeMouseDragAction;
+        private EditorAction activeMouseClickAction;
+        private List<EditorActionMouseDrag> editorDragActionsMouseClicked;
+        private List<EditorAction> editorActionsMouseClicked;
 
         // Editor actions that are via keyboard commands
-        EditorActionAddEnd possibleAddEndAction;
-        EditorActionAddEnd activeAddEndAction;
-        EditorActionAddWait possibleAddWaitAction;
-        EditorActionAddWait activeAddWaitAction;
-
-        bool _editingIsActive;
-        bool _draggingIsActive;
+        private EditorActionAddEnd possibleAddEndAction;
+        private EditorActionAddEnd activeAddEndAction;
+        private EditorActionAddWait possibleAddWaitAction;
+        private EditorActionAddWait activeAddWaitAction;
+        private bool _editingIsActive;
+        private bool _draggingIsActive;
         #endregion
 
         #region Constructors
@@ -154,7 +152,7 @@ namespace ORTS.TrackViewer.Editing
             CreateContextMenu();
         }
 
-        void CreateNonMenuActions()
+        private void CreateNonMenuActions()
         {
             activeTrackLocation = new TrainpathVectorNode(trackDB, tsectionDat);
             nonInteractiveAction = new EditorActionNonInteractive();
@@ -469,7 +467,7 @@ namespace ORTS.TrackViewer.Editing
         /// <summary>
         /// Close the context menu, to be called, for instance, if the user does something else than clicking on the context menu
         /// </summary>
-        void CloseContextMenu()
+        private void CloseContextMenu()
         {
             if (contextMenu == null) { return; }
             contextMenu.IsOpen = false;
@@ -478,7 +476,7 @@ namespace ORTS.TrackViewer.Editing
         /// <summary>
         /// When the context menu closes, enable updates based on mouse movement again.
         /// </summary>
-        void ContextMenu_Closed(object sender, RoutedEventArgs e)
+        private void ContextMenu_Closed(object sender, RoutedEventArgs e)
         {
             enableMouseUpdate = true;
         }
@@ -487,7 +485,7 @@ namespace ORTS.TrackViewer.Editing
         /// Callback that will be called from EditorActions after edits have been performed
         /// </summary>
         /// <param name="nodesAdded">Number of nodes that have been added during edits</param>
-        void UpdateAfterEdits(int nodesAdded)
+        private void UpdateAfterEdits(int nodesAdded)
         {
             numberToDraw += nodesAdded;
             OnPathChanged();
@@ -497,7 +495,7 @@ namespace ORTS.TrackViewer.Editing
         /// Callback that will be called from EditorActions to set the number to draw.
         /// </summary>
         /// <param name="newNumberToDraw">The new number of nodes to draw, -1 if not defined.</param>
-        void DrawUntilHere(int newNumberToDraw)
+        private void DrawUntilHere(int newNumberToDraw)
         {
             if (newNumberToDraw >= 0)
             {
@@ -559,7 +557,7 @@ namespace ORTS.TrackViewer.Editing
         /// </summary>
         /// <param name="drawArea">Area that is being drawn upon and where we have a mouse location</param>
         /// <param name="drawnPathData">The data structure with the information on the drawn path</param>
-        void FindActiveNode(DrawArea drawArea, DrawnPathData drawnPathData)
+        private void FindActiveNode(DrawArea drawArea, DrawnPathData drawnPathData)
         {
             // Initial simplest implementation: find simply the closest and first.
             float closestMouseDistanceSquared = float.MaxValue;
@@ -583,7 +581,7 @@ namespace ORTS.TrackViewer.Editing
         /// Find the location on the track that can be used as a new end or wait node (or possibly start)
         /// </summary>
         /// <param name="drawnPathData">The data structure with the information on the drawn path</param>
-        void FindActiveTrackLocation(DrawnPathData drawnPathData)
+        private void FindActiveTrackLocation(DrawnPathData drawnPathData)
         {
             if (drawTrackDB.ClosestTrack == null ||
                 drawTrackDB.ClosestTrack.TrackNode == null)
@@ -634,7 +632,7 @@ namespace ORTS.TrackViewer.Editing
         /// <param name="drawnPathData">The data structure with the information on the drawn path</param>
         /// <param name="trackNodeIndex">The index of the track node</param>
         /// <returns>The node that will be before a possible new node on the track</returns>
-        TrainpathNode FindPrevNodeOfActiveTrack(DrawnPathData drawnPathData, int trackNodeIndex)
+        private TrainpathNode FindPrevNodeOfActiveTrack(DrawnPathData drawnPathData, int trackNodeIndex)
         {
             Collection<TrainpathNode> nodesOnTrack = drawnPathData.NodesOnTrack(trackNodeIndex);
             // We are given a set of nodes. We know that a part of the path was drawn following those nodes
@@ -656,7 +654,7 @@ namespace ORTS.TrackViewer.Editing
         /// <summary>
         /// Once the editing becomes active for this path, we make sure the path is 'clean' according to our standards
         /// </summary>
-        void OnActiveOrPathChanged()
+        private void OnActiveOrPathChanged()
         {
             if (!EditingIsActive) { return; }
             SnapAllJunctionNodes();
@@ -668,7 +666,7 @@ namespace ORTS.TrackViewer.Editing
         /// Make sure the junction nodes of have the exact location of the junctions in the track database.
         /// This is to make sure changes in the track database are taken over in the path
         /// </summary>
-        void SnapAllJunctionNodes()
+        private void SnapAllJunctionNodes()
         {
             TrainpathNode mainNode = CurrentTrainPath.FirstNode;
             while (mainNode != null)
@@ -697,7 +695,7 @@ namespace ORTS.TrackViewer.Editing
         /// <summary>
         /// Not all paths have enough disambiguity nodes to distinghuish between two possible paths. Here we add them
         /// </summary>
-        void AddMissingDisambiguityNodes()
+        private void AddMissingDisambiguityNodes()
         {
             nonInteractiveAction.AddMissingDisambiguityNodes(CurrentTrainPath, UpdateAfterEdits);
         }
@@ -972,7 +970,7 @@ namespace ORTS.TrackViewer.Editing
         /// </summary>
         public event ChangedPathHandler ChangedPath;
 
-        void OnPathChanged()
+        private void OnPathChanged()
         {
             ChangedPath?.Invoke();
         }

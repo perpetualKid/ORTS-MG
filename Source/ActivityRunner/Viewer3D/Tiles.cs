@@ -38,15 +38,14 @@ namespace Orts.ActivityRunner.Viewer3D
     [DebuggerDisplay("Count = {Tiles.List.Count}, Zoom = {Zoom}")]
     public class TileManager
     {
-        const int MaximumCachedTiles = 8 * 8;
-
-        readonly string FilePath;
-        readonly TileHelper.Zoom Zoom;
+        private const int MaximumCachedTiles = 8 * 8;
+        private readonly string FilePath;
+        private readonly TileHelper.Zoom Zoom;
 
         // THREAD SAFETY:
         //   All accesses must be done in local variables. No modifications to the objects are allowed except by
         //   assignment of a new instance (possibly cloned and then modified).
-        TileList Tiles = new TileList(new List<Tile>());
+        private TileList Tiles = new TileList(new List<Tile>());
 
         /// <summary>
         /// Constructs a new TileManager for loading tiles from a specific path, either at high-resolution or low-resolution.
@@ -291,7 +290,7 @@ namespace Orts.ActivityRunner.Viewer3D
         }
 
         [DebuggerDisplay("Count = {List.Count}")]
-        class TileList
+        private class TileList
         {
             /// <summary>
             /// Stores tiles in load order, so eviction is predictable and reasonable.
@@ -349,9 +348,9 @@ namespace Orts.ActivityRunner.Viewer3D
             return TFile.Terrain.Patchsets[0].Patches[z * PatchCount + x];
         }
 
-        readonly TerrainFile TFile;
-        readonly TerrainAltitudeFile YFile;
-        readonly TerrainFlagsFile FFile;
+        private readonly TerrainFile TFile;
+        private readonly TerrainAltitudeFile YFile;
+        private readonly TerrainFlagsFile FFile;
 
         public Tile(string filePath, int tileX, int tileZ, TileHelper.Zoom zoom, bool visible)
         {
@@ -447,7 +446,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         internal bool IsVertexHidden(int ux, int uz)
         {
-            return FFile == null ? false : FFile.IsVertexHiddenAt(ux, uz);
+            return FFile != null && FFile.IsVertexHiddenAt(ux, uz);
         }
     }
 }

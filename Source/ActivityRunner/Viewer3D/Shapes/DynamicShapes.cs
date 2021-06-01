@@ -520,7 +520,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
 
         }
 
-        static float GetTextureCoordX(char c)
+        private static float GetTextureCoordX(char c)
         {
             float x;
             switch(c)
@@ -539,7 +539,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
             return x;
         }
 
-        static float GetTextureCoordY(char c)
+        private static float GetTextureCoordY(char c)
         {
             switch (c)
             {
@@ -702,8 +702,8 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
 
     public class HazardShape : PoseableShape
     {
-        readonly HazardObject hazardObject;
-        readonly Hazard hazard;
+        private readonly HazardObject hazardObject;
+        private readonly Hazard hazard;
 
         private readonly int animationFrames;
         private double moved = 0f;

@@ -54,15 +54,13 @@ namespace Orts.ActivityRunner.Viewer3D
     #region MSTSSkyDrawer
     public class MSTSSkyDrawer
     {
-
-        Viewer MSTSSkyViewer;
-        Material MSTSSkyMaterial;
-        bool initialized;
+        private Viewer MSTSSkyViewer;
+        private Material MSTSSkyMaterial;
+        private bool initialized;
         // Classes reqiring instantiation
         public MSTSSkyMesh MSTSSkyMesh;
-        SunMoonPos MSTSSkyVectors;
-
-        int mstsskyseasonType; //still need to remember it as MP now can change it.
+        private SunMoonPos MSTSSkyVectors;
+        private int mstsskyseasonType; //still need to remember it as MP now can change it.
         #region Class variables
         // Latitude of current route in radians. -pi/2 = south pole, 0 = equator, pi/2 = north pole.
         // Longitude of current route in radians. -pi = west of prime, 0 = prime, pi = east of prime.
@@ -91,8 +89,8 @@ namespace Orts.ActivityRunner.Viewer3D
         public List<string> SkyLayers = new List<string>();
 
         // These arrays and vectors define the position of the sun and moon in the world
-        Vector3[] mstsskysolarPosArray = new Vector3[72];
-        Vector3[] mstsskylunarPosArray = new Vector3[72];
+        private Vector3[] mstsskysolarPosArray = new Vector3[72];
+        private Vector3[] mstsskylunarPosArray = new Vector3[72];
         public Vector3 mstsskysolarDirection;
         public Vector3 mstsskylunarDirection;
         #endregion
@@ -319,7 +317,7 @@ namespace Orts.ActivityRunner.Viewer3D
         private VertexBuffer MSTSSkyVertexBuffer;
         private static IndexBuffer MSTSSkyIndexBuffer;
         public int drawIndex;
-        VertexPositionNormalTexture[] vertexList;
+        private VertexPositionNormalTexture[] vertexList;
         private static short[] triangleListIndices; // Trilist buffer.
 
         // Sky dome geometry is based on two global variables: the radius and the number of sides
@@ -427,7 +425,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// </summary>
         /// <param name="index">The starting triangle index number</param>
         /// <param name="pass">A multiplier used to arrive at the starting vertex number</param>
-        static void MSTSSkyDomeTriangleList(short index, short pass)
+        private static void MSTSSkyDomeTriangleList(short index, short pass)
         {
             // ----------------------------------------------------------------------
             // 24-sided sky dome mesh is built like this:        48 49 50
@@ -716,12 +714,12 @@ namespace Orts.ActivityRunner.Viewer3D
             return false;
         }
 
-        const float nightStart = 0.15f; // The sun's Y value where it begins to get dark
-        const float nightFinish = -0.05f; // The Y value where darkest fog color is reached and held steady
+        private const float nightStart = 0.15f; // The sun's Y value where it begins to get dark
+        private const float nightFinish = -0.05f; // The Y value where darkest fog color is reached and held steady
 
         // These should be user defined in the Environment files (future)
-        static Vector3 startColor = new Vector3(0.647f, 0.651f, 0.655f); // Original daytime fog color - must be preserved!
-        static Vector3 finishColor = new Vector3(0.05f, 0.05f, 0.05f); //Darkest nighttime fog color
+        private static Vector3 startColor = new Vector3(0.647f, 0.651f, 0.655f); // Original daytime fog color - must be preserved!
+        private static Vector3 finishColor = new Vector3(0.05f, 0.05f, 0.05f); //Darkest nighttime fog color
 
         /// <summary>
         /// This function darkens the fog color as night begins to fall
@@ -729,7 +727,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// </summary>
         /// <param name="sunHeight">The Y value of the sunlight vector</param>
         /// <param name="overcast">The amount of overcast</param>
-        static void FogDay2Night(float sunHeight, float overcast)
+        private static void FogDay2Night(float sunHeight, float overcast)
         {
             Vector3 floatColor;
 

@@ -46,9 +46,10 @@ namespace ORTS.TrackViewer.Editing
 
         #region private members to store the path
         /// <summary>List of TVNs that describe how to connect two nodes (via which TrackVectorNodes the connection is made)</summary>
-        List<int> linkingTvns;
+        private List<int> linkingTvns;
+
         /// <summary>True when the connection is made on the same track from one vector node to the next</summary>
-        bool sameTrackConnect;
+        private bool sameTrackConnect;
 
         internal ConnectableNode autoConnectFromNode;
         internal ReconnectNodeOptions autoConnectToNodeOptions;

@@ -15,9 +15,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
-using System.Collections.Generic;
 using System.IO;
-using Orts.Formats.Msts.Models;
+
 using Orts.Formats.Msts.Files;
 using Orts.Formats.OR.Files;
 
@@ -26,7 +25,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .pat files
     /// </summary>
-    class CarSpawnLoader : Loader
+    internal class CarSpawnLoader : Loader
     {
         /// <summary>
         /// Try to load the file.
@@ -35,16 +34,16 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            var subdirname = Path.GetFileName(Path.GetDirectoryName(file)).ToLowerInvariant();
-            if (subdirname == "openrails")
+            string subdirname = Path.GetFileName(Path.GetDirectoryName(file));
+            if (subdirname.Equals("openrails", System.StringComparison.OrdinalIgnoreCase))
             {
                 string RoutePath = Path.GetDirectoryName(Path.GetDirectoryName(file));
-                var extCarSpawnerFile = new ORCarSpawnerFile(file, RoutePath + @"\shapes\");
+                _ = new ORCarSpawnerFile(file, RoutePath + @"\shapes\");
             }
             else
             {
                 string RoutePath = Path.GetDirectoryName(file);
-                var carSpawnerFile = new CarSpawnerFile(file, RoutePath + @"\shapes\");
+                _ = new CarSpawnerFile(file, RoutePath + @"\shapes\");
             }
         }
     }

@@ -8,7 +8,7 @@ using Game = Orts.ActivityRunner.Viewer3D.Processes.Game;
 
 namespace Orts.ActivityRunner.Viewer3D.Primitives
 {
-    class LoadingScreenPrimitive : LoadingPrimitive
+    internal class LoadingScreenPrimitive : LoadingPrimitive
     {
         public LoadingScreenPrimitive(Game game)
             : base(game)

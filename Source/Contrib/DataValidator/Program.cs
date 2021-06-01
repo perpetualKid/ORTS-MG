@@ -24,9 +24,9 @@ using Orts.Common.Logging;
 
 namespace Orts.DataValidator
 {
-    class Program
+    internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             var verbose = args.Contains("/verbose", StringComparer.OrdinalIgnoreCase);
             var files = args.Where(arg => !arg.StartsWith("/"));
@@ -36,7 +36,7 @@ namespace Orts.DataValidator
                 ShowHelp();
         }
 
-        static void ShowHelp()
+        private static void ShowHelp()
         {
             Console.WriteLine("Open Rails Data Validator utility");
             Console.WriteLine();
@@ -46,7 +46,7 @@ namespace Orts.DataValidator
             Console.WriteLine("    /verbose  Displays all expected/valid values in addition to any errors.");
         }
 
-        static void Validate(bool verbose, IEnumerable<string> files)
+        private static void Validate(bool verbose, IEnumerable<string> files)
         {
             var traceListener = SetUpTracing(verbose);
 
@@ -56,7 +56,7 @@ namespace Orts.DataValidator
             ShowTracingReport(traceListener);
         }
 
-        static ORTraceListener SetUpTracing(bool verbose)
+        private static ORTraceListener SetUpTracing(bool verbose)
         {
             // Captures Trace.Trace* calls and others and formats.
             var traceListener = new ORTraceListener(Console.Out);
@@ -72,7 +72,7 @@ namespace Orts.DataValidator
             return traceListener;
         }
 
-        static void ShowTracingReport(ORTraceListener traceListener)
+        private static void ShowTracingReport(ORTraceListener traceListener)
         {
             Console.WriteLine();
             Console.WriteLine("Validator summary");
@@ -82,7 +82,7 @@ namespace Orts.DataValidator
             Console.WriteLine();
         }
 
-        static void Validate(string file)
+        private static void Validate(string file)
         {
             Console.WriteLine("{0}: Begin", file);
 

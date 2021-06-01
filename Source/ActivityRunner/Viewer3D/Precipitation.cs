@@ -40,15 +40,12 @@ namespace Orts.ActivityRunner.Viewer3D
         public const float MaxIntensityPPSPM2_16 = 0.010f;
         // Default 32 bit version.
         public const float MaxIntensityPPSPM2 = 0.035f;
-                
-        readonly Viewer Viewer;
-        readonly WeatherControl WeatherControl;
-        readonly Weather Weather;
-
-        readonly Material Material;
-        readonly PrecipitationPrimitive Pricipitation;
-
-        Vector3 Wind;
+        private readonly Viewer Viewer;
+        private readonly WeatherControl WeatherControl;
+        private readonly Weather Weather;
+        private readonly Material Material;
+        private readonly PrecipitationPrimitive Pricipitation;
+        private Vector3 Wind;
 
         public PrecipitationViewer(Viewer viewer, WeatherControl weatherControl)
         {
@@ -101,33 +98,32 @@ namespace Orts.ActivityRunner.Viewer3D
     {
         // http://www-das.uwyo.edu/~geerts/cwx/notes/chap09/hydrometeor.html
         // "Rain  1.8 - 2.2mm  6.1 - 6.9m/s"
-        const float RainVelocityMpS = 6.9f;
-        // "Snow flakes of any size falls at about 1 m/s"
-        const float SnowVelocityMpS = 1.0f;
-        // This is a fiddle factor because the above values feel too slow. Alternative suggestions welcome.
-        const float ParticleVelocityFactor = 10.0f;
+        private const float RainVelocityMpS = 6.9f;
 
-        readonly float ParticleBoxLengthM;
-        readonly float ParticleBoxWidthM;
-        readonly float ParticleBoxHeightM;
+        // "Snow flakes of any size falls at about 1 m/s"
+        private const float SnowVelocityMpS = 1.0f;
+
+        // This is a fiddle factor because the above values feel too slow. Alternative suggestions welcome.
+        private const float ParticleVelocityFactor = 10.0f;
+        private readonly float ParticleBoxLengthM;
+        private readonly float ParticleBoxWidthM;
+        private readonly float ParticleBoxHeightM;
 
         // 16bit Box Parameters
-        const float ParticleBoxLengthM_16 = 500;
-        const float ParticleBoxWidthM_16 = 500;
-        const float ParticleBoxHeightM_16 = 43;
+        private const float ParticleBoxLengthM_16 = 500;
+        private const float ParticleBoxWidthM_16 = 500;
+        private const float ParticleBoxHeightM_16 = 43;
+        private const int IndiciesPerParticle = 6;
+        private const int VerticiesPerParticle = 4;
+        private const int PrimitivesPerParticle = 2;
+        private readonly int MaxParticles;
+        private readonly ParticleVertex[] Vertices;
+        private readonly VertexDeclaration VertexDeclaration;
+        private readonly int VertexStride;
+        private readonly DynamicVertexBuffer VertexBuffer;
+        private readonly IndexBuffer IndexBuffer;
 
-        const int IndiciesPerParticle = 6;
-        const int VerticiesPerParticle = 4;
-        const int PrimitivesPerParticle = 2;
-
-        readonly int MaxParticles;
-        readonly ParticleVertex[] Vertices;
-        readonly VertexDeclaration VertexDeclaration;
-        readonly int VertexStride;
-        readonly DynamicVertexBuffer VertexBuffer;
-        readonly IndexBuffer IndexBuffer;
-
-        struct ParticleVertex
+        private struct ParticleVertex
         {
             public Vector4 StartPosition_StartTime;
             public Vector4 EndPosition_EndTime;
@@ -143,23 +139,22 @@ namespace Orts.ActivityRunner.Viewer3D
             public static int SizeInBytes = sizeof(float) * (4 + 4) + sizeof(float) * 4;
         }
 
-        float ParticleDuration;
-        Vector3 ParticleDirection;
-        HeightCache Heights;
+        private float ParticleDuration;
+        private Vector3 ParticleDirection;
+        private HeightCache Heights;
 
         // Particle buffer goes like this:
         //   +--active>-----new>--+
         //   |                    |
         //   +--<retired---<free--+
 
-        int FirstActiveParticle;
-        int FirstNewParticle;
-        int FirstFreeParticle;
-        int FirstRetiredParticle;
-
-        float ParticlesToEmit;
-        float TimeParticlesLastEmitted;
-        int DrawCounter;
+        private int FirstActiveParticle;
+        private int FirstNewParticle;
+        private int FirstFreeParticle;
+        private int FirstRetiredParticle;
+        private float ParticlesToEmit;
+        private float TimeParticlesLastEmitted;
+        private int DrawCounter;
 
         public PrecipitationPrimitive(GraphicsDevice graphicsDevice)
         {
@@ -196,15 +191,16 @@ namespace Orts.ActivityRunner.Viewer3D
                 IndexBuffer = InitIndexBuffer16(graphicsDevice, MaxParticles * IndiciesPerParticle);
             Heights = new HeightCache(8);
             // This Trace command is used to show how much memory is used.
-            Trace.TraceInformation(String.Format("Allocation for {0:N0} particles:\n\n  {1,13:N0} B RAM vertex data\n  {2,13:N0} B RAM index data (temporary)\n  {1,13:N0} B VRAM DynamicVertexBuffer\n  {2,13:N0} B VRAM IndexBuffer", MaxParticles, Marshal.SizeOf(typeof(ParticleVertex)) * MaxParticles * VerticiesPerParticle, sizeof(uint) * MaxParticles * IndiciesPerParticle));
+            Trace.TraceInformation(string.Format(System.Globalization.CultureInfo.CurrentCulture, "Allocation for {0:N0} particles:\n\n  {1,13:N0} B RAM vertex data\n  {2,13:N0} B RAM index data (temporary)\n  {1,13:N0} B VRAM DynamicVertexBuffer\n  {2,13:N0} B VRAM IndexBuffer", MaxParticles, Marshal.SizeOf(typeof(ParticleVertex)) * MaxParticles * VerticiesPerParticle, sizeof(uint) * MaxParticles * IndiciesPerParticle));
         }
 
-        void VertexBuffer_ContentLost()
+        private void VertexBuffer_ContentLost()
         {
             VertexBuffer.SetData(0, Vertices, 0, Vertices.Length, VertexStride, SetDataOptions.NoOverwrite);
         }
+
         // IndexBuffer for 32bit process.
-        static IndexBuffer InitIndexBuffer(GraphicsDevice graphicsDevice, int numIndicies)
+        private static IndexBuffer InitIndexBuffer(GraphicsDevice graphicsDevice, int numIndicies)
         {
             var indices = new uint[numIndicies];
             var index = 0;
@@ -224,8 +220,9 @@ namespace Orts.ActivityRunner.Viewer3D
             indexBuffer.SetData(indices);
             return indexBuffer;
         }
+
         // IndexBuffer for computers that still use 16bit graphics.
-        static IndexBuffer InitIndexBuffer16(GraphicsDevice graphicsDevice, int numIndicies)
+        private static IndexBuffer InitIndexBuffer16(GraphicsDevice graphicsDevice, int numIndicies)
         {
             var indices = new ushort[numIndicies];
             var index = 0;
@@ -246,7 +243,7 @@ namespace Orts.ActivityRunner.Viewer3D
             return indexBuffer;
         }
 
-        void RetireActiveParticles(float currentTime)
+        private void RetireActiveParticles(float currentTime)
         {
             while (FirstActiveParticle != FirstNewParticle)
             {
@@ -263,7 +260,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        void FreeRetiredParticles()
+        private void FreeRetiredParticles()
         {
             while (FirstRetiredParticle != FirstActiveParticle)
             {
@@ -278,7 +275,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        int GetCountFreeParticles()
+        private int GetCountFreeParticles()
         {
             var nextFree = (FirstFreeParticle + 1) % MaxParticles;
 
@@ -362,7 +359,7 @@ namespace Orts.ActivityRunner.Viewer3D
             ParticlesToEmit = ParticlesToEmit - (int)ParticlesToEmit;
         }
 
-        void AddNewParticlesToVertexBuffer()
+        private void AddNewParticlesToVertexBuffer()
         {
             if (FirstNewParticle < FirstFreeParticle)
             {
@@ -416,13 +413,12 @@ namespace Orts.ActivityRunner.Viewer3D
             DrawCounter++;
         }
 
-        class HeightCache
+        private class HeightCache
         {
-            const int TileCount = 10;
-
-            readonly int BlockSize;
-            readonly int Divisions;
-            readonly List<Tile> Tiles = new List<Tile>();
+            private const int TileCount = 10;
+            private readonly int BlockSize;
+            private readonly int Divisions;
+            private readonly List<Tile> Tiles = new List<Tile>();
 
             public HeightCache(int blockSize)
             {
@@ -469,7 +465,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
 
             [DebuggerDisplay("Tile = {TileX},{TileZ} Used = {Used}")]
-            class Tile
+            private class Tile
             {
                 public readonly int TileX;
                 public readonly int TileZ;

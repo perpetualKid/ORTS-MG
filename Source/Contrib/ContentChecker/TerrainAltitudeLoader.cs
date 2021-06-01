@@ -16,12 +16,7 @@
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
 
-using Orts.Formats.Msts;
 using Orts.Formats.Msts.Files;
 
 namespace Orts.ContentChecker
@@ -29,10 +24,10 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for -f.raw files
     /// </summary>
-    class TerrainAltitudeLoader : Loader
+    internal class TerrainAltitudeLoader : Loader
     {
         /// <summary> The sample count needed for loading a terrain .raw file </summary>
-        private int _sampleCount;
+        private int sampleCount;
 
         /// <summary>
         /// default constructor when not enough information is available
@@ -48,7 +43,7 @@ namespace Orts.ContentChecker
         /// <param name="sampleCount">The Signal Configuration object</param>
         public TerrainAltitudeLoader(int sampleCount) : this()
         {
-            _sampleCount = sampleCount;
+            this.sampleCount = sampleCount;
         }
 
         /// <summary>
@@ -58,14 +53,16 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            if (_sampleCount == 0)
+            if (sampleCount == 0)
             {
                 FilesLoaded = 0;
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
                 Console.WriteLine("_y.raw files can not be loaded independently. Try the option /d");
+#pragma warning restore CA1303 // Do not pass literals as localized parameters
             }
             else
             {
-                var yFile = new TerrainAltitudeFile(file, _sampleCount);
+                _ = new TerrainAltitudeFile(file, sampleCount);
             }
         }
     }

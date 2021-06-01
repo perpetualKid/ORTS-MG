@@ -33,9 +33,9 @@ namespace Orts.ActivityRunner.Viewer3D
 {
     public class TransferShape : StaticShape
     {
-        readonly Material Material;
-        readonly TransferPrimitive Primitive;
-        readonly float Radius;
+        private readonly Material Material;
+        private readonly TransferPrimitive Primitive;
+        private readonly float Radius;
 
         public TransferShape(TransferObject transfer, in WorldPosition position)
             : base(null, RemoveRotation(position), ShapeFlags.AutoZBias)
@@ -45,7 +45,7 @@ namespace Orts.ActivityRunner.Viewer3D
             Radius = (float)Math.Sqrt(transfer.Width * transfer.Width + transfer.Height * transfer.Height) / 2;
         }
 
-        static WorldPosition RemoveRotation(in WorldPosition position)
+        private static WorldPosition RemoveRotation(in WorldPosition position)
         {           
             return new WorldPosition(position.TileX, position.TileZ, Matrix.CreateTranslation(position.XNAMatrix.Translation));
         }
@@ -68,10 +68,10 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class TransferPrimitive : RenderPrimitive
     {
-        readonly VertexBuffer VertexBuffer;
-        readonly IndexBuffer IndexBuffer;
-        readonly int VertexCount;
-        readonly int PrimitiveCount;
+        private readonly VertexBuffer VertexBuffer;
+        private readonly IndexBuffer IndexBuffer;
+        private readonly int VertexCount;
+        private readonly int PrimitiveCount;
 
         public TransferPrimitive(Viewer viewer, float width, float height, in WorldPosition position)
         {

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Windows.Forms;
 
 using Orts.Common.Info;
 using Orts.Common.Logging;
-using Orts.Common.Native;
 
 namespace Orts.TrackViewer
 {
@@ -14,11 +12,7 @@ namespace Orts.TrackViewer
         [STAThread]
         private static void Main()
         {
-#if NETCOREAPP
             Application.SetHighDpiMode(HighDpiMode.PerMonitorV2);
-#else
-            NativeMethods.SetProcessDpiAwareness(NativeMethods.PROCESS_DPI_AWARENESS.Process_Per_Monitor_DPI_Aware);
-#endif
             Application.SetCompatibleTextRenderingDefault(false);
             using (GameWindow game = new GameWindow())
             {

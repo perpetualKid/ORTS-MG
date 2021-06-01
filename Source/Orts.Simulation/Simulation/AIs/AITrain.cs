@@ -4025,7 +4025,7 @@ namespace Orts.Simulation.AIs
             delay = delay - 40000 - carsToKeep * 100;
             if (IsActualPlayerTrain && TrainType == TrainType.AiPlayerDriven && this != simulator.OriginalPlayerTrain)
             {
-                simulator.ActivityRun.MsgFromNewPlayer = String.Format("Uncouple and keep coupled only {0} {1} cars", carsToKeep, keepFront ? "first" : "last");
+                simulator.ActivityRun.MsgFromNewPlayer = $"Uncouple and keep coupled only {carsToKeep} {(keepFront ? "first" : "last")} cars";
                 simulator.ActivityRun.NewMsgFromNewPlayer = true;
             }
             else UncoupleSomeWagons(carsToKeep, keepFront);

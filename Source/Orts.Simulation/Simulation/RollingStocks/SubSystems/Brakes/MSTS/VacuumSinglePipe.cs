@@ -33,13 +33,13 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
 {
     public class VacuumSinglePipe : MSTSBrakeSystem
     {
-        protected readonly static float OneAtmospherePSI = (float)Pressure.Atmospheric.ToPSI(1);
+        protected static readonly float OneAtmospherePSI = (float)Pressure.Atmospheric.ToPSI(1);
         protected float MaxForcePressurePSI = (float)Pressure.Standard.ToPSI(Pressure.Standard.FromInHg(21));    // relative pressure difference for max brake force
         protected TrainCar Car;
         protected float HandbrakePercent;
         protected float CylPressurePSIA;
-        float BrakeCutOffPSIA;
-        float BrakeRestorePSIA; 
+        private float BrakeCutOffPSIA;
+        private float BrakeRestorePSIA; 
         protected float VacResPressurePSIA;  // vacuum reservior pressure with piston in released position
         // defaults based on information in http://www.lmsca.org.uk/lms-coaches/LMSRAVB.pdf
         public int NumBrakeCylinders = 2;
@@ -47,9 +47,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
         protected float BrakeCylVolM3 = (float)Size.Volume.FromIn3(((18 / 2) * (18 / 2) * 4.5 * Math.PI));
         // vacuum reservior volume with piston in released position
         public float VacResVolM3 = (float)Size.Volume.FromIn3(((24 / 2) * (24 / 2) * 16 * Math.PI));
+
         // volume units need to be consistent but otherwise don't matter, defaults are cubic inches
-        bool HasDirectAdmissionValue = false;
-        float DirectAdmissionValve = 0.0f;
+        private bool HasDirectAdmissionValue = false;
+        private float DirectAdmissionValve = 0.0f;
         protected float MaxReleaseRatePSIpS = 2.5f;
         protected float MaxApplicationRatePSIpS = 2.5f;
         protected float LargeEjectorChargingRate;
@@ -58,10 +59,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
         protected int SoundTriggerCounter = 0;
         protected float prevCylPressurePSIA = 0f;
         protected float prevBrakePipePressurePSI = 0f;
-        bool LocomotiveSteamBrakeFitted = false;
-        float SteamBrakeCylinderPressurePSI = 0;
-        float SteamBrakeCompensation;
-        float SteamBrakingCurrentFraction;
+        private bool LocomotiveSteamBrakeFitted = false;
+        private float SteamBrakeCylinderPressurePSI = 0;
+        private float SteamBrakeCompensation;
+        private float SteamBrakingCurrentFraction;
 
         public VacuumSinglePipe(TrainCar car)
         {
@@ -109,8 +110,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
 
         public override string GetStatus(Dictionary<BrakeSystemComponent, Pressure.Unit> units) // Status for last car in Main HUD
         {
-            return string.Format(Simulator.Catalog.GetString(" BP {0}"), 
-                FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(BrakeLine1PressurePSI), Pressure.Unit.InHg, Pressure.Unit.InHg, false));
+            return Simulator.Catalog.GetString($" BP {FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(BrakeLine1PressurePSI), Pressure.Unit.InHg, Pressure.Unit.InHg, false)}");
         }
 
         public override string GetFullStatus(BrakeSystem lastCarBrakeSystem, Dictionary<BrakeSystemComponent, Pressure.Unit> units)  // Status for Main HUD view (calls above as well)
@@ -128,21 +128,19 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
 
                 float DisplayEqualReservoirPressurePSIorInHg = (ValveFraction * (OneAtmospherePSI - (OneAtmospherePSI - MaxVacuumPipeLevelPSI))) + (OneAtmospherePSI - MaxVacuumPipeLevelPSI);
 
-                s = string.Format(Simulator.Catalog.GetString(" EQ {0}"), 
-                    FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(DisplayEqualReservoirPressurePSIorInHg), Pressure.Unit.InHg, Pressure.Unit.InHg, true));
-                s += string.Format(Simulator.Catalog.GetString(" V {0}"), FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(BrakeLine1PressurePSI), Pressure.Unit.InHg, Pressure.Unit.InHg, true));
+                s = Simulator.Catalog.GetString($" EQ {FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(DisplayEqualReservoirPressurePSIorInHg), Pressure.Unit.InHg, Pressure.Unit.InHg, true)}");
+                s += Simulator.Catalog.GetString($" V {FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(BrakeLine1PressurePSI), Pressure.Unit.InHg, Pressure.Unit.InHg, true)}");
             }
             else // No EQ reservoir by default
             {
-                s = string.Format(Simulator.Catalog.GetString(" Lead BP {0}"), 
-                    FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(BrakeLine1PressurePSI), Pressure.Unit.InHg, Pressure.Unit.InHg, true));
+                s = Simulator.Catalog.GetString($" Lead BP {FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(BrakeLine1PressurePSI), Pressure.Unit.InHg, Pressure.Unit.InHg, true)}");
             }
 
             //            string s = string.Format(" V {0}", FormatStrings.FormatPressure(Car.Train.EqualReservoirPressurePSIorInHg, Pressure.Units.InHg, Pressure.Units.InHg, true));
             if (lastCarBrakeSystem != null && lastCarBrakeSystem != this)
                 s += Simulator.Catalog.GetString(" EOT ") + lastCarBrakeSystem.GetStatus(units);
             if (HandbrakePercent > 0)
-                s += string.Format(Simulator.Catalog.GetString(" Handbrake {0:F0}%"), HandbrakePercent);
+                s += Simulator.Catalog.GetString($" Handbrake {HandbrakePercent:F0}%");
             return s;
         }
 
@@ -152,7 +150,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
             {
                 return new string[] {
                 "S",
-                string.Format("{0:F0}", FormatStrings.FormatPressure(SteamBrakeCylinderPressurePSI, Pressure.Unit.PSI,  Pressure.Unit.PSI, true)),
+                $"{FormatStrings.FormatPressure(SteamBrakeCylinderPressurePSI, Pressure.Unit.PSI,  Pressure.Unit.PSI, true):F0}",
                 string.Empty,
                 string.Empty,
                 string.Empty,
@@ -160,9 +158,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                 string.Empty,
                 string.Empty,
                 string.Empty, // Spacer because the state above needs 2 columns.
-                (Car as MSTSWagon).HandBrakePresent ? string.Format("{0:F0}%", HandbrakePercent) : string.Empty,
+                (Car as MSTSWagon).HandBrakePresent ? $"{HandbrakePercent:F0}%" : string.Empty,
                 FrontBrakeHoseConnected ? "I" : "T",
-                string.Format("A{0} B{1}", AngleCockAOpen ? "+" : "-", AngleCockBOpen ? "+" : "-"),
+                $"A{(AngleCockAOpen ? "+" : "-")} B{(AngleCockBOpen ? "+" : "-")}",
                 };
             }
             else
@@ -178,9 +176,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                 string.Empty,
                 string.Empty,
                 string.Empty,
-                HandbrakePercent > 0 ? string.Format("{0:F0}%", HandbrakePercent) : string.Empty,
+                HandbrakePercent > 0 ? $"{HandbrakePercent:F0}%" : string.Empty,
                 FrontBrakeHoseConnected ? "I" : "T",
-                string.Format("A{0} B{1}", AngleCockAOpen ? "+" : "-", AngleCockBOpen ? "+" : "-"),
+                $"A{(AngleCockAOpen ? "+" : "-")} B{(AngleCockBOpen ? "+" : "-")}",
                 };
             }
         }
@@ -696,7 +694,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
             float LapNetBPLossGainPSI = 0.0f;   // The net value of the losses and gains in the brake pipe for lap position: eg Net = Lg Ejector + Sm Ejector + Vac Pump - BP Loss
             float EQReleaseNetBPLossGainPSI = 0.0f;   // The net value of the losses and gains in the brake pipe for EQ release position: eg Net = Lg Ejector + Sm Ejector + Vac Pump - BP Loss
 
-            train.EQEquippedVacLoco = lead == null ? false : lead.VacuumBrakeEQFitted;
+            train.EQEquippedVacLoco = lead != null && lead.VacuumBrakeEQFitted;
 
             foreach (TrainCar car in train.Cars)
             {

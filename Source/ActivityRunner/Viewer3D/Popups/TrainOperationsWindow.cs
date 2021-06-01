@@ -29,18 +29,18 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class TrainOperationsWindow : Window
     {
-        const int CarListPadding = 2;
+        private const int CarListPadding = 2;
         internal static Texture2D CouplerTexture;
-        Train PlayerTrain;
-        int LastPlayerTrainCars;
-        bool LastPlayerLocomotiveFlippedState;
+        private Train PlayerTrain;
+        private int LastPlayerTrainCars;
+        private bool LastPlayerLocomotiveFlippedState;
 
         public TrainOperationsWindow(WindowManager owner)
             : base(owner, Window.DecorationSize.X + owner.TextFontDefault.Height * 37, Window.DecorationSize.Y + CarListPadding + owner.TextFontDefault.Height * 2, Viewer.Catalog.GetString("Train Operations"))
         {
         }
 
-        protected internal override void Initialize()
+        internal protected override void Initialize()
         {
             base.Initialize();
             if (CouplerTexture == null)
@@ -74,7 +74,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             return hbox;
         }
 
-        void carLabel_Click(Control arg1, Point arg2)
+        private void carLabel_Click(Control arg1, Point arg2)
         {
 
         }
@@ -97,10 +97,10 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         }
     }
 
-    class TrainOperationsCoupler : Image
+    internal class TrainOperationsCoupler : Image
     {
-        readonly Viewer Viewer;
-        readonly int CarPosition;
+        private readonly Viewer Viewer;
+        private readonly int CarPosition;
 
         public TrainOperationsCoupler(int x, int y, int size, Viewer viewer, TrainCar car, int carPosition)
             : base(x, y, size, size)
@@ -112,7 +112,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             Click += new Action<Control, Point>(TrainOperationsCoupler_Click);
         }
 
-        void TrainOperationsCoupler_Click(Control arg1, Point arg2)
+        private void TrainOperationsCoupler_Click(Control arg1, Point arg2)
         {
             if (Viewer.Simulator.TimetableMode)
             {
@@ -127,10 +127,10 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         }
     }
 
-    class TrainOperationsLabel : Label
+    internal class TrainOperationsLabel : Label
     {
-        readonly Viewer Viewer;
-        readonly int CarPosition;
+        private readonly Viewer Viewer;
+        private readonly int CarPosition;
 
         public TrainOperationsLabel(int x, int y, Viewer viewer, TrainCar car, int carPosition, LabelAlignment alignment)
             : base(x, y, "", alignment)
@@ -141,7 +141,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             Click += new Action<Control, Point>(TrainOperationsLabel_Click);
         }
 
-        void TrainOperationsLabel_Click(Control arg1, Point arg2)
+        private void TrainOperationsLabel_Click(Control arg1, Point arg2)
         {
             Viewer.CarOperationsWindow.CarPosition = CarPosition;
             Viewer.CarOperationsWindow.Visible = true;

@@ -176,7 +176,7 @@ namespace Orts.ContentManager
             return new TreeNode($"{c.Name} ({c.Type})", new[] { new TreeNode() }) { Tag = c };
         }
 
-        void TreeViewContent_AfterSelect(object sender, TreeViewEventArgs e)
+        private void TreeViewContent_AfterSelect(object sender, TreeViewEventArgs e)
         {
             richTextBoxContent.Clear();
 
@@ -197,7 +197,7 @@ namespace Orts.ContentManager
             while (linkMatch.Success)
             {
                 richTextBoxContent.Select(linkMatch.Index, linkMatch.Length);
-                richTextBoxContent.SelectedRtf = String.Format(@"{{\rtf{{{0}{{\v{{\u1.{0}\u1.{1}}}\v0}}}}}}", linkMatch.Groups[1].Value, linkMatch.Groups[2].Value);
+                richTextBoxContent.SelectedRtf = $@"{{\rtf{{{linkMatch.Groups[1].Value}{{\v{{\u1.{linkMatch.Groups[1].Value}\u1.{linkMatch.Groups[2].Value}}}\v0}}}}}}";
                 richTextBoxContent.Select(linkMatch.Index, linkMatch.Groups[1].Value.Length * 2 + linkMatch.Groups[2].Value.Length + 2);
                 SendMessage(richTextBoxContent.Handle, EmSetCharFormat, (IntPtr)ScfSelection, ref rtfLink);
                 linkMatch = contentLink.Match(richTextBoxContent.Text);
@@ -327,7 +327,7 @@ namespace Orts.ContentManager
             return Task.CompletedTask;
         }
 
-        void SearchResults_DoubleClick(object sender, EventArgs e)
+        private void SearchResults_DoubleClick(object sender, EventArgs e)
         {
             if (!(searchResults.SelectedItem is SearchResult result))
                 return;
@@ -363,8 +363,7 @@ namespace Orts.ContentManager
     {
         public string Name;
         public string[] Path;
-
-        static string[] separators = { " / ", " -> " };
+        private static string[] separators = { " / ", " -> " };
         public SearchResult(Content content, string path)
         {
             var placeEnd = Math.Max(path.LastIndexOf(" / "), path.LastIndexOf(" -> "));

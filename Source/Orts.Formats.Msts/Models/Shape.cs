@@ -510,7 +510,7 @@ namespace Orts.Formats.Msts.Models
             SourceUVIndex = block.ReadInt();
             UnknownParameter3 = block.ReadFloat();
             block.VerifyEndOfBlock();
-            block.TraceInformation(String.Format("{0} was treated as uv_op_copy", block.ID.ToString()));
+            block.TraceInformation($"{block.ID} was treated as uv_op_copy");
         }
     }
 
@@ -529,7 +529,7 @@ namespace Orts.Formats.Msts.Models
             UnknownParameter3 = block.ReadFloat();
             UnknownParameter4 = block.ReadFloat();
             block.VerifyEndOfBlock();
-            block.TraceInformation(String.Format("{0} was treated as uv_op_copy", block.ID.ToString()));
+            block.TraceInformation($"{block.ID} was treated as uv_op_copy");
         }
     }
 

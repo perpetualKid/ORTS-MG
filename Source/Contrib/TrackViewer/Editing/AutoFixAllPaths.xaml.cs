@@ -32,17 +32,16 @@ namespace ORTS.TrackViewer.Editing
     /// </summary>
     public partial class AutoFixAllPaths : Window
     {
-        RouteData routeData;
-        DrawTrackDB drawTrackDB;
-
-        Dictionary<string, List<string>> pathsThatAre = new Dictionary<string, List<string>>
+        private RouteData routeData;
+        private DrawTrackDB drawTrackDB;
+        private Dictionary<string, List<string>> pathsThatAre = new Dictionary<string, List<string>>
             {
                 ["UnmodifiedFine"] = new List<string>(),
                 ["UnmodifiedBroken"] = new List<string>(),
                 ["ModifiedFine"] = new List<string>(),
                 ["ModifiedBroken"] = new List<string>(),
             };
-        List<PathEditor> modifiedPaths;
+        private List<PathEditor> modifiedPaths;
 
         /// <summary>
         /// Constructor
@@ -201,7 +200,7 @@ namespace ORTS.TrackViewer.Editing
             file.Close();
         }
 
-        static string GetFileName()
+        private static string GetFileName()
         {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
             {

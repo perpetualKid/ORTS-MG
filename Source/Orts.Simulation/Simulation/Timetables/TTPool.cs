@@ -352,7 +352,7 @@ namespace Orts.Simulation.Timetables
         /// Method to save pool
         /// </summary>
         /// <param name="outf"></param>
-        virtual public void Save(BinaryWriter outf)
+        public virtual void Save(BinaryWriter outf)
         {
             outf.Write(PoolName);
             outf.Write(ForceCreation);
@@ -686,7 +686,7 @@ namespace Orts.Simulation.Timetables
         /// TestPoolExit : test if end of route is access to required pool
         /// </summary>
         /// <param name="train"></param>
-        virtual public bool TestPoolExit(TTTrain train)
+        public virtual bool TestPoolExit(TTTrain train)
         {
 
             bool validPool = false;
@@ -742,7 +742,7 @@ namespace Orts.Simulation.Timetables
         /// </summary>
         /// <param name="train"></param>
 
-        virtual public TrackCircuitPartialPathRoute CreateInPool(TTTrain train, out int poolStorageIndex, bool checkAccessPath)
+        public virtual TrackCircuitPartialPathRoute CreateInPool(TTTrain train, out int poolStorageIndex, bool checkAccessPath)
         {
             int tempIndex;
             TrackCircuitPartialPathRoute newRoute = SetPoolExit(train, out tempIndex, checkAccessPath);
@@ -756,7 +756,7 @@ namespace Orts.Simulation.Timetables
         /// Returned poolStorageState : <0 : state (enum TTTrain.PoolAccessState); >0 : poolIndex
         /// </summary>
         /// <param name="train"></param>
-        virtual public TrackCircuitPartialPathRoute SetPoolExit(TTTrain train, out int poolStorageState, bool checkAccessPath)
+        public virtual TrackCircuitPartialPathRoute SetPoolExit(TTTrain train, out int poolStorageState, bool checkAccessPath)
         {
             // new route
             TrackCircuitPartialPathRoute newRoute = null;
@@ -1093,7 +1093,7 @@ namespace Orts.Simulation.Timetables
         /// </summary>
         /// <param name="train"></param>
         /// <returns></returns>
-        virtual public TrainFromPool ExtractTrain(ref TTTrain train, int presentTime)
+        public virtual TrainFromPool ExtractTrain(ref TTTrain train, int presentTime)
         {
 #if DEBUG_POOLINFO
             var sob = new StringBuilder();

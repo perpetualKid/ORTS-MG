@@ -17,6 +17,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Globalization;
 
 using Orts.Common;
 
@@ -47,10 +48,9 @@ namespace Orts.Simulation
         // be replaced with French and other languages.
         //
         //                      control, off/reset/initialize, neutral, on/apply/switch, decrease, increase, warn
-        readonly string[][] ConfirmText; 
-
-        readonly Simulator Simulator;
-        readonly double DefaultDurationS;
+        private readonly string[][] ConfirmText;
+        private readonly Simulator Simulator;
+        private readonly double DefaultDurationS;
 
         public event System.EventHandler PlayErrorSound;
         public event EventHandler<DisplayMessageEventArgs> DisplayMessage;
@@ -215,7 +215,7 @@ namespace Orts.Simulation
 
         public void Message(CabControl control, string format, params object[] args)
         {
-            Message(control, ConfirmLevel.None, String.Format(format, args));
+            Message(control, ConfirmLevel.None, string.Format(CultureInfo.CurrentCulture, format, args));
         }
 
         public void Warning(CabControl control, CabSetting setting)
@@ -254,7 +254,7 @@ namespace Orts.Simulation
 
         #endregion
 
-        void Message(CabControl control, ConfirmLevel level, string message)
+        private void Message(CabControl control, ConfirmLevel level, string message)
         {
             // User can suppress levels None and Information but not Warning, Error and MSGs.
             // Cab control confirmations have level None.
@@ -270,7 +270,7 @@ namespace Orts.Simulation
 			var duration = DefaultDurationS;
 			if (level >= ConfirmLevel.Warning) duration *= 2;
 			if (level >= ConfirmLevel.Message) duration *= 5;
-            DisplayMessage?.Invoke(this, new DisplayMessageEventArgs($"{control}/{level}", string.Format(format, ConfirmText[(int)control][0], level.GetLocalizedDescription(), message), duration));
+            DisplayMessage?.Invoke(this, new DisplayMessageEventArgs($"{control}/{level}", string.Format(CultureInfo.CurrentCulture, format, ConfirmText[(int)control][0], level.GetLocalizedDescription(), message), duration));
         }
     }
 }

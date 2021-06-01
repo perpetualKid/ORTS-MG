@@ -25,8 +25,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
 {
     public class SingleTransferPipe : AirSinglePipe
     {
-
-        readonly static float OneAtmospherePSI = (float)Pressure.Atmospheric.ToPSI(1);
+        private static readonly float OneAtmospherePSI = (float)Pressure.Atmospheric.ToPSI(1);
 
         public SingleTransferPipe(TrainCar car)
             : base(car)
@@ -72,13 +71,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
             // display differently depending upon whether vacuum or air braked system
             if (Car.CarBrakeSystemType == "vacuum_piped")
             {
-                return string.Format(Simulator.Catalog.GetString(" BP {0}"), 
-                    FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(BrakeLine1PressurePSI), Pressure.Unit.InHg, Pressure.Unit.InHg, false));
+                return Simulator.Catalog.GetString($" BP {FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(BrakeLine1PressurePSI), Pressure.Unit.InHg, Pressure.Unit.InHg, false)}");
             }
             else  // air braked by default
             {
-                return string.Format(Simulator.Catalog.GetString("BP {0}"), 
-                    FormatStrings.FormatPressure(BrakeLine1PressurePSI, Pressure.Unit.PSI, units[BrakeSystemComponent.BrakePipe], true));
+                return Simulator.Catalog.GetString($"BP {FormatStrings.FormatPressure(BrakeLine1PressurePSI, Pressure.Unit.PSI, units[BrakeSystemComponent.BrakePipe], true)}");
             }
         }
 
@@ -87,22 +84,20 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
             // display differently depending upon whether vacuum or air braked system
             if (Car.CarBrakeSystemType == "vacuum_piped")
             {
-                string s = string.Format(Simulator.Catalog.GetString(" V {0}"), 
-                    FormatStrings.FormatPressure(Car.Train.EqualReservoirPressurePSIorInHg, Pressure.Unit.InHg, Pressure.Unit.InHg, true));
+                string s = Simulator.Catalog.GetString($" V {FormatStrings.FormatPressure(Car.Train.EqualReservoirPressurePSIorInHg, Pressure.Unit.InHg, Pressure.Unit.InHg, true)}");
                 if (lastCarBrakeSystem != null && lastCarBrakeSystem != this)
                     s += Simulator.Catalog.GetString(" EOT ") + lastCarBrakeSystem.GetStatus(units);
                 if (HandbrakePercent > 0)
-                    s += string.Format(Simulator.Catalog.GetString(" Handbrake {0:F0}%"), HandbrakePercent);
+                    s += Simulator.Catalog.GetString($" Handbrake {HandbrakePercent:F0}%");
                 return s;
             }
             else // air braked by default
             {
-                string s = string.Format(Simulator.Catalog.GetString("BP {0}"), 
-                    FormatStrings.FormatPressure(BrakeLine1PressurePSI, Pressure.Unit.PSI, units[BrakeSystemComponent.BrakePipe], false));
+                string s = Simulator.Catalog.GetString($"BP {FormatStrings.FormatPressure(BrakeLine1PressurePSI, Pressure.Unit.PSI, units[BrakeSystemComponent.BrakePipe], false)}");
                 if (lastCarBrakeSystem != null && lastCarBrakeSystem != this)
                     s += Simulator.Catalog.GetString(" EOT ") + lastCarBrakeSystem.GetStatus(units);
                 if (HandbrakePercent > 0)
-                    s += string.Format(Simulator.Catalog.GetString(" Handbrake {0:F0}%"), HandbrakePercent);
+                    s += Simulator.Catalog.GetString($" Handbrake {HandbrakePercent:F0}%");
                 return s;
             }
             
@@ -121,9 +116,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                 FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(BrakeLine1PressurePSI), Pressure.Unit.InHg, Pressure.Unit.InHg, true),
                 string.Empty,
                 string.Empty, // Spacer because the state above needs 2 columns.
-                HandbrakePercent > 0 ? string.Format("{0:F0}%", HandbrakePercent) : string.Empty,
+                HandbrakePercent > 0 ? $"{HandbrakePercent:F0}%" : string.Empty,
                 FrontBrakeHoseConnected ? "I" : "T",
-                string.Format("A{0} B{1}", AngleCockAOpen ? "+" : "-", AngleCockBOpen ? "+" : "-"),
+                $"A{(AngleCockAOpen ? "+" : "-")} B{(AngleCockBOpen ? "+" : "-")}",
                 };
             }
             else  // air braked by default
@@ -139,9 +134,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                 string.Empty,
                 string.Empty,
                 string.Empty, // Spacer because the state above needs 2 columns.
-                (Car as MSTSWagon).HandBrakePresent ? string.Format("{0:F0}%", HandbrakePercent) : string.Empty,
+                (Car as MSTSWagon).HandBrakePresent ? $"{HandbrakePercent:F0}%" : string.Empty,
                 FrontBrakeHoseConnected ? "I" : "T",
-                string.Format("A{0} B{1}", AngleCockAOpen ? "+" : "-", AngleCockBOpen ? "+" : "-"),
+                $"A{(AngleCockAOpen ? "+" : "-")} B{(AngleCockBOpen ? "+" : "-")}",
                 BleedOffValveOpen ? Simulator.Catalog.GetString("Open") : string.Empty,
                 };
 

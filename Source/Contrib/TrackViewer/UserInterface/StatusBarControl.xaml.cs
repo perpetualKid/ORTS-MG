@@ -352,7 +352,7 @@ namespace ORTS.TrackViewer.UserInterface
             GC.SuppressFinalize(this);
         }
 
-        void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposed)
             {

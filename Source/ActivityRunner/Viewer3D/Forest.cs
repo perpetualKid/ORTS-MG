@@ -35,10 +35,10 @@ namespace Orts.ActivityRunner.Viewer3D
 {
     public class ForestViewer
     {
-        readonly Viewer Viewer;
-        readonly WorldPosition Position;
-        readonly Material Material;
-        readonly ForestPrimitive Primitive;
+        private readonly Viewer Viewer;
+        private readonly WorldPosition Position;
+        private readonly Material Material;
+        private readonly ForestPrimitive Primitive;
 
         public float MaximumCenterlineOffset = 0.0f;
         public bool CheckRoadsToo = false;
@@ -74,8 +74,8 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class ForestPrimitive : RenderPrimitive
     {
-        readonly Viewer Viewer;
-        readonly VertexBuffer VertexBuffer;
+        private readonly Viewer Viewer;
+        private readonly VertexBuffer VertexBuffer;
         public readonly int PrimitiveCount;
         public float MaximumCenterlineOffset;
         public bool CheckRoadsToo;
@@ -276,8 +276,9 @@ namespace Orts.ActivityRunner.Viewer3D
             else return null;
         }
 
-        TrackSection trackSection;
-        bool InitTrackSection(TrackVectorSection section, Vector3 xnaTreePosition, int tileX, int tileZ, float treeWidth)
+        private TrackSection trackSection;
+
+        private bool InitTrackSection(TrackVectorSection section, Vector3 xnaTreePosition, int tileX, int tileZ, float treeWidth)
         {
             trackSection = Viewer.Simulator.TSectionDat.TrackSections.Get(section.SectionIndex);
             if (trackSection == null)
@@ -316,9 +317,9 @@ namespace Orts.ActivityRunner.Viewer3D
             return;
         }
 
-        const float InitErrorMargin = 0.5f;
+        private const float InitErrorMargin = 0.5f;
 
-        bool InitTrackSectionCurved(int tileX, int tileZ, float x, float z, TrackVectorSection trackVectorSection, float treeWidth)
+        private bool InitTrackSectionCurved(int tileX, int tileZ, float x, float z, TrackVectorSection trackVectorSection, float treeWidth)
         {
             // We're working relative to the track section, so offset as needed.
             x += (tileX - trackVectorSection.Location.TileX) * 2048;
@@ -359,7 +360,7 @@ namespace Orts.ActivityRunner.Viewer3D
             return true;
         }
 
-        bool InitTrackSectionStraight(int tileX, int tileZ, float x, float z, TrackVectorSection trackVectorSection, float treeWidth)
+        private bool InitTrackSectionStraight(int tileX, int tileZ, float x, float z, TrackVectorSection trackVectorSection, float treeWidth)
         {
             // We're working relative to the track section, so offset as needed.
             x += (tileX - trackVectorSection.Location.TileX) * 2048;
@@ -387,7 +388,7 @@ namespace Orts.ActivityRunner.Viewer3D
             return true;
         }
 
-        static float GetLength(TrackSection trackSection)
+        private static float GetLength(TrackSection trackSection)
         {
             return trackSection.Curved ? trackSection.Radius * Math.Abs(MathHelper.ToRadians(trackSection.Angle)) : trackSection.Length;
         }
@@ -401,7 +402,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class ForestMaterial : Material
     {
-        readonly Texture2D treeTexture;
+        private readonly Texture2D treeTexture;
         private readonly SceneryShader shader;
         private readonly int techniqueIndex;
 

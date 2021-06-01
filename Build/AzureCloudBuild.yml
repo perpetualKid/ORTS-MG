@@ -76,8 +76,17 @@ steps:
   condition: ne(variables['Build.SourceBranch'], 'refs/heads/main')
   displayName: Testing the solution
   inputs:
+    testSelector: 'testAssemblies'
+    testAssemblyVer2: |
+      **\*test*.dll
+      !**\*TestAdapter.dll
+      !**\*TestPlatform*
+      !**\*testhost*
+      !**\obj\**
+    otherConsoleOptions: '/platform:x64 /Framework:.NETCoreApp,Version=v3.1'
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
+    runInParallel: true
 
 - task: CmdLine@2
   displayName: Collecting language files
@@ -119,4 +128,3 @@ steps:
         $feed='builds'}
       dotnet tool install sleet
       dotnet sleet push .\..\a --config none -p SLEET_FEED_TYPE=azure -p SLEET_FEED_CONTAINER=$feed -p SLEET_FEED_CONNECTIONSTRING=${env:connectionstring}
-

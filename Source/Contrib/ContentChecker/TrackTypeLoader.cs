@@ -23,7 +23,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for ttype.dat files
     /// </summary>
-    class TrackTypeLoader : Loader
+    internal class TrackTypeLoader : Loader
     {
         /// <summary>
         /// Try to load the file.
@@ -32,7 +32,7 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            var TrackTypes = new TrackTypesFile(file);
+            _ = new TrackTypesFile(file);
         }
     }
 }

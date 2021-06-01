@@ -54,8 +54,8 @@ namespace ORTS.TrackViewer.UserInterface
     /// </summary>
     public sealed partial class SearchControl : Window
     {
-        TrackViewer trackViewer;
-        SearchableItem searchItem;
+        private TrackViewer trackViewer;
+        private SearchableItem searchItem;
         /// <summary>
         /// Constructor
         /// </summary>

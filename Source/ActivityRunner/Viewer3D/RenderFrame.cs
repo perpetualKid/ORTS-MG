@@ -216,7 +216,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class RenderFrame
     {
-        readonly Game game;
+        private readonly Game game;
 
         // Shared shadow map data.
         private static RenderTarget2D[] shadowMap;
@@ -231,8 +231,7 @@ namespace Orts.ActivityRunner.Viewer3D
         private Vector3 shadowMapX;
         private Vector3 shadowMapY;
         private readonly Vector3[] shadowMapCenter;
-
-        readonly Material DummyBlendedMaterial;
+        private readonly Material DummyBlendedMaterial;
 
         private readonly Dictionary<Material, List<RenderItem>>[] renderItems = new Dictionary<Material, List<RenderItem>>[(int)RenderPrimitiveSequence.Sentinel];
         private readonly List<RenderItem> renderItemsSequence = new List<RenderItem>();
@@ -454,9 +453,9 @@ namespace Orts.ActivityRunner.Viewer3D
             AddPrimitive(material, primitive, group, ref xnaMatrix, flags, null);
         }
 
-        static readonly bool[] PrimitiveBlendedScenery = new bool[] { true, false }; // Search for opaque pixels in alpha blended primitives, thus maintaining correct DepthBuffer
-        static readonly bool[] PrimitiveBlended = new bool[] { true };
-        static readonly bool[] PrimitiveNotBlended = new bool[] { false };
+        private static readonly bool[] PrimitiveBlendedScenery = new bool[] { true, false }; // Search for opaque pixels in alpha blended primitives, thus maintaining correct DepthBuffer
+        private static readonly bool[] PrimitiveBlended = new bool[] { true };
+        private static readonly bool[] PrimitiveNotBlended = new bool[] { false };
 
         public void AddPrimitive(Material material, RenderPrimitive primitive, RenderPrimitiveGroup group, ref Matrix xnaMatrix, ShapeFlags flags, object itemData)
         {
@@ -480,7 +479,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 primitive.ZBias = 1;
         }
 
-        void AddShadowPrimitive(int shadowMapIndex, Material material, RenderPrimitive primitive, ref Matrix xnaMatrix, ShapeFlags flags)
+        private void AddShadowPrimitive(int shadowMapIndex, Material material, RenderPrimitive primitive, ref Matrix xnaMatrix, ShapeFlags flags)
         {
             if (material is SceneryMaterial)
                 renderShadowSceneryItems[shadowMapIndex].Add(new RenderItem(material, primitive, xnaMatrix, flags));
@@ -515,7 +514,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        bool IsInShadowMap(int shadowMapIndex, Vector3 mstsLocation, float objectRadius, float objectViewingDistance)
+        private bool IsInShadowMap(int shadowMapIndex, Vector3 mstsLocation, float objectRadius, float objectViewingDistance)
         {
             if (shadowMapRenderTarget == null)
                 return false;
@@ -546,7 +545,7 @@ namespace Orts.ActivityRunner.Viewer3D
             return true;
         }
 
-        static RenderPrimitiveSequence GetRenderSequence(RenderPrimitiveGroup group, bool blended)
+        private static RenderPrimitiveSequence GetRenderSequence(RenderPrimitiveGroup group, bool blended)
         {
             if (blended)
                 return RenderPrimitive.SequenceForBlended[(int)group];
@@ -575,7 +574,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        void DrawShadows(bool logging )
+        private void DrawShadows(bool logging )
         {
             if (logging) Trace.WriteLine("  DrawShadows {");
             for (var shadowMapIndex = 0; shadowMapIndex < shadowMapCount; shadowMapIndex++)
@@ -585,7 +584,7 @@ namespace Orts.ActivityRunner.Viewer3D
             if (logging) Trace.WriteLine("  }");
         }
 
-        void DrawShadows(bool logging, int shadowMapIndex)
+        private void DrawShadows(bool logging, int shadowMapIndex)
         {
             if (logging) 
                 Trace.WriteLine($"    {shadowMapIndex} {{");
@@ -648,7 +647,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// </summary>
         /// <param name="graphicsDevice"></param>
         /// <param name="logging"></param>
-        void DrawSimple(bool logging)
+        private void DrawSimple(bool logging)
         {
             if (game.Settings.DistantMountains)
             {
@@ -670,7 +669,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        void DrawSequences(bool logging)
+        private void DrawSequences(bool logging)
         {
             ref Matrix viewRef = ref (camera != null ? ref camera.XnaView : ref identity);
             ref Matrix projectionRef = ref (camera != null ? ref camera.XnaProjection : ref projection);
@@ -738,7 +737,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 sceneryShader.ClearShadowMap();
         }
 
-        void DrawSequencesDistantMountains(bool logging)
+        private void DrawSequencesDistantMountains(bool logging)
         {
             Matrix mountainViewProjection;
             if (camera == null)

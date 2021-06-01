@@ -30,7 +30,7 @@ namespace ORTS.TrackViewer.Drawing
     /// </summary>
     public class DrawScaleRuler
     {
-        struct RulerDatum
+        private struct RulerDatum
         {
             public float value;
             public string text;

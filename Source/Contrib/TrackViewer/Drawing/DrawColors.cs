@@ -34,7 +34,7 @@ namespace ORTS.TrackViewer.Drawing
     /// </summary>
     /// <remarks> Currently both colorschemes and colors are identified by a  string. Possibly it is better to use enumerations.
     /// </remarks>
-    static class DrawColors
+    internal static class DrawColors
     {
 
         public static ColorScheme colorsNormal    = new ColorScheme();
@@ -45,16 +45,14 @@ namespace ORTS.TrackViewer.Drawing
         public static ColorScheme colorsRoadsHotlight = new ColorScheme(HighlightType.Hotlight);
         public static ColorScheme colorsPathMain = new ColorScheme();
         public static ColorScheme colorsPathSiding = new ColorScheme();
-
-        static ColorsGroupTrack trackGroupFlat = new ColorsGroupTrack();
-        static ColorsGroupTrack roadTrackGroupFlat = new ColorsGroupTrack();
-        static ColorsGroupTrack trackGroupColoured = new ColorsGroupTrack();
-        static ColorsGroupTrack roadTrackGroupColoured = new ColorsGroupTrack();
-        static ColorsGroupTrack trackGroupTerrain = new ColorsGroupTrack();
-        static ColorsGroupTrack roadTrackGroupTerrain = new ColorsGroupTrack();
-        
-        static ColorsGroupBackground backgroundWithTilesGroup = new ColorsGroupBackground();
-        static ColorsGroupBackground backgroundWithoutTilesGroup = new ColorsGroupBackground();
+        private static ColorsGroupTrack trackGroupFlat = new ColorsGroupTrack();
+        private static ColorsGroupTrack roadTrackGroupFlat = new ColorsGroupTrack();
+        private static ColorsGroupTrack trackGroupColoured = new ColorsGroupTrack();
+        private static ColorsGroupTrack roadTrackGroupColoured = new ColorsGroupTrack();
+        private static ColorsGroupTrack trackGroupTerrain = new ColorsGroupTrack();
+        private static ColorsGroupTrack roadTrackGroupTerrain = new ColorsGroupTrack();
+        private static ColorsGroupBackground backgroundWithTilesGroup = new ColorsGroupBackground();
+        private static ColorsGroupBackground backgroundWithoutTilesGroup = new ColorsGroupBackground();
 
         public static ColorWithHighlights otherPathsReferenceColor;
 
@@ -283,7 +281,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <summary>
         /// Set the colors that (can) appear multiple times, each time with another shade.
         /// </summary>
-        static void SetShadedColors(IPreferenceChanger preferenceChanger)
+        private static void SetShadedColors(IPreferenceChanger preferenceChanger)
         {
             otherPathsReferenceColor = new ColorWithHighlights(Color.Fuchsia, 0);
             otherPathsReferenceColor.MakeIntoUserPreference(preferenceChanger, "otherPaths",
@@ -313,7 +311,7 @@ namespace ORTS.TrackViewer.Drawing
     #endregion
 
     #region ColorGroup classes
-    class ColorsGroupBasic {
+    internal class ColorsGroupBasic {
         public ColorWithHighlights Junction { get; set; }
         public ColorWithHighlights EndNode { get; set; }
         public ColorWithHighlights Crossing { get; set; }
@@ -328,13 +326,13 @@ namespace ORTS.TrackViewer.Drawing
         public ColorWithHighlights CandidateNode { get; set; }
     }
 
-    class ColorsGroupBackground
+    internal class ColorsGroupBackground
     {
         public ColorWithHighlights Tile { get; set; }
         public ColorWithHighlights ClearWindow { get; set; }
     }
 
-    class ColorsGroupTrack
+    internal class ColorsGroupTrack
     {
         public ColorWithHighlights BrokenPath { get; set; }
         public ColorWithHighlights BrokenNode { get; set; }
@@ -349,7 +347,7 @@ namespace ORTS.TrackViewer.Drawing
     /// Exists to facilitate drawing the same thing multiple times but in different colors, like 
     /// highlight colors, path colors, ...
     /// </summary>
-    class ColorScheme
+    internal class ColorScheme
     {
         public ColorsGroupBasic TrackItemColors {get; set;}
         public ColorsGroupBackground BackgroundColors { get; set; }
@@ -416,17 +414,17 @@ namespace ORTS.TrackViewer.Drawing
     #endregion
 
     #region class ColorWithHighlights
-    enum HighlightType
+    internal enum HighlightType
     {
         Normal,
         Highlight,
         Hotlight,
     }
-    
+
     /// <summary>
     /// Class to store not only a color but also its highlighted variants
     /// </summary>
-    class ColorWithHighlights
+    internal class ColorWithHighlights
     {
         /// <summary>
         /// The current normal, highlight and hotlight colors.
@@ -437,11 +435,10 @@ namespace ORTS.TrackViewer.Drawing
         private byte highlightDelta;
         private Color defaultColor;
         private String defaultColorName;
-
-        const string defaultOptionExtension = " (default)";
+        private const string defaultOptionExtension = " (default)";
 
         // map names of colors to actual color objects.
-        static readonly Dictionary<string, Color> namedColors =
+        private static readonly Dictionary<string, Color> namedColors =
                 typeof(Color).GetProperties()
                      .Where(prop => prop.PropertyType == typeof(Color))
                      .ToDictionary(prop => prop.Name,
@@ -637,7 +634,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <param name="original">Original non-shaded color</param>
         /// <param name="index">Index describing which of the colors we need to make in a spectrum</param>
         /// <param name="count">Total amount of colors in the spectrion</param>
-        static byte ReshadeSingleChannel(byte original, int index, int count)
+        private static byte ReshadeSingleChannel(byte original, int index, int count)
         {
             float newvalue;
             if (original >= 128)

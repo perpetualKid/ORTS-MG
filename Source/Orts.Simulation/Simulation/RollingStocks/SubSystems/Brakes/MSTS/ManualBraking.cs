@@ -28,9 +28,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
 {
     public class ManualBraking : MSTSBrakeSystem
     {
-        TrainCar Car;
+        private TrainCar Car;
         protected string DebugType = string.Empty;
-        float HandbrakePercent;
+        private float HandbrakePercent;
 
         public ManualBraking(TrainCar car)
         {
@@ -38,18 +38,18 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
 
         }
 
-        float ManualMaxBrakeValue = 100.0f;
-        float ManualReleaseRateValuepS;
-        float ManualMaxApplicationRateValuepS;
-        float ManualBrakingDesiredFraction;
-        float EngineBrakeDesiredFraction;
-        float ManualBrakingCurrentFraction;
-        float EngineBrakingCurrentFraction;
-        float SteamBrakeCompensation;
-        bool LocomotiveSteamBrakeFitted = false;
-        float SteamBrakePressurePSI = 0;
-        float SteamBrakeCylinderPressurePSI = 0;
-        float BrakeForceFraction;
+        private float ManualMaxBrakeValue = 100.0f;
+        private float ManualReleaseRateValuepS;
+        private float ManualMaxApplicationRateValuepS;
+        private float ManualBrakingDesiredFraction;
+        private float EngineBrakeDesiredFraction;
+        private float ManualBrakingCurrentFraction;
+        private float EngineBrakingCurrentFraction;
+        private float SteamBrakeCompensation;
+        private bool LocomotiveSteamBrakeFitted = false;
+        private float SteamBrakePressurePSI = 0;
+        private float SteamBrakeCylinderPressurePSI = 0;
+        private float BrakeForceFraction;
 
         public override bool GetHandbrakeStatus()
         {
@@ -249,7 +249,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
             {
                 return new string[] {
                 DebugType,
-                string.Format("{0:F0}", FormatStrings.FormatPressure(SteamBrakeCylinderPressurePSI, Pressure.Unit.PSI,  Pressure.Unit.PSI, true)),
+                $"{FormatStrings.FormatPressure(SteamBrakeCylinderPressurePSI, Pressure.Unit.PSI,  Pressure.Unit.PSI, true):F0}",
                 string.Empty,
                 string.Empty,
                 string.Empty,
@@ -257,7 +257,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                 string.Empty,
                 string.Empty,
                 string.Empty, // Spacer because the state above needs 2 columns.
-                (Car as MSTSWagon).HandBrakePresent ? string.Format("{0:F0}%", HandbrakePercent) : string.Empty,
+                (Car as MSTSWagon).HandBrakePresent ? $"{HandbrakePercent:F0}%" : string.Empty,
                 string.Empty,
                 string.Empty,
                 string.Empty,
@@ -267,7 +267,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
             {
                 return new string[] {
                 DebugType,
-                string.Format("{0:F0} %", ManualBrakingCurrentFraction),
+                $"{ManualBrakingCurrentFraction:F0} %",
                 string.Empty,
                 string.Empty,
                 string.Empty,
@@ -275,7 +275,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                 string.Empty,
                 string.Empty,
                 string.Empty, // Spacer because the state above needs 2 columns.
-                (Car as MSTSWagon).HandBrakePresent ? string.Format("{0:F0}%", HandbrakePercent) : string.Empty,
+                (Car as MSTSWagon).HandBrakePresent ? $"{HandbrakePercent:F0}%" : string.Empty,
                 string.Empty,
                 string.Empty,
                 string.Empty,
@@ -293,7 +293,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                 string.Empty,
                 string.Empty,
                 string.Empty, // Spacer because the state above needs 2 columns.
-                (Car as MSTSWagon).HandBrakePresent ? string.Format("{0:F0}%", HandbrakePercent) : string.Empty,
+                (Car as MSTSWagon).HandBrakePresent ? $"{HandbrakePercent:F0}%" : string.Empty,
                 string.Empty,
                 string.Empty,
                 string.Empty,

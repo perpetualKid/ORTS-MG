@@ -21,14 +21,13 @@ using System.IO;
 
 using Orts.Formats.Msts;
 using Orts.Formats.Msts.Files;
-using Orts.Simulation.Signalling;
 
 namespace Orts.ContentChecker
 {
     /// <summary>
     /// Loader class for .eng files
     /// </summary>
-    class SignalScriptLoader : Loader
+    internal class SignalScriptLoader : Loader
     {
         /// <summary> The signal configuration file needed for loading a script file </summary>
         private SignalConfigurationFile _sigcfg;
@@ -61,12 +60,14 @@ namespace Orts.ContentChecker
             if (_sigcfg == null)
             {
                 FilesLoaded = 0;
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
                 Console.WriteLine("signal script files can not be loaded independently. Try the option /d");
+#pragma warning restore CA1303 // Do not pass literals as localized parameters
             }
             else {
                 // we want to load the signal scripts one by one, not as a group
-                var scriptFiles = new List<string>() { Path.GetFileName(file) };
-                SignalScriptProcessing.Initialize(new SignalScripts(_sigcfg.ScriptPath, scriptFiles, _sigcfg.SignalTypes));
+                List<string> scriptFiles = new List<string>() { Path.GetFileName(file) };
+                _ = new SignalScripts(_sigcfg.ScriptPath, scriptFiles, _sigcfg.SignalTypes);
             }
         }
     }

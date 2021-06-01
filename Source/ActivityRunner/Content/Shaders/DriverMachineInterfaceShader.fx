@@ -27,6 +27,7 @@ float4   LimitAngle;   // radian, x: target speed (colored start), y: permitted 
 
 float4   LimitColor;   // dark grey, white or yellow
 float4   PointerColor; // medium grey, white, yellow or red
+float4	 InterventionColor; // yellow or red
 
 texture  ImageTexture;
 
@@ -76,12 +77,12 @@ float4 PSCircularSpeedGauge(PIXEL_INPUT In) : COLOR0
 
 	if (radius < radiusNeedleCenter)
 		returnColor = PointerColor;
-    else if (radius > radiusOutside)
+	else if (radius > radiusOutside)
 		returnColor = origColor;
 	else if (radius < radiusLimitPointer)
 		returnColor = origColor;
 	else
-    {
+	{
 		float angle = atan(-dist.x / dist.y);
 		if (dist.y < 0)
 		{
@@ -97,9 +98,19 @@ float4 PSCircularSpeedGauge(PIXEL_INPUT In) : COLOR0
 		{
 			returnColor = origColor;
 		}
+        else if (LimitAngle.x < limitStartAngle) // Do not display gauge
+        {
+            returnColor = origColor;
+        }
 		else if (angle > LimitAngle.y)
-            // Exceeded limit pointer at overspeed
-            returnColor = PointerColor;
+        {
+            if (angle > LimitAngle.w) // Exceeded limit pointer at overspeed
+                returnColor = InterventionColor;
+            else if (radius > radiusInside)
+                returnColor = ReleaseColor;
+			else
+				returnColor = origColor;
+        }
 		else if (angle > LimitAngle.x)
 		{
 			if (angle > LimitAngle.w)

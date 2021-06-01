@@ -71,42 +71,45 @@ namespace ORTS.TrackViewer.Drawing
     public class ShadowDrawArea: DrawArea, IDisposable
     {
         #region private Fields
-        int blockW; // Width  of single block in pixels
-        int blockH; // Height of single block in pixels
+        private int blockW; // Width  of single block in pixels
+        private int blockH; // Height of single block in pixels
 
         // basic scaling equations: pixelX = scale * (worldX - offsetX)
-        double shadowScale;     // scale of the current combined shadow texture in pixels/meter
-        double shadowOffsetX;   // lower-left location (in real world coordinates) of the combined texture
-        double shadowOffsetZ;   // lower-left location (in real world coordinates) of the combined texture
+        private double shadowScale;     // scale of the current combined shadow texture in pixels/meter
+        private double shadowOffsetX;   // lower-left location (in real world coordinates) of the combined texture
+        private double shadowOffsetZ;   // lower-left location (in real world coordinates) of the combined texture
 
         // fields related to when and what we are re-drawing
-        bool needToRedraw      = true;
-        bool needToRedrawLater = true;
-        bool[] needToDrawRectangle; // Array of booleans describing which of the rectangles still need to be redrawn
-        int nextRectangleToDraw; // integer from 0 to Nblocks-1, describing which of the subblocks will be drawn
+        private bool needToRedraw      = true;
+        private bool needToRedrawLater = true;
+        private bool[] needToDrawRectangle; // Array of booleans describing which of the rectangles still need to be redrawn
+        private int nextRectangleToDraw; // integer from 0 to Nblocks-1, describing which of the subblocks will be drawn
 
-        GraphicsDevice graphicsDevice;  // we need a graphics device so we can draw to texture
-        SpriteBatch spriteBatch;        // also for drawing to texture
+        private GraphicsDevice graphicsDevice;  // we need a graphics device so we can draw to texture
+        private SpriteBatch spriteBatch;        // also for drawing to texture
 
         // textures and rendertarget for blocks
-        RenderTarget2D[] shadowRenderTargetSingle;
-        Texture2D[] shadowMapsSingle;
-        ShadowDrawArea shadowDrawArea; // draw area used to draw individual blocks. 
-                                       // A normal drawArea would suffice, but this would not give access to protected members!
+        private RenderTarget2D[] shadowRenderTargetSingle;
+        private Texture2D[] shadowMapsSingle;
+        private ShadowDrawArea shadowDrawArea; // draw area used to draw individual blocks. 
+                                              // A normal drawArea would suffice, but this would not give access to protected members!
 
         // texture and rendertarget for combined texture
-        RenderTarget2D shadowRenderTargetCombined;
-        Texture2D shadowMapCombined;
+
+        private RenderTarget2D shadowRenderTargetCombined;
+        private Texture2D shadowMapCombined;
 
         // fields related to subblocks
-        int Nsubblocks; // total amount of subblocks
-        int Ninner;    // Number of (1D) blocks in visible region
-        int Nouter;    // Number of (1D) blocks total.
-        int Nborder { get { return (Nouter - Ninner) / 2; } } // number of blocks in border
-        int Nsampling; // Oversampling rate.
-        int[] xOrder; // array containing the x-indexes of the subblocks in the order they need to be drawn
-        int[] zOrder; // array containing the z-indexes of the subblocks in the order they need to be drawn
-        int[][] orderFromLocation; // array that contains the order-index, given the x, and z-indexes of the subblock.
+        private int Nsubblocks; // total amount of subblocks
+        private int Ninner;    // Number of (1D) blocks in visible region
+        private int Nouter;    // Number of (1D) blocks total.
+
+        private int Nborder { get { return (Nouter - Ninner) / 2; } } // number of blocks in border
+
+        private int Nsampling; // Oversampling rate.
+        private int[] xOrder; // array containing the x-indexes of the subblocks in the order they need to be drawn
+        private int[] zOrder; // array containing the z-indexes of the subblocks in the order they need to be drawn
+        private int[][] orderFromLocation; // array that contains the order-index, given the x, and z-indexes of the subblock.
 
         #endregion
 
@@ -125,7 +128,7 @@ namespace ORTS.TrackViewer.Drawing
         /// Therefore, it is a shadowDrawArea, but we will not use any of its additional functionality.
         /// Hence also private
         /// </summary>
-        ShadowDrawArea(): base(null){}
+        private ShadowDrawArea(): base(null){}
 
         /// <summary>
         /// Sets the screen size on which we can draw (in pixels). 
@@ -212,7 +215,7 @@ namespace ORTS.TrackViewer.Drawing
         /// Filling the order in which the sub blocks will be generated is a bit tricky. Hence in a separate method.
         /// The order is important because we first want to make sure we draw what will be visible (or visible soon)
         /// We start in the middle, and move outward, in rings 
-        void FillXYorder()
+        private void FillXYorder()
         {
             needToDrawRectangle = new bool[Nsubblocks]; // all false by default
             xOrder = new int[Nsubblocks];
@@ -384,7 +387,7 @@ namespace ORTS.TrackViewer.Drawing
             } while (nextRectangleToDraw < Nsubblocks && !needToDrawRectangle[nextRectangleToDraw]);
         }
 
-        enum ShiftDirection {Left, Right, Up, Down};
+        private enum ShiftDirection {Left, Right, Up, Down};
 
         /// <summary>
         /// Instead of redrawing a lot of subblocks, we will just move most of the blocks by one block to any direction
@@ -639,7 +642,7 @@ namespace ORTS.TrackViewer.Drawing
             GC.SuppressFinalize(this);
         }
 
-        void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposed)
             {

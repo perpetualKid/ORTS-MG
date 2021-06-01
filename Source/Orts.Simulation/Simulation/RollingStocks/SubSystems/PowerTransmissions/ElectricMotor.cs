@@ -31,7 +31,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         protected float frictionTorqueNm;
         public float FrictionTorqueNm { set { frictionTorqueNm = Math.Abs(value); } get { return frictionTorqueNm; } }
 
-        float inertiaKgm2;
+        private float inertiaKgm2;
         public float InertiaKgm2
         {
             set
@@ -52,7 +52,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         protected float temperatureK;
         public float TemperatureK { get { return temperatureK; } }
 
-        Integrator tempIntegrator = new Integrator();
+        private Integrator tempIntegrator = new Integrator();
 
         public float ThermalCoeffJ_m2sC { set; get; }
         public float SpecificHeatCapacityJ_kg_C { set; get; }
@@ -63,7 +63,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
 
         public float CoolingPowerW { set; get; }
 
-        float transmissionRatio;
+        private float transmissionRatio;
         public float TransmissionRatio
         {
             set
@@ -78,7 +78,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
             }
         }
 
-        float axleDiameterM;
+        private float axleDiameterM;
         public float AxleDiameterM
         {
             set

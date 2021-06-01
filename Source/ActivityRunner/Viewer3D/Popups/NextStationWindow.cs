@@ -32,31 +32,25 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class NextStationWindow : Window
     {
-        Label CurrentTime;
-        Label StationPlatform;
-        Label CurrentDelay;
-
-        Label StationPreviousName;
-        Label StationPreviousDistance;
-        Label StationPreviousArriveScheduled;
-        Label StationPreviousArriveActual;
-        Label StationPreviousDepartScheduled;
-        Label StationPreviousDepartActual;
-
-        Label StationCurrentName;
-        Label StationCurrentDistance;
-        Label StationCurrentArriveScheduled;
-        Label StationCurrentArriveActual;
-        Label StationCurrentDepartScheduled;
-
-        Label StationNextName;
-        Label StationNextDistance;
-
-
-        Label StationNextArriveScheduled;
-        Label StationNextDepartScheduled;
-
-        Label Message;
+        private Label CurrentTime;
+        private Label StationPlatform;
+        private Label CurrentDelay;
+        private Label StationPreviousName;
+        private Label StationPreviousDistance;
+        private Label StationPreviousArriveScheduled;
+        private Label StationPreviousArriveActual;
+        private Label StationPreviousDepartScheduled;
+        private Label StationPreviousDepartActual;
+        private Label StationCurrentName;
+        private Label StationCurrentDistance;
+        private Label StationCurrentArriveScheduled;
+        private Label StationCurrentArriveActual;
+        private Label StationCurrentDepartScheduled;
+        private Label StationNextName;
+        private Label StationNextDistance;
+        private Label StationNextArriveScheduled;
+        private Label StationNextDepartScheduled;
+        private Label Message;
 
         public NextStationWindow(WindowManager owner)
             : base(owner, Window.DecorationSize.X + owner.TextFontDefault.Height * 34, Window.DecorationSize.Y + owner.TextFontDefault.Height * 6 + ControlLayout.SeparatorSize * 2, Viewer.Catalog.GetString("Next Station"))

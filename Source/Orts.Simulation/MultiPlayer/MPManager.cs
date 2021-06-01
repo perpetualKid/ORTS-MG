@@ -55,12 +55,12 @@ namespace Orts.MultiPlayer
         public static ClientComm Client;
 
         public int version = 15;
-        double lastMoveTime;
+        private double lastMoveTime;
         public double lastSwitchTime;
         public double lastSyncTime = 0;
-        double lastSendTime;
-		string metric = "";
-		double metricbase = 1.0f;
+        private double lastSendTime;
+        private string metric = "";
+        private double metricbase = 1.0f;
 		public static OnlineTrains OnlineTrains = new OnlineTrains();
         private static MPManager localUser;
 
@@ -80,7 +80,7 @@ namespace Orts.MultiPlayer
 
         public double lastPlayerAddedTime;
 		public int MPUpdateInterval = 10;
-		static public bool AllowedManualSwitch = true;
+		public static bool AllowedManualSwitch = true;
 		public bool TrySwitch = true;
 		public bool AllowNewPlayer = true;
 		public bool ComposingText = false;
@@ -220,8 +220,8 @@ namespace Orts.MultiPlayer
             }
         }
 
-        double previousSpeed;
-        double begineZeroTime;
+        private double previousSpeed;
+        private double begineZeroTime;
 
         /// <summary>
         /// Update. Determines what messages to send every some seconds
@@ -363,8 +363,7 @@ namespace Orts.MultiPlayer
 			 * */
 		}
 
-
-		void CheckPlayerTrainSpad()
+        private void CheckPlayerTrainSpad()
 		{
 			if (CheckSpad == false) return;
 			var Locomotive = (MSTSLocomotive)Simulator.PlayerLocomotive;
@@ -400,7 +399,7 @@ namespace Orts.MultiPlayer
             return !MPManager.AllowedManualSwitch; //aloow manual switch or not
         }
         //user name
-		static public string GetUserName()
+		public static string GetUserName()
 		{
 			if (Server != null) return Server.UserName;
 			else if (Client != null) return Client.UserName;
@@ -408,33 +407,33 @@ namespace Orts.MultiPlayer
 		}
 
 		//check if it is in the multiplayer session
-		static public bool IsMultiPlayer()
+		public static bool IsMultiPlayer()
 		{
 			if (Server != null || Client != null) return true;
 			else return false;
 		}
 
-		static public void BroadCast(string m)
+		public static void BroadCast(string m)
 		{
 			if (m == null) return;
 			if (Server != null) Server.BroadCast(m);
 		}
 
 		//notify others (server will broadcast, client will send msg to server)
-		static public void Notify(string m)
+		public static void Notify(string m)
 		{
 			if (m == null) return;
 			if (Client != null && Server == null) Client.Send(m); //client notify server
 			if (Server != null) Server.BroadCast(m); //server notify everybody else
 		}
 
-		static public void SendToServer(string m)
+		public static void SendToServer(string m)
 		{
 			if (m!= null && Client != null) Client.Send(m);
 		}
 
 		//nicely shutdown listening threads, and notify the server/other player
-		static public void Stop()
+		public static void Stop()
 		{
 			if (Client != null && Server == null)
 			{
@@ -541,11 +540,12 @@ namespace Orts.MultiPlayer
 			}
 			return result;
 		}
-		/// <summary>
-		/// Return a string of information of how many players online and those users who are close
-		/// </summary>
-		
-		SortedList<double, string> users;
+
+        /// <summary>
+        /// Return a string of information of how many players online and those users who are close
+        /// </summary>
+
+        private SortedList<double, string> users;
 
 		public string GetOnlineUsersInfo()
 		{
@@ -851,8 +851,9 @@ namespace Orts.MultiPlayer
 			}
 			return car;
 		}
-        SortedList<double, string> coachList;
-        SortedList<double, string> engList;
+
+        private SortedList<double, string> coachList;
+        private SortedList<double, string> engList;
 
         public string SubMissingCar(int length, char type)
 		{
@@ -882,7 +883,7 @@ namespace Orts.MultiPlayer
 
 		}
 
-		static SortedList<double, string> GetList(Simulator simulator, char type)
+        private static SortedList<double, string> GetList(Simulator simulator, char type)
 		{
 			string ending = "*.eng";
 			if (type == 'w') ending = "*.wag";

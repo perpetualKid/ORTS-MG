@@ -76,9 +76,8 @@ namespace Orts.Simulation.Timetables
         }
 
         public TurntableDetails AdditionalTurntableDetails;
-
-        static float defaultTurntableApproachClearanceM = 10.0f;  // default approach clearance
-        static float defaultTurntableReleaseClearanceM = 5.0f;    // default release clearance
+        private static float defaultTurntableApproachClearanceM = 10.0f;  // default approach clearance
+        private static float defaultTurntableReleaseClearanceM = 5.0f;    // default release clearance
 
         public Simulator Simulatorref { get; protected set; }
 
@@ -488,7 +487,7 @@ namespace Orts.Simulation.Timetables
         /// Method to save pool
         /// </summary>
         /// <param name="outf"></param>
-        override public void Save(BinaryWriter outf)
+        public override void Save(BinaryWriter outf)
         {
             outf.Write(PoolName);
             outf.Write(ForceCreation);
@@ -913,7 +912,7 @@ namespace Orts.Simulation.Timetables
         /// Extract train from pool
         /// </summary>
 
-        override public TrainFromPool ExtractTrain(ref TTTrain train, int presentTime)
+        public override TrainFromPool ExtractTrain(ref TTTrain train, int presentTime)
         {
 #if DEBUG_POOLINFO
             var sob = new StringBuilder();
@@ -1221,7 +1220,7 @@ namespace Orts.Simulation.Timetables
         /// Returned poolStorageState : <0 : state (enum TTTrain.PoolAccessState); >0 : poolIndex
         /// </summary>
 
-        override public TrackCircuitPartialPathRoute SetPoolExit(TTTrain train, out int poolStorageIndex, bool checkAccessPath)
+        public override TrackCircuitPartialPathRoute SetPoolExit(TTTrain train, out int poolStorageIndex, bool checkAccessPath)
         {
             // new route
             TrackCircuitPartialPathRoute newRoute = null;
@@ -1341,13 +1340,13 @@ namespace Orts.Simulation.Timetables
 
     public class TimetableTurntableControl
     {
-        Turntable parentTurntable;                          // parent turntable
-        int parentIndex;                                    // index of parent turntable in moving table list
+        private Turntable parentTurntable;                          // parent turntable
+        private int parentIndex;                                    // index of parent turntable in moving table list
 
-        TimetableTurntablePool parentPool;                  // parent pool
-        string poolName;                                    // parent pool name
+        private TimetableTurntablePool parentPool;                  // parent pool
+        private string poolName;                                    // parent pool name
 
-        TTTrain parentTrain = null;                         // train linked to turntable actions
+        private TTTrain parentTrain = null;                         // train linked to turntable actions
 
         public enum MovingTableStateEnum
         {
@@ -1377,14 +1376,14 @@ namespace Orts.Simulation.Timetables
         public int StoragePathIndex;                       // index of selected storage path
         public int AccessPathIndex;                        // index of selected access path
 
-        TrainOnMovingTable trainOnTable = null;            // class for train on table information
-        int reqTurntableExit;                              // index of required exit
-        bool reqReverseFormation;                          // train exits table in reverse formation
-        float clearingDistanceM;                           // distance for train to move to clear turntable
-        float originalTrainMaxSpeedMpS;                    // original allowed train max speed
-        float originalSpeedSignalMpS;                      // original signal speed limit
-        float originalSpeedLimitMpS;                       // original speedpost speed limit
-        float stopPositionOnTurntableM;                    // actual stop position on turntable
+        private TrainOnMovingTable trainOnTable = null;            // class for train on table information
+        private int reqTurntableExit;                              // index of required exit
+        private bool reqReverseFormation;                          // train exits table in reverse formation
+        private float clearingDistanceM;                           // distance for train to move to clear turntable
+        private float originalTrainMaxSpeedMpS;                    // original allowed train max speed
+        private float originalSpeedSignalMpS;                      // original signal speed limit
+        private float originalSpeedLimitMpS;                       // original speedpost speed limit
+        private float stopPositionOnTurntableM;                    // actual stop position on turntable
 
         //================================================================================================//
         // constructor from new

@@ -23,7 +23,6 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Resources;
-using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -134,11 +133,6 @@ namespace Orts.Menu
             Text = $"{RuntimeInfo.ProductName} {VersionInfo.Version}";
 #if DEBUG
             Text += " (debug)";
-#endif
-#if NETCOREAPP
-            Text += " [.NET Core]";
-#elif NETFRAMEWORK
-            Text += " [.NET Classic]";
 #endif
             panelModeTimetable.Location = panelModeActivity.Location;
             UpdateEnabled();

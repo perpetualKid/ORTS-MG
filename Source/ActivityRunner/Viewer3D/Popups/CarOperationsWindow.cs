@@ -30,7 +30,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class CarOperationsWindow : Window
     {
-        readonly Viewer Viewer;
+        private readonly Viewer Viewer;
 
         public int CarPosition
         {
@@ -80,7 +80,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             return vbox;
         }
 
-        void buttonClose_Click(Control arg1, Point arg2)
+        private void buttonClose_Click(Control arg1, Point arg2)
         {
             Visible = false;
         }
@@ -94,7 +94,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             base.PrepareFrame(elapsedTime, updateFull);
         }
 
-        void buttonHandbrake_Click(Control arg1, Point arg2)
+        private void buttonHandbrake_Click(Control arg1, Point arg2)
         {
             new WagonHandbrakeCommand(Viewer.Log, (Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon), !(Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon).GetTrainHandbrakeStatus());
             if ((Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon).GetTrainHandbrakeStatus())
@@ -103,7 +103,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 Viewer.Simulator.Confirmer.Information(Viewer.Catalog.GetString("Handbrake off"));
         }
 
-        void buttonTogglePower_Click(Control arg1, Point arg2)
+        private void buttonTogglePower_Click(Control arg1, Point arg2)
         {
             if ((Viewer.PlayerTrain.Cars[CarPosition].GetType() == typeof(MSTSLocomotive))
                 ||
@@ -121,7 +121,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 Viewer.Simulator.Confirmer.Warning(Viewer.Catalog.GetString("No power command for this type of car!"));
         }
 
-        void buttonToggleMU_Click(Control arg1, Point arg2)
+        private void buttonToggleMU_Click(Control arg1, Point arg2)
         {
 
             if ((Viewer.PlayerTrain.Cars[CarPosition].GetType() == typeof(MSTSLocomotive))
@@ -140,7 +140,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 Viewer.Simulator.Confirmer.Warning(Viewer.Catalog.GetString("No MU command for this type of car!"));
         }
 
-        void buttonToggleBrakeHose_Click(Control arg1, Point arg2)
+        private void buttonToggleBrakeHose_Click(Control arg1, Point arg2)
         {
             new WagonBrakeHoseConnectCommand(Viewer.Log, (Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon), !(Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon).BrakeSystem.FrontBrakeHoseConnected);
             if ((Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon).BrakeSystem.FrontBrakeHoseConnected)
@@ -149,7 +149,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 Viewer.Simulator.Confirmer.Information(Viewer.Catalog.GetString("Front brake hose disconnected"));
         }
 
-        void buttonToggleAngleCockA_Click(Control arg1, Point arg2)
+        private void buttonToggleAngleCockA_Click(Control arg1, Point arg2)
         {
             new ToggleAngleCockACommand(Viewer.Log, (Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon), !(Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon).BrakeSystem.AngleCockAOpen);
             if ((Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon).BrakeSystem.AngleCockAOpen)
@@ -158,7 +158,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 Viewer.Simulator.Confirmer.Information(Viewer.Catalog.GetString("Front angle cock closed"));
         }
 
-        void buttonToggleAngleCockB_Click(Control arg1, Point arg2)
+        private void buttonToggleAngleCockB_Click(Control arg1, Point arg2)
         {
             new ToggleAngleCockBCommand(Viewer.Log, (Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon), !(Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon).BrakeSystem.AngleCockBOpen);
             if ((Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon).BrakeSystem.AngleCockBOpen)
@@ -167,7 +167,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 Viewer.Simulator.Confirmer.Information(Viewer.Catalog.GetString("Rear angle cock closed"));
         }
 
-        void buttonToggleBleedOffValve_Click(Control arg1, Point arg2)
+        private void buttonToggleBleedOffValve_Click(Control arg1, Point arg2)
         {
             if ((Viewer.PlayerTrain.Cars[CarPosition] as MSTSWagon).BrakeSystem is SingleTransferPipe)
                 return;

@@ -25,7 +25,7 @@ namespace ORTS.TrackViewer.Editing
     /// </summary>
     public class DrawEditorAction
     {
-        Vector2 lowerLeft;
+        private Vector2 lowerLeft;
         /// <summary>
         /// Constructor
         /// </summary>

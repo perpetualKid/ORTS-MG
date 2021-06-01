@@ -20,7 +20,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
 {
     public class SeriesMotor : ElectricMotor
     {
-        float armatureResistanceOhms;
+        private float armatureResistanceOhms;
         public float ArmatureResistanceOhms 
         {
             set
@@ -34,7 +34,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         }
         public float ArmatureInductanceH { set; get; }
 
-        float fieldResistanceOhms;
+        private float fieldResistanceOhms;
         public float FieldResistanceOhms
         {
             set
@@ -50,10 +50,10 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
 
         public bool Compensated { set; get; }
 
-        float armatureCurrentA;
+        private float armatureCurrentA;
         public float ArmatureCurrentA { get { return armatureCurrentA; } }
 
-        float fieldCurrentA;
+        private float fieldCurrentA;
         public float FieldCurrentA { get { return fieldCurrentA; } }
 
 
@@ -70,7 +70,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         public float StartingResistorOhms { set; get; }
         public float AdditionalResistanceOhms { set; get; }
 
-        float shuntResistorOhms;
+        private float shuntResistorOhms;
         public float ShuntResistorOhms
         {
             set
@@ -92,7 +92,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
             }
         }
 
-        float shuntRatio;
+        private float shuntRatio;
         public float ShuntPercent
         {
             set
@@ -108,12 +108,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
             }
         }
 
-        float backEMFvoltageV;
+        private float backEMFvoltageV;
         public float BackEMFvoltageV { get { return backEMFvoltageV; } }
 
         public float MotorConstant { set; get; }
 
-        float fieldWb;
+        private float fieldWb;
 
         public float NominalRevolutionsRad;
         public float NominalVoltageV;

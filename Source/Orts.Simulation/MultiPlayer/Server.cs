@@ -29,7 +29,7 @@ namespace Orts.MultiPlayer
 		public List<OnlinePlayer> Players;
 		public string UserName;
 		public string Code;
-		ClientComm Connection;
+        private ClientComm Connection;
 		public ServerComm ServerComm;
 		public int ConnectionMode;
 

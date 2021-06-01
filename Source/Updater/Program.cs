@@ -16,10 +16,7 @@
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Diagnostics;
 using System.Windows.Forms;
-
-using Orts.Common.Native;
 
 namespace Orts.Updater
 {
@@ -31,11 +28,7 @@ namespace Orts.Updater
         [STAThread]
         private static void Main()
         {
-#if NETCOREAPP
             Application.SetHighDpiMode(HighDpiMode.DpiUnaware);
-#else
-            NativeMethods.SetProcessDpiAwareness(NativeMethods.PROCESS_DPI_AWARENESS.Process_DPI_Unaware);
-#endif
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             using (UpdaterProgress updater = (new UpdaterProgress()))

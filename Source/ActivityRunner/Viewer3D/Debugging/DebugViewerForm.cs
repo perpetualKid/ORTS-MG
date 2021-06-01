@@ -83,7 +83,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
       public float xScale = 1; // pixels / metre
       public float yScale = 1; // pixels / metre 
 
-		string name = "";
+        private string name = "";
 	  public List<SwitchWidget> switchItemsDrawn;
 	  public List<SignalWidget> signalItemsDrawn;
 
@@ -94,7 +94,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
       public bool signalPickedItemHandled;
       public double signalPickedTime;
 	  public bool DrawPath = true; //draw train path
-      ImageList imageList1;
+        private ImageList imageList1;
       public List<Train> selectedTrainList;
 	  /// <summary>
 	  /// contains the last position of the mouse
@@ -145,9 +145,8 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
       /// user is holding down a "shift view" button.
       /// </summary>
       private Timer UITimer;
-
-      bool loaded;
-	  TrackNode[] nodes;
+        private bool loaded;
+        private TrackNode[] nodes;
 
 		// Extents of the route in meters measured from the World origin
 		public float minX = float.MaxValue;
@@ -229,14 +228,14 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 
 		private double lastUpdateTime;
 
-      /// <summary>
-      /// When the user holds down the  "L", "R", "U", "D" buttons,
-      /// shift the view. Avoids the case when the user has to click
-      /// buttons like crazy.
-      /// </summary>
-      /// <param name="sender"></param>
-      /// <param name="e"></param>
-      void UITimer_Tick(object sender, EventArgs e)
+        /// <summary>
+        /// When the user holds down the  "L", "R", "U", "D" buttons,
+        /// shift the view. Avoids the case when the user has to click
+        /// buttons like crazy.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void UITimer_Tick(object sender, EventArgs e)
       {
 		  if (Viewer.DebugViewerEnabled == false) { this.Visible = false; firstShow = true; return; }
 		  else this.Visible = true;
@@ -339,7 +338,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
             TimetableWindow.PopulateItemLists();
 		}
 
-      bool Inited;
+        private bool Inited;
 		public List<LineSegment> segments = new List<LineSegment>();
 		public List<SwitchWidget> switches;
 	  //List<PointF> buffers = new List<PointF>();
@@ -368,10 +367,10 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 
 	  }
 
-	  #endregion
+        #endregion
 
-	  #region avatar
-      Dictionary<string, Image> avatarList;
+        #region avatar
+        private Dictionary<string, Image> avatarList;
 	  public void AddAvatar(string name, string url)
 	  {
 		  if (avatarList == null) avatarList = new Dictionary<string, Image>();
@@ -434,7 +433,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 		  }*/
 	  }
 
-	  int LostCount = 0;//how many players in the lost list (quit)
+        private int LostCount = 0;//how many players in the lost list (quit)
 	  public void CheckAvatar()
 	  {
 		  if (!MultiPlayer.MPManager.IsMultiPlayer() || MultiPlayer.MPManager.OnlineTrains == null || MultiPlayer.MPManager.OnlineTrains.Players == null) return;
@@ -538,8 +537,8 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
       public float oldWidth;
       public float oldHeight;
 
-       //determine locations of buttons and boxes
-      void DetermineLocations()
+        //determine locations of buttons and boxes
+        private void DetermineLocations()
       {
           if (this.Height < 600 || this.Width < 800) return;
           if (oldHeight != this.Height || oldWidth != label1.Left)//use the label "Res" as anchor point to determine the picture size
@@ -1036,15 +1035,15 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 		  }
 		  return position * spacing;
 	  }
-	  
-	    const float SignalErrorDistance = 100;
-        const float SignalWarningDistance = 500;
-        const float DisplayDistance = 1000;
-        const float DisplaySegmentLength = 10;
-        const float MaximumSectionDistance = 10000;
 
-	  Dictionary<int, SignallingDebugWindow.TrackSectionCacheEntry> Cache = new Dictionary<int, SignallingDebugWindow.TrackSectionCacheEntry>();
-	  SignallingDebugWindow.TrackSectionCacheEntry GetCacheEntry(Traveller position)
+        private const float SignalErrorDistance = 100;
+        private const float SignalWarningDistance = 500;
+        private const float DisplayDistance = 1000;
+        private const float DisplaySegmentLength = 10;
+        private const float MaximumSectionDistance = 10000;
+        private Dictionary<int, SignallingDebugWindow.TrackSectionCacheEntry> Cache = new Dictionary<int, SignallingDebugWindow.TrackSectionCacheEntry>();
+
+        private SignallingDebugWindow.TrackSectionCacheEntry GetCacheEntry(Traveller position)
         {
             SignallingDebugWindow.TrackSectionCacheEntry rv;
             if (Cache.TryGetValue(position.TrackNodeIndex, out rv) && (rv.Direction == position.Direction))
@@ -1251,7 +1250,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
         /// <param name="p">Center point of the dot, in pixels.</param>
         /// <param name="size">Size of the dot's diameter, in pixels</param>
         /// <returns></returns>
-      static public RectangleF GetRect(PointF p, float size)
+      public static RectangleF GetRect(PointF p, float size)
         {
             return new RectangleF(p.X - size / 2f, p.Y - size / 2f, size, size);
         }
@@ -1766,7 +1765,8 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 			  return myCp;
 		  }
 	  }
-	  string imagestring = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAACpJREFUOE9jYBjs4D/QgSBMNhg1ABKAFAUi2aFPNY0Ue4FiA6jmlUFsEABfyg/x8/L8/gAAAABJRU5ErkJggg==";
+
+        private string imagestring = "iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAgY0hSTQAAeiYAAICEAAD6AAAAgOgAAHUwAADqYAAAOpgAABdwnLpRPAAAACpJREFUOE9jYBjs4D/QgSBMNhg1ABKAFAUi2aFPNY0Ue4FiA6jmlUFsEABfyg/x8/L8/gAAAABJRU5ErkJggg==";
 
 	  private void composeMSG_Click(object sender, EventArgs e)
 	  {
@@ -2602,7 +2602,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
             this.location = location;
         }
 
-        static public double DistanceSqr(DebugVector v1, DebugVector v2)
+        public static double DistanceSqr(DebugVector v1, DebugVector v2)
         {
             return Math.Pow((v1.location.TileX - v2.location.TileX) * 2048 + v1.location.Location.X - v2.location.Location.X, 2)
                 + Math.Pow((v1.location.TileZ - v2.location.TileZ) * 2048 + v1.location.Location.Z - v2.location.Location.Z, 2);

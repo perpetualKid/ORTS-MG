@@ -29,7 +29,8 @@ namespace Orts.ActivityRunner.Viewer3D
     public abstract class ActivityCommand : PausedCommand
         {
         public static ActivityWindow Receiver { get; set; }
-        string EventNameLabel;
+
+        private readonly string EventNameLabel;
 
         public ActivityCommand( CommandLog log, string eventNameLabel, double pauseDurationS )
             : base(log, pauseDurationS)
@@ -40,7 +41,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public override string ToString()
         {
-            return String.Format("{0} Event: {1} ", base.ToString(), EventNameLabel);
+            return $"{base.ToString()} Event: {EventNameLabel} ";
         }
     }
 
@@ -166,7 +167,8 @@ namespace Orts.ActivityRunner.Viewer3D
     public sealed class UncoupleCommand : Command
     {
         public static Viewer Receiver { get; set; }
-        int CarPosition;    // 0 for head of train
+
+        private int CarPosition;    // 0 for head of train
 
         public UncoupleCommand( CommandLog log, int carPosition ) 
             : base(log)
@@ -520,14 +522,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public override string ToString()
         {
-            return base.ToString() + " - " + String.Format( "{0}", FormatStrings.FormatPreciseTime( EndTime ) );
+            return $"{base.ToString()} - {FormatStrings.FormatPreciseTime(EndTime)}";
         }
     }
 
     [Serializable()]
     public sealed class CameraRotateUpDownCommand : MoveCameraCommand
     {
-        float RotationXRadians;
+        private readonly float RotationXRadians;
 
         public CameraRotateUpDownCommand( CommandLog log, double startTime, double endTime, float rx )
             : base(log, startTime, endTime)
@@ -549,14 +551,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public override string ToString()
         {
-            return base.ToString() + String.Format( ", {0}", RotationXRadians );
+            return $"{base.ToString()} , {RotationXRadians}";
         }
     }
 
     [Serializable()]
     public sealed class CameraRotateLeftRightCommand : MoveCameraCommand
     {
-        float RotationYRadians;
+        private float RotationYRadians;
 
         public CameraRotateLeftRightCommand( CommandLog log, double startTime, double endTime, float ry )
             : base(log, startTime, endTime)
@@ -578,7 +580,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public override string ToString()
         {
-            return base.ToString() + String.Format( ", {0}", RotationYRadians );
+            return $"{base.ToString()} , {RotationYRadians}";
         }
     }
 
@@ -588,8 +590,8 @@ namespace Orts.ActivityRunner.Viewer3D
     [Serializable()]
     public sealed class CameraMouseRotateCommand : MoveCameraCommand
     {
-        float RotationXRadians;
-        float RotationYRadians;
+        private float RotationXRadians;
+        private float RotationYRadians;
 
         public CameraMouseRotateCommand( CommandLog log, double startTime, double endTime, float rx, float ry )
             : base(log, startTime, endTime)
@@ -613,14 +615,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public override string ToString()
         {
-            return base.ToString() + String.Format( ", {0} {1} {2}", EndTime, RotationXRadians, RotationYRadians );
+            return $"{base.ToString()}, {EndTime} {RotationXRadians} {RotationYRadians}";
         }
     }
 
     [Serializable()]
     public sealed class CameraXCommand : MoveCameraCommand
     {
-        float XRadians;
+        private float XRadians;
 
         public CameraXCommand( CommandLog log, double startTime, double endTime, float xr )
             : base(log, startTime, endTime)
@@ -642,14 +644,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public override string ToString()
         {
-            return base.ToString() + String.Format( ", {0}", XRadians );
+            return $"{base.ToString()}, {XRadians}";
         }
     }
 
     [Serializable()]
     public sealed class CameraYCommand : MoveCameraCommand
     {
-        float YRadians;
+        private float YRadians;
 
         public CameraYCommand( CommandLog log, double startTime, double endTime, float yr )
             : base(log, startTime, endTime)
@@ -671,14 +673,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public override string ToString()
         {
-            return base.ToString() + String.Format( ", {0}", YRadians );
+            return $"{base.ToString()}, {YRadians}";
         }
     }
 
     [Serializable()]
     public sealed class CameraZCommand : MoveCameraCommand
     {
-        float ZRadians;
+        private float ZRadians;
 
         public CameraZCommand( CommandLog log, double startTime, double endTime, float zr )
             : base(log, startTime, endTime)
@@ -699,14 +701,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public override string ToString()
         {
-            return base.ToString() + String.Format( ", {0}", ZRadians );
+            return $"{base.ToString()}, {ZRadians}";
         }
     }
 
 	[Serializable()]
 	public sealed class CameraMoveXYZCommand : MoveCameraCommand
 	{
-		float X, Y, Z;
+        private float X, Y, Z;
 
         public CameraMoveXYZCommand(CommandLog log, double startTime, double endTime, float xr, float yr, float zr)
 			: base(log, startTime, endTime)
@@ -728,14 +730,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
 		public override string ToString()
 		{
-			return base.ToString() + String.Format(", {0}", X);
+			return $"{base.ToString()}, {X}";
 		}
 	}
 
 	[Serializable()]
     public sealed class TrackingCameraXCommand : MoveCameraCommand
     {
-        float PositionXRadians;
+        private float PositionXRadians;
 
         public TrackingCameraXCommand( CommandLog log, double startTime, double endTime, float rx )
             : base(log, startTime, endTime)
@@ -757,14 +759,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public override string ToString()
         {
-            return base.ToString() + String.Format( ", {0}", PositionXRadians );
+            return $"{base.ToString()}, {PositionXRadians}";
         }
     }
 
     [Serializable()]
     public sealed class TrackingCameraYCommand : MoveCameraCommand
     {
-        float PositionYRadians;
+        private float PositionYRadians;
 
         public TrackingCameraYCommand( CommandLog log, double startTime, double endTime, float ry )
             : base(log, startTime, endTime)
@@ -786,14 +788,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public override string ToString()
         {
-            return base.ToString() + String.Format( ", {0}", PositionYRadians );
+            return $"{base.ToString()}, {PositionYRadians}";
         }
     }
 
     [Serializable()]
     public sealed class TrackingCameraZCommand : MoveCameraCommand
     {
-        float PositionDistanceMetres;
+        private float PositionDistanceMetres;
 
         public TrackingCameraZCommand( CommandLog log, double startTime, double endTime, float d )
             : base(log, startTime, endTime)
@@ -815,7 +817,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public override string ToString()
         {
-            return base.ToString() + String.Format( ", {0}", PositionDistanceMetres );
+            return $"{base.ToString()}, {PositionDistanceMetres}";
         }
     }
 
@@ -906,7 +908,7 @@ namespace Orts.ActivityRunner.Viewer3D
     [Serializable]
     public sealed class FieldOfViewCommand : UseCameraCommand
     {
-        float FieldOfView;
+        private float FieldOfView;
 
         public FieldOfViewCommand(CommandLog log, float fieldOfView)
             : base(log)

@@ -26,7 +26,7 @@ namespace Orts.Formats.Msts.Models
         public ref readonly WorldLocation Location => ref location;
 
         /// <summary>Id if track item</summary>
-        public uint TrackItemId { get; protected internal set; }
+        public uint TrackItemId { get; internal protected set; }
         /// <summary>Extra data 1, related to location along section</summary>
         public float SData1 { get; protected set; }
         /// <summary>Extra data 2</summary>

@@ -30,7 +30,8 @@ namespace Orts.Formats.Msts.Models
                 new STFReader.TokenProcessor("combinedcontrol", ()=>{ Add(new CabViewDiscreteControl(stf, basePath)); }),
                 new STFReader.TokenProcessor("firebox", ()=>{ Add(new CabViewFireboxControl(stf, basePath)); }),
                 new STFReader.TokenProcessor("dialclock", ()=>{ ProcessDialClock(stf, basePath);  }),
-                new STFReader.TokenProcessor("digitalclock", ()=>{ Add(new CabViewDigitalClockControl(stf, basePath)); })
+                new STFReader.TokenProcessor("digitalclock", ()=>{ Add(new CabViewDigitalClockControl(stf, basePath)); }),
+                new STFReader.TokenProcessor("screendisplay", ()=>{ Add(new CabViewScreenControl(stf, basePath)); })
             });
 
             if (count != Count)
@@ -817,6 +818,36 @@ namespace Orts.Formats.Msts.Models
             var style = stf.ReadInt(0);
             stf.SkipRestOfBlock();
             return style;
+        }
+    }
+    #endregion
+
+    #region Screen based controls
+    public class CabViewScreenControl : CabViewControl
+    {
+        public readonly Dictionary<string, string> CustomParameters = new Dictionary<string, string>();
+        public CabViewScreenControl()
+        {
+        }
+
+        public CabViewScreenControl(STFReader stf, string basepath)
+        {
+            stf.MustMatch("(");
+            stf.ParseBlock(new STFReader.TokenProcessor[] {
+                new STFReader.TokenProcessor("type", ()=>{ ParseType(stf); }),
+                new STFReader.TokenProcessor("position", ()=>{ ParsePosition(stf); }),
+                new STFReader.TokenProcessor("graphic", ()=>{ ParseGraphic(stf, basepath); }),
+                new STFReader.TokenProcessor("units", ()=>{ ParseUnits(stf); }),
+                new STFReader.TokenProcessor("parameters", ()=>{ ParseCustomParameters(stf); }),
+            });
+        }
+        protected void ParseCustomParameters(STFReader stf)
+        {
+            stf.MustMatch("(");
+            while (!stf.EndOfBlock())
+            {
+                CustomParameters[stf.ReadString().ToLower()] = stf.ReadString().ToLower();
+            }
         }
     }
     #endregion

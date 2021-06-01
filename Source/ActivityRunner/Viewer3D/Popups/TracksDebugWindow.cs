@@ -32,13 +32,12 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class TracksDebugWindow : LayeredWindow
     {
-        const float DisplayDistance = 1000;
-        const float DisplaySegmentLength = 10;
-        const float MaximumSectionDistance = 10000;
-        const float Tolerance = 0.0001F;
-
-        Viewport Viewport;
-        List<DispatcherPrimitive> Primitives = new List<DispatcherPrimitive>();
+        private const float DisplayDistance = 1000;
+        private const float DisplaySegmentLength = 10;
+        private const float MaximumSectionDistance = 10000;
+        private const float Tolerance = 0.0001F;
+        private Viewport Viewport;
+        private List<DispatcherPrimitive> Primitives = new List<DispatcherPrimitive>();
 
         public TracksDebugWindow(WindowManager owner)
             : base(owner, 1, 1, "Tracks and Roads Debug")
@@ -116,7 +115,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                 var trItem = rdb.RoadTrackDB.TrItemTable[trItemID];
                                 currentPosition = new Traveller(tSectionDat, rdb.RoadTrackDB.TrackNodes, trackNode);
                                 currentPosition.Move(trItem.SData1);
-                                primitives.Add(new DispatcherLabel(currentPosition.WorldLocation, Color.LightSalmon, String.Format("{0} {1} {2}", trItem.TrackItemId, trItem.GetType().Name.Replace("Item", string.Empty), trItem.ItemName), Owner.TextFontDefaultOutlined));
+                                primitives.Add(new DispatcherLabel(currentPosition.WorldLocation, Color.LightSalmon, $"{trItem.TrackItemId} {trItem.GetType().Name.Replace("Item", string.Empty)} {trItem.ItemName}", Owner.TextFontDefaultOutlined));
                             }
                         }
                     }

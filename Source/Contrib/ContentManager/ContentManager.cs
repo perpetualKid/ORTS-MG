@@ -25,7 +25,7 @@ namespace Orts.ContentManager
     public class ContentManager : Content
     {
         [NonSerialized]
-        readonly FolderSettings Settings;
+        private readonly FolderSettings Settings;
 
         public override ContentType Type { get { return ContentType.Root; } }
 

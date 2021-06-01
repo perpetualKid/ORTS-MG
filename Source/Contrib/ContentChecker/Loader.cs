@@ -34,23 +34,21 @@
 // from a single start-point (the .trk file). Here, however, we want to be able to load only 
 // a limited set of files: so we need to have a little more independence.
 //
-// Note that any exception handling dring loading is not done in the loader (sub)classes. This is
+// Note that any exception handling during loading is not done in the loader (sub)classes. This is
 // done at a higher level, currently.
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using Microsoft.Xna.Framework.Graphics;
 using System.Windows.Forms;
+
+using Microsoft.Xna.Framework.Graphics;
 
 namespace Orts.ContentChecker
 {
     /// <summary>
     /// Different levels of related additional files are recognized. This describes these various levels
     /// </summary>
-    enum AdditionType
+    internal enum AdditionType
     {
         /// <summary>No extra files need to be loaded </summary>
         None,
@@ -63,9 +61,9 @@ namespace Orts.ContentChecker
 
     }
 
-    abstract class Loader
+    internal abstract class Loader
     {
-        private static GraphicsDevice _graphicsDevice;
+        private static GraphicsDevice graphicsDevice;
 
         /// <summary> The number of files that were actually loaded </summary>
         public int FilesLoaded { get; protected set; }
@@ -156,10 +154,10 @@ namespace Orts.ContentChecker
         /// <returns>a graphicsDevice</returns>
         protected static GraphicsDevice GetGraphicsDevice()
         {
-            if (_graphicsDevice == null)
+            if (graphicsDevice == null)
             {
                 // We use a Windows.Forms Control instead of an xna GAME because it is much easier to use.
-                var _c = new Control();
+                Control control = new Control();
 
                 // Details probably do not matter too much
                 PresentationParameters parameters = new PresentationParameters()
@@ -168,14 +166,14 @@ namespace Orts.ContentChecker
                     BackBufferHeight = 100,
                     BackBufferFormat = SurfaceFormat.Color,
                     //DepthStencilFormat = DepthFormat.Depth24,
-                    DeviceWindowHandle = _c.Handle,
+                    DeviceWindowHandle = control.Handle,
                     PresentationInterval = PresentInterval.Immediate,
                     IsFullScreen = false,
                 };
 
-                _graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile.HiDef, parameters);
+                graphicsDevice = new GraphicsDevice(GraphicsAdapter.DefaultAdapter, GraphicsProfile.HiDef, parameters);
             }
-            return _graphicsDevice;
+            return graphicsDevice;
         }
     }
 }

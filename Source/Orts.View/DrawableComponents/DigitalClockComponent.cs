@@ -72,7 +72,7 @@ namespace Orts.View.DrawableComponents
             base.Update(gameTime);
         }
 
-        protected internal override void Enable(ContentArea content)
+        internal protected override void Enable(ContentArea content)
         {
             InitializeSize(TimeSpan.Zero.ToString(formatMask, CultureInfo.DefaultThreadCurrentUICulture));
             base.Enable(content);

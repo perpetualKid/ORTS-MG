@@ -226,7 +226,7 @@ namespace ORTS.TrackViewer.Editing.Charts
     }
     #endregion
 
-    interface ISubChart
+    internal interface ISubChart
     {
         void Draw(double zoomPercentageStart, double zoomPercentageStop, Canvas drawingCanvas, Canvas legendCanvas);
     }
@@ -312,7 +312,7 @@ namespace ORTS.TrackViewer.Editing.Charts
         /// </summary>
         /// <param name="drawingCanvas">The WPF canvas to draw upon</param>
         /// <param name="legendCanvas">The WPF canvas to draw the legend upon</param>
-        abstract protected void DrawSubChart(Canvas drawingCanvas, Canvas legendCanvas);
+        protected abstract void DrawSubChart(Canvas drawingCanvas, Canvas legendCanvas);
 
         #region General drawing routines
         /// <summary>
@@ -654,7 +654,7 @@ namespace ORTS.TrackViewer.Editing.Charts
         /// <param name="height">The height for this label</param>
         private void DrawHeightLabel(Canvas drawingCanvas, decimal height)
         {
-            string textToDraw = String.Format("{0}{1}", height/niceScale.Scale, niceScale.Unit);
+            string textToDraw = $"{height / niceScale.Scale}{niceScale.Unit}";
             DrawText(drawingCanvas, 5, ScaledY((double)height), textToDraw, Colors.Black);
         }
 
@@ -665,7 +665,7 @@ namespace ORTS.TrackViewer.Editing.Charts
         private void PrintGradesAndStations(Canvas drawingCanvas)
         {
             double lastX = ScaledX(0);
-            string lastTextToDraw = String.Format("{0,5:0.0}", 0);
+            string lastTextToDraw = $"{0,5:0.0}";
 
             foreach (PathChartPoint sourcePoint in this.pathData.PathChartPoints)
             {
@@ -675,7 +675,7 @@ namespace ORTS.TrackViewer.Editing.Charts
                 }
                 double newX = ScaledX(sourcePoint.DistanceAlongPath);
                 double newY = sourcePoint.GradePercent;
-                string newTextToDraw = String.Format("{0,5:0.0}", newY);
+                string newTextToDraw = $"{newY,5:0.0}";
 
                 if (lastTextToDraw != newTextToDraw)
                 {
@@ -771,7 +771,7 @@ namespace ORTS.TrackViewer.Editing.Charts
         /// <param name="grade">The grade value for which to draw the label</param>
         private void DrawGradePercentageLabel(Canvas legendCanvas, int grade)
         {
-            string textToDraw = String.Format("{0}%", grade);
+            string textToDraw = $"{grade}%";
             DrawText(legendCanvas, 5, ScaledY(grade), textToDraw, Colors.Black);
         }
 
@@ -850,7 +850,7 @@ namespace ORTS.TrackViewer.Editing.Charts
                     if (InCurve)
                     {   // end of a curve
 
-                        string textToDraw = String.Format("{0:F0}{1}", 180*accumulatedCurveRad/Math.PI, degree);
+                        string textToDraw = $"{180 * accumulatedCurveRad / Math.PI:F0}{degree}";
                         DrawTextCentered(drawingCanvas, ScaledX((sourcePoint.DistanceAlongPath + distanceAlongPathAtStart) / 2), 30, textToDraw, Colors.Red);
                     }
                     InCurve = false;
@@ -928,7 +928,7 @@ namespace ORTS.TrackViewer.Editing.Charts
 
             foreach (decimal niceValue in niceScale.NiceValues)
             {
-                string textToDraw = String.Format("{0}{1}", niceValue / niceScale.Scale, niceScale.Unit);
+                string textToDraw = $"{niceValue / niceScale.Scale}{niceScale.Unit}";
                 DrawText(drawingCanvas, ScaledX((double)niceValue), 5, textToDraw, Colors.Black);
             }
         }

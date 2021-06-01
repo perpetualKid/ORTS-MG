@@ -15,12 +15,6 @@
 // You should have received a copy of the GNU General Public License
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-
 using Orts.ActivityRunner.Viewer3D;
 
 namespace Orts.ContentChecker
@@ -28,7 +22,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .wav files
     /// </summary>
-    class WavLoader : Loader
+    internal class WavLoader : Loader
     {
         /// <summary>
         /// Try to load the file.
@@ -37,7 +31,8 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-           var soundPiece = new SoundPiece(file, false, false);
+            using (new SoundPiece(file, false, false))
+            { }
         }
     }
 }

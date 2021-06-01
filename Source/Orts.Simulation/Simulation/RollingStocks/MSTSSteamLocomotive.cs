@@ -107,173 +107,175 @@ namespace Orts.Simulation.RollingStocks
         public MSTSNotchController LargeEjectorController = new MSTSNotchController(0, 1, 0.1f);
 
         public bool Injector1IsOn;
-        bool Injector1SoundIsOn = false;
+        private bool Injector1SoundIsOn = false;
         public bool Injector2IsOn;
-        bool Injector2SoundIsOn = false;
+        private bool Injector2SoundIsOn = false;
         public bool CylinderCocksAreOpen;
         public bool BlowdownValveOpen;
         public bool CylinderCompoundOn;  // Flag to indicate whether compound locomotive is in compound or simple mode of operation - simple = true (ie bypass valve is open)
-        bool FiringIsManual;
-        bool BlowerIsOn = false;
-        bool BoilerIsPriming = false;
-        bool WaterIsExhausted = false;
-        bool CoalIsExhausted = false;
-        bool FireIsExhausted = false;
-        bool FuelBoost = false;
-        bool FuelBoostReset = false;
-        bool StokerIsMechanical = false;
-        bool HotStart; // Determine whether locomotive is started in hot or cold state - selectable option in Options TAB
-        bool FullBoilerHeat = false;    // Boiler heat has exceeded max possible heat in boiler (max operating steam pressure)
-        bool FullMaxPressBoilerHeat = false; // Boiler heat has exceed the max total possible heat in boiler (max safety valve pressure)
-        bool ShovelAnyway = false; // Predicts when the AI fireman should be increasing the fire burn rate despite the heat in the boiler
+        private bool FiringIsManual;
+        private bool BlowerIsOn = false;
+        private bool BoilerIsPriming = false;
+        private bool WaterIsExhausted = false;
+        private bool CoalIsExhausted = false;
+        private bool FireIsExhausted = false;
+        private bool FuelBoost = false;
+        private bool FuelBoostReset = false;
+        private bool StokerIsMechanical = false;
+        private bool HotStart; // Determine whether locomotive is started in hot or cold state - selectable option in Options TAB
+        private bool FullBoilerHeat = false;    // Boiler heat has exceeded max possible heat in boiler (max operating steam pressure)
+        private bool FullMaxPressBoilerHeat = false; // Boiler heat has exceed the max total possible heat in boiler (max safety valve pressure)
+        private bool ShovelAnyway = false; // Predicts when the AI fireman should be increasing the fire burn rate despite the heat in the boiler
         /// <summary>
         /// Grate limit of locomotive exceedeed?
         /// </summary>
         public bool IsGrateLimit { get; protected set; } = false;
-        bool HasSuperheater = false;  // Flag to indicate whether locomotive is superheated steam type
-        bool IsSuperSet = false;    // Flag to indicate whether superheating is reducing cylinder condenstation
-        bool IsSaturated = false;     // Flag to indicate locomotive is saturated steam type
-        bool safety2IsOn = false; // Safety valve #2 is on and opertaing
-        bool safety3IsOn = false; // Safety valve #3 is on and opertaing
-        bool safety4IsOn = false; // Safety valve #4 is on and opertaing
-        bool IsFixGeared = false;
-        bool IsSelectGeared = false;
-        bool IsLocoSlip = false; 	   // locomotive is slipping
-        bool IsCritTELimit = false; // Flag to advise if critical TE is exceeded
-        bool ISBoilerLimited = false;  // Flag to indicate that Boiler is limiting factor with the locomotive power
-        bool SetFireOn = false; // Flag to set the AI fire to on for starting of locomotive
-        bool SetFireOff = false; // Flag to set the AI fire to off for locomotive when approaching a stop 
-        bool SetFireReset = false; // Flag if AI fire has been reset, ie no overrides in place
-        bool AIFireOverride = false; // Flag to show ai fire has has been overriden
-        bool InjectorLockedOut = false; // Flag to lock injectors from changing within a fixed period of time
+
+        private bool HasSuperheater = false;  // Flag to indicate whether locomotive is superheated steam type
+        private bool IsSuperSet = false;    // Flag to indicate whether superheating is reducing cylinder condenstation
+        private bool IsSaturated = false;     // Flag to indicate locomotive is saturated steam type
+        private bool safety2IsOn = false; // Safety valve #2 is on and opertaing
+        private bool safety3IsOn = false; // Safety valve #3 is on and opertaing
+        private bool safety4IsOn = false; // Safety valve #4 is on and opertaing
+        private bool IsFixGeared = false;
+        private bool IsSelectGeared = false;
+        private bool IsLocoSlip = false;        // locomotive is slipping
+        private bool IsCritTELimit = false; // Flag to advise if critical TE is exceeded
+        private bool ISBoilerLimited = false;  // Flag to indicate that Boiler is limiting factor with the locomotive power
+        private bool SetFireOn = false; // Flag to set the AI fire to on for starting of locomotive
+        private bool SetFireOff = false; // Flag to set the AI fire to off for locomotive when approaching a stop 
+        private bool SetFireReset = false; // Flag if AI fire has been reset, ie no overrides in place
+        private bool AIFireOverride = false; // Flag to show ai fire has has been overriden
+        private bool InjectorLockedOut = false; // Flag to lock injectors from changing within a fixed period of time
 
         // Aux Tender Parameters
         public bool AuxTenderMoveFlag = false; // Flag to indicate whether train has moved
-        bool SteamIsAuxTenderCoupled = false;
-        float TenderWaterPercent;       // Percentage of water in tender
+        private bool SteamIsAuxTenderCoupled = false;
+        private float TenderWaterPercent;       // Percentage of water in tender
         public float WaterConsumptionLbpS;
         public float CurrentAuxTenderWaterMassKG;
         public float CurrentAuxTenderWaterVolumeUKG;
         public float CurrentLocoTenderWaterVolumeUKG;
-        float PrevCombinedTenderWaterVolumeUKG;
-        float PreviousTenderWaterVolumeUKG;
+        private float PrevCombinedTenderWaterVolumeUKG;
+        private float PreviousTenderWaterVolumeUKG;
         public float MaxLocoTenderWaterMassKG = 1;         // Maximum read from Eng file - this value must be non-zero, if not defined in ENG file, can cause NaN errors
-        float RestoredMaxTotalCombinedWaterVolumeUKG; // Values to restore after game save
-        float RestoredCombinedTenderWaterVolumeUKG;     // Values to restore after game save
+        private float RestoredMaxTotalCombinedWaterVolumeUKG; // Values to restore after game save
+        private float RestoredCombinedTenderWaterVolumeUKG;     // Values to restore after game save
 
         // Tender
         public bool HasTenderCoupled = true;
-        float BlowdownSteamUsageLBpS;
-        float BlowdownValveSizeDiaIn2;
+        private float BlowdownSteamUsageLBpS;
+        private float BlowdownValveSizeDiaIn2;
+        private string SteamLocoType;     // Type of steam locomotive type
 
-        string SteamLocoType;     // Type of steam locomotive type
-
-        float PulseTracker;
-        int NextPulse = 1;
+        private float PulseTracker;
+        private int NextPulse = 1;
 
         // state variables
-        SmoothedData BoilerHeatSmoothBTU = new SmoothedData(240); // total heat in water and steam in boiler - lb/s * SteamHeat(BTU/lb)
-        float BoilerHeatSmoothedBTU;
-        float PreviousBoilerHeatSmoothedBTU;
-        float BoilerHeatBTU;        // total heat in water and steam in boiler - lb/s * SteamHeat(BTU/lb)
-        float MaxBoilerHeatBTU;   // Boiler heat at max rated output and pressure, etc
-        float MaxBoilerSafetyPressHeatBTU;  // Boiler heat at boiler pressure for operation of safety valves
-        float MaxBoilerHeatSafetyPressurePSI; // Boiler Pressure for calculating max boiler pressure, includes safety valve pressure
-        float BoilerStartkW;        // calculate starting boilerkW
-        float MaxBoilerHeatInBTUpS = 0.1f; // Remember the BoilerHeat value equivalent to Max Boiler Heat
+        private SmoothedData BoilerHeatSmoothBTU = new SmoothedData(240); // total heat in water and steam in boiler - lb/s * SteamHeat(BTU/lb)
+        private float BoilerHeatSmoothedBTU;
+        private float PreviousBoilerHeatSmoothedBTU;
+        private float BoilerHeatBTU;        // total heat in water and steam in boiler - lb/s * SteamHeat(BTU/lb)
+        private float MaxBoilerHeatBTU;   // Boiler heat at max rated output and pressure, etc
+        private float MaxBoilerSafetyPressHeatBTU;  // Boiler heat at boiler pressure for operation of safety valves
+        private float MaxBoilerHeatSafetyPressurePSI; // Boiler Pressure for calculating max boiler pressure, includes safety valve pressure
+        private float BoilerStartkW;        // calculate starting boilerkW
+        private float MaxBoilerHeatInBTUpS = 0.1f; // Remember the BoilerHeat value equivalent to Max Boiler Heat
 
-        float baseStartTempK;     // Starting water temp
-        float StartBoilerHeatBTU;
+        private float baseStartTempK;     // Starting water temp
+        private float StartBoilerHeatBTU;
         public float BoilerMassLB;         // current total mass of water and steam in boiler (changes as boiler usage changes)
-        bool RestoredGame = false; // Flag to indicate that game is being restored. This will stop some values from being "initialised", as this will overwrite restored values.
+        private bool RestoredGame = false; // Flag to indicate that game is being restored. This will stop some values from being "initialised", as this will overwrite restored values.
 
-        float BoilerKW;                 // power of boiler
-        float MaxBoilerKW;              // power of boiler at full performance
-        float MaxBoilerOutputHP;           // Horsepower output of boiler
-        float BoilerSteamHeatBTUpLB;    // Steam Heat based on current boiler pressure
-        float BoilerWaterHeatBTUpLB;    // Water Heat based on current boiler pressure
-        float BoilerSteamDensityLBpFT3; // Steam Density based on current boiler pressure
-        float BoilerWaterDensityLBpFT3; // Water Density based on current boiler pressure
-        float BoilerWaterTempK;
+        private float BoilerKW;                 // power of boiler
+        private float MaxBoilerKW;              // power of boiler at full performance
+        private float MaxBoilerOutputHP;           // Horsepower output of boiler
+        private float BoilerSteamHeatBTUpLB;    // Steam Heat based on current boiler pressure
+        private float BoilerWaterHeatBTUpLB;    // Water Heat based on current boiler pressure
+        private float BoilerSteamDensityLBpFT3; // Steam Density based on current boiler pressure
+        private float BoilerWaterDensityLBpFT3; // Water Density based on current boiler pressure
+        private float BoilerWaterTempK;
         public float FuelBurnRateSmoothedKGpS;
-        float FuelFeedRateKGpS;
-        float DesiredChange;     // Amount of change to increase fire mass, clamped to range 0.0 - 1.0
+        private float FuelFeedRateKGpS;
+        private float DesiredChange;     // Amount of change to increase fire mass, clamped to range 0.0 - 1.0
         public float CylinderSteamUsageLBpS;
         public float NewCylinderSteamUsageLBpS;
         public float BlowerSteamUsageLBpS;
         public float EvaporationLBpS;          // steam generation rate
         public float FireMassKG;      // Mass of coal currently on grate area
         public float FireRatio;     // Ratio of actual firemass to ideal firemass
-        float MaxFiringRateLbpH; // Max coal burnt when steam evaporation (production) rate is maximum
-        float TempFireHeatLossPercent;
-        float FireHeatLossPercent;  // Percentage loss of heat due to too much or too little air for combustion
-        float FlueTempK = 775;      // Initial FlueTemp (best @ 475)
-        float MaxFlueTempK;         // FlueTemp at full boiler performance
+        private float MaxFiringRateLbpH; // Max coal burnt when steam evaporation (production) rate is maximum
+        private float TempFireHeatLossPercent;
+        private float FireHeatLossPercent;  // Percentage loss of heat due to too much or too little air for combustion
+        private float FlueTempK = 775;      // Initial FlueTemp (best @ 475)
+        private float MaxFlueTempK;         // FlueTemp at full boiler performance
         public bool SafetyIsOn;
         public readonly SmoothedData SmokeColor = new SmoothedData(2);
 
         // eng file configuration parameters
 
-        float BoilerVolumeFT3;      // total space in boiler that can hold water and steam
-        int NumCylinders = 2;       // Number of Cylinders
-        float CylinderStrokeM;      // High pressure cylinders
-        float CylinderDiameterM;    // High pressure cylinders
-        int LPNumCylinders = 2;       // Number of LP Cylinders
-        float LPCylinderStrokeM;      // Low pressure cylinders
-        float LPCylinderDiameterM;    // Low pressure cylinders
-        float CompoundCylinderRatio;    // Compound locomotive - ratio of low pressure to high pressure cylinder
-        float MaxBoilerOutputLBpH;  // maximum boiler steam generation rate
-        float IdealFireMassKG;      // Target fire mass
-        float MaxFireMassKG;        // Max possible fire mass
-        float MaxFiringRateKGpS;              // Max rate at which fireman or stoker can can feed coal into fire
+        private float BoilerVolumeFT3;      // total space in boiler that can hold water and steam
+        private int NumCylinders = 2;       // Number of Cylinders
+        private float CylinderStrokeM;      // High pressure cylinders
+        private float CylinderDiameterM;    // High pressure cylinders
+        private int LPNumCylinders = 2;       // Number of LP Cylinders
+        private float LPCylinderStrokeM;      // Low pressure cylinders
+        private float LPCylinderDiameterM;    // Low pressure cylinders
+        private float CompoundCylinderRatio;    // Compound locomotive - ratio of low pressure to high pressure cylinder
+        private float MaxBoilerOutputLBpH;  // maximum boiler steam generation rate
+        private float IdealFireMassKG;      // Target fire mass
+        private float MaxFireMassKG;        // Max possible fire mass
+        private float MaxFiringRateKGpS;              // Max rate at which fireman or stoker can can feed coal into fire
         /// <summary>
         /// Max combustion rate of the grate; once this is reached, no more steam is produced.
         /// </summary>
         public float GrateLimitLBpFt2 { get; protected set; } = 150.0f;
-        float MaxFuelBurnGrateKGpS;            // Maximum rate of fuel burnt depending upon grate limit
+
+        private float MaxFuelBurnGrateKGpS;            // Maximum rate of fuel burnt depending upon grate limit
         /// <summary>
         /// Grate combustion rate, i.e. how many lbs coal burnt per sq ft grate area.
         /// </summary>
         public float GrateCombustionRateLBpFt2 { get; protected set; }
-        float ORTSMaxFiringRateKGpS;          // OR equivalent of above
-        float DisplayMaxFiringRateKGpS;     // Display value of MaxFiringRate
+
+        private float ORTSMaxFiringRateKGpS;          // OR equivalent of above
+        private float DisplayMaxFiringRateKGpS;     // Display value of MaxFiringRate
         public float SafetyValveUsageLBpS;
-        float SafetyValveBoilerHeatOutBTUpS; // Heat removed by blowing of safety valves.
-        float BoilerHeatOutSVAIBTUpS;
-        float SafetyValveDropPSI = 4.0f;      // Pressure drop before Safety valve turns off, normally around 4 psi - First safety valve normally operates between MaxBoilerPressure, and MaxBoilerPressure - 4, ie Max Boiler = 200, cutoff = 196.
-        float EvaporationAreaM2;
-        float SuperheatAreaM2 = 0.0f;      // Heating area of superheater
-        float SuperheatKFactor = 15000.0f;     // Factor used to calculate superheat temperature - guesstimate
-        float MaxSuperheatRefTempF;            // Maximum Superheat temperature in deg Fahrenheit, based upon the heating area.
-        float SuperheatTempRatio;          // A ratio used to calculate the superheat temp - based on the ratio of superheat (using heat area) to "known" curve. 
+        private float SafetyValveBoilerHeatOutBTUpS; // Heat removed by blowing of safety valves.
+        private float BoilerHeatOutSVAIBTUpS;
+        private float SafetyValveDropPSI = 4.0f;      // Pressure drop before Safety valve turns off, normally around 4 psi - First safety valve normally operates between MaxBoilerPressure, and MaxBoilerPressure - 4, ie Max Boiler = 200, cutoff = 196.
+        private float EvaporationAreaM2;
+        private float SuperheatAreaM2 = 0.0f;      // Heating area of superheater
+        private float SuperheatKFactor = 15000.0f;     // Factor used to calculate superheat temperature - guesstimate
+        private float MaxSuperheatRefTempF;            // Maximum Superheat temperature in deg Fahrenheit, based upon the heating area.
+        private float SuperheatTempRatio;          // A ratio used to calculate the superheat temp - based on the ratio of superheat (using heat area) to "known" curve. 
         public float CurrentSuperheatTempF;      // current value of superheating based upon boiler steam output
-        float SuperheatVolumeRatio;   // Approximate ratio of Superheated steam to saturated steam at same pressure
-        float SuperheatCutoffPressureFactor; // Factor to adjust cutoff pressure for superheat locomotives, defaults to 55.0, user defineable
-        float FuelCalorificKJpKG = 33400;
-        float ManBlowerMultiplier = 20.0f; // Blower Multipler for Manual firing
-        float ShovelMassKG = 6;
-        float FiringSteamUsageRateLBpS;   // rate if excessive usage
-        float FullBoilerHeatRatio = 1.0f;   // Boiler heat ratio, if boiler heat exceeds, normal boiler pressure boiler heat
-        float MaxBoilerHeatRatio = 1.0f;   // Max Boiler heat ratio, if boiler heat exceeds, safety boiler pressure boiler heat
-        float AIFiremanBurnFactor = 1.0f;  // Factor by which to adjust burning (hence heat rate), combination of PressureRatio * BoilerHeatRatio * MaxBoilerHeatRatio
-        float AIFiremanBurnFactorExceed = 1.0f;  // Factor by which to adjust burning (hence heat rate) for excessive shoveling, combination of PressureRatio * BoilerHeatRatio * MaxBoilerHeatRatio
-        float HeatRatio = 0.001f;        // Ratio to control burn rate - based on ratio of heat in vs heat out
-        float PressureRatio = 0.001f;    // Ratio to control burn rate - based upon boiler pressure
-        float BurnRateRawKGpS;           // Raw combustion (burn) rate
-        float MaxCombustionRateKgpS;
-        SmoothedData FuelRateStoker = new SmoothedData(15); // Stoker is more responsive and only takes x seconds to fully react to changing needs.
-        SmoothedData FuelRate = new SmoothedData(45); // Automatic fireman takes x seconds to fully react to changing needs.
-        SmoothedData BurnRateSmoothKGpS = new SmoothedData(150); // Changes in BurnRate take x seconds to fully react to changing needs - models increase and decrease in heat.
-        float FuelRateSmoothed = 0.0f;     // Smoothed Fuel Rate
+        private float SuperheatVolumeRatio;   // Approximate ratio of Superheated steam to saturated steam at same pressure
+        private float SuperheatCutoffPressureFactor; // Factor to adjust cutoff pressure for superheat locomotives, defaults to 55.0, user defineable
+        private float FuelCalorificKJpKG = 33400;
+        private float ManBlowerMultiplier = 20.0f; // Blower Multipler for Manual firing
+        private float ShovelMassKG = 6;
+        private float FiringSteamUsageRateLBpS;   // rate if excessive usage
+        private float FullBoilerHeatRatio = 1.0f;   // Boiler heat ratio, if boiler heat exceeds, normal boiler pressure boiler heat
+        private float MaxBoilerHeatRatio = 1.0f;   // Max Boiler heat ratio, if boiler heat exceeds, safety boiler pressure boiler heat
+        private float AIFiremanBurnFactor = 1.0f;  // Factor by which to adjust burning (hence heat rate), combination of PressureRatio * BoilerHeatRatio * MaxBoilerHeatRatio
+        private float AIFiremanBurnFactorExceed = 1.0f;  // Factor by which to adjust burning (hence heat rate) for excessive shoveling, combination of PressureRatio * BoilerHeatRatio * MaxBoilerHeatRatio
+        private float HeatRatio = 0.001f;        // Ratio to control burn rate - based on ratio of heat in vs heat out
+        private float PressureRatio = 0.001f;    // Ratio to control burn rate - based upon boiler pressure
+        private float BurnRateRawKGpS;           // Raw combustion (burn) rate
+        private float MaxCombustionRateKgpS;
+        private SmoothedData FuelRateStoker = new SmoothedData(15); // Stoker is more responsive and only takes x seconds to fully react to changing needs.
+        private SmoothedData FuelRate = new SmoothedData(45); // Automatic fireman takes x seconds to fully react to changing needs.
+        private SmoothedData BurnRateSmoothKGpS = new SmoothedData(150); // Changes in BurnRate take x seconds to fully react to changing needs - models increase and decrease in heat.
+        private float FuelRateSmoothed = 0.0f;     // Smoothed Fuel Rate
 
         // steam performance reporting
         public float SteamPerformanceTimeS = 0.0f; // Records the time since starting movement
         public float CumulativeWaterConsumptionLbs = 0.0f;
         public float CumulativeCylinderSteamConsumptionLbs = 0.0f;
-        float CummulativeTotalSteamConsumptionLbs = 0.0f;
+        private float CummulativeTotalSteamConsumptionLbs = 0.0f;
         public static float DbfEvalCumulativeWaterConsumptionLbs;//DebriefEval
 
-        int LocoIndex;
+        private int LocoIndex;
         public float LocoTenderFrictionForceN; // Combined friction of locomotive and tender
         public float TotalFrictionForceN;
         public float TrainLoadKg;
@@ -281,69 +283,69 @@ namespace Orts.Simulation.RollingStocks
 
 
         // precomputed values
-        float CylinderSweptVolumeFT3pFT;     // Volume of steam Cylinder
-        float LPCylinderSweptVolumeFT3pFT;     // Volume of LP steam Cylinder
-        float CylinderCondensationFactor;  // Cylinder compensation factor for condensation in cylinder due to cutoff
-        float BlowerSteamUsageFactor;
-        float InjectorLockOutResetTimeS = 15.0f; // Time to reset the injector lock out time - time to prevent change of injectors
-        float InjectorLockOutTimeS = 0.0f; // Current lock out time - reset after Reset Time exceeded 
-        float InjectorFlowRateLBpS;    // Current injector flow rate - based upon current boiler pressure
-        float MaxInjectorFlowRateLBpS = 0.0f;      // Maximum possible injector flow rate - based upon maximum boiler pressure
-        Interpolator BackPressureIHPtoPSI;             // back pressure in cylinders given usage
-        Interpolator CylinderSteamDensityPSItoLBpFT3;   // steam density in cylinders given pressure (could be super heated)
-        Interpolator WaterDensityPSItoLBpFT3;   // water density given pressure
-        Interpolator WaterHeatPSItoBTUpLB;      // total heat in water given pressure
-        Interpolator HeatToPressureBTUpLBtoPSI; // pressure given total heat in water (inverse of WaterHeat)
-        Interpolator PressureToTemperaturePSItoF;
-        Interpolator InjDelWaterTempMinPressureFtoPSI; // Injector Delivery Water Temp - Minimum Capacity
-        Interpolator InjDelWaterTempMaxPressureFtoPSI; // Injector Delivery Water Temp - Maximum Capacity
-        Interpolator InjWaterFedSteamPressureFtoPSI; // Injector Water Lbs of water per lb steam used
-        Interpolator InjCapMinFactorX; // Injector Water Table to determin min capacity - max/min
-        Interpolator Injector09FlowratePSItoUKGpM;  // Flowrate of 09mm injector in gpm based on boiler pressure        
-        Interpolator Injector10FlowratePSItoUKGpM;  // Flowrate of 10mm injector in gpm based on boiler pressure
-        Interpolator Injector11FlowratePSItoUKGpM;  // Flowrate of 11mm injector in gpm based on boiler pressure
-        Interpolator Injector13FlowratePSItoUKGpM;  // Flowrate of 13mm injector in gpm based on boiler pressure 
-        Interpolator Injector14FlowratePSItoUKGpM;  // Flowrate of 14mm injector in gpm based on boiler pressure         
-        Interpolator Injector15FlowratePSItoUKGpM;  // Flowrate of 15mm injector in gpm based on boiler pressure                       
-        Interpolator SpecificHeatKtoKJpKGpK;        // table for specific heat capacity of water at temp of water
-        Interpolator SaturationPressureKtoPSI;      // Saturated pressure of steam (psi) @ water temperature (K)
-        Interpolator BoilerEfficiencyGrateAreaLBpFT2toX;      //  Table to determine boiler efficiency based upon lbs of coal per sq ft of Grate Area
-        Interpolator BoilerEfficiency;  // boiler efficiency given steam usage
-        Interpolator WaterTempFtoPSI;  // Table to convert water temp to pressure
-        Interpolator CylinderCondensationFractionX;  // Table to find the cylinder condensation fraction per cutoff for the cylinder - saturated steam
-        Interpolator SuperheatTempLimitXtoDegF;  // Table to find Super heat temp required to prevent cylinder condensation - Ref Elseco Superheater manual
-        Interpolator SuperheatTempLbpHtoDegF;  // Table to find Super heat temp per lbs of steam to cylinder - from BTC Test Results for Std 8
-        Interpolator InitialPressureDropRatioRpMtoX; // Allowance for wire-drawing - ie drop in initial pressure (cutoff) as speed increases
+        private float CylinderSweptVolumeFT3pFT;     // Volume of steam Cylinder
+        private float LPCylinderSweptVolumeFT3pFT;     // Volume of LP steam Cylinder
+        private float CylinderCondensationFactor;  // Cylinder compensation factor for condensation in cylinder due to cutoff
+        private float BlowerSteamUsageFactor;
+        private float InjectorLockOutResetTimeS = 15.0f; // Time to reset the injector lock out time - time to prevent change of injectors
+        private float InjectorLockOutTimeS = 0.0f; // Current lock out time - reset after Reset Time exceeded 
+        private float InjectorFlowRateLBpS;    // Current injector flow rate - based upon current boiler pressure
+        private float MaxInjectorFlowRateLBpS = 0.0f;      // Maximum possible injector flow rate - based upon maximum boiler pressure
+        private Interpolator BackPressureIHPtoPSI;             // back pressure in cylinders given usage
+        private Interpolator CylinderSteamDensityPSItoLBpFT3;   // steam density in cylinders given pressure (could be super heated)
+        private Interpolator WaterDensityPSItoLBpFT3;   // water density given pressure
+        private Interpolator WaterHeatPSItoBTUpLB;      // total heat in water given pressure
+        private Interpolator HeatToPressureBTUpLBtoPSI; // pressure given total heat in water (inverse of WaterHeat)
+        private Interpolator PressureToTemperaturePSItoF;
+        private Interpolator InjDelWaterTempMinPressureFtoPSI; // Injector Delivery Water Temp - Minimum Capacity
+        private Interpolator InjDelWaterTempMaxPressureFtoPSI; // Injector Delivery Water Temp - Maximum Capacity
+        private Interpolator InjWaterFedSteamPressureFtoPSI; // Injector Water Lbs of water per lb steam used
+        private Interpolator InjCapMinFactorX; // Injector Water Table to determin min capacity - max/min
+        private Interpolator Injector09FlowratePSItoUKGpM;  // Flowrate of 09mm injector in gpm based on boiler pressure        
+        private Interpolator Injector10FlowratePSItoUKGpM;  // Flowrate of 10mm injector in gpm based on boiler pressure
+        private Interpolator Injector11FlowratePSItoUKGpM;  // Flowrate of 11mm injector in gpm based on boiler pressure
+        private Interpolator Injector13FlowratePSItoUKGpM;  // Flowrate of 13mm injector in gpm based on boiler pressure 
+        private Interpolator Injector14FlowratePSItoUKGpM;  // Flowrate of 14mm injector in gpm based on boiler pressure         
+        private Interpolator Injector15FlowratePSItoUKGpM;  // Flowrate of 15mm injector in gpm based on boiler pressure                       
+        private Interpolator SpecificHeatKtoKJpKGpK;        // table for specific heat capacity of water at temp of water
+        private Interpolator SaturationPressureKtoPSI;      // Saturated pressure of steam (psi) @ water temperature (K)
+        private Interpolator BoilerEfficiencyGrateAreaLBpFT2toX;      //  Table to determine boiler efficiency based upon lbs of coal per sq ft of Grate Area
+        private Interpolator BoilerEfficiency;  // boiler efficiency given steam usage
+        private Interpolator WaterTempFtoPSI;  // Table to convert water temp to pressure
+        private Interpolator CylinderCondensationFractionX;  // Table to find the cylinder condensation fraction per cutoff for the cylinder - saturated steam
+        private Interpolator SuperheatTempLimitXtoDegF;  // Table to find Super heat temp required to prevent cylinder condensation - Ref Elseco Superheater manual
+        private Interpolator SuperheatTempLbpHtoDegF;  // Table to find Super heat temp per lbs of steam to cylinder - from BTC Test Results for Std 8
+        private Interpolator InitialPressureDropRatioRpMtoX; // Allowance for wire-drawing - ie drop in initial pressure (cutoff) as speed increases
 
-        Interpolator SaturatedSpeedFactorSpeedDropFtpMintoX; // Allowance for drop in TE for a saturated locomotive due to piston speed limitations
-        Interpolator SuperheatedSpeedFactorSpeedDropFtpMintoX; // Allowance for drop in TE for a superheated locomotive due to piston speed limitations
+        private Interpolator SaturatedSpeedFactorSpeedDropFtpMintoX; // Allowance for drop in TE for a saturated locomotive due to piston speed limitations
+        private Interpolator SuperheatedSpeedFactorSpeedDropFtpMintoX; // Allowance for drop in TE for a superheated locomotive due to piston speed limitations
 
-        Interpolator NewBurnRateSteamToCoalLbspH; // Combustion rate of steam generated per hour to Dry Coal per hour
+        private Interpolator NewBurnRateSteamToCoalLbspH; // Combustion rate of steam generated per hour to Dry Coal per hour
 
-        Interpolator2D CutoffInitialPressureDropRatioUpper;  // Upper limit of the pressure drop from initial pressure to cut-off pressure
-        Interpolator2D CutoffInitialPressureDropRatioLower;  // Lower limit of the pressure drop from initial pressure to cut-off pressure
+        private Interpolator2D CutoffInitialPressureDropRatioUpper;  // Upper limit of the pressure drop from initial pressure to cut-off pressure
+        private Interpolator2D CutoffInitialPressureDropRatioLower;  // Lower limit of the pressure drop from initial pressure to cut-off pressure
 
-        Interpolator CylinderExhausttoCutoff;  // Fraction of cylinder travel to exhaust
-        Interpolator CylinderCompressiontoCutoff;  // Fraction of cylinder travel to Compression
-        Interpolator CylinderAdmissiontoCutoff;  // Fraction of cylinder travel to Admission
+        private Interpolator CylinderExhausttoCutoff;  // Fraction of cylinder travel to exhaust
+        private Interpolator CylinderCompressiontoCutoff;  // Fraction of cylinder travel to Compression
+        private Interpolator CylinderAdmissiontoCutoff;  // Fraction of cylinder travel to Admission
 
         // Heat Radiation Parameters
-        float KcInsulation;   // Insulated section of Boiler - Coefficient of thermal conductivity -  BBTU / sq.ft. / hr / l in / °F.
-        float KcUninsulation = 1.67f;   // Uninsulated section of Boiler (Steel only) - Coefficient of thermal conductivity -  BBTU / sq.ft. / hr / l in / °F.
-        float BoilerSurfaceAreaFt2;
-        float FractionBoilerAreaInsulated;
-        float BoilerHeatRadiationLossBTU; // Heat loss of boiler (hourly value)
+        private float KcInsulation;   // Insulated section of Boiler - Coefficient of thermal conductivity -  BBTU / sq.ft. / hr / l in / °F.
+        private float KcUninsulation = 1.67f;   // Uninsulated section of Boiler (Steel only) - Coefficient of thermal conductivity -  BBTU / sq.ft. / hr / l in / °F.
+        private float BoilerSurfaceAreaFt2;
+        private float FractionBoilerAreaInsulated;
+        private float BoilerHeatRadiationLossBTU; // Heat loss of boiler (hourly value)
 
         #region Additional steam properties
-        const float SpecificHeatCoalKJpKGpK = 1.26f; // specific heat of coal - kJ/kg/K
-        const float SteamVaporSpecVolumeAt100DegC1BarM3pKG = 1.696f;
-        float WaterHeatBTUpFT3;             // Water heat in btu/ft3
-        bool FusiblePlugIsBlown = false;    // Fusible plug blown, due to lack of water in the boiler
-        bool LocoIsOilBurner = false;       // Used to identify if loco is oil burner
-        float GrateAreaM2;                  // Grate Area in SqM
-        float IdealFireDepthIN = 7.0f;      // Assume standard coal coverage of grate = 7 inches.
-        float FuelDensityKGpM3 = 864.5f;    // Anthracite Coal : 50 - 58 (lb/ft3), 800 - 929 (kg/m3)
-        float DamperFactorManual = 1.0f;    // factor to control draft through fire when locomotive is running in Manual mode
+        private const float SpecificHeatCoalKJpKGpK = 1.26f; // specific heat of coal - kJ/kg/K
+        private const float SteamVaporSpecVolumeAt100DegC1BarM3pKG = 1.696f;
+        private float WaterHeatBTUpFT3;             // Water heat in btu/ft3
+        private bool FusiblePlugIsBlown = false;    // Fusible plug blown, due to lack of water in the boiler
+        private bool LocoIsOilBurner = false;       // Used to identify if loco is oil burner
+        private float GrateAreaM2;                  // Grate Area in SqM
+        private float IdealFireDepthIN = 7.0f;      // Assume standard coal coverage of grate = 7 inches.
+        private float FuelDensityKGpM3 = 864.5f;    // Anthracite Coal : 50 - 58 (lb/ft3), 800 - 929 (kg/m3)
+        private float DamperFactorManual = 1.0f;    // factor to control draft through fire when locomotive is running in Manual mode
         public float WaterLBpUKG = 10.0f;    // lbs of water in 1 gal (uk)
         public float MaxTenderCoalMassKG = 1;          // Maximum read from Eng File -  - this value must be non-zero, if not defined in ENG file, can cause NaN errors
         public float TenderCoalMassKG              // Decreased by firing and increased by refilling
@@ -352,124 +354,126 @@ namespace Orts.Simulation.RollingStocks
             set { FuelController.CurrentValue = value / MaxTenderCoalMassKG; }
         }
 
-        float DamperBurnEffect;             // Effect of the Damper control Used in manual firing)
-        float Injector1Fraction = 0.0f;     // Fraction (0-1) of injector 1 flow from Fireman controller or AI
-        float Injector2Fraction = 0.0f;     // Fraction (0-1) of injector  of injector 2 flow from Fireman controller or AI
-        float SafetyValveStartPSI = 0.1f;   // Set safety valve to just over max pressure - allows for safety valve not to operate in AI firing
-        float InjectorBoilerInputLB = 0.0f; // Input into boiler from injectors
-        const float WaterDensityAt100DegC1BarKGpM3 = 954.8f;
+        private float DamperBurnEffect;             // Effect of the Damper control Used in manual firing)
+        private float Injector1Fraction = 0.0f;     // Fraction (0-1) of injector 1 flow from Fireman controller or AI
+        private float Injector2Fraction = 0.0f;     // Fraction (0-1) of injector  of injector 2 flow from Fireman controller or AI
+        private float SafetyValveStartPSI = 0.1f;   // Set safety valve to just over max pressure - allows for safety valve not to operate in AI firing
+        private float InjectorBoilerInputLB = 0.0f; // Input into boiler from injectors
+        private const float WaterDensityAt100DegC1BarKGpM3 = 954.8f;
 
 
         // Steam Ejector
-        float TempEjectorSmallSteamConsumptionLbpS;
-        float TempEjectorLargeSteamConsumptionLbpS;
-        float EjectorTotalSteamConsumptionLbpS;
+        private float TempEjectorSmallSteamConsumptionLbpS;
+        private float TempEjectorLargeSteamConsumptionLbpS;
+        private float EjectorTotalSteamConsumptionLbpS;
         public float VacuumPumpOutputFt3pM;
 
         // Air Compressor Characteristics - assume 9.5in x 10in Compressor operating at 120 strokes per min.          
-        float CompCylDiaIN = 9.5f;
-        float CompCylStrokeIN = 10.0f;
-        float CompStrokespM = 120.0f;
-        float CompSteamUsageLBpS = 0.0f;
-        const float BTUpHtoKJpS = 0.000293071f;     // Convert BTU/s to Kj/s
-        float BoilerHeatTransferCoeffWpM2K = 45.0f; // Heat Transfer of locomotive boiler 45 Wm2K
-        float TotalSteamUsageLBpS;                  // Running total for complete current steam usage
-        float GeneratorSteamUsageLBpS = 1.0f;       // Generator Steam Usage
-        float RadiationSteamLossLBpS = 2.5f;        // Steam loss due to radiation losses
-        float BlowerBurnEffect;                     // Effect of Blower on burning rate
-        float FlueTempDiffK;                        // Current difference in flue temp at current firing and steam usage rates.
-        float FireHeatTxfKW;                        // Current heat generated by the locomotive fire
-        float HeatMaterialThicknessFactor = 1.0f;   // Material thickness for convection heat transfer
-        float TheoreticalMaxSteamOutputLBpS;        // Max boiler output based upon Output = EvapArea x 15 ( lbs steam per evap area)
+        private float CompCylDiaIN = 9.5f;
+        private float CompCylStrokeIN = 10.0f;
+        private float CompStrokespM = 120.0f;
+        private float CompSteamUsageLBpS = 0.0f;
+        private const float BTUpHtoKJpS = 0.000293071f;     // Convert BTU/s to Kj/s
+        private float BoilerHeatTransferCoeffWpM2K = 45.0f; // Heat Transfer of locomotive boiler 45 Wm2K
+        private float TotalSteamUsageLBpS;                  // Running total for complete current steam usage
+        private float GeneratorSteamUsageLBpS = 1.0f;       // Generator Steam Usage
+        private float RadiationSteamLossLBpS = 2.5f;        // Steam loss due to radiation losses
+        private float BlowerBurnEffect;                     // Effect of Blower on burning rate
+        private float FlueTempDiffK;                        // Current difference in flue temp at current firing and steam usage rates.
+        private float FireHeatTxfKW;                        // Current heat generated by the locomotive fire
+        private float HeatMaterialThicknessFactor = 1.0f;   // Material thickness for convection heat transfer
+        private float TheoreticalMaxSteamOutputLBpS;        // Max boiler output based upon Output = EvapArea x 15 ( lbs steam per evap area)
 
         // Water model - locomotive boilers require water level to be maintained above the firebox crown sheet
         // This model is a crude representation of a water gauge based on a generic boiler and 8" water gauge
         // Based on a scaled drawing following water fraction levels have been used - crown sheet = 0.7, min water level = 0.73, max water level = 0.89
-        float WaterFraction;        // fraction of boiler volume occupied by water
-        float WaterMinLevel = 0.7f;         // min level before we blow the fusible plug
-        float WaterMinLevelSafe = 0.75f;    // min level which you would normally want for safety
-        float WaterMaxLevel = 0.91f;        // max level above which we start priming
-        float WaterMaxLevelSafe = 0.90f;    // max level below which we stop priming
-        float WaterGlassMaxLevel = 0.89f;   // max height of water gauge as a fraction of boiler level
-        float WaterGlassMinLevel = 0.73f;   // min height of water gauge as a fraction of boiler level
-        float WaterGlassLengthIN = 8.0f;    // nominal length of water gauge
-        float WaterGlassLevelIN;            // Water glass level in inches
-        float waterGlassPercent;            // Water glass level in percent
-        float MEPFactor = 0.7f;             // Factor to determine the MEP
-        float GrateAreaDesignFactor = 500.0f;   // Design factor for determining Grate Area
-        float EvapAreaDesignFactor = 10.0f;     // Design factor for determining Evaporation Area
+        private float WaterFraction;        // fraction of boiler volume occupied by water
+        private float WaterMinLevel = 0.7f;         // min level before we blow the fusible plug
+        private float WaterMinLevelSafe = 0.75f;    // min level which you would normally want for safety
+        private float WaterMaxLevel = 0.91f;        // max level above which we start priming
+        private float WaterMaxLevelSafe = 0.90f;    // max level below which we stop priming
+        private float WaterGlassMaxLevel = 0.89f;   // max height of water gauge as a fraction of boiler level
+        private float WaterGlassMinLevel = 0.73f;   // min height of water gauge as a fraction of boiler level
+        private float WaterGlassLengthIN = 8.0f;    // nominal length of water gauge
+        private float WaterGlassLevelIN;            // Water glass level in inches
+        private float waterGlassPercent;            // Water glass level in percent
+        private float MEPFactor = 0.7f;             // Factor to determine the MEP
+        private float GrateAreaDesignFactor = 500.0f;   // Design factor for determining Grate Area
+        private float EvapAreaDesignFactor = 10.0f;     // Design factor for determining Evaporation Area
 
-        float SpecificHeatWaterKJpKGpC; // Specific Heat Capacity of water in boiler (from Interpolator table) kJ/kG per deg C
-        float WaterTempInK;              // Input to water Temp Integrator.
-        float WaterTempNewK;            // Boiler Water Temp (Kelvin) - for testing purposes
-        float BkW_Diff;                 // Net Energy into boiler after steam loads taken.
-        float WaterVolL;                // Actual volume of water in bolier (litres)
-        float BoilerHeatOutBTUpS = 0.0f;// heat out of boiler in BTU
+        private float SpecificHeatWaterKJpKGpC; // Specific Heat Capacity of water in boiler (from Interpolator table) kJ/kG per deg C
+        private float WaterTempInK;              // Input to water Temp Integrator.
+        private float WaterTempNewK;            // Boiler Water Temp (Kelvin) - for testing purposes
+        private float BkW_Diff;                 // Net Energy into boiler after steam loads taken.
+        private float WaterVolL;                // Actual volume of water in bolier (litres)
+        private float BoilerHeatOutBTUpS = 0.0f;// heat out of boiler in BTU
         /// <summary>
         /// Heat into boiler in BTU
         /// </summary>
         public float BoilerHeatInBTUpS { get; protected set; } = 0.0f;
-        float BoilerHeatExcess;         // Vlaue of excess boiler heat
-        float InjCylEquivSizeIN;        // Calculate the equivalent cylinder size for purpose of sizing the injector.
-        float InjectorSize;             // size of injector installed on boiler
+
+        private float BoilerHeatExcess;         // Vlaue of excess boiler heat
+        private float InjCylEquivSizeIN;        // Calculate the equivalent cylinder size for purpose of sizing the injector.
+        private float InjectorSize;             // size of injector installed on boiler
 
         // Values from previous iteration to use in UpdateFiring() and show in HUD
         public float PreviousBoilerHeatOutBTUpS { get; protected set; } = 0.0f;
         public float PreviousTotalSteamUsageLBpS { get; protected set; }
-        float Injector1WaterDelTempF = 65f;   // Injector 1 water delivery temperature - F
-        float Injector2WaterDelTempF = 65f;   // Injector 1 water delivery temperature - F
-        float Injector1TempFraction;    // Find the fraction above the min temp of water delivery
-        float Injector2TempFraction;    // Find the fraction above the min temp of water delivery
-        float Injector1WaterTempPressurePSI;  // Pressure equivalent of water delivery temp
-        float Injector2WaterTempPressurePSI;  // Pressure equivalent of water delivery temp
-        float MaxInject1SteamUsedLbpS;  // Max steam injected into boiler when injector operating at full value - Injector 1
-        float MaxInject2SteamUsedLbpS;  // Max steam injected into boiler when injector operating at full value - Injector 2
-        float ActInject1SteamUsedLbpS;  // Act steam injected into boiler when injector operating at current value - Injector 1
-        float ActInject2SteamUsedLbpS;  // Act steam injected into boiler when injector operating at current value - Injector 2   
-        float Inject1SteamHeatLossBTU;  // heat loss due to steam usage from boiler for injector operation - Injector 1     
-        float Inject2SteamHeatLossBTU;  // heat loss due to steam usage from boiler for injector operation - Injector 2
-        float Inject1WaterHeatLossBTU;  // heat loss due to water injected into the boiler for injector operation - Injector 1   
-        float Inject2WaterHeatLossBTU;  // heat loss due to water injected into the boiler for injector operation - Injector 1                        
+
+        private float Injector1WaterDelTempF = 65f;   // Injector 1 water delivery temperature - F
+        private float Injector2WaterDelTempF = 65f;   // Injector 1 water delivery temperature - F
+        private float Injector1TempFraction;    // Find the fraction above the min temp of water delivery
+        private float Injector2TempFraction;    // Find the fraction above the min temp of water delivery
+        private float Injector1WaterTempPressurePSI;  // Pressure equivalent of water delivery temp
+        private float Injector2WaterTempPressurePSI;  // Pressure equivalent of water delivery temp
+        private float MaxInject1SteamUsedLbpS;  // Max steam injected into boiler when injector operating at full value - Injector 1
+        private float MaxInject2SteamUsedLbpS;  // Max steam injected into boiler when injector operating at full value - Injector 2
+        private float ActInject1SteamUsedLbpS;  // Act steam injected into boiler when injector operating at current value - Injector 1
+        private float ActInject2SteamUsedLbpS;  // Act steam injected into boiler when injector operating at current value - Injector 2   
+        private float Inject1SteamHeatLossBTU;  // heat loss due to steam usage from boiler for injector operation - Injector 1     
+        private float Inject2SteamHeatLossBTU;  // heat loss due to steam usage from boiler for injector operation - Injector 2
+        private float Inject1WaterHeatLossBTU;  // heat loss due to water injected into the boiler for injector operation - Injector 1   
+        private float Inject2WaterHeatLossBTU;  // heat loss due to water injected into the boiler for injector operation - Injector 1                        
 
         // Derating factors for motive force 
-        float BoilerPrimingDeratingFactor = 0.1f;   // Factor if boiler is priming
-        float OneAtmospherePSI = 14.696f;      // Atmospheric Pressure
+        private float BoilerPrimingDeratingFactor = 0.1f;   // Factor if boiler is priming
+        private float OneAtmospherePSI = 14.696f;      // Atmospheric Pressure
 
-        float SuperheaterFactor = 1.0f;               // Currently 2 values respected: 0.0 for no superheat (default), > 1.0 for typical superheat
+        private float SuperheaterFactor = 1.0f;               // Currently 2 values respected: 0.0 for no superheat (default), > 1.0 for typical superheat
         public float SuperheaterSteamUsageFactor = 1.0f;       // Below 1.0, reduces steam usage due to superheater
-        float Stoker = 0.0f;                // Currently 2 values respected: 0.0 for no mechanical stoker (default), = 1.0 for typical mechanical stoker
-        float StokerMaxUsage = 0.01f;       // Max steam usage of stoker - 1% of max boiler output
-        float StokerMinUsage = 0.005f;      // Min Steam usage - just to keep motor ticking over - 0.5% of max boiler output
-        float StokerSteamUsageLBpS;         // Current steam usage of stoker
-        float MaxTheoreticalFiringRateKgpS;     // Max firing rate that fireman can sustain for short periods
-        float FuelBoostOnTimerS = 0.01f;    // Timer to allow fuel boosting for a short while
-        float FuelBoostResetTimerS = 0.01f; // Timer to rest fuel boosting for a while
-        float TimeFuelBoostOnS = 300.0f;    // Time to allow fuel boosting to go on for 
-        float TimeFuelBoostResetS = 1200.0f;// Time to wait before next fuel boost
-        float throttle;
-        float SpeedEquivMpS = 27.0f;          // Equvalent speed of 60mph in mps (27m/s) - used for damper control
+        private float Stoker = 0.0f;                // Currently 2 values respected: 0.0 for no mechanical stoker (default), = 1.0 for typical mechanical stoker
+        private float StokerMaxUsage = 0.01f;       // Max steam usage of stoker - 1% of max boiler output
+        private float StokerMinUsage = 0.005f;      // Min Steam usage - just to keep motor ticking over - 0.5% of max boiler output
+        private float StokerSteamUsageLBpS;         // Current steam usage of stoker
+        private float MaxTheoreticalFiringRateKgpS;     // Max firing rate that fireman can sustain for short periods
+        private float FuelBoostOnTimerS = 0.01f;    // Timer to allow fuel boosting for a short while
+        private float FuelBoostResetTimerS = 0.01f; // Timer to rest fuel boosting for a while
+        private float TimeFuelBoostOnS = 300.0f;    // Time to allow fuel boosting to go on for 
+        private float TimeFuelBoostResetS = 1200.0f;// Time to wait before next fuel boost
+        private float throttle;
+        private float SpeedEquivMpS = 27.0f;          // Equvalent speed of 60mph in mps (27m/s) - used for damper control
 
         // Cylinder related parameters
         public float CutoffPressureDropRatio;  // Ratio of Cutoff Pressure to Initial Pressure
         public float LPCutoffPressureDropRatio; // Ratio of Cutoff Pressure to Initial Pressure - LP Cylinder
-        float CylinderCocksPressureAtmPSI; // Pressure in cylinder (impacted by cylinder cocks).
-        float Pressure_d_AtmPSI;
-        float Pressure_a_AtmPSI;    // Initial Pressure to cylinder @ start if stroke
-        float Pressure_b_AtmPSI;    // Pressure at cutoff
-        float SteamChestPressurePSI;    // Pressure in steam chest - input to cylinder
+        private float CylinderCocksPressureAtmPSI; // Pressure in cylinder (impacted by cylinder cocks).
+        private float Pressure_d_AtmPSI;
+        private float Pressure_a_AtmPSI;    // Initial Pressure to cylinder @ start if stroke
+        private float Pressure_b_AtmPSI;    // Pressure at cutoff
+        private float SteamChestPressurePSI;    // Pressure in steam chest - input to cylinder
 
-        float CylinderWork_ab_InLbs; // Work done during steam admission into cylinder
-        float CylinderExhaustOpenFactor; // Point on cylinder stroke when exhaust valve opens.
-        float CylinderCompressionCloseFactor; // Point on cylinder stroke when compression valve closes - assumed reciporical of exhaust opens.
-        float CylinderAdmissionOpenFactor = 0.05f; // Point on cylinder stroke when pre-admission valve opens
-        float Pressure_c_AtmPSI;       // Pressure when exhaust valve opens
-        float Pressure_e_AtmPSI;       // Pressure when exhaust valve closes
-        float Pressure_f_AtmPSI;    // Pressure after compression occurs and steam admission starts
-        float CylinderWork_bc_InLbs; // Work done during expansion stage of cylinder
-        float CylinderWork_cd_InLbs;   // Work done during release stage of cylinder
-        float CylinderWork_ef_InLbs; // Work done during compression stage of cylinder
-        float CylinderWork_fa_InLbs; // Work done during PreAdmission stage of cylinder
-        float CylinderWork_de_InLbs; // Work done during Exhaust stage of cylinder
+        private float CylinderWork_ab_InLbs; // Work done during steam admission into cylinder
+        private float CylinderExhaustOpenFactor; // Point on cylinder stroke when exhaust valve opens.
+        private float CylinderCompressionCloseFactor; // Point on cylinder stroke when compression valve closes - assumed reciporical of exhaust opens.
+        private float CylinderAdmissionOpenFactor = 0.05f; // Point on cylinder stroke when pre-admission valve opens
+        private float Pressure_c_AtmPSI;       // Pressure when exhaust valve opens
+        private float Pressure_e_AtmPSI;       // Pressure when exhaust valve closes
+        private float Pressure_f_AtmPSI;    // Pressure after compression occurs and steam admission starts
+        private float CylinderWork_bc_InLbs; // Work done during expansion stage of cylinder
+        private float CylinderWork_cd_InLbs;   // Work done during release stage of cylinder
+        private float CylinderWork_ef_InLbs; // Work done during compression stage of cylinder
+        private float CylinderWork_fa_InLbs; // Work done during PreAdmission stage of cylinder
+        private float CylinderWork_de_InLbs; // Work done during Exhaust stage of cylinder
 
         // Values for logging and displaying Steam pressure
         public float LogInitialPressurePSI;
@@ -479,11 +483,11 @@ namespace Orts.Simulation.RollingStocks
         public float LogSteamChestPressurePSI;
 
         // Values for Steam Cylinder events
-        float ValveTravel = 10.8268f;
-        float ValveLead = 0.275591f;
-        float ValveExhLap = 0.708661f;
-        float ValveSteamLap;
-        double ValveAdvanceAngleDeg;
+        private float ValveTravel = 10.8268f;
+        private float ValveLead = 0.275591f;
+        private float ValveExhLap = 0.708661f;
+        private float ValveSteamLap;
+        private double ValveAdvanceAngleDeg;
 
         public float LogLPInitialPressurePSI;
         public float LogLPCutoffPressurePSI;
@@ -492,184 +496,183 @@ namespace Orts.Simulation.RollingStocks
         public float LogLPSteamChestPressurePSI;
 
         public bool LogIsCompoundLoco = false;
-
-        float LogPreCompressionPressurePSI;
-        float LogPreAdmissionPressurePSI;
+        private float LogPreCompressionPressurePSI;
+        private float LogPreAdmissionPressurePSI;
 
         // Compound Cylinder Information - HP Cylinder - Compound Operation
 
-        float HPCompPressure_a_AtmPSI;    // Initial Pressure to HP cylinder @ start if stroke
-        float HPCompPressure_b_AtmPSI;    // Pressure at HP cylinder cutoff
-        float HPCompPressure_d_AtmPSI;       // Pressure in HP cylinder when steam release valve opens
-        float HPCompPressure_e_AtmPSI;   // Pressure in HP cylinder when steam release valve opens, and steam moves into steam passages which connect HP & LP together
-        float HPCompPressure_f_AtmPSI;       // Pressure in HP cylinder when steam completely released from the cylinder
-        float HPCompPressure_h_AtmPSI;       // Pressure when exhaust valve closes, and compression commences
-        float HPCompPressure_k_AtmPSI; //  Pre-Admission pressure prior to exhaust valve closing
-        float HPCompPressure_u_AtmPSI;  // Admission pressure
-        float HPCompMeanPressure_gh_AtmPSI;     // Back pressure on HP cylinder
+        private float HPCompPressure_a_AtmPSI;    // Initial Pressure to HP cylinder @ start if stroke
+        private float HPCompPressure_b_AtmPSI;    // Pressure at HP cylinder cutoff
+        private float HPCompPressure_d_AtmPSI;       // Pressure in HP cylinder when steam release valve opens
+        private float HPCompPressure_e_AtmPSI;   // Pressure in HP cylinder when steam release valve opens, and steam moves into steam passages which connect HP & LP together
+        private float HPCompPressure_f_AtmPSI;       // Pressure in HP cylinder when steam completely released from the cylinder
+        private float HPCompPressure_h_AtmPSI;       // Pressure when exhaust valve closes, and compression commences
+        private float HPCompPressure_k_AtmPSI; //  Pre-Admission pressure prior to exhaust valve closing
+        private float HPCompPressure_u_AtmPSI;  // Admission pressure
+        private float HPCompMeanPressure_gh_AtmPSI;     // Back pressure on HP cylinder
         public float HPCylinderMEPPSI;                 // Mean effective Pressure of HP Cylinder
-        float HPCylinderClearancePC = 0.19f;    // Assume cylinder clearance of 19% of the piston displacement for HP cylinder
-        float CompoundRecieverVolumePCHP = 0.3f; // Volume of receiver or passages between HP and LP cylinder as a fraction of the HP cylinder volume.
-        float HPCylinderVolumeFactor = 1.0f;    // Represents the full volume of the HP steam cylinder    
-        float LPCylinderVolumeFactor = 1.0f;    // Represents the full volume of the LP steam cylinder 
-        float HPIndicatedHorsePowerHP;
-        float LPIndicatedHorsePowerHP;
+        private float HPCylinderClearancePC = 0.19f;    // Assume cylinder clearance of 19% of the piston displacement for HP cylinder
+        private float CompoundRecieverVolumePCHP = 0.3f; // Volume of receiver or passages between HP and LP cylinder as a fraction of the HP cylinder volume.
+        private float HPCylinderVolumeFactor = 1.0f;    // Represents the full volume of the HP steam cylinder    
+        private float LPCylinderVolumeFactor = 1.0f;    // Represents the full volume of the LP steam cylinder 
+        private float HPIndicatedHorsePowerHP;
+        private float LPIndicatedHorsePowerHP;
 
         // Compound Cylinder Information - LP Cylinder - Simple Operation
-        float LPPressure_a_AtmPSI;    // Initial Pressure to LP cylinder @ start if stroke
-        float LPPressure_b_AtmPSI; // Pressure in combined HP & LP Cylinder pre-cutoff
-        float LPPressure_c_AtmPSI;   // Pressure in LP cylinder when steam release valve opens
-        float LPPressure_d_AtmPSI;     // Back pressure on LP cylinder
-        float LPPressure_e_AtmPSI;       // Pressure in LP cylinder when exhaust valve closes, and compression commences
-        float LPPressure_f_AtmPSI;    // Pressure in LP cylinder after compression occurs and steam admission starts
+        private float LPPressure_a_AtmPSI;    // Initial Pressure to LP cylinder @ start if stroke
+        private float LPPressure_b_AtmPSI; // Pressure in combined HP & LP Cylinder pre-cutoff
+        private float LPPressure_c_AtmPSI;   // Pressure in LP cylinder when steam release valve opens
+        private float LPPressure_d_AtmPSI;     // Back pressure on LP cylinder
+        private float LPPressure_e_AtmPSI;       // Pressure in LP cylinder when exhaust valve closes, and compression commences
+        private float LPPressure_f_AtmPSI;    // Pressure in LP cylinder after compression occurs and steam admission starts
         public float LPCylinderMEPPSI;                     // Mean effective pressure of LP Cylinder
-        float LPCylinderClearancePC = 0.066f;    // Assume cylinder clearance of 6.6% of the piston displacement for LP cylinder
+        private float LPCylinderClearancePC = 0.066f;    // Assume cylinder clearance of 6.6% of the piston displacement for LP cylinder
 
         // Simple locomotive cylinder information
         public float MeanEffectivePressurePSI;         // Mean effective pressure
-        float RatioOfExpansion_bc;             // Ratio of expansion
-        float CylinderClearancePC = 0.09f;    // Assume cylinder clearance of 8% of the piston displacement for saturated locomotives and 9% for superheated locomotive - default to saturated locomotive value
-        float CylinderPortOpeningFactor;   // Model the size of the steam port opening in the cylinder - set to 0.085 as default, if no ENG file value added
-        float CylinderPortOpeningUpper = 0.12f; // Set upper limit for Cylinder port opening
-        float CylinderPortOpeningLower = 0.05f; // Set lower limit for Cylinder port opening
-        float CylinderPistonShaftFt3;   // Volume taken up by the cylinder piston shaft
-        float CylinderPistonShaftDiaIn = 3.5f; // Assume cylinder piston shaft to be 3.5 inches
-        float CylinderPistonAreaFt2;    // Area of the piston in the cylinder (& HP Cylinder in case of Compound locomotive)
-        float LPCylinderPistonAreaFt2;    // Area of the piston in the LP cylinder
-        float CylinderAdmissionSteamWeightLbs; // Weight of steam remaining in cylinder at "admission" (when admission valve opens)
-        float CylinderReleaseSteamWeightLbs;   // Weight of steam in cylinder at "release" (exhaust valve opens)
-        float CylinderReleaseSteamVolumeFt3; // Volume of cylinder at steam release in cylinder
-        float CylinderAdmissionSteamVolumeFt3; // Volume in cylinder at start of steam compression
-        float RawCylinderSteamWeightLbs;    // 
-        float RawCalculatedCylinderSteamUsageLBpS;  // Steam usage before superheat or cylinder condensation compensation
-        float CalculatedCylinderSteamUsageLBpS; // Steam usage calculated from steam indicator diagram
+        private float RatioOfExpansion_bc;             // Ratio of expansion
+        private float CylinderClearancePC = 0.09f;    // Assume cylinder clearance of 8% of the piston displacement for saturated locomotives and 9% for superheated locomotive - default to saturated locomotive value
+        private float CylinderPortOpeningFactor;   // Model the size of the steam port opening in the cylinder - set to 0.085 as default, if no ENG file value added
+        private float CylinderPortOpeningUpper = 0.12f; // Set upper limit for Cylinder port opening
+        private float CylinderPortOpeningLower = 0.05f; // Set lower limit for Cylinder port opening
+        private float CylinderPistonShaftFt3;   // Volume taken up by the cylinder piston shaft
+        private float CylinderPistonShaftDiaIn = 3.5f; // Assume cylinder piston shaft to be 3.5 inches
+        private float CylinderPistonAreaFt2;    // Area of the piston in the cylinder (& HP Cylinder in case of Compound locomotive)
+        private float LPCylinderPistonAreaFt2;    // Area of the piston in the LP cylinder
+        private float CylinderAdmissionSteamWeightLbs; // Weight of steam remaining in cylinder at "admission" (when admission valve opens)
+        private float CylinderReleaseSteamWeightLbs;   // Weight of steam in cylinder at "release" (exhaust valve opens)
+        private float CylinderReleaseSteamVolumeFt3; // Volume of cylinder at steam release in cylinder
+        private float CylinderAdmissionSteamVolumeFt3; // Volume in cylinder at start of steam compression
+        private float RawCylinderSteamWeightLbs;    // 
+        private float RawCalculatedCylinderSteamUsageLBpS;  // Steam usage before superheat or cylinder condensation compensation
+        private float CalculatedCylinderSteamUsageLBpS; // Steam usage calculated from steam indicator diagram
 
-        const int CylStrokesPerCycle = 2;  // each cylinder does 2 strokes for every wheel rotation, within each stroke
-        float CylinderEfficiencyRate = 1.0f; // Factor to vary the output power of the cylinder without changing steam usage - used as a player customisation factor.
+        private const int CylStrokesPerCycle = 2;  // each cylinder does 2 strokes for every wheel rotation, within each stroke
+        private float CylinderEfficiencyRate = 1.0f; // Factor to vary the output power of the cylinder without changing steam usage - used as a player customisation factor.
         public float CylCockSteamUsageLBpS = 0.0f; // Cylinder Cock Steam Usage if locomotive moving
         public float CylCockSteamUsageStatLBpS = 0.0f; // Cylinder Cock Steam Usage if locomotive stationary
         public float CylCockSteamUsageDisplayLBpS = 0.0f; // Cylinder Cock Steam Usage for display and effects
-        float CylCockDiaIN = 0.5f;          // Steam Cylinder Cock orifice size
-        float CylCockPressReduceFactor;     // Factor to reduce cylinder pressure by if cocks open
-        float CylCockBoilerHeatOutBTUpS;  // Amount of heat taken out by use of cylinder cocks
+        private float CylCockDiaIN = 0.5f;          // Steam Cylinder Cock orifice size
+        private float CylCockPressReduceFactor;     // Factor to reduce cylinder pressure by if cocks open
+        private float CylCockBoilerHeatOutBTUpS;  // Amount of heat taken out by use of cylinder cocks
 
-        float DrvWheelDiaM;     // Diameter of driver wheel
-        float DrvWheelRevRpS;       // number of revolutions of the drive wheel per minute based upon speed.
-        float PistonSpeedFtpMin;      // Piston speed of locomotive
+        private float DrvWheelDiaM;     // Diameter of driver wheel
+        private float DrvWheelRevRpS;       // number of revolutions of the drive wheel per minute based upon speed.
+        private float PistonSpeedFtpMin;      // Piston speed of locomotive
         public float IndicatedHorsePowerHP;   // Indicated Horse Power (IHP), theoretical power of the locomotive, it doesn't take into account the losses due to friction, etc. Typically output HP will be 70 - 90% of the IHP
         public float DrawbarHorsePowerHP;  // Drawbar Horse Power  (DHP), maximum power available at the wheels.
         public float DrawBarPullLbsF;      // Drawbar pull in lbf
-        float BoilerEvapRateLbspFt2;  // Sets the evaporation rate for the boiler is used to multiple boiler evaporation area by - used as a player customisation factor.
+        private float BoilerEvapRateLbspFt2;  // Sets the evaporation rate for the boiler is used to multiple boiler evaporation area by - used as a player customisation factor.
 
-        float MaxSpeedFactor;      // Max Speed factor - factor @ critical piston speed to reduce TE due to speed increase - American locomotive company
-        float DisplaySpeedFactor;  // Value displayed in HUD
+        private float MaxSpeedFactor;      // Max Speed factor - factor @ critical piston speed to reduce TE due to speed increase - American locomotive company
+        private float DisplaySpeedFactor;  // Value displayed in HUD
 
         public float MaxTractiveEffortLbf;     // Maximum theoritical tractive effort for locomotive
         public float DisplayMaxTractiveEffortLbf;     // HuD display value of maximum theoritical tractive effort for locomotive
 
-        float DisplayTractiveEffortLbsF; // Value of Tractive effort to display in HUD
-        float MaxCriticalSpeedTractiveEffortLbf;  // Maximum power value @ critical speed of piston
-        float DisplayCriticalSpeedTractiveEffortLbf;  // Display power value @ speed of piston
-        float absStartTractiveEffortN = 0.0f;      // Record starting tractive effort
-        float TractiveEffortLbsF;           // Current sim calculated tractive effort
-        const float TractiveEffortFactor = 0.85f;  // factor for calculating Theoretical Tractive Effort for non-geared locomotives
-        float GearedTractiveEffortFactor = 0.7f;  // factor for calculating Theoretical Tractive Effort for geared locomotives
-        float NeutralGearedDavisAN; // Davis A value adjusted for neutral gearing
-        const float DavisMechanicalResistanceFactor = 20.0f;
-        float GearedRetainedDavisAN; // Remembers the Davis A value
+        private float DisplayTractiveEffortLbsF; // Value of Tractive effort to display in HUD
+        private float MaxCriticalSpeedTractiveEffortLbf;  // Maximum power value @ critical speed of piston
+        private float DisplayCriticalSpeedTractiveEffortLbf;  // Display power value @ speed of piston
+        private float absStartTractiveEffortN = 0.0f;      // Record starting tractive effort
+        private float TractiveEffortLbsF;           // Current sim calculated tractive effort
+        private const float TractiveEffortFactor = 0.85f;  // factor for calculating Theoretical Tractive Effort for non-geared locomotives
+        private float GearedTractiveEffortFactor = 0.7f;  // factor for calculating Theoretical Tractive Effort for geared locomotives
+        private float NeutralGearedDavisAN; // Davis A value adjusted for neutral gearing
+        private const float DavisMechanicalResistanceFactor = 20.0f;
+        private float GearedRetainedDavisAN; // Remembers the Davis A value
 
-        float MaxLocoSpeedMpH;      // Speed of loco when max performance reached
-        float DisplayMaxLocoSpeedMpH;      // Display value of speed of loco when max performance reached
-        float MaxPistonSpeedFtpM;   // Piston speed @ max performance for the locomotive
-        float MaxIndicatedHorsePowerHP; // IHP @ max performance for the locomotive
-        float DisplayMaxIndicatedHorsePowerHP; // Display value for HUD of IHP @ max performance for the geared locomotive
-        float RetainedGearedMaxMaxIndicatedHorsePowerHP; // Retrains maximum IHP value for steam locomotives.
-        float absSpeedMpS;
-        float CombFrictionN;  // Temporary parameter to store combined friction values of locomotive and tender
-        float CombGravityN;   // Temporary parameter to store combined Gravity values of locomotive and tender
-        float CombTunnelN;    // Temporary parameter to store combined Tunnel values of locomotive and tender
-        float CombCurveN;     // Temporary parameter to store combined Curve values of locomotive and tender
-        float CombWindN;     // Temporary parameter to store combined Curve values of locomotive and tender
+        private float MaxLocoSpeedMpH;      // Speed of loco when max performance reached
+        private float DisplayMaxLocoSpeedMpH;      // Display value of speed of loco when max performance reached
+        private float MaxPistonSpeedFtpM;   // Piston speed @ max performance for the locomotive
+        private float MaxIndicatedHorsePowerHP; // IHP @ max performance for the locomotive
+        private float DisplayMaxIndicatedHorsePowerHP; // Display value for HUD of IHP @ max performance for the geared locomotive
+        private float RetainedGearedMaxMaxIndicatedHorsePowerHP; // Retrains maximum IHP value for steam locomotives.
+        private float absSpeedMpS;
+        private float CombFrictionN;  // Temporary parameter to store combined friction values of locomotive and tender
+        private float CombGravityN;   // Temporary parameter to store combined Gravity values of locomotive and tender
+        private float CombTunnelN;    // Temporary parameter to store combined Tunnel values of locomotive and tender
+        private float CombCurveN;     // Temporary parameter to store combined Curve values of locomotive and tender
+        private float CombWindN;     // Temporary parameter to store combined Curve values of locomotive and tender
 
-        float cutoff;
-        float NumSafetyValves;  // Number of safety valves fitted to locomotive - typically 1 to 4
-        float SafetyValveSizeIn;    // Size of the safety value - all will be the same size.
-        float SafetyValveSizeDiaIn2; // Area of the safety valve - impacts steam discharge rate - is the space when the valve lifts
-        float MaxSafetyValveDischargeLbspS; // Steam discharge rate of all safety valves combined.
-        float SafetyValveUsage1LBpS; // Usage rate for safety valve #1
-        float SafetyValveUsage2LBpS; // Usage rate for safety valve #2
-        float SafetyValveUsage3LBpS; // Usage rate for safety valve #3
-        float SafetyValveUsage4LBpS; // Usage rate for safety valve #4
-        float MaxSteamGearPistonRateFtpM;   // Max piston rate for a geared locomotive, such as a Shay
-        float SteamGearRatio;   // Gear ratio for a geared locomotive, such as a Shay  
-        float SteamGearRatioLow;   // Gear ratio for a geared locomotive, such as a Shay
-        float SteamGearRatioHigh;   // Gear ratio for a two speed geared locomotive, such as a Climax
-        float LowMaxGearedSpeedMpS;  // Max speed of the geared locomotive - Low Gear
-        float HighMaxGearedSpeedMpS; // Max speed of the geared locomotive - High Gear
-        float MotiveForceGearRatio; // mulitplication factor to be used in calculating motive force etc, when a geared locomotive.
-        float SteamGearPosition = 0.0f; // Position of Gears if set
+        private float cutoff;
+        private float NumSafetyValves;  // Number of safety valves fitted to locomotive - typically 1 to 4
+        private float SafetyValveSizeIn;    // Size of the safety value - all will be the same size.
+        private float SafetyValveSizeDiaIn2; // Area of the safety valve - impacts steam discharge rate - is the space when the valve lifts
+        private float MaxSafetyValveDischargeLbspS; // Steam discharge rate of all safety valves combined.
+        private float SafetyValveUsage1LBpS; // Usage rate for safety valve #1
+        private float SafetyValveUsage2LBpS; // Usage rate for safety valve #2
+        private float SafetyValveUsage3LBpS; // Usage rate for safety valve #3
+        private float SafetyValveUsage4LBpS; // Usage rate for safety valve #4
+        private float MaxSteamGearPistonRateFtpM;   // Max piston rate for a geared locomotive, such as a Shay
+        private float SteamGearRatio;   // Gear ratio for a geared locomotive, such as a Shay  
+        private float SteamGearRatioLow;   // Gear ratio for a geared locomotive, such as a Shay
+        private float SteamGearRatioHigh;   // Gear ratio for a two speed geared locomotive, such as a Climax
+        private float LowMaxGearedSpeedMpS;  // Max speed of the geared locomotive - Low Gear
+        private float HighMaxGearedSpeedMpS; // Max speed of the geared locomotive - High Gear
+        private float MotiveForceGearRatio; // mulitplication factor to be used in calculating motive force etc, when a geared locomotive.
+        private float SteamGearPosition = 0.0f; // Position of Gears if set
 
         // Rotative Force and adhesion
 
-        float CalculatedFactorofAdhesion; // Calculated factor of adhesion
-        float StartTangentialCrankWheelForceLbf; 		// Tangential force on wheel - at start
-        float SpeedTotalTangCrankWheelForceLbf; 		// Tangential force on wheel - at speed
-        float StartStaticWheelFrictionForceLbf;  // Static force on wheel due to adhesion
-        float SpeedStaticWheelFrictionForceLbf;  // Static force on wheel  - at speed
-        float StartPistonForceLeftLbf;    // Max force exerted by piston.
-        float StartPistonForceMiddleLbf;
-        float StartPistonForceRightLbf;
-        float StartTangentialWheelTreadForceLbf; // Tangential force at the wheel tread.
-        float SpeedTangentialWheelTreadForceLbf;
-        float ReciprocatingWeightLb = 580.0f;  // Weight of reciprocating parts of the rod driving gears
-        float ConnectingRodWeightLb = 600.0f;  // Weignt of connecting rod
-        float ConnectingRodBalanceWeightLb = 300.0f; // Balance weight for connecting rods
-        float ExcessBalanceFactor = 400.0f;  // Factor to be included in excess balance formula
-        float CrankRadiusFt = 1.08f;        // Assume crank and rod lengths to give a 1:10 ratio - a reasonable av for steam locomotives?
-        float ConnectRodLengthFt = 10.8f;
-        float RodCoGFt = 3.0f;
-        float CrankLeftCylinderPressure;
-        float CrankMiddleCylinderPressure;
-        float CrankRightCylinderPressure;
-        float RadConvert = (float)Math.PI / 180.0f;  // Conversion of degs to radians
-        float StartCrankAngleLeft;
-        float StartCrankAngleRight;
-        float StartCrankAngleMiddle;
-        float StartTangentialCrankForceFactorLeft;
-        float StartTangentialCrankForceFactorMiddle = 0.0f;
-        float StartTangentialCrankForceFactorRight;
-        float SpeedTangentialCrankForceFactorLeft;
-        float SpeedTangentialCrankForceFactorMiddle;
-        float SpeedTangentialCrankForceFactorRight;
-        float SpeedPistonForceLeftLbf;
-        float SpeedPistonForceMiddleLbf;
-        float SpeedPistonForceRightLbf;
-        float SpeedTangentialCrankWheelForceLeftLbf;
-        float SpeedTangentialCrankWheelForceMiddleLbf;
-        float SpeedTangentialCrankWheelForceRightLbf;
-        float StartVerticalThrustFactorLeft;
-        float StartVerticalThrustFactorMiddle;
-        float StartVerticalThrustFactorRight;
-        float SpeedVerticalThrustFactorLeft;
-        float SpeedVerticalThrustFactorMiddle;
-        float SpeedVerticalThrustFactorRight;
-        float StartVerticalThrustForceMiddle;
-        float StartVerticalThrustForceLeft;
-        float StartVerticalThrustForceRight;
-        float SpeedVerticalThrustForceLeft;
-        float SpeedVerticalThrustForceMiddle;
-        float SpeedVerticalThrustForceRight;
-        float SpeedCrankAngleLeft;
-        float SpeedCrankAngleRight;
-        float SpeedCrankAngleMiddle;
-        float CrankCylinderPositionLeft;
-        float CrankCylinderPositionMiddle;
-        float CrankCylinderPositionRight;
-        float ExcessBalanceForceLeft;
-        float ExcessBalanceForceMiddle;
-        float ExcessBalanceForceRight;
-        float FrictionWheelSpeedMpS; // Tangential speed of wheel rim
-        float PrevFrictionWheelSpeedMpS; // Previous tangential speed of wheel rim
+        private float CalculatedFactorofAdhesion; // Calculated factor of adhesion
+        private float StartTangentialCrankWheelForceLbf;         // Tangential force on wheel - at start
+        private float SpeedTotalTangCrankWheelForceLbf;      // Tangential force on wheel - at speed
+        private float StartStaticWheelFrictionForceLbf;  // Static force on wheel due to adhesion
+        private float SpeedStaticWheelFrictionForceLbf;  // Static force on wheel  - at speed
+        private float StartPistonForceLeftLbf;    // Max force exerted by piston.
+        private float StartPistonForceMiddleLbf;
+        private float StartPistonForceRightLbf;
+        private float StartTangentialWheelTreadForceLbf; // Tangential force at the wheel tread.
+        private float SpeedTangentialWheelTreadForceLbf;
+        private float ReciprocatingWeightLb = 580.0f;  // Weight of reciprocating parts of the rod driving gears
+        private float ConnectingRodWeightLb = 600.0f;  // Weignt of connecting rod
+        private float ConnectingRodBalanceWeightLb = 300.0f; // Balance weight for connecting rods
+        private float ExcessBalanceFactor = 400.0f;  // Factor to be included in excess balance formula
+        private float CrankRadiusFt = 1.08f;        // Assume crank and rod lengths to give a 1:10 ratio - a reasonable av for steam locomotives?
+        private float ConnectRodLengthFt = 10.8f;
+        private float RodCoGFt = 3.0f;
+        private float CrankLeftCylinderPressure;
+        private float CrankMiddleCylinderPressure;
+        private float CrankRightCylinderPressure;
+        private float RadConvert = (float)Math.PI / 180.0f;  // Conversion of degs to radians
+        private float StartCrankAngleLeft;
+        private float StartCrankAngleRight;
+        private float StartCrankAngleMiddle;
+        private float StartTangentialCrankForceFactorLeft;
+        private float StartTangentialCrankForceFactorMiddle = 0.0f;
+        private float StartTangentialCrankForceFactorRight;
+        private float SpeedTangentialCrankForceFactorLeft;
+        private float SpeedTangentialCrankForceFactorMiddle;
+        private float SpeedTangentialCrankForceFactorRight;
+        private float SpeedPistonForceLeftLbf;
+        private float SpeedPistonForceMiddleLbf;
+        private float SpeedPistonForceRightLbf;
+        private float SpeedTangentialCrankWheelForceLeftLbf;
+        private float SpeedTangentialCrankWheelForceMiddleLbf;
+        private float SpeedTangentialCrankWheelForceRightLbf;
+        private float StartVerticalThrustFactorLeft;
+        private float StartVerticalThrustFactorMiddle;
+        private float StartVerticalThrustFactorRight;
+        private float SpeedVerticalThrustFactorLeft;
+        private float SpeedVerticalThrustFactorMiddle;
+        private float SpeedVerticalThrustFactorRight;
+        private float StartVerticalThrustForceMiddle;
+        private float StartVerticalThrustForceLeft;
+        private float StartVerticalThrustForceRight;
+        private float SpeedVerticalThrustForceLeft;
+        private float SpeedVerticalThrustForceMiddle;
+        private float SpeedVerticalThrustForceRight;
+        private float SpeedCrankAngleLeft;
+        private float SpeedCrankAngleRight;
+        private float SpeedCrankAngleMiddle;
+        private float CrankCylinderPositionLeft;
+        private float CrankCylinderPositionMiddle;
+        private float CrankCylinderPositionRight;
+        private float ExcessBalanceForceLeft;
+        private float ExcessBalanceForceMiddle;
+        private float ExcessBalanceForceRight;
+        private float FrictionWheelSpeedMpS; // Tangential speed of wheel rim
+        private float PrevFrictionWheelSpeedMpS; // Previous tangential speed of wheel rim
 
         #endregion
 
@@ -709,10 +712,10 @@ namespace Orts.Simulation.RollingStocks
         public float GeneratorSteamVelocityMpS;
         public float WhistleSteamVolumeM3pS;
         public float WhistleSteamVelocityMpS;
-        float CylinderCockTimerS = 0.0f;
-        float CylinderCockOpenTimeS = 0.0f;
-        bool CylinderCock1On = true;
-        bool CylinderCock2On = false;
+        private float CylinderCockTimerS = 0.0f;
+        private float CylinderCockOpenTimeS = 0.0f;
+        private bool CylinderCock1On = true;
+        private bool CylinderCock2On = false;
         public bool Cylinder2SteamEffects = false;
         public bool GeneratorSteamEffects = false;
         public float CompressorParticleDurationS = 3.0f;

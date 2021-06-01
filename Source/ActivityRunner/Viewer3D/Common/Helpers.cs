@@ -129,14 +129,13 @@ namespace Orts.ActivityRunner.Viewer3D.Common
             return (simulator.Season == SeasonType.Winter) || ((simulator.Season != SeasonType.Summer) && (simulator.WeatherType == WeatherType.Snow));
         }
 
-        static readonly Dictionary<string, SceneryMaterialOptions> TextureAddressingModeNames = new Dictionary<string, SceneryMaterialOptions> {
+        private static readonly Dictionary<string, SceneryMaterialOptions> TextureAddressingModeNames = new Dictionary<string, SceneryMaterialOptions> {
             { "Wrap", SceneryMaterialOptions.TextureAddressModeWrap },
             { "Mirror", SceneryMaterialOptions.TextureAddressModeMirror },
             { "Clamp", SceneryMaterialOptions.TextureAddressModeClamp },
             { "Border", SceneryMaterialOptions.TextureAddressModeBorder },
         };
-
-        static readonly Dictionary<string, SceneryMaterialOptions> ShaderNames = new Dictionary<string, SceneryMaterialOptions> {
+        private static readonly Dictionary<string, SceneryMaterialOptions> ShaderNames = new Dictionary<string, SceneryMaterialOptions> {
             { "Tex", SceneryMaterialOptions.None },
             { "TexDiff", SceneryMaterialOptions.Diffuse },
             { "BlendATex", SceneryMaterialOptions.AlphaBlendingBlend },
@@ -144,8 +143,7 @@ namespace Orts.ActivityRunner.Viewer3D.Common
             { "AddATex", SceneryMaterialOptions.AlphaBlendingAdd },
             { "AddATexDiff", SceneryMaterialOptions.AlphaBlendingAdd | SceneryMaterialOptions.Diffuse },
         };
-
-        static readonly Dictionary<string, SceneryMaterialOptions> LightingModelNames = new Dictionary<string, SceneryMaterialOptions> {
+        private static readonly Dictionary<string, SceneryMaterialOptions> LightingModelNames = new Dictionary<string, SceneryMaterialOptions> {
             { "DarkShade", SceneryMaterialOptions.ShaderDarkShade },
             { "OptHalfBright", SceneryMaterialOptions.ShaderHalfBright },
             { "Cruciform", SceneryMaterialOptions.ShaderVegetation },

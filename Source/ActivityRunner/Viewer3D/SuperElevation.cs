@@ -104,7 +104,7 @@ namespace Orts.ActivityRunner.Viewer3D
         }
 
         //remove sections from future consideration
-        static void RemoveTracks(Simulator simulator, List<TrackVectorSection> sectionsinShape)
+        private static void RemoveTracks(Simulator simulator, List<TrackVectorSection> sectionsinShape)
         {
             foreach (var tmpSec in sectionsinShape)
             {
@@ -186,7 +186,7 @@ namespace Orts.ActivityRunner.Viewer3D
             return 1;
         }
 
-        static float sv, ev, mv, dir;
+        private static float sv, ev, mv, dir;
         //a function to find the elevation of a section ,by searching the TDB database
         public static TrackVectorSection FindSectionValue(TrackShape shape, Simulator simulator, TrackSection section, int TileX, int TileZ, uint UID)
         {
@@ -449,7 +449,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class SuperElevationPrimitive : DynamicTrackPrimitive
     {
-        float StartElev, MaxElev, EndElv;
+        private float StartElev, MaxElev, EndElv;
         public SuperElevationPrimitive(Viewer viewer, in WorldPosition worldPosition, in WorldPosition endPosition, 
             float radius, float angle, float s, float e, float m, float dir)
             : base()
@@ -508,9 +508,9 @@ namespace Orts.ActivityRunner.Viewer3D
             else ObjectRadius = DTrackData.Radius * (float)Math.Sin(0.5 * Math.Abs(DTrackData.Length)); // half chord length
         }
 
-        int offSet = 0;
-        int whichCase = 0;
-        float elevated;
+        private int offSet = 0;
+        private int whichCase = 0;
+        private float elevated;
         /// <summary>
         /// Builds a SuperElevation LOD to SuperElevationProfile specifications as one vertex buffer and one index buffer.
         /// The order in which the buffers are built reflects the nesting in the TrProfile.  The nesting order is:
@@ -624,7 +624,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <summary>
         /// Initializes member variables for straight track sections.
         /// </summary>
-        void LinearGen()
+        private void LinearGen()
         {
             // Define the number of track cross sections in addition to the base.
             NumSections = 1;
@@ -638,7 +638,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <summary>
         /// Initializes member variables for circular arc track sections.
         /// </summary>
-        void CircArcGen()
+        private void CircArcGen()
         {
             // Define the number of track cross sections in addition to the base.
             NumSections = (int)(Math.Abs(MathHelper.ToDegrees(DTrackData.Length)) / TrProfile.ChordSpan);

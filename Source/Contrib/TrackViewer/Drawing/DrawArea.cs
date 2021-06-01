@@ -203,7 +203,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <param name="maxX">maximal real world X location</param>
         /// <param name="minZ">minimal real world Z location</param>
         /// <param name="maxZ">maximal real world Z location</param>
-        void SetDrawArea(double minX, double maxX, double minZ, double maxZ)
+        private void SetDrawArea(double minX, double maxX, double minZ, double maxZ)
         {
             double scaleX = AreaW / (maxX - minX);
             double scaleY = AreaH / (maxZ - minZ);

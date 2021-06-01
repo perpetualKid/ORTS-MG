@@ -87,7 +87,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Represents a drawable signal
     /// </summary>
-    class DrawableSignalItem : DrawableTrackItem
+    internal class DrawableSignalItem : DrawableTrackItem
     {
         /// <summary>direction (forward or backward the signal relative to the direction of the track</summary>
         private TrackDirection direction;
@@ -181,7 +181,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Represents a drawable level crossing
     /// </summary>
-    class DrawableLevelCrItem : DrawableTrackItem
+    internal class DrawableLevelCrItem : DrawableTrackItem
     {
         /// <summary>
         /// Default constructor
@@ -215,7 +215,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Represents a drawable level crossing on a road
     /// </summary>
-    class DrawableRoadLevelCrItem : DrawableTrackItem
+    internal class DrawableRoadLevelCrItem : DrawableTrackItem
     {
         /// <summary>
         /// Default constructor
@@ -249,7 +249,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Represents a drawable siding item
     /// </summary>
-    class DrawableSidingItem : DrawableTrackItem
+    internal class DrawableSidingItem : DrawableTrackItem
     {
         private string itemName;
 
@@ -293,7 +293,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Represents a drawable platform item
     /// </summary>
-    class DrawablePlatformItem : DrawableTrackItem
+    internal class DrawablePlatformItem : DrawableTrackItem
     {
         private string itemName;
         private string stationName;
@@ -349,7 +349,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Represents a drawable pickup item
     /// </summary>
-    class DrawablePickupItem : DrawableTrackItem
+    internal class DrawablePickupItem : DrawableTrackItem
     {
         /// <summary>
         /// Default constructor
@@ -385,7 +385,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Represents a drawable hazard item
     /// </summary>
-    class DrawableHazardItem : DrawableTrackItem
+    internal class DrawableHazardItem : DrawableTrackItem
     {
         /// <summary>
         /// Default constructor
@@ -421,7 +421,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Represents a drawable car spawner
     /// </summary>
-    class DrawableCarSpawnerItem : DrawableTrackItem
+    internal class DrawableCarSpawnerItem : DrawableTrackItem
     {
         /// <summary>
         /// Default constructor
@@ -457,7 +457,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Represents a drawable empty item (so not much to draw then)
     /// </summary>
-    class DrawableEmptyItem : DrawableTrackItem
+    internal class DrawableEmptyItem : DrawableTrackItem
     {
         /// <summary>
         /// Default constructor
@@ -487,7 +487,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Represents a drawable cross-over
     /// </summary>
-    class DrawableCrossoverItem : DrawableTrackItem
+    internal class DrawableCrossoverItem : DrawableTrackItem
     {
         /// <summary>
         /// Default constructor
@@ -521,7 +521,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Represents a drawable speedpost (or milepost)
     /// </summary>
-    class DrawableSpeedPostItem : DrawableTrackItem
+    internal class DrawableSpeedPostItem : DrawableTrackItem
     {
         private SpeedPostItem originalItem;
 
@@ -570,7 +570,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Represents a drawable sound region
     /// </summary>
-    class DrawableSoundRegionItem : DrawableTrackItem
+    internal class DrawableSoundRegionItem : DrawableTrackItem
     {
         /// <summary>
         /// Default constructor

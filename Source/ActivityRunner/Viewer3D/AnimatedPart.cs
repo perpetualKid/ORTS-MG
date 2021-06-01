@@ -32,13 +32,13 @@ namespace Orts.ActivityRunner.Viewer3D
     public class AnimatedPart
     {
         // Shape that we're animating.
-        readonly PoseableShape PoseableShape;
+        private readonly PoseableShape PoseableShape;
 
         // Number of animation key-frames that are used by this part. This is calculated from the matrices provided.
         public int FrameCount;
 
         // Current frame of the animation.
-        float AnimationKey;
+        private float AnimationKey;
 
         // List of the matrices we're animating for this part.
         public List<int> MatrixIndexes = new List<int>();
@@ -61,7 +61,7 @@ namespace Orts.ActivityRunner.Viewer3D
             UpdateFrameCount(matrix);
         }
 
-        void UpdateFrameCount(int matrix)
+        private void UpdateFrameCount(int matrix)
         {
             if (PoseableShape.SharedShape.Animations?.Count > 0
                 && PoseableShape.SharedShape.Animations[0].AnimationNodes.Count > matrix
@@ -88,7 +88,7 @@ namespace Orts.ActivityRunner.Viewer3D
             return MatrixIndexes.Count == 0;
         }
 
-        void SetFrame(double frame)
+        private void SetFrame(double frame)
         {
             AnimationKey = (float)frame;
             foreach (var matrix in MatrixIndexes)

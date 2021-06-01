@@ -22,19 +22,21 @@ using System.IO;
 using System.Linq;
 using Orts.Common.Logging;
 
+[assembly: CLSCompliant(true)]
+
 namespace Orts.ContentChecker
 {
-    class Program
+    internal class Program
     {
         /// <summary> Contains the list of originally requested files</summary>
-        static List<string> requestedFiles = new List<string>();
+        private static readonly List<string> requestedFiles = new List<string>();
+
         /// <summary> Contains the list of originally requested files, in order, as well as whether they have been loaded already </summary>
-        static Dictionary<string, bool> isLoaded = new Dictionary<string, bool>();
+        private static readonly Dictionary<string, bool> loaded = new Dictionary<string, bool>();
+        private static int FilesLoaded;
+        private static int FilesSkipped;
 
-        static int FilesLoaded;
-        static int FilesSkipped;
-
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             bool optionVerbose = OptionsContain(args, new string[] { "/v", "/verbose" });
             bool optionHelp = OptionsContain(args, new string[] { "/h", "/help" });
@@ -49,7 +51,7 @@ namespace Orts.ContentChecker
 
             AdditionType additionType = optionAll ? AdditionType.All : optionReferenced ? AdditionType.Referenced : optionDependent ? AdditionType.Dependent : AdditionType.None;
 
-            var files = args.Where(arg => !arg.StartsWith("/"));
+            IEnumerable<string> files = args.Where(arg => !arg.StartsWith("/", StringComparison.OrdinalIgnoreCase));
             if (files.Any())
             {
                 LoadFiles(files, optionVerbose, additionType);
@@ -68,15 +70,16 @@ namespace Orts.ContentChecker
         /// <param name="args">The command line arguments that need to be checked for an iption</param>
         /// <param name="optionNames">The list of option names that need to be found</param>
         /// <returns>true if one of the optionNames is given</returns>
-        static bool OptionsContain(string[] args, IEnumerable<string> optionNames) {
+        private static bool OptionsContain(string[] args, IEnumerable<string> optionNames) {
             return optionNames.Any((option) => args.Contains(option, StringComparer.OrdinalIgnoreCase) );
         }
 
         /// <summary>
         /// Just show an help message
         /// </summary>
-        static void ShowHelp()
+        private static void ShowHelp()
         {
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
             Console.WriteLine("Open Rails File Loader and Cross-check utility");
             Console.WriteLine();
             Console.WriteLine("{0} [<option> ...] FILE [...]", Path.GetFileNameWithoutExtension(AppDomain.CurrentDomain.FriendlyName));
@@ -112,10 +115,10 @@ namespace Orts.ContentChecker
         /// </summary>
         /// <param name="verbose"></param>
         /// <returns></returns>
-        static ORTraceListener SetUpTracing(bool verbose)
+        private static ORTraceListener SetUpTracing(bool verbose)
         {
             // Captures Trace.Trace* calls and others and formats.
-            var traceListener = new ORTraceListener(Console.Out)
+            ORTraceListener traceListener = new ORTraceListener(Console.Out)
             {
                 TraceOutputOptions = TraceOptions.Callstack
             };
@@ -134,20 +137,20 @@ namespace Orts.ContentChecker
         /// Determine the set of files that are requested from the command line. This includes dealing with the search pattern
         /// </summary>
         /// <param name="files">Unsorted list of input files that might still contain search patterns</param>
-        static void SetRequestedFiles(IEnumerable<string> files)
+        private static void SetRequestedFiles(IEnumerable<string> files)
         {
-            foreach (var file in files)
+            foreach (string file in files)
             {
                 if (file.Contains("*"))
                 {
-                    var path = Path.GetDirectoryName(file);
-                    if (path == string.Empty)
+                    string path = Path.GetDirectoryName(file);
+                    if (string.IsNullOrEmpty(path))
                     {
                         path = Directory.GetCurrentDirectory();
                     }
                     if (Directory.Exists(path))
                     {
-                        var searchPattern = Path.GetFileName(file);
+                        string searchPattern = Path.GetFileName(file);
                         SetRequestedFiles(Directory.GetFiles(path, searchPattern, SearchOption.AllDirectories));
                     }
                     else
@@ -161,7 +164,7 @@ namespace Orts.ContentChecker
                     {
                         string fileFull = Path.GetFullPath(file);
                         requestedFiles.Add(fileFull);
-                        isLoaded[fileFull] = false;
+                        loaded[fileFull] = false;
                     }
                     else
                     {
@@ -182,9 +185,9 @@ namespace Orts.ContentChecker
         /// <param name="files">Unsorted list of input files that might still contain search patterns</param>
         /// <param name="verbose">True if more verbose messages need to be shown</param>
         /// <param name="additionType"> The type of files that need to be added</param>
-        static void LoadFiles(IEnumerable<string> files, bool verbose, AdditionType additionType)
+        private static void LoadFiles(IEnumerable<string> files, bool verbose, AdditionType additionType)
         {
-            var traceListener = SetUpTracing(verbose);
+            ORTraceListener traceListener = SetUpTracing(verbose);
 
             SetRequestedFiles(files);
             if (additionType == AdditionType.None)
@@ -197,13 +200,14 @@ namespace Orts.ContentChecker
 
             ShowTracingReport(traceListener);
         }
+
         /// <summary>
         /// Load all the requested files one by one in the given order without caring about relations between files.
         /// Many files might not be loadable in this way.
         /// </summary>
-        static void LoadAllFlat()
+        private static void LoadAllFlat()
         {
-            foreach (var file in requestedFiles)
+            foreach (string file in requestedFiles)
             {
                 Loader currentLoader = LoaderFactory.GetLoader(file);
                 LoadSingleFile(file, currentLoader, 0);
@@ -214,13 +218,13 @@ namespace Orts.ContentChecker
         /// Load all the requested files one by one in the given order without caring about relations between files.
         /// Many files might not be loadable in this way.
         /// </summary>
-        static void LoadWithAdditional(AdditionType additionType)
+        private static void LoadWithAdditional(AdditionType additionType)
         {
             for (int pass = 0; pass < 2; pass++)
             {   // we do two passes, postponing loading of some files to a later stage
-                foreach (var file in requestedFiles)
+                foreach (string file in requestedFiles)
                 {
-                    if (isLoaded[file])
+                    if (loaded[file])
                     {
                         continue;
                     }
@@ -246,15 +250,15 @@ namespace Orts.ContentChecker
             if (!File.Exists(file))
             {
                 Console.WriteLine($"Error in loading dependent files: File does not exist: {file}");
-                isLoaded[file] = true;  // do not try to load it again
+                loaded[file] = true;  // do not try to load it again
                 return;
             }
 
-            var dependentFiles = new List<FileAndLoader>();
+            List<FileAndLoader> dependentFiles = new List<FileAndLoader>();
             LoadSingleFile(file, loader, indentLevel);
             loader.AddAdditionalFiles(additionType, (newfile, newLoader) => dependentFiles.Add(new FileAndLoader(newfile, newLoader)));
 
-            foreach (var fileAndLoader in dependentFiles)
+            foreach (FileAndLoader fileAndLoader in dependentFiles)
             {
                 LoadFileAndAdditions(fileAndLoader.File, fileAndLoader.Loader, additionType, indentLevel + 1);
             }
@@ -267,12 +271,12 @@ namespace Orts.ContentChecker
         /// <param name="file">The name of the file that needs to be loaded</param>
         /// <param name="loader">The loader to be used for the actually loading</param>
         /// <param name="indentLevel"> Indentation level indicating the depth of files added</param>
-        static void LoadSingleFile(string file, Loader loader, int indentLevel)
+        private static void LoadSingleFile(string file, Loader loader, int indentLevel)
         {
             if (indentLevel > 0)
             {
                 Console.Write('.');
-                Console.Write(new String(' ', indentLevel));
+                Console.Write(new string(' ', indentLevel));
             }
             Console.Write("{0}: ", file);
             try
@@ -283,7 +287,9 @@ namespace Orts.ContentChecker
                     Console.WriteLine("OK");
                 }
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception error)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
                 Trace.WriteLine(error);
             }
@@ -291,7 +297,7 @@ namespace Orts.ContentChecker
             //Even if the loading fails, we should update the amount of files that were loaded or at least attempted
             FilesLoaded += loader.FilesLoaded;
             FilesSkipped += loader.FilesSkipped;
-            isLoaded[file] = true;
+            loaded[file] = true;
 
             SetConsoleBufferSize();
         }
@@ -304,7 +310,7 @@ namespace Orts.ContentChecker
         /// Make sure that the console buffer (the amount of lines it remembers) is large enough.
         /// But at the same time make sure we do not increase it too often for performance reasons
         /// </summary>
-        static void SetConsoleBufferSize()
+        private static void SetConsoleBufferSize()
         {
             //The amount of lines we might expect to be written during the loading of one file
             //This is surprisingly large
@@ -323,7 +329,7 @@ namespace Orts.ContentChecker
         /// Print the final report of files loaded, skipped and the amount of errors, warnings, informations
         /// </summary>
         /// <param name="traceListener"></param>
-        static void ShowTracingReport(ORTraceListener traceListener)
+        private static void ShowTracingReport(ORTraceListener traceListener)
         {
             if (FilesLoaded <= 1)
             {
@@ -343,6 +349,7 @@ namespace Orts.ContentChecker
         }
 
         #endregion
+#pragma warning restore CA1303 // Do not pass literals as localized parameters
 
         private readonly struct FileAndLoader
         {

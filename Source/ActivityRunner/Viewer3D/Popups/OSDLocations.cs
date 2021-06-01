@@ -31,7 +31,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class OSDLocations : LayeredWindow
     {
-        Matrix Identity = Matrix.Identity;
+        private Matrix Identity = Matrix.Identity;
 
         internal const float MaximumDistancePlatform = 1000;
         internal const float MaximumDistanceSiding = 500;
@@ -44,16 +44,14 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             All = 0x3,
             Auto = 0x7,
         }
-        DisplayState State = DisplayState.Auto;
 
-        Dictionary<TrItemLabel, LabelPrimitive> Labels = new Dictionary<TrItemLabel, LabelPrimitive>();
-
-        int StationStopsCount;
-        ActivityTask ActivityCurrentTask;
-        Dictionary<string, bool> Platforms;
-        Dictionary<string, bool> Sidings;
-
-        int PlatformUpdate = 0;
+        private DisplayState State = DisplayState.Auto;
+        private Dictionary<TrItemLabel, LabelPrimitive> Labels = new Dictionary<TrItemLabel, LabelPrimitive>();
+        private int StationStopsCount;
+        private ActivityTask ActivityCurrentTask;
+        private Dictionary<string, bool> Platforms;
+        private Dictionary<string, bool> Sidings;
+        private int PlatformUpdate = 0;
 
         public OSDLocations(WindowManager owner)
             : base(owner, 0, 0, "OSD Locations")
@@ -62,7 +60,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             if (Platforms.Count + Sidings.Count == 0) State = DisplayState.All;
         }
 
-        void UpdateLabelLists()
+        private void UpdateLabelLists()
         {
             var tdb = Owner.Viewer.Simulator.TDB.TrackDB;
             var stationStops = Owner.Viewer.Simulator.PlayerLocomotive.Train.StationStops;

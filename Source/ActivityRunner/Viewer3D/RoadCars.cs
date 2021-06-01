@@ -36,13 +36,12 @@ namespace Orts.ActivityRunner.Viewer3D
     public class RoadCarSpawner
     {
         public const float StopDistance = 10;
-        const float RampLength = 2;
-        const float TrackHalfWidth = 1;
-        const float TrackMergeDistance = 7; // Must be >= 2 * (RampLength + TrackHalfWidth).
-        const float TrackRailHeight = 0.275f;
-        const float TrainRailHeightMaximum = 1;
-
-        readonly Viewer Viewer;
+        private const float RampLength = 2;
+        private const float TrackHalfWidth = 1;
+        private const float TrackMergeDistance = 7; // Must be >= 2 * (RampLength + TrackHalfWidth).
+        private const float TrackRailHeight = 0.275f;
+        private const float TrainRailHeightMaximum = 1;
+        private readonly Viewer Viewer;
         public readonly CarSpawnerObject CarSpawnerObj;
 
         // THREAD SAFETY:
@@ -54,8 +53,8 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public readonly Traveller Traveller;
         public readonly float Length;
-        float LastSpawnedTime;
-        float NextSpawnTime;
+        private float LastSpawnedTime;
+        private float NextSpawnTime;
 
         public RoadCarSpawner(Viewer viewer, in WorldPosition position, CarSpawnerObject carSpawnerObj)
         {
@@ -185,9 +184,9 @@ namespace Orts.ActivityRunner.Viewer3D
     public class RoadCar : IWorldPosition
     {
         public const float VisualHeightAdjustment = 0.1f;
-        const float AccelerationFactor = 5;
-        const float BrakingFactor = 5;
-        const float BrakingMinFactor = 1;
+        private const float AccelerationFactor = 5;
+        private const float BrakingFactor = 5;
+        private const float BrakingMinFactor = 1;
 
         public readonly RoadCarSpawner Spawner;
 
@@ -249,8 +248,8 @@ namespace Orts.ActivityRunner.Viewer3D
         public readonly Traveller FrontTraveller;
         public readonly Traveller RearTraveller;
         public float Speed;
-        float SpeedMax;
-        int NextCrossingIndex;
+        private float SpeedMax;
+        private int NextCrossingIndex;
         public int CarSpawnerListIdx;
 
         public RoadCar(Viewer viewer, RoadCarSpawner spawner, float averageSpeed, int carSpawnerListIdx)
@@ -336,12 +335,12 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class RoadCarViewer
     {
-        readonly Viewer Viewer;
+        private readonly Viewer Viewer;
 
         // THREAD SAFETY:
         //   All accesses must be done in local variables. No modifications to the objects are allowed except by
         //   assignment of a new instance (possibly cloned and then modified).
-        Dictionary<RoadCar, RoadCarPrimitive> Cars = new Dictionary<RoadCar, RoadCarPrimitive>();
+        private Dictionary<RoadCar, RoadCarPrimitive> Cars = new Dictionary<RoadCar, RoadCarPrimitive>();
         public List<RoadCar> VisibleCars = new List<RoadCar>();
 
         public RoadCarViewer(Viewer viewer)
@@ -387,7 +386,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 car.PrepareFrame(frame, elapsedTime);
         }
 
-        RoadCarPrimitive LoadCar(RoadCar car)
+        private RoadCarPrimitive LoadCar(RoadCar car)
         {
             return new RoadCarPrimitive(Viewer, car);
         }
@@ -402,8 +401,8 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class RoadCarPrimitive
     {
-        readonly RoadCar Car;
-        readonly RoadCarShape CarShape;
+        private readonly RoadCar Car;
+        private readonly RoadCarShape CarShape;
 
         public RoadCarPrimitive(Viewer viewer, RoadCar car)
         {

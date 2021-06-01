@@ -22,7 +22,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .ace files
     /// </summary>
-    class AceLoader : Loader
+    internal class AceLoader : Loader
     {
         /// <summary>
         /// Try to load the file.
@@ -31,8 +31,8 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            var graphicsDevice = GetGraphicsDevice();
-            var texture = AceFile.Texture2DFromFile(graphicsDevice, file);
+            Microsoft.Xna.Framework.Graphics.GraphicsDevice graphicsDevice = GetGraphicsDevice();
+            _ = AceFile.Texture2DFromFile(graphicsDevice, file);
         }
     }
 

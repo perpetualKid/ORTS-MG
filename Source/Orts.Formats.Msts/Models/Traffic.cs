@@ -136,10 +136,10 @@ namespace Orts.Formats.Msts.Models
         public int Time { get; private set; }
         public int UiD { get; private set; }
 
-        float efficiency;
-        int skipCount;
-        float distanceDownPath;
-        int platformStartID;
+        private float efficiency;
+        private int skipCount;
+        private float distanceDownPath;
+        private int platformStartID;
 
         public Services(STFReader stf)
         {

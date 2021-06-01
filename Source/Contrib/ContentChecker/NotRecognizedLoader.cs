@@ -16,19 +16,13 @@
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-
-using Orts.ActivityRunner.Viewer3D;
 
 namespace Orts.ContentChecker
 {
     /// <summary>
     /// Loader class for all files that are not recognized.
     /// </summary>
-    class NotRecognizedLoader : Loader
+    internal class NotRecognizedLoader : Loader
     {
         /// <summary>
         /// Constructor
@@ -47,7 +41,9 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
             Console.WriteLine("Not supported");
+#pragma warning restore CA1303 // Do not pass literals as localized parameters
         }
     }
 }

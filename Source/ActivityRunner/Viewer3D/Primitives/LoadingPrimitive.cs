@@ -11,7 +11,7 @@ namespace Orts.ActivityRunner.Viewer3D.Primitives
     internal class LoadingPrimitive : RenderPrimitive
     {
         public readonly LoadingMaterial Material;
-        readonly VertexBuffer VertexBuffer;
+        private readonly VertexBuffer VertexBuffer;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
         public LoadingPrimitive(Game game)
@@ -22,12 +22,12 @@ namespace Orts.ActivityRunner.Viewer3D.Primitives
             VertexBuffer.SetData(verticies);
         }
 
-        virtual protected LoadingMaterial GetMaterial(Game game)
+        protected virtual LoadingMaterial GetMaterial(Game game)
         {
             return new LoadingMaterial(game);
         }
 
-        virtual protected VertexPositionTexture[] GetVerticies(Game game)
+        protected virtual VertexPositionTexture[] GetVerticies(Game game)
         {
             var dd = (float)Material.TextureWidth / 2;
             return new[] {

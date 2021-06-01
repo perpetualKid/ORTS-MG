@@ -165,7 +165,7 @@ namespace Orts.ContentManager
             return base.Get(name, type);
         }
 
-        string GetRelatedPath(string type, string name, string extension)
+        private string GetRelatedPath(string type, string name, string extension)
         {
             return Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(PathName)), type, name + extension);
         }

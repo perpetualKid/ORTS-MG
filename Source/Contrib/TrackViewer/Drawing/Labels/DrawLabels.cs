@@ -32,7 +32,7 @@ namespace ORTS.TrackViewer.Drawing.Labels
     /// The list of labels can be saved or loaded to .json. This will not be done automatically.
     /// The labels can be modified either w.r.t. to their location (dragging) or w.r.t. their text.
     /// </summary>
-    class DrawLabels
+    internal class DrawLabels
     {
         #region private fields
         /// <summary>This is the list of labels that we need to draw and possibly modify </summary>

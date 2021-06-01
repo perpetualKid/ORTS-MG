@@ -157,7 +157,7 @@ namespace ORTS.TrackViewer.Editing
             }
         }
 
-        int GetIntOrZero(string inputText)
+        private int GetIntOrZero(string inputText)
         {
             int returnValue; 
             try
@@ -253,8 +253,8 @@ namespace ORTS.TrackViewer.Editing
             try
             {
                 int waitTime = GetWaitTime();
-                WaitTimeDecimal.Content = String.Format("{0:D5},", waitTime);
-                WaitTimeHexadecimal.Content = String.Format("{0:x4}.", waitTime);
+                WaitTimeDecimal.Content = $"{waitTime:D5},";
+                WaitTimeHexadecimal.Content = $"{waitTime:x4}.";
             }
             catch { }
         }

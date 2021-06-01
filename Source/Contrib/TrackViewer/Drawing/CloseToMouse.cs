@@ -332,7 +332,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <summary>
         /// Method to calculate, for each of the candidates, the real closest distance (squared) from mouse to track
         /// </summary>
-        void CalcRealDistances()
+        private void CalcRealDistances()
         {
             if (realDistancesAreCalculated) return;
             List<double> existingKeys = sortedTrackCandidates.Keys.ToList();
@@ -365,7 +365,7 @@ namespace ORTS.TrackViewer.Drawing
         /// The math here is not perfect (it is quite difficult to calculate the distances to a curved line 
         /// for all possibilities) but good enough. The math was designed (in Traveller.cs) to work well for close distances.
         /// Math is modified to prevent NaN and to combine straight and curved tracks.</remarks>
-        DistanceLon CalcRealDistanceSquared(TrackVectorSection trackVectorSection, TrackSection trackSection)
+        private DistanceLon CalcRealDistanceSquared(TrackVectorSection trackVectorSection, TrackSection trackSection)
         {
             //Calculate the vector from start of track to the mouse
             Vector3 vectorToMouse = new Vector3
@@ -423,7 +423,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Struct to store a candidate for the track closest to the mouse, so we can keep an ordered list.
     /// </summary>
-    struct TrackCandidate {
+    internal struct TrackCandidate {
         public TrackNode trackNode;
         public TrackVectorSection vectorSection;
         public int trackVectorSectionIndex;  // which section within a trackNode that is a vector node
@@ -441,7 +441,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Small struct storing distance to a track (squared) and length along the track (section).
     /// </summary>
-    struct DistanceLon
+    internal struct DistanceLon
     {
         public float distanceSquared;
         public float lengthAlongTrack;

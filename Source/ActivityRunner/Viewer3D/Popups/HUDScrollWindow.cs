@@ -24,14 +24,13 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class HUDScrollWindow : Window
     {
-
-        Label pageDown;
-        Label pageUp;
-        Label pageLeft;
-        Label pageRight;
-        Label nextLoco;
-        Label prevLoco;
-        Label screenMode;
+        private Label pageDown;
+        private Label pageUp;
+        private Label pageLeft;
+        private Label pageRight;
+        private Label nextLoco;
+        private Label prevLoco;
+        private Label screenMode;
 
         public HUDScrollWindow(WindowManager owner)
             : base(owner, Window.DecorationSize.X + owner.TextFontDefault.Height * 8, Window.DecorationSize.Y + owner.TextFontDefault.Height * 9 + ControlLayout.SeparatorSize * 2, Viewer.Catalog.GetString("HUD Scroll"))

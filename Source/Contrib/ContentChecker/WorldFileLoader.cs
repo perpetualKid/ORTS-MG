@@ -23,7 +23,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .w files
     /// </summary>
-    class WorldFileLoader : Loader
+    internal class WorldFileLoader : Loader
     {
         /// <summary>
         /// Try to load the file.
@@ -32,7 +32,7 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            var wf = new WorldFile(file); 
+            _ = new WorldFile(file);
         }
     }
 }

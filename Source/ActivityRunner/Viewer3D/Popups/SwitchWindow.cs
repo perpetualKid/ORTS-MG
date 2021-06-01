@@ -35,22 +35,20 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class SwitchWindow : Window
     {
-        const int SwitchImageSize = 32;
-
-        Image SwitchForwards;
-        Image SwitchBackwards;
-        Image TrainDirection;
-        Image ForwardEye;
-        Image BackwardEye;
-
-        static Texture2D SwitchStates;
+        private const int SwitchImageSize = 32;
+        private Image SwitchForwards;
+        private Image SwitchBackwards;
+        private Image TrainDirection;
+        private Image ForwardEye;
+        private Image BackwardEye;
+        private static Texture2D SwitchStates;
 
         public SwitchWindow(WindowManager owner)
             : base(owner, Window.DecorationSize.X + (int)2.5 * SwitchImageSize, Window.DecorationSize.Y + 2 * SwitchImageSize, Viewer.Catalog.GetString("Switch"))
         {
         }
 
-        protected internal override void Initialize()
+        internal protected override void Initialize()
         {
             base.Initialize();
             if (SwitchStates == null)
@@ -78,12 +76,12 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             return hbox;
         }
 
-        void SwitchForwards_Click(Control arg1, Point arg2)
+        private void SwitchForwards_Click(Control arg1, Point arg2)
         {
             new ToggleSwitchAheadCommand(Owner.Viewer.Log);
         }
 
-        void SwitchBackwards_Click(Control arg1, Point arg2)
+        private void SwitchBackwards_Click(Control arg1, Point arg2)
         {
             new ToggleSwitchBehindCommand(Owner.Viewer.Log);
         }
@@ -108,7 +106,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             }
         }
 
-        void UpdateSwitch(Image image, Train train, bool front)
+        private void UpdateSwitch(Image image, Train train, bool front)
         {
             image.Source = new Rectangle(0, 0, SwitchImageSize, SwitchImageSize);
 
@@ -147,7 +145,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 image.Source.Y += 2 * SwitchImageSize;
         }
 
-        static void UpdateDirection(Image image, Train train)
+        private static void UpdateDirection(Image image, Train train)
         {
             image.Source = new Rectangle(0, 0, SwitchImageSize, SwitchImageSize);
             image.Source.Y = 4 * SwitchImageSize;
@@ -155,7 +153,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 (train.MUDirection == MidpointDirection.Reverse ? 1 * SwitchImageSize : 0);
         }
 
-        static void UpdateEye(Image image, Train train, bool front)
+        private static void UpdateEye(Image image, Train train, bool front)
         {
             image.Source = new Rectangle(0, 0, SwitchImageSize, SwitchImageSize / 2);
             image.Source.Y = (int)(4.25 * SwitchImageSize);

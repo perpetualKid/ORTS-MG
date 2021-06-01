@@ -166,12 +166,12 @@ namespace Orts.Simulation.RollingStocks
         public const float GravitationalAccelerationFtpSpS = 32.26f;
         public float TenderWaterLevelFraction;
         public float WaterScoopTotalWaterL;
-        bool WaterScoopOverTroughFlag = false;
-        bool WaterScoopNotFittedFlag = false;
-        bool WaterScoopSlowSpeedFlag = false;
-        bool WaterScoopDirectionFlag = false;
+        private bool WaterScoopOverTroughFlag = false;
+        private bool WaterScoopNotFittedFlag = false;
+        private bool WaterScoopSlowSpeedFlag = false;
+        private bool WaterScoopDirectionFlag = false;
         public bool IsWaterScoopPlayerLocomotive = false;
-        bool WaterScoopSoundOn = false;
+        private bool WaterScoopSoundOn = false;
         public float MaxTotalCombinedWaterVolumeUKG;
         public MSTSNotchController WaterController = new MSTSNotchController(0, 1, 0.01f);
         public float CombinedTenderWaterVolumeUKG          // Decreased by running injectors and increased by refilling
@@ -217,7 +217,7 @@ namespace Orts.Simulation.RollingStocks
 #endif
 
         // Adhesion parameters
-        float BaseFrictionCoefficientFactor;  // Factor used to adjust Curtius formula depending upon weather conditions
+        private float BaseFrictionCoefficientFactor;  // Factor used to adjust Curtius formula depending upon weather conditions
         public float SteamStaticWheelForce;
         public float SteamTangentialWheelForce;
         public float SteamDrvWheelWeightLbs;  // Weight on each drive axle
@@ -231,7 +231,7 @@ namespace Orts.Simulation.RollingStocks
         public float TrackSanderSandConsumptionM3pS = (float)Size.Volume.FromFt3(11.6f) / 3600.0f; // Default value 11.6 ft3/h
 
         // Vacuum Braking parameters
-        readonly static double OneAtmospherePSI = Pressure.Atmospheric.ToPSI(1);
+        private static readonly double OneAtmospherePSI = Pressure.Atmospheric.ToPSI(1);
         public bool SmallSteamEjectorIsOn = false;
         public bool LargeSteamEjectorIsOn = false;
         public bool VacuumPumpOperating = false;
@@ -363,7 +363,7 @@ namespace Orts.Simulation.RollingStocks
         protected bool DynamicBrakeBlended; // dynamic brake blending is currently active
         protected bool DynamicBrakeBlendingEnabled; // dynamic brake blending is configured
         protected bool DynamicBrakeAvailable; // dynamic brake is available
-        AirSinglePipe airPipeSystem;
+        private AirSinglePipe airPipeSystem;
         public double DynamicBrakeCommandStartTime;
         protected bool DynamicBrakeBlendingOverride; // true when DB lever >0% should always override the blending. When false, the bigger command is applied.
         protected bool DynamicBrakeBlendingForceMatch = true; // if true, dynamic brake blending tries to achieve the same braking force as the airbrake would have.
@@ -708,9 +708,9 @@ namespace Orts.Simulation.RollingStocks
             if (boundingLimitsFound)
             {
                 if (cabViewType == CabViewType.Front)
-                    noseAhead = (viewPointList[0].Location.Z + 0.5f < shapeFile.Shape.EsdBoundingBox.Max.Z) ? true : false;
+                    noseAhead = (viewPointList[0].Location.Z + 0.5f < shapeFile.Shape.EsdBoundingBox.Max.Z);
                 else if (cabViewType == CabViewType.Rear)
-                    noseAhead = (viewPointList[0].Location.Z - 0.5f > shapeFile.Shape.EsdBoundingBox.Min.Z) ? true : false;
+                    noseAhead = (viewPointList[0].Location.Z - 0.5f > shapeFile.Shape.EsdBoundingBox.Min.Z);
             }
             if (!(this is MSTSSteamLocomotive))
             {
@@ -3588,16 +3588,16 @@ namespace Orts.Simulation.RollingStocks
                     if (SteamEngineBrakeFitted)
                     {
                         const float percentageConversion = 100;
-                        return string.Format("{0} {1}%", EngineBrakeController.GetStatus(), percentageConversion * EngineBrakeController.CurrentValue);  // Display for steam brake
+                        return $"{EngineBrakeController.GetStatus()} {percentageConversion * EngineBrakeController.CurrentValue}%";  // Display for steam brake
                     }
                     else
                     {
-                        return string.Format("{0} BC {1}", EngineBrakeController.GetStatus(), FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(Train.HUDLocomotiveBrakeCylinderPSI), Pressure.Unit.InHg, Pressure.Unit.InHg, true));
+                        return $"{EngineBrakeController.GetStatus()} BC {FormatStrings.FormatPressure(Pressure.Vacuum.FromPressure(Train.HUDLocomotiveBrakeCylinderPSI), Pressure.Unit.InHg, Pressure.Unit.InHg, true)}";
                     }
                 }
                 else
                 {
-                    return string.Format("{0} BC {1} {2}", EngineBrakeController.GetStatus(), FormatStrings.FormatPressure(Train.HUDLocomotiveBrakeCylinderPSI, Pressure.Unit.PSI, MainPressureUnit, true), BailOff ? " BailOff" : "");
+                    return $"{EngineBrakeController.GetStatus()} BC {FormatStrings.FormatPressure(Train.HUDLocomotiveBrakeCylinderPSI, Pressure.Unit.PSI, MainPressureUnit, true)} {(BailOff ? " BailOff" : "")}";
                 }
 
                 // Fraction not found so display BC                
@@ -3606,11 +3606,11 @@ namespace Orts.Simulation.RollingStocks
             {
                 if ((BrakeSystem is VacuumSinglePipe))
                 {
-                    return string.Format("{0}", EngineBrakeController.GetStatus());  // Fraction found so don't display BC
+                    return $"{EngineBrakeController.GetStatus()}";  // Fraction found so don't display BC
                 }
                 else
                 {
-                    return string.Format("{0}{1}", EngineBrakeController.GetStatus(), BailOff ? " BailOff" : "");  // Fraction found so don't display BC
+                    return $"{EngineBrakeController.GetStatus()}{(BailOff ? " BailOff" : "")}";  // Fraction found so don't display BC
                 }
             }
         }
@@ -3720,7 +3720,7 @@ namespace Orts.Simulation.RollingStocks
         {
             if (BrakemanBrakeController == null)
                 return null;
-            return string.Format("{0}", BrakemanBrakeController.GetStatus());
+            return $"{BrakemanBrakeController.GetStatus()}";
         }
 
         #endregion
@@ -3891,8 +3891,8 @@ namespace Orts.Simulation.RollingStocks
             if (DynamicBrakePercent < 0)
                 return string.Empty;
             if (TrainControlSystem.FullDynamicBrakingOrder)
-                return string.Format("{0:F0}%", DynamicBrakePercent);
-            return string.Format("{0}", DynamicBrakeController.GetStatus());
+                return $"{DynamicBrakePercent:F0}%";
+            return $"{DynamicBrakeController.GetStatus()}";
         }
         #endregion
 

@@ -31,7 +31,7 @@ using Orts.Common.Xna;
 
 namespace Orts.ActivityRunner.Viewer3D
 {
-    static class SkyConstants
+    internal static class SkyConstants
     {
         // Sky dome constants
         public const int skyRadius = 6000;
@@ -42,14 +42,13 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class SkyViewer
     {
-        Viewer Viewer;
-        Material Material;
+        private Viewer Viewer;
+        private Material Material;
         private bool initialized;
         // Classes reqiring instantiation
         public SkyPrimitive Primitive;
-        SunMoonPos skyVectors;
-
-        int seasonType; //still need to remember it as MP now can change it.
+        private SunMoonPos skyVectors;
+        private int seasonType; //still need to remember it as MP now can change it.
         // Latitude of current route in radians. -pi/2 = south pole, 0 = equator, pi/2 = north pole.
         // Longitude of current route in radians. -pi = west of prime, 0 = prime, pi = east of prime.
         private double latitude, longitude;
@@ -69,7 +68,7 @@ namespace Orts.ActivityRunner.Viewer3D
         // Must be an integral divisor of 1440 (which is the number of minutes in a day).
         private int maxSteps = 72;
         private double oldClockTime;
-        int step1, step2;
+        private int step1, step2;
         // Phase of the moon
         public int moonPhase;
         // Wind speed and direction
@@ -77,8 +76,8 @@ namespace Orts.ActivityRunner.Viewer3D
         public float windDirection;
 
         // These arrays and vectors define the position of the sun and moon in the world
-        Vector3[] solarPosArray = new Vector3[72];
-        Vector3[] lunarPosArray = new Vector3[72];
+        private Vector3[] solarPosArray = new Vector3[72];
+        private Vector3[] lunarPosArray = new Vector3[72];
         public Vector3 solarDirection;
         public Vector3 lunarDirection;
 
@@ -221,8 +220,7 @@ namespace Orts.ActivityRunner.Viewer3D
         private VertexBuffer SkyVertexBuffer;
         private static IndexBuffer SkyIndexBuffer;
         public int drawIndex;
-
-        VertexPositionNormalTexture[] vertexList;
+        private VertexPositionNormalTexture[] vertexList;
         private static short[] triangleListIndices; // Trilist buffer.
 
         // Sky dome geometry is based on two global variables: the radius and the number of sides
@@ -329,7 +327,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// </summary>
         /// <param name="index">The starting triangle index number</param>
         /// <param name="pass">A multiplier used to arrive at the starting vertex number</param>
-        static void DomeTriangleList(short index, short pass)
+        private static void DomeTriangleList(short index, short pass)
         {
             // ----------------------------------------------------------------------
             // 24-sided sky dome mesh is built like this:        48 49 50
@@ -570,12 +568,12 @@ namespace Orts.ActivityRunner.Viewer3D
             return false;
         }
 
-        const float nightStart = 0.15f; // The sun's Y value where it begins to get dark
-        const float nightFinish = -0.05f; // The Y value where darkest fog color is reached and held steady
+        private const float nightStart = 0.15f; // The sun's Y value where it begins to get dark
+        private const float nightFinish = -0.05f; // The Y value where darkest fog color is reached and held steady
 
         // These should be user defined in the Environment files (future)
-        static Vector3 startColor = new Vector3(0.647f, 0.651f, 0.655f); // Original daytime fog color - must be preserved!
-        static Vector3 finishColor = new Vector3(0.05f, 0.05f, 0.05f); //Darkest nighttime fog color
+        private static Vector3 startColor = new Vector3(0.647f, 0.651f, 0.655f); // Original daytime fog color - must be preserved!
+        private static Vector3 finishColor = new Vector3(0.05f, 0.05f, 0.05f); //Darkest nighttime fog color
 
         /// <summary>
         /// This function darkens the fog color as night begins to fall
@@ -583,7 +581,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// </summary>
         /// <param name="sunHeight">The Y value of the sunlight vector</param>
         /// <param name="overcast">The amount of overcast</param>
-        static void FogDay2Night(float sunHeight, float overcast)
+        private static void FogDay2Night(float sunHeight, float overcast)
         {
             Vector3 floatColor;
 

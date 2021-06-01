@@ -45,8 +45,8 @@ namespace Orts.ActivityRunner.Viewer3D
 #if DEBUG_SIGNAL_SHAPES
         readonly uint UID;
 #endif
-        readonly bool[] SubObjVisible;
-        readonly List<SignalShapeHead> Heads = new List<SignalShapeHead>();
+        private readonly bool[] SubObjVisible;
+        private readonly List<SignalShapeHead> Heads = new List<SignalShapeHead>();
 
         public SignalShape(SignalObject mstsSignal, string path, IWorldPosition positionSource, ShapeFlags flags)
             : base(path, positionSource, flags)
@@ -178,25 +178,24 @@ namespace Orts.ActivityRunner.Viewer3D
             base.Mark();
         }
 
-        class SignalShapeHead
+        private class SignalShapeHead
         {
-            static readonly Dictionary<string, SignalTypeData> SignalTypes = new Dictionary<string, SignalTypeData>();
-
-            readonly Viewer Viewer;
-            readonly SignalShape SignalShape;
+            private static readonly Dictionary<string, SignalTypeData> SignalTypes = new Dictionary<string, SignalTypeData>();
+            private readonly Viewer Viewer;
+            private readonly SignalShape SignalShape;
 #if DEBUG_SIGNAL_SHAPES
             readonly int Index;
 #endif
-            readonly SignalHead SignalHead;
-            readonly List<int> MatrixIndices = new List<int>();
-            readonly SignalTypeData SignalTypeData;
-            readonly SoundSource Sound;
-            float CumulativeTime;
-            float SemaphorePos;
-            float SemaphoreTarget;
-            float SemaphoreSpeed;
-            List<AnimatedPart> SemaphoreParts = new List<AnimatedPart>();
-            int DisplayState = -1;
+            private readonly SignalHead SignalHead;
+            private readonly List<int> MatrixIndices = new List<int>();
+            private readonly SignalTypeData SignalTypeData;
+            private readonly SoundSource Sound;
+            private float CumulativeTime;
+            private float SemaphorePos;
+            private float SemaphoreTarget;
+            private float SemaphoreSpeed;
+            private List<AnimatedPart> SemaphoreParts = new List<AnimatedPart>();
+            private int DisplayState = -1;
 
             private readonly SignalLightState[] lightStates;
 
@@ -416,7 +415,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        class SignalTypeData
+        private class SignalTypeData
         {
             public readonly Material Material;
             public readonly Material GlowMaterial;
@@ -504,7 +503,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        enum SignalTypeDataType
+        private enum SignalTypeDataType
         {
             Normal,
             Distance,
@@ -513,7 +512,7 @@ namespace Orts.ActivityRunner.Viewer3D
             Info,
         }
 
-        class SignalAspectData
+        private class SignalAspectData
         {
             public readonly bool[] DrawLights;
             public readonly bool[] FlashLights;
@@ -584,7 +583,7 @@ namespace Orts.ActivityRunner.Viewer3D
         internal readonly Vector3 Position;
         internal readonly float GlowIntensityDay;
         internal readonly float GlowIntensityNight;
-        readonly VertexBuffer VertexBuffer;
+        private readonly VertexBuffer VertexBuffer;
 
         public SignalLightPrimitive(Viewer viewer, in Vector3 position, float radius, Color color, float glowDay, float glowNight, in Matrix2x2 textureCoordinates)
         {

@@ -19,8 +19,8 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
     {
         protected double animationKey;  // advances with time
         protected Turntable Turntable; // linked turntable data
-        readonly SoundSource Sound;
-        bool Rotating = false;
+        private readonly SoundSource Sound;
+        private bool Rotating = false;
         protected int IAnimationMatrix = -1; // index of animation matrix
 
         /// <summary>
@@ -119,8 +119,8 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
     {
         protected double animationKey;  // advances with time
         protected Transfertable Transfertable; // linked turntable data
-        readonly SoundSource Sound;
-        bool Translating = false;
+        private readonly SoundSource Sound;
+        private bool Translating = false;
         protected int IAnimationMatrix = -1; // index of animation matrix
 
         /// <summary>

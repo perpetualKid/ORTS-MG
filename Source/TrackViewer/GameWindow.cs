@@ -122,12 +122,6 @@ namespace Orts.TrackViewer
 #if DEBUG
             windowTitle += " (debug)";
 #endif
-#if NETCOREAPP
-            windowTitle += " [.NET Core]";
-#elif NETFRAMEWORK
-            windowTitle += " [.NET Classic]";
-#endif
-
             Window.Title = windowTitle;
             Window.AllowUserResizing = true;
 
@@ -436,8 +430,7 @@ namespace Orts.TrackViewer
         }
 
         private System.Drawing.Font drawfont = new System.Drawing.Font("Segoe UI", (int)Math.Round(25.0), System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Pixel);
-
-        int drawTime;
+        private int drawTime;
 
         public bool InputCaptured { get; internal set; }
 

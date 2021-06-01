@@ -225,7 +225,7 @@ namespace Orts.Formats.Msts.Parsers
                 if (!IsEof(PeekPastWhitespace()))
                     STFException.TraceWarning(this, "Expected end of file");
                 else if (block_depth != 0)
-                    STFException.TraceWarning(this, string.Format("Expected depth 0; got depth {0} at end of file (missing ')'?)", block_depth));
+                    STFException.TraceWarning(this, $"Expected depth 0; got depth {block_depth} at end of file (missing ')'?)");
                 streamSTF.Close(); streamSTF = null;
                 if (includeReader != null)
                     includeReader.Dispose();
@@ -1886,7 +1886,7 @@ namespace Orts.Formats.Msts.Parsers
                         }
                         string includeFileName = Path.Combine(Path.GetDirectoryName(FileName), fileName);
                         if (!File.Exists(includeFileName))
-                            STFException.TraceWarning(this, string.Format("'{0}' not found", includeFileName));
+                            STFException.TraceWarning(this, $"'{includeFileName}' not found");
                         includeReader = new STFReader(includeFileName, false);
                         return ReadItem(skip_mode, string_mode); // Which will recurse down when includeReader is tested
                     #endregion
@@ -1975,7 +1975,7 @@ namespace Orts.Formats.Msts.Parsers
         }
 
         public STFException(STFReader stf, string message)
-            : base(String.Format("{2} in {0}:line {1}\n", stf.FileName, stf.LineNumber, message))
+            : base($"{message} in {stf.FileName}:line {stf.LineNumber}\n")
         {
         }
     }

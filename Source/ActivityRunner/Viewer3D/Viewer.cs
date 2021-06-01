@@ -83,7 +83,8 @@ namespace Orts.ActivityRunner.Viewer3D
         /// Monotonically increasing time value (in seconds) for the game/viewer. Starts at 0 and only ever increases, at real-time.
         /// </summary>
         public double RealTime { get; private set; }
-        InfoDisplay InfoDisplay;
+
+        private InfoDisplay InfoDisplay;
         public WindowManager WindowManager { get; private set; }
         public MessagesWindow MessagesWindow { get; private set; } // Game message window (special, always visible)
         public NoticeWindow NoticeWindow { get; private set; } // Game notices window (special)
@@ -132,7 +133,7 @@ namespace Orts.ActivityRunner.Viewer3D
         public FreeRoamCamera FreeRoamCamera { get { return FreeRoamCameraList[0]; } } // Camera 8
         public CabCamera3D ThreeDimCabCamera; //Camera 0
 
-        List<Camera> WellKnownCameras; // Providing Camera save functionality by GeorgeS
+        private List<Camera> WellKnownCameras; // Providing Camera save functionality by GeorgeS
 
         private TrainCarViewer playerLocomotiveViewer;
 
@@ -146,7 +147,8 @@ namespace Orts.ActivityRunner.Viewer3D
                 playerLocomotiveViewer?.RegisterUserCommandHandling();
             }
         }  // we are controlling this loco, or null if we aren't controlling any
-        MouseState originalMouseState;      // Current mouse coordinates.
+
+        private MouseState originalMouseState;      // Current mouse coordinates.
 
         // This is the train we are controlling
         public TrainCar PlayerLocomotive { get { return Simulator.PlayerLocomotive; } set { Simulator.PlayerLocomotive = value; } }
@@ -156,7 +158,8 @@ namespace Orts.ActivityRunner.Viewer3D
 
         // This is the train we are viewing
         public Train SelectedTrain { get; private set; }
-        void CameraActivate()
+
+        private void CameraActivate()
         {
             if (Camera == null || !Camera.IsAvailable) //passenger camera may jump to a train without passenger view
                 FrontCamera.Activate();
@@ -168,7 +171,9 @@ namespace Orts.ActivityRunner.Viewer3D
         private double mouseVisibleTillRealTime;
         private Cursor actualCursor = Cursors.Default;
         public static Viewport DefaultViewport;
-
+        private ICabViewMouseControlRenderer MouseChangingControl;
+        private ICabViewMouseControlRenderer MousePickedControl;
+        private ICabViewMouseControlRenderer OldMousePickedControl;
         public bool SaveScreenshot { get; set; }
         public bool SaveActivityThumbnail { get; private set; }
         public string SaveActivityFileStem { get; private set; }
@@ -178,14 +183,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public TRPFile TRP; // Track profile file
 
-        enum VisibilityState
+        private enum VisibilityState
         {
             Visible,
             Hidden,
             ScreenshotPending,
         };
 
-        VisibilityState Visibility = VisibilityState.Visible;
+        private VisibilityState Visibility = VisibilityState.Visible;
 
         // MSTS cab views are images with aspect ratio 4:3.
         // OR can use cab views with other aspect ratios where these are available.
@@ -233,7 +238,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <summary>
         /// Finds time of last entry to set ReplayEndsAt and provide the Replay started message.
         /// </summary>
-        void InitReplay()
+        private void InitReplay()
         {
             if (Simulator.ReplayCommandList != null)
             {
@@ -244,10 +249,7 @@ namespace Orts.ActivityRunner.Viewer3D
                     double lastTime = Simulator.ReplayCommandList[lastEntry].Time;
                     Log.ReplayEndsAt = lastTime;
                     double duration = lastTime - Simulator.ClockTime;
-                    MessagesWindow.AddMessage(String.Format("Replay started: ending at {0} after {1}",
-                        FormatStrings.FormatApproximateTime(lastTime),
-                        FormatStrings.FormatTime(duration)),
-                        3.0);
+                    MessagesWindow.AddMessage($"Replay started: ending at {FormatStrings.FormatApproximateTime(lastTime)} after {FormatStrings.FormatTime(duration)}", 3.0);
                 }
             }
         }
@@ -1062,7 +1064,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        void RotateFreeRoamCameraList()
+        private void RotateFreeRoamCameraList()
         {
             // Rotate list moving 1 to 0 etc. (by adding 0 to end, then removing 0)
             FreeRoamCameraList.Add(FreeRoamCamera);
@@ -1294,7 +1296,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        void HandleUserInput(in ElapsedTime elapsedTime)
+        private void HandleUserInput(in ElapsedTime elapsedTime)
         {
             var train = Program.Viewer.PlayerLocomotive.Train;//DebriefEval
 
@@ -1346,7 +1348,7 @@ namespace Orts.ActivityRunner.Viewer3D
             RenderProcess.IsMouseVisible = forceMouseVisible || RealTime < mouseVisibleTillRealTime;
         }
 
-        static bool IsReverserInNeutral(TrainCar car)
+        private static bool IsReverserInNeutral(TrainCar car)
         {
             // Diesel and electric locos have a Reverser lever and,
             // in the neutral position, direction == N
@@ -1405,7 +1407,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <summary>
         /// Called when switching player train
         /// </summary>
-        void PlayerLocomotiveChanged(object sender, EventArgs e)
+        private void PlayerLocomotiveChanged(object sender, EventArgs e)
         {
             PlayerLocomotiveViewer = World.Trains.GetViewer(Simulator.PlayerLocomotive);
             CabCamera.Activate(); // If you need anything else here the cameras should check for it.
@@ -1416,7 +1418,7 @@ namespace Orts.ActivityRunner.Viewer3D
         }
 
         // change reference to player train when switching train in Timetable mode
-        void PlayerTrainChanged(object sender, Simulator.PlayerTrainChangedEventArgs e)
+        private void PlayerTrainChanged(object sender, Simulator.PlayerTrainChangedEventArgs e)
         {
             if (SelectedTrain == e.OldTrain)
             {
@@ -1425,13 +1427,13 @@ namespace Orts.ActivityRunner.Viewer3D
         }
 
         // display window for Timetable Player train detach actions
-        void RequestTTDetachWindow(object sender, EventArgs e)
+        private void RequestTTDetachWindow(object sender, EventArgs e)
         {
             TTDetachWindow.Visible = true;
         }
 
         // Finds the Turntable or Transfertable nearest to the viewing point
-        MovingTable FindActiveMovingTable()
+        private MovingTable FindActiveMovingTable()
         {
             MovingTable activeMovingTable = null;
             float minDistanceSquared = 1000000f;

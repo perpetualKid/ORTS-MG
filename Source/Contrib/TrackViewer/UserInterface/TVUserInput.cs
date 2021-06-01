@@ -43,11 +43,12 @@ namespace ORTS.TrackViewer.UserInterface
     {
         /// <summary>Boolean describing whether the keyboard and/or mouse state has been changed</summary>
         public static bool Changed;  // flag UpdaterProcess that its time to handle keyboard input
-        //public static bool ComposingMessage;
-        static KeyboardState KeyboardState;
-        static MouseState MouseState;
-        static KeyboardState LastKeyboardState;
-        static MouseState LastMouseState;
+                                     //public static bool ComposingMessage;
+
+        private static KeyboardState KeyboardState;
+        private static MouseState MouseState;
+        private static KeyboardState LastKeyboardState;
+        private static MouseState LastMouseState;
 
         /// <summary>Return the current x-location of the mouse pointer</summary>
         public static int MouseLocationX { get { return MouseState.X; } }
@@ -55,7 +56,7 @@ namespace ORTS.TrackViewer.UserInterface
         public static int MouseLocationY { get { return MouseState.Y; } }
 
         [DllImport("user32.dll")]
-        static extern short GetAsyncKeyState(Keys key);
+        private static extern short GetAsyncKeyState(Keys key);
 
         /// <summary>
         /// Call this to update the mouse and keyboard states.
@@ -117,7 +118,7 @@ namespace ORTS.TrackViewer.UserInterface
 #endif
         }
 
-        static Keys[] GetKeysWithPrintScreenFix(KeyboardState keyboardState)
+        private static Keys[] GetKeysWithPrintScreenFix(KeyboardState keyboardState)
         {
             // When running in fullscreen, Win32's GetKeyboardState (the API behind Keyboard.GetState()) never returns
             // the print screen key as being down. Something is eating it or something. So here we simply query that

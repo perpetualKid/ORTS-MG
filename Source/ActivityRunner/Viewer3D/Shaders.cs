@@ -33,48 +33,48 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class SceneryShader : BaseShader
     {
-        readonly EffectParameter world;
-        readonly EffectParameter worldViewProjection;
-        readonly EffectParameter[] lightViewProjectionShadowProjection;
-        readonly EffectParameter[] shadowMapTextures;
-        readonly EffectParameter shadowMapLimit;
-        readonly EffectParameter zBias_Lighting;
-        readonly EffectParameter fog;
-        readonly EffectParameter lightVector_ZFar;
-        readonly EffectParameter headlightPosition;
-        readonly EffectParameter headlightDirection;
-        readonly EffectParameter headlightRcpDistance;
-        readonly EffectParameter headlightColor;
-        readonly EffectParameter overcast;
-        readonly EffectParameter viewerPos;
-        readonly EffectParameter imageTextureIsNight;
-        readonly EffectParameter nightColorModifier;
-        readonly EffectParameter halfNightColorModifier;
-        readonly EffectParameter vegetationAmbientModifier;
-        readonly EffectParameter signalLightIntensity;
-        readonly EffectParameter eyeVector;
-        readonly EffectParameter sideVector;
-        readonly EffectParameter imageTexture;
-        readonly EffectParameter overlayTexture;
-        readonly EffectParameter referenceAlpha;
-        readonly EffectParameter overlayScale;
+        private readonly EffectParameter world;
+        private readonly EffectParameter worldViewProjection;
+        private readonly EffectParameter[] lightViewProjectionShadowProjection;
+        private readonly EffectParameter[] shadowMapTextures;
+        private readonly EffectParameter shadowMapLimit;
+        private readonly EffectParameter zBias_Lighting;
+        private readonly EffectParameter fog;
+        private readonly EffectParameter lightVector_ZFar;
+        private readonly EffectParameter headlightPosition;
+        private readonly EffectParameter headlightDirection;
+        private readonly EffectParameter headlightRcpDistance;
+        private readonly EffectParameter headlightColor;
+        private readonly EffectParameter overcast;
+        private readonly EffectParameter viewerPos;
+        private readonly EffectParameter imageTextureIsNight;
+        private readonly EffectParameter nightColorModifier;
+        private readonly EffectParameter halfNightColorModifier;
+        private readonly EffectParameter vegetationAmbientModifier;
+        private readonly EffectParameter signalLightIntensity;
+        private readonly EffectParameter eyeVector;
+        private readonly EffectParameter sideVector;
+        private readonly EffectParameter imageTexture;
+        private readonly EffectParameter overlayTexture;
+        private readonly EffectParameter referenceAlpha;
+        private readonly EffectParameter overlayScale;
 
         private Vector3 viewEyeVector;
-        Vector4 _zBias_Lighting;
-        Vector3 _sunDirection;
-        bool _imageTextureIsNight;
+        private Vector4 _zBias_Lighting;
+        private Vector3 _sunDirection;
+        private bool _imageTextureIsNight;
 
         private readonly float fullBrightness;
 
         //const float HalfShadowBrightness = 0.75;
-        const float HalfNightBrightness = 0.6f;
-        const float ShadowBrightness = 0.5f;
-        const float NightBrightness = 0.2f;
+        private const float HalfNightBrightness = 0.6f;
+        private const float ShadowBrightness = 0.5f;
+        private const float NightBrightness = 0.2f;
 
         // The following constants define the beginning and the end conditions of
         // the day-night transition. Values refer to the Y postion of LightVector.
-        const float startNightTrans = 0.1f;
-        const float finishNightTrans = -0.1f;
+        private const float startNightTrans = 0.1f;
+        private const float finishNightTrans = -0.1f;
 
         public void SetViewMatrix(ref Matrix v)
         {
@@ -225,11 +225,11 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class ShadowMapShader : BaseShader
     {
-        readonly EffectParameter worldViewProjection;
-        readonly EffectParameter sideVector;
-        readonly EffectParameter imageBlurStep;
-        readonly EffectParameter imageTexture;
-        readonly EffectParameter blurTexture;
+        private readonly EffectParameter worldViewProjection;
+        private readonly EffectParameter sideVector;
+        private readonly EffectParameter imageBlurStep;
+        private readonly EffectParameter imageTexture;
+        private readonly EffectParameter blurTexture;
 
         public void SetData(ref Matrix v)
         {
@@ -267,24 +267,24 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class SkyShader : BaseShader
     {
-        readonly EffectParameter worldViewProjection;
-        readonly EffectParameter lightVector;
-        readonly EffectParameter time;
-        readonly EffectParameter overcast;
-        readonly EffectParameter windDisplacement;
-        readonly EffectParameter skyColor;
-        readonly EffectParameter fogColor;
-        readonly EffectParameter fog;
-        readonly EffectParameter moonColor;
-        readonly EffectParameter moonTexCoord;
-        readonly EffectParameter cloudColor;
-        readonly EffectParameter rightVector;
-        readonly EffectParameter upVector;
-        readonly EffectParameter skyMapTexture;
-        readonly EffectParameter starMapTexture;
-        readonly EffectParameter moonMapTexture;
-        readonly EffectParameter moonMaskTexture;
-        readonly EffectParameter cloudMapTexture;
+        private readonly EffectParameter worldViewProjection;
+        private readonly EffectParameter lightVector;
+        private readonly EffectParameter time;
+        private readonly EffectParameter overcast;
+        private readonly EffectParameter windDisplacement;
+        private readonly EffectParameter skyColor;
+        private readonly EffectParameter fogColor;
+        private readonly EffectParameter fog;
+        private readonly EffectParameter moonColor;
+        private readonly EffectParameter moonTexCoord;
+        private readonly EffectParameter cloudColor;
+        private readonly EffectParameter rightVector;
+        private readonly EffectParameter upVector;
+        private readonly EffectParameter skyMapTexture;
+        private readonly EffectParameter starMapTexture;
+        private readonly EffectParameter moonMapTexture;
+        private readonly EffectParameter moonMaskTexture;
+        private readonly EffectParameter cloudMapTexture;
 
 
         public Vector3 LightVector
@@ -313,7 +313,7 @@ namespace Orts.ActivityRunner.Viewer3D
             fog.SetValue(new Vector4(5000f / depth, 0.015f * MathHelper.Clamp(depth / 5000f, 0, 1), MathHelper.Clamp(depth / 10000f, 0, 1), 0.05f * MathHelper.Clamp(depth / 10000f, 0, 1)));
         }
 
-        float _time;
+        private float _time;
         public float Time
         {
             set
@@ -323,7 +323,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        int _moonPhase;
+        private int _moonPhase;
         public float Random
         {
             set 
@@ -405,10 +405,10 @@ namespace Orts.ActivityRunner.Viewer3D
             moonMaskTexture = Parameters["MoonMaskTexture"];
             cloudMapTexture = Parameters["CloudMapTexture"];
         }
-        
+
 
         // This function dims the lighting at night, with a transition period as the sun rises or sets
-        static float Day2Night(float startNightTrans, float finishNightTrans, float minDarknessCoeff, float sunDirectionY)
+        private static float Day2Night(float startNightTrans, float finishNightTrans, float minDarknessCoeff, float sunDirectionY)
         {
             int vIn = Simulator.Instance.Settings.DayAmbientLight;
             float dayAmbientLight = (float)vIn / 20.0f ;
@@ -432,14 +432,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class ParticleEmitterShader : BaseShader
     {
-        EffectParameter emitSize;
-        EffectParameter tileXY;
-        EffectParameter currentTime;
-        EffectParameter wvp;
-        EffectParameter invView;
-        EffectParameter texture;
-        EffectParameter lightVector;
-        EffectParameter fog;
+        private EffectParameter emitSize;
+        private EffectParameter tileXY;
+        private EffectParameter currentTime;
+        private EffectParameter wvp;
+        private EffectParameter invView;
+        private EffectParameter texture;
+        private EffectParameter lightVector;
+        private EffectParameter fog;
 
         public float CurrentTime
         {
@@ -493,9 +493,9 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class LightGlowShader : BaseShader
     {
-        readonly EffectParameter worldViewProjection;
-        readonly EffectParameter fade;
-        readonly EffectParameter lightGlowTexture;
+        private readonly EffectParameter worldViewProjection;
+        private readonly EffectParameter fade;
+        private readonly EffectParameter lightGlowTexture;
 
         public Texture2D LightGlowTexture { set { lightGlowTexture.SetValue(value); } }
 
@@ -520,8 +520,8 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class LightConeShader : BaseShader
     {
-        EffectParameter worldViewProjection;
-        EffectParameter fade;
+        private EffectParameter worldViewProjection;
+        private EffectParameter fade;
 
         public LightConeShader(GraphicsDevice graphicsDevice)
             : base(graphicsDevice, "LightConeShader")
@@ -543,11 +543,11 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class PopupWindowShader : BaseShader
     {
-        readonly EffectParameter world;
-        readonly EffectParameter worldViewProjection;
-        readonly EffectParameter glassColor;
-        readonly EffectParameter screenSize;
-        readonly EffectParameter screenTexture;
+        private readonly EffectParameter world;
+        private readonly EffectParameter worldViewProjection;
+        private readonly EffectParameter glassColor;
+        private readonly EffectParameter screenSize;
+        private readonly EffectParameter screenTexture;
 
         public Texture2D Screen
         {
@@ -584,15 +584,15 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class CabShader : BaseShader
     {
-        readonly EffectParameter nightColorModifier;
-        readonly EffectParameter lightOn;
-        readonly EffectParameter light1Pos;
-        readonly EffectParameter light2Pos;
-        readonly EffectParameter light1Col;
-        readonly EffectParameter light2Col;
-        readonly EffectParameter texPos;
-        readonly EffectParameter texSize;
-        readonly EffectParameter imageTexture;
+        private readonly EffectParameter nightColorModifier;
+        private readonly EffectParameter lightOn;
+        private readonly EffectParameter light1Pos;
+        private readonly EffectParameter light2Pos;
+        private readonly EffectParameter light1Col;
+        private readonly EffectParameter light2Col;
+        private readonly EffectParameter texPos;
+        private readonly EffectParameter texSize;
+        private readonly EffectParameter imageTexture;
 
         public void SetTextureData(float x, float y, float width, float height)
         {
@@ -634,18 +634,20 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class DriverMachineInterfaceShader : BaseShader
     {
-        readonly EffectParameter limitAngle;
-        readonly EffectParameter normalColor;
-        readonly EffectParameter limitColor;
-        readonly EffectParameter pointerColor;
-        readonly EffectParameter backgroundColor;
-        readonly EffectParameter imageTexture;
+        private readonly EffectParameter limitAngle;
+        private readonly EffectParameter normalColor;
+        private readonly EffectParameter limitColor;
+        private readonly EffectParameter pointerColor;
+        private readonly EffectParameter interventionColor;
+        private readonly EffectParameter backgroundColor;
+        private readonly EffectParameter imageTexture;
 
-        public void SetData(Vector4 angle, Color gaugeColor, Color needleColor)
+        public void SetData(Vector4 angle, Color gaugeColor, Color needleColor, Color overspeedColor)
         {
             limitAngle.SetValue(angle);
             limitColor.SetValue(gaugeColor.ToVector4());
             pointerColor.SetValue(needleColor.ToVector4());
+            interventionColor.SetValue(overspeedColor.ToVector4());
         }
 
         public DriverMachineInterfaceShader(GraphicsDevice graphicsDevice)
@@ -657,15 +659,16 @@ namespace Orts.ActivityRunner.Viewer3D
             backgroundColor = Parameters["BackgroundColor"];
             limitAngle = Parameters["LimitAngle"];
             imageTexture = Parameters["ImageTexture"];
+            interventionColor = Parameters["InterventionColor"];
         }
     }
 
     public class DebugShader : BaseShader
     {
-        readonly EffectParameter worldViewProjection;
-        readonly EffectParameter screenSize;
-        readonly EffectParameter graphPos;
-        readonly EffectParameter graphSample;
+        private readonly EffectParameter worldViewProjection;
+        private readonly EffectParameter screenSize;
+        private readonly EffectParameter graphPos;
+        private readonly EffectParameter graphSample;
 
         public Vector2 ScreenSize { set { screenSize.SetValue(value); } }
 

@@ -9,11 +9,11 @@ namespace Orts.Formats.Msts.Signalling
     {
         private readonly Tokenizer tokenizer;
 
-        public int LineNumber { get { return tokenizer.LineNumber; } }
+        public int LineNumber => tokenizer.LineNumber;
 
         public Parser(TextReader reader)
         {
-            this.tokenizer = new Tokenizer(reader);
+            tokenizer = new Tokenizer(reader);
         }
 
         internal enum ScriptParserState

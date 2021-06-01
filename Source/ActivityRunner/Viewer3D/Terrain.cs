@@ -37,16 +37,16 @@ namespace Orts.ActivityRunner.Viewer3D
     [DebuggerDisplay("Count = {TerrainTiles.Count}")]
     public class TerrainViewer
     {
-        readonly Viewer Viewer;
+        private readonly Viewer Viewer;
 
         // THREAD SAFETY:
         //   All accesses must be done in local variables. No modifications to the objects are allowed except by
         //   assignment of a new instance (possibly cloned and then modified).
-        List<TerrainTile> TerrainTiles = new List<TerrainTile>();
-        int TileX;
-        int TileZ;
-        int VisibleTileX;
-        int VisibleTileZ;
+        private List<TerrainTile> TerrainTiles = new List<TerrainTile>();
+        private int TileX;
+        private int TileZ;
+        private int VisibleTileX;
+        private int VisibleTileZ;
 
         public TerrainViewer(Viewer viewer)
         {
@@ -130,9 +130,8 @@ namespace Orts.ActivityRunner.Viewer3D
     public class TerrainTile
     {
         public readonly int TileX, TileZ, Size, PatchCount;
-
-        readonly TerrainPrimitive[,] TerrainPatches;
-        readonly WaterPrimitive WaterTile;
+        private readonly TerrainPrimitive[,] TerrainPatches;
+        private readonly WaterPrimitive WaterTile;
 
         public TerrainTile(Viewer viewer, TileManager tileManager, Tile tile)
         {
@@ -183,25 +182,24 @@ namespace Orts.ActivityRunner.Viewer3D
     [DebuggerDisplay("TileX = {TileX}, TileZ = {TileZ}, Size = {Size}, PatchX = {PatchX}, PatchZ = {PatchZ}")]
     public class TerrainPrimitive : RenderPrimitive
     {
-        readonly Viewer Viewer;
-        readonly int TileX, TileZ, Size, PatchX, PatchZ, PatchSize;
-        readonly float AverageElevation;
-
-        readonly Vector3 PatchLocation;        // In MSTS world coordinates relative to the center of the tile
-        readonly VertexBuffer PatchVertexBuffer;  // Separate vertex buffer for each patch
-        readonly IndexBuffer PatchIndexBuffer;    // Separate index buffer for each patch (if there are tunnels)
-        readonly int PatchPrimitiveCount;
-        readonly Material PatchMaterial;
-        readonly VertexBufferBinding[] VertexBufferBindings;
+        private readonly Viewer Viewer;
+        private readonly int TileX, TileZ, Size, PatchX, PatchZ, PatchSize;
+        private readonly float AverageElevation;
+        private readonly Vector3 PatchLocation;        // In MSTS world coordinates relative to the center of the tile
+        private readonly VertexBuffer PatchVertexBuffer;  // Separate vertex buffer for each patch
+        private readonly IndexBuffer PatchIndexBuffer;    // Separate index buffer for each patch (if there are tunnels)
+        private readonly int PatchPrimitiveCount;
+        private readonly Material PatchMaterial;
+        private readonly VertexBufferBinding[] VertexBufferBindings;
 
         // These can be shared since they are the same for all patches
         public static IndexBuffer SharedPatchIndexBuffer;
         public static int SharedPatchVertexStride;
 
         // These are only used while the contructor runs and are discarded after.
-        readonly TileManager TileManager;
-        readonly Tile Tile;
-        readonly Patch Patch;
+        private readonly TileManager TileManager;
+        private readonly Tile Tile;
+        private readonly Patch Patch;
 
         public TerrainPrimitive(Viewer viewer, TileManager tileManager, Tile tile, int x, int z)
         {
@@ -261,17 +259,17 @@ namespace Orts.ActivityRunner.Viewer3D
             graphicsDevice.DrawIndexedPrimitives(PrimitiveType.TriangleList, 0, 0, PatchPrimitiveCount);
         }
 
-        float Elevation(int x, int z)
+        private float Elevation(int x, int z)
         {
             return TileManager.GetElevation(Tile, PatchX * 16 + x, PatchZ * 16 + z);
         }
 
-        bool IsVertexHidden(int x, int z)
+        private bool IsVertexHidden(int x, int z)
         {
             return TileManager.IsVertexHidden(Tile, PatchX * 16 + x, PatchZ * 16 + z);
         }
 
-        Vector3 TerrainNormal(int x, int z)
+        private Vector3 TerrainNormal(int x, int z)
         {
 #if !SUPERSMOOTHNORMALS
             return SpecificTerrainNormal(x, z);
@@ -307,7 +305,7 @@ namespace Orts.ActivityRunner.Viewer3D
 #endif
         }
 
-        Vector3 SpecificTerrainNormal(int x, int z)
+        private Vector3 SpecificTerrainNormal(int x, int z)
         {
             // TODO, decode this from the _N.RAW TILE
             // until I figure out this file, I'll compute normals from the terrain
@@ -349,7 +347,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        IndexBuffer GetIndexBuffer(out int primitiveCount)
+        private IndexBuffer GetIndexBuffer(out int primitiveCount)
         {
             const int bufferSize = 1536;    //16 * 16 * 2 * 3;
             int i = 0;
@@ -406,7 +404,7 @@ namespace Orts.ActivityRunner.Viewer3D
             return result;
         }
 
-        VertexBuffer GetVertexBuffer(out float averageElevation)
+        private VertexBuffer GetVertexBuffer(out float averageElevation)
         {
             const int bufferSize = 289; //17*17
             int i = 0;
@@ -447,7 +445,7 @@ namespace Orts.ActivityRunner.Viewer3D
             PatchMaterial.Mark();
         }
 
-        static void SetupSharedData(GraphicsDevice graphicsDevice)
+        private static void SetupSharedData(GraphicsDevice graphicsDevice)
         {
             // 16 x 16 squares * 2 triangles per square * 3 indices per triangle
             const int bufferSize = 1536;    //16 * 16 * 2 * 3;

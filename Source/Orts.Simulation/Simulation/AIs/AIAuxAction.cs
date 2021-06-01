@@ -52,8 +52,7 @@ namespace Orts.Simulation.AIs
 
         public DistanceTravelledActions genRequiredActions = new DistanceTravelledActions(); // distance travelled Generic action list for AITrain
         public DistanceTravelledActions specRequiredActions = new DistanceTravelledActions();
-
-        Train ThisTrain;
+        private Train ThisTrain;
 
         public AuxActionsContainer(Train thisTrain)
         {
@@ -1278,7 +1277,7 @@ namespace Orts.Simulation.AIs
 
     internal class AuxActionWPItem : AuxActionItem
     {
-        int Delay;
+        private int Delay;
         public int ActualDepart;
 
         //================================================================================================//

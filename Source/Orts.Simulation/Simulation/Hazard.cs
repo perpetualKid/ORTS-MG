@@ -28,14 +28,14 @@ namespace Orts.Simulation
 {
     public class HazardManager
 	{
-		readonly int hornDist = 200;
-		readonly int approachDist = 160;
-        readonly int scaredDist = 147;
-		readonly Simulator Simulator;
+        private readonly int hornDist = 200;
+        private readonly int approachDist = 160;
+        private readonly int scaredDist = 147;
+        private readonly Simulator Simulator;
 		public readonly Dictionary<int, Hazard> Hazards;
 		public readonly Dictionary<int, Hazard> CurrentHazards;
 		public readonly Dictionary<string, HazardFile> HazFiles;
-		List<int> InterestedHazards;//those hazards is closed to player, needs to listen to horn
+        private List<int> InterestedHazards;//those hazards is closed to player, needs to listen to horn
 		public HazardManager(Simulator simulator)
 		{
 			Simulator = simulator;
@@ -45,7 +45,7 @@ namespace Orts.Simulation
 			Hazards = simulator.TDB != null && simulator.TDB.TrackDB != null ? GetHazardsFromDB(simulator.TDB.TrackDB.TrackNodes, simulator.TDB.TrackDB.TrackItems) : new Dictionary<int, Hazard>();
 		}
 
-		static Dictionary<int, Hazard> GetHazardsFromDB(TrackNode[] trackNodes, TrackItem[] trItemTable)
+        private static Dictionary<int, Hazard> GetHazardsFromDB(TrackNode[] trackNodes, TrackItem[] trItemTable)
 		{
 			return (from trackNode in trackNodes
 					where trackNode is TrackVectorNode tvn && tvn.TrackItemIndices.Length > 0
@@ -128,7 +128,7 @@ namespace Orts.Simulation
 	public class Hazard
 
 	{
-        readonly TrackNode TrackNode;
+        private readonly TrackNode TrackNode;
 
         internal WorldLocation Location;
 		public HazardFile HazFile { get { return hazF; } set { hazF = value; if (hazF.Hazard.Workers != null) animal = false; else animal = true; } }

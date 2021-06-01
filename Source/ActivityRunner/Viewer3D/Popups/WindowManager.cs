@@ -42,7 +42,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         // is draw with a different texture to anything else; the change of texture triggers an internal flush. The
         // texture is initialised to transparent black so although we draw it in a visible area, it will not actually
         // be visible on screen.
-        static Texture2D FlushTexture;
+        private static Texture2D FlushTexture;
         public static void Flush(SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(FlushTexture, Vector2.Zero, Color.Black);
@@ -62,16 +62,16 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 
         public Label3DMaterial Label3DMaterial { get; private set; }
 
-        readonly Material WindowManagerMaterial;
-        readonly PopupWindowMaterial PopupWindowMaterial;
-        readonly List<Window> Windows = new List<Window>();
-        Window[] WindowsZOrder = new Window[0];
-        SpriteBatch SpriteBatch;
-        Matrix Identity = Matrix.Identity;
-        Matrix XNAView = Matrix.Identity;
-        Matrix XNAProjection = Matrix.Identity;
+        private readonly Material WindowManagerMaterial;
+        private readonly PopupWindowMaterial PopupWindowMaterial;
+        private readonly List<Window> Windows = new List<Window>();
+        private Window[] WindowsZOrder = new Window[0];
+        private SpriteBatch SpriteBatch;
+        private Matrix Identity = Matrix.Identity;
+        private Matrix XNAView = Matrix.Identity;
+        private Matrix XNAProjection = Matrix.Identity;
         internal Point ScreenSize = new Point(10000, 10000); // Arbitrary but necessary.
-        RenderTarget2D Screen;
+        private RenderTarget2D Screen;
 
         public WindowManager(Viewer viewer)
         {
@@ -259,7 +259,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             }
         }
 
-        double LastPrepareRealTime;
+        private double LastPrepareRealTime;
 
         public void PrepareFrame(RenderFrame frame, in ElapsedTime elapsedTime)
         {

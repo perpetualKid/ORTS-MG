@@ -30,7 +30,7 @@ namespace Orts.Simulation
 {
     public class FuelManager
     {
-        readonly Simulator Simulator;
+        private readonly Simulator Simulator;
         public readonly Dictionary<int, FuelPickupItem> FuelPickupItems;
 
         public FuelManager(Simulator simulator)
@@ -39,7 +39,7 @@ namespace Orts.Simulation
             FuelPickupItems = simulator.TDB != null && simulator.TDB.TrackDB != null ? GetFuelPickupItemsFromDB(simulator.TDB.TrackDB.TrackNodes, simulator.TDB.TrackDB.TrackItems) : new Dictionary<int, FuelPickupItem>();
         }
 
-        static Dictionary<int, FuelPickupItem> GetFuelPickupItemsFromDB(TrackNode[] trackNodes, TrackItem[] trItemTable)
+        private static Dictionary<int, FuelPickupItem> GetFuelPickupItemsFromDB(TrackNode[] trackNodes, TrackItem[] trItemTable)
         {
             return (from trackNode in trackNodes
                     where trackNode is TrackVectorNode tvn && tvn.TrackItemIndices.Length > 0
@@ -61,7 +61,7 @@ namespace Orts.Simulation
     public class FuelPickupItem
     {
         internal WorldLocation Location;
-        readonly TrackNode TrackNode;
+        private readonly TrackNode TrackNode;
 
         public FuelPickupItem(TrackNode trackNode, TrackItem trItem)
         {

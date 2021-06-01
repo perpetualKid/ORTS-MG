@@ -124,32 +124,22 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
         // Get the brake BC & BP for EOT conditions
         public override string GetStatus(Dictionary<BrakeSystemComponent, Pressure.Unit> units)
         {
-            string s = string.Format(
-                Simulator.Catalog.GetString(" BC {0}"),
-                FormatStrings.FormatPressure(CylPressurePSI, Pressure.Unit.PSI, units[BrakeSystemComponent.BrakeCylinder], true));
-                s += string.Format(Simulator.Catalog.GetString(" BP {0}"),
-                 FormatStrings.FormatPressure(BrakeLine1PressurePSI, Pressure.Unit.PSI, units[BrakeSystemComponent.BrakePipe], true));
+            string s = Simulator.Catalog.GetString($" BC {FormatStrings.FormatPressure(CylPressurePSI, Pressure.Unit.PSI, units[BrakeSystemComponent.BrakeCylinder], true)}");
+                s += Simulator.Catalog.GetString($" BP {FormatStrings.FormatPressure(BrakeLine1PressurePSI, Pressure.Unit.PSI, units[BrakeSystemComponent.BrakePipe], true)}");
             return s;
         }
 
         // Get Brake information for train
         public override string GetFullStatus(BrakeSystem lastCarBrakeSystem, Dictionary<BrakeSystemComponent, Pressure.Unit> units)
         {
-            string s = string.Format(Simulator.Catalog.GetString(" EQ {0}"), 
-                FormatStrings.FormatPressure(Car.Train.EqualReservoirPressurePSIorInHg, Pressure.Unit.PSI, units[BrakeSystemComponent.EqualizingReservoir], true));
-            s += string.Format(
-                Simulator.Catalog.GetString(" BC {0}"),
-                FormatStrings.FormatPressure(Car.Train.HUDWagonBrakeCylinderPSI, Pressure.Unit.PSI, units[BrakeSystemComponent.BrakeCylinder], true)
-            );
+            string s = Simulator.Catalog.GetString($" EQ {FormatStrings.FormatPressure(Car.Train.EqualReservoirPressurePSIorInHg, Pressure.Unit.PSI, units[BrakeSystemComponent.EqualizingReservoir], true)}");
+            s += Simulator.Catalog.GetString($" BC {FormatStrings.FormatPressure(Car.Train.HUDWagonBrakeCylinderPSI, Pressure.Unit.PSI, units[BrakeSystemComponent.BrakeCylinder], true)}");
 
-            s += string.Format(
-                Simulator.Catalog.GetString(" BP {0}"),                
-                FormatStrings.FormatPressure(BrakeLine1PressurePSI, Pressure.Unit.PSI, units[BrakeSystemComponent.BrakePipe], true)
-            );
+            s += Simulator.Catalog.GetString($" BP {FormatStrings.FormatPressure(BrakeLine1PressurePSI, Pressure.Unit.PSI, units[BrakeSystemComponent.BrakePipe], true)}");
             if (lastCarBrakeSystem != null && lastCarBrakeSystem != this)
                 s += Simulator.Catalog.GetString(" EOT ") + lastCarBrakeSystem.GetStatus(units);
             if (HandbrakePercent > 0)
-                s += string.Format(Simulator.Catalog.GetString(" Handbrake {0:F0}%"), HandbrakePercent);
+                s += Simulator.Catalog.GetString($" Handbrake {HandbrakePercent:F0}%");
             return s;
         }
 
@@ -165,9 +155,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
                 (Car as MSTSWagon).RetainerPositions == 0 ? string.Empty : RetainerDebugState,
                 TripleValveState.GetLocalizedDescription(),
                 string.Empty, // Spacer because the state above needs 2 columns.
-                (Car as MSTSWagon).HandBrakePresent ? string.Format("{0:F0}%", HandbrakePercent) : string.Empty,
+                (Car as MSTSWagon).HandBrakePresent ? $"{HandbrakePercent:F0}%" : string.Empty,
                 FrontBrakeHoseConnected ? "I" : "T",
-                string.Format("A{0} B{1}", AngleCockAOpen ? "+" : "-", AngleCockBOpen ? "+" : "-"),
+                $"A{(AngleCockAOpen ? "+" : "-")} B{(AngleCockBOpen ? "+" : "-")}",
                 BleedOffValveOpen ? Simulator.Catalog.GetString("Open") : " ",//HudScroll feature requires for the last value, at least one space instead of string.Empty,
             };
         }

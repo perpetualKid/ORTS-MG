@@ -32,11 +32,12 @@ namespace Orts.ActivityRunner.Processes
         public SmoothedData Wall { get; private set; }
         public SmoothedData CPU { get; private set; }
         public SmoothedData Wait { get; private set; }
-        readonly Stopwatch TimeTotal;
-        readonly Stopwatch TimeRunning;
-        TimeSpan TimeCPU;
-        TimeSpan LastCPU;
-        ProcessThread ProcessThread;
+
+        private readonly Stopwatch TimeTotal;
+        private readonly Stopwatch TimeRunning;
+        private TimeSpan TimeCPU;
+        private TimeSpan LastCPU;
+        private ProcessThread ProcessThread;
 #if DEBUG_THREAD_PERFORMANCE
         StreamWriter DebugFileStream;
 #endif

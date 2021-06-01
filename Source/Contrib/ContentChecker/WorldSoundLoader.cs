@@ -17,7 +17,6 @@
 
 using System;
 
-using Orts.Formats.Msts;
 using Orts.Formats.Msts.Files;
 using Orts.Formats.Msts.Models;
 
@@ -26,10 +25,10 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .s files
     /// </summary>
-    class WorldSoundLoader : Loader
+    internal class WorldSoundLoader : Loader
     {
         /// <summary> The track database needed for loading a world-sound file </summary>
-        private TrackDB _TDB;
+        private TrackDB trackDB;
 
         /// <summary>
         /// default constructor when not enough information is available
@@ -45,7 +44,7 @@ namespace Orts.ContentChecker
         /// <param name="tdb">The Signal Configuration object</param>
         public WorldSoundLoader(TrackDB tdb) : this()
         {
-            _TDB = tdb;
+            trackDB = tdb;
         }
 
         /// <summary>
@@ -56,18 +55,21 @@ namespace Orts.ContentChecker
         public override void TryLoading(string file)
         {
             TrackItem[] items;
-            if (_TDB == null)
+            if (trackDB == null)
             {
                 //It is not clear that 10000 items is enough, which would give wrong warnings
                 Console.WriteLine("");
+#pragma warning disable CA1303 // Do not pass literals as localized parameters
                 Console.Write("  Not using the proper .tdb, but just an empty array of TrItems for loading the .ws file: ");
+#pragma warning restore CA1303 // Do not pass literals as localized parameters
                 items = new TrackItem[100000];
             }
             else
             {
-                items = _TDB.TrackItems;
+                items = trackDB.TrackItems;
             }
-            var wf = new WorldSoundFile(file, items);
+
+            _ = new WorldSoundFile(file, items);
         }
     }
 }

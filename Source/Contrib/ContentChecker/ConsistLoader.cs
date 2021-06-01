@@ -23,7 +23,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .con files
     /// </summary>
-    class ConsistLoader : Loader
+    internal class ConsistLoader : Loader
     {
         /// <summary>
         /// Try to load the file.
@@ -32,7 +32,7 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            var act = new ConsistFile(file);
+            _ = new ConsistFile(file);
         }
     }
 }

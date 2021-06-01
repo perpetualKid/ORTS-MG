@@ -26,7 +26,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .s files
     /// </summary>
-    class TimetableLoader : Loader
+    internal class TimetableLoader : Loader
     {
         /// <summary>
         /// Try to load the file.
@@ -35,14 +35,16 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            String extension = Path.GetExtension(file).ToLowerInvariant();
+#pragma warning disable CA1308 // Normalize strings to uppercase
+            string extension = Path.GetExtension(file).ToLowerInvariant();
+#pragma warning restore CA1308 // Normalize strings to uppercase
             if (extension.Contains("table"))
             {
-                var timeTableList = new TimetableGroupFile(file);
+                _ = new TimetableGroupFile(file);
             }
             else
             {
-                var timeTable = new TimetableReader(file);
+                _ = new TimetableReader(file);
 
             }
         }

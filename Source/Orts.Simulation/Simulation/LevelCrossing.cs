@@ -31,9 +31,8 @@ namespace Orts.Simulation
 {
     public class LevelCrossings
     {
-        const float MaximumActivationDistance = 2000;
-        
-        readonly Simulator Simulator;
+        private const float MaximumActivationDistance = 2000;
+        private readonly Simulator Simulator;
         public readonly Dictionary<int, LevelCrossingItem> TrackCrossingItems;
         public readonly Dictionary<int, LevelCrossingItem> RoadCrossingItems;
         public readonly Dictionary<LevelCrossingItem, LevelCrossingItem> RoadToTrackCrossingItems = new Dictionary<LevelCrossingItem, LevelCrossingItem>();
@@ -49,7 +48,7 @@ namespace Orts.Simulation
                 ? GetLevelCrossingsFromDB(simulator.RDB.RoadTrackDB.TrackNodes, simulator.RDB.RoadTrackDB.TrItemTable) : new Dictionary<int, LevelCrossingItem>();
         }
 
-        static Dictionary<int, LevelCrossingItem> GetLevelCrossingsFromDB(TrackNode[] trackNodes, TrackItem[] trItemTable)
+        private static Dictionary<int, LevelCrossingItem> GetLevelCrossingsFromDB(TrackNode[] trackNodes, TrackItem[] trItemTable)
         {
             return Enumerable.ToDictionary((from trackNode in trackNodes
                                             where trackNode is TrackVectorNode tvn && tvn.TrackItemIndices.Length > 0
@@ -87,7 +86,7 @@ namespace Orts.Simulation
                 UpdateCrossings(train, elapsedClockSeconds);
         }
 
-        void UpdateCrossings(Train train, double elapsedTime)
+        private void UpdateCrossings(Train train, double elapsedTime)
         {
             var speedMpS = train.SpeedMpS;
             var absSpeedMpS = Math.Abs(speedMpS);
@@ -322,7 +321,7 @@ namespace Orts.Simulation
 
     public class LevelCrossingItem
     {
-        readonly TrackNode TrackNode;
+        private readonly TrackNode TrackNode;
 
         // THREAD SAFETY:
         //   All accesses must be done in local variables. No modifications to the objects are allowed except by

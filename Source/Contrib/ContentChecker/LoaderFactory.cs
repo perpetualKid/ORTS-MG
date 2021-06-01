@@ -24,13 +24,11 @@
 // 3. The filename in case also the SIMIS header is not unique, or the file does not have a SIMIS header
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 
 namespace Orts.ContentChecker
 {
-    static class LoaderFactory
+    internal static class LoaderFactory
     {
         /// <summary>
         /// Get the default Loader object for a file, based on its extension or in some other way.
@@ -40,9 +38,11 @@ namespace Orts.ContentChecker
         /// <returns>The most appropriate subclass to load this file</returns>
         public static Loader GetLoader(string file)
         {
-            String extension = Path.GetExtension(file).ToLowerInvariant();
+            string extension = Path.GetExtension(file);
 
-            switch (extension)
+#pragma warning disable CA1308 // Normalize strings to uppercase
+            switch (extension.ToLowerInvariant())
+#pragma warning restore CA1308 // Normalize strings to uppercase
             {
                 case ".ace": return new AceLoader();
                 case ".act": return new ActivityLoader();
@@ -70,6 +70,8 @@ namespace Orts.ContentChecker
                 case ".timetable-or": return new TimetableLoader();
                 case ".timetablelist_or": return new TimetableLoader();
                 case ".timetablelist-or": return new TimetableLoader();
+                default:
+                    break;
             }
 
             if (extension == ".dat")
@@ -90,11 +92,13 @@ namespace Orts.ContentChecker
         /// </summary>
         /// <param name="file">The name of the file that needs to be loaded</param>
         /// <returns>The most appropriate subclass to load this file</returns>
-        static Loader GetDatLoader(string file)
+        private static Loader GetDatLoader(string file)
         {
+#pragma warning disable CA1308 // Normalize strings to uppercase
             string filename = Path.GetFileName(file).ToLowerInvariant();
-            // First try to determine the file from the SIMIS header
-            using (var stf = new StreamReader(file, true))
+#pragma warning restore CA1308 // Normalize strings to uppercase
+                              // First try to determine the file from the SIMIS header
+            using (StreamReader stf = new StreamReader(file, true))
             {
                 string SimisSignature = stf.ReadLine();
                 switch (SimisSignature)
@@ -134,7 +138,7 @@ namespace Orts.ContentChecker
                         return new NotUsedLoader(); // Global/soundcfg.dat
 
                     case "SIMISA@@@@@@@@@@JINX0T0t______":
-                        return new TsectionLoader();
+                        return new TSectionLoader();
 
                     case "SIMISA@@@@@@@@@@JINX0t1t______":
                         switch (filename)
@@ -183,9 +187,11 @@ namespace Orts.ContentChecker
         /// </summary>
         /// <param name="file">The name of the file that needs to be loaded</param>
         /// <returns>The most appropriate subclass to load this file</returns>
-        static Loader GetRawLoader(string file)
+        private static Loader GetRawLoader(string file)
         {
+#pragma warning disable CA1308 // Normalize strings to uppercase
             string fileName = Path.GetFileName(file).ToLowerInvariant();
+#pragma warning restore CA1308 // Normalize strings to uppercase
             string endswith = fileName.Substring(fileName.Length - 6);
 
             switch (endswith)

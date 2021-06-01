@@ -15,7 +15,7 @@ namespace Orts.Formats.Msts.Models
 {
     public abstract class WorldObject
     {
-        protected internal class PositionHolder
+        internal protected class PositionHolder
         {
             public Vector3 Location;
             public Quaternion Direction;

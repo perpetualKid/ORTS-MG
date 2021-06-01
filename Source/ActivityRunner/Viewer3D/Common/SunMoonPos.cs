@@ -30,7 +30,7 @@ using System;
 
 namespace Orts.ActivityRunner.Viewer3D.Common
 {
-    class SunMoonPos
+    internal class SunMoonPos
     {
         /// <summary>
         /// Calculates the solar direction vector.
@@ -192,7 +192,7 @@ namespace Orts.ActivityRunner.Viewer3D.Common
         /// </summary>
         /// <param name="input">the raw number</param>
         /// <param name="divisor">the number, or its multiples, we want to remove</param> 
-        static double Normalize(double input, double divisor)
+        private static double Normalize(double input, double divisor)
         {
             double output = input - divisor * Math.Floor(input / divisor);
             return output;

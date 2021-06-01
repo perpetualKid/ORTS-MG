@@ -1,8 +1,0 @@
-trigger: none
-
-pr: none
-
-jobs:
-- template: azure-pipelines_MG.Core.template.yml
-  parameters:
-    channelName: "Release"

@@ -54,21 +54,21 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         public Dictionary<UserCommand, Action[]> UserInputCommands = new Dictionary<UserCommand, Action[]>();
 
         // Wheels are rotated by hand instead of in the shape file.
-        float WheelRotationR;
-        List<int> WheelPartIndexes = new List<int>();
+        private float WheelRotationR;
+        private List<int> WheelPartIndexes = new List<int>();
 
         // Everything else is animated through the shape file.
-        AnimatedPart RunningGear;
-        AnimatedPart Pantograph1;
-        AnimatedPart Pantograph2;
-        AnimatedPart Pantograph3;
-        AnimatedPart Pantograph4;
-        AnimatedPart LeftDoor;
-        AnimatedPart RightDoor;
-        AnimatedPart Mirrors;
+        private AnimatedPart RunningGear;
+        private AnimatedPart Pantograph1;
+        private AnimatedPart Pantograph2;
+        private AnimatedPart Pantograph3;
+        private AnimatedPart Pantograph4;
+        private AnimatedPart LeftDoor;
+        private AnimatedPart RightDoor;
+        private AnimatedPart Mirrors;
         protected AnimatedPart Wipers;
         protected AnimatedPart Bell;
-        AnimatedPart UnloadingParts;
+        private AnimatedPart UnloadingParts;
 
         public Dictionary<string, List<ParticleEmitterViewer>> ParticleDrawers = new Dictionary<string, List<ParticleEmitterViewer>>();
 
@@ -76,25 +76,24 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 
 
         // Create viewers for special steam/smoke effects on car
-        List<ParticleEmitterViewer> HeatingHose = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> HeatingCompartmentSteamTrap = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> HeatingMainPipeSteamTrap = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> WaterScoop = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> WaterScoopReverse = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> TenderWaterOverflow = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> WagonSmoke = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> HeatingSteamBoiler = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> BearingHotBox = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> SteamBrake = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> HeatingHose = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> HeatingCompartmentSteamTrap = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> HeatingMainPipeSteamTrap = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> WaterScoop = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> WaterScoopReverse = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> TenderWaterOverflow = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> WagonSmoke = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> HeatingSteamBoiler = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> BearingHotBox = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> SteamBrake = new List<ParticleEmitterViewer>();
 
         // Create viewers for special steam effects on car
-        List<ParticleEmitterViewer> WagonGenerator = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> DieselLocoGenerator = new List<ParticleEmitterViewer>();
-
-        bool HasFirstPanto;
-        int numBogie1, numBogie2, numBogie, bogie1Axles, bogie2Axles = 0;
-        int bogieMatrix1, bogieMatrix2 = 0;
-        FreightAnimationsViewer FreightAnimations;
+        private List<ParticleEmitterViewer> WagonGenerator = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> DieselLocoGenerator = new List<ParticleEmitterViewer>();
+        private bool HasFirstPanto;
+        private int numBogie1, numBogie2, numBogie, bogie1Axles, bogie2Axles = 0;
+        private int bogieMatrix1, bogieMatrix2 = 0;
+        private FreightAnimationsViewer FreightAnimations;
 
         public MSTSWagonViewer(Viewer viewer, MSTSWagon car)
             : base(viewer, car)
@@ -383,7 +382,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             InitializeUserInputCommands();
         }
 
-        void MatchMatrixToPart(MSTSWagon car, int matrix, int bogieMatrix)
+        private void MatchMatrixToPart(MSTSWagon car, int matrix, int bogieMatrix)
         {
             var matrixName = TrainCarShape.SharedShape.MatrixNames[matrix].ToUpper();
             // Gate all RunningGearPartIndexes on this!

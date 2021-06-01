@@ -20,8 +20,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         public float GearBoxCoastingForceN = 500;
         public float GearBoxUpGearProportion = 0.85f;
         public float GearBoxDownGearProportion = 0.35f;
-
-        int initLevel;
+        private int initLevel;
 
         public bool IsInitialized { get { return initLevel >= 5; } }
         public bool AtLeastOneParamFound { get { return initLevel >= 1; } }
@@ -119,7 +118,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
     public class GearBox
     {
         public MSTSGearBoxParams mstsParams = new MSTSGearBoxParams();
-        DieselEngine DieselEngine;
+        private DieselEngine DieselEngine;
         public List<Gear> Gears = new List<Gear>();
 
         public Gear CurrentGear
@@ -236,8 +235,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
 
         public int NumOfGears { get { return Gears.Count; } }
 
-        int currentGearIndex = -1;
-        int nextGearIndex = -1;
+        private int currentGearIndex = -1;
+        private int nextGearIndex = -1;
 
         public float CurrentSpeedMpS 
         {
@@ -283,7 +282,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
             }
         }
 
-        float clutch;
+        private float clutch;
         public float ClutchPercent { set { clutch = (value > 100.0f ? 100f : (value < -100f ? -100f : value)) / 100f; }
             get { return clutch * 100f; } }
 

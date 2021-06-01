@@ -493,16 +493,16 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
         public virtual string GetStatus()
         {
             if (Notches.Count == 0)
-                return string.Format("{0:F0}%", 100 * CurrentValue);
+                return $"{100 * CurrentValue:F0}%";
             INotchController notch = Notches[CurrentNotch];
             string name = notch.NotchStateType.GetLocalizedDescription();
             if (!notch.Smooth && notch.NotchStateType == ControllerState.Dummy)
-                return string.Format("{0:F0}%", 100 * CurrentValue);
+                return $"{100 * CurrentValue:F0}%";
             if (!notch.Smooth)
                 return name;
             if (!string.IsNullOrEmpty(name))
-                return string.Format("{0} {1:F0}%", name, 100 * GetNotchFraction());
-            return string.Format("{0:F0}%", 100 * GetNotchFraction());
+                return $"{name} {100 * GetNotchFraction():F0}%";
+            return $"{100 * GetNotchFraction():F0}%";
         }
 
         public virtual void Save(BinaryWriter outf)

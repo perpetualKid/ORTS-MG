@@ -351,9 +351,8 @@ namespace Orts.ActivityRunner.Viewer3D
     public class WireProfile : TrProfile
     {
         public float expectedSegmentLength;
-
-        float u1 = 0.25f, v1 = 0.25f;
-        float normalvalue = 0.707f;
+        private float u1 = 0.25f, v1 = 0.25f;
+        private float normalvalue = 0.707f;
 
         /// <summary>
         /// WireProfile constructor (default - builds from self-contained data)
@@ -492,8 +491,8 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class WirePrimitive : DynamicTrackPrimitive
     {
-        static WireProfile WireProfile;
-        float topWireOffset;
+        private static WireProfile WireProfile;
+        private float topWireOffset;
 
         public WirePrimitive(Viewer viewer, in WorldPosition worldPosition, in WorldPosition endPosition, float radius, float angle)
             : base()
@@ -720,7 +719,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <summary>
         /// Initializes member variables for straight track sections.
         /// </summary>
-        void LinearGen()
+        private void LinearGen()
         {
             NumSections = 1;
 
@@ -739,7 +738,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <summary>
         /// Initializes member variables for circular arc track sections.
         /// </summary>
-        void CircArcGen()
+        private void CircArcGen()
         {
             float arcLength = Math.Abs(DTrackData.Radius * DTrackData.Length);
             // Define the number of track cross sections in addition to the base.
@@ -778,7 +777,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// </summary>
         /// <param name="stride">Index increment between section-to-section vertices.</param>
         /// <param name="pl"></param>
-        void LinearVerticalGen(uint stride, Polyline pl)
+        private void LinearVerticalGen(uint stride, Polyline pl)
         {
             Vector3 displacement = new Vector3(0, -topWireOffset, 0) + DDY;
             float wrapLength = displacement.Length();

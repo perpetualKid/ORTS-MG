@@ -67,8 +67,8 @@ namespace Orts.Simulation.RollingStocks
         public float MaxExhaust = 2.8f;
         public float MaxMagnitude = 1.5f;
         public float EngineRPMderivation;
-        float EngineRPMold;
-        float EngineRPMRatio; // used to compute Variable1 and Variable2
+        private float EngineRPMold;
+        private float EngineRPMRatio; // used to compute Variable1 and Variable2
         public float MaximumDieselEnginePowerW;
 
         public MSTSNotchController FuelController = new MSTSNotchController(0, 1, 0.0025f);
@@ -83,7 +83,7 @@ namespace Orts.Simulation.RollingStocks
         public float DieselUsedPerHourAtIdleL = 1.0f;
         public float DieselFlowLps;
         public float DieselWeightKgpL = 0.8508f; //per liter
-        float InitialMassKg = 100000.0f;
+        private float InitialMassKg = 100000.0f;
 
         public float LocomotiveMaxRailOutputPowerW;
 
@@ -108,7 +108,7 @@ namespace Orts.Simulation.RollingStocks
         /// <summary>
         /// Used to accumulate a quantity that is not lost because of lack of precision when added to the Fuel level
         /// </summary>        
-        float partialFuelConsumption = 0;
+        private float partialFuelConsumption = 0;
 
         private const float GearBoxControllerBoost = 1; // Slow boost to enable easy single gear up/down commands
 

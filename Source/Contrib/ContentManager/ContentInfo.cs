@@ -193,7 +193,7 @@ namespace Orts.ContentManager
             return details.ToString();
         }
 
-        static string FormatDateTime(this DateTime dateTime)
+        private static string FormatDateTime(this DateTime dateTime)
         {
             return $"{dateTime.Day - 1} {dateTime.ToLongTimeString()}";
         }

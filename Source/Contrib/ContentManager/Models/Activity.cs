@@ -42,13 +42,13 @@ namespace Orts.ContentManager.Models
                 Name = file.Activity.Header.Name;
                 Description = file.Activity.Header.Description;
                 Briefing = file.Activity.Header.Briefing;
-                PlayerServices = new[] { String.Format("Player|{0}", file.Activity.PlayerServices.Name) };
+                PlayerServices = new[] { $"Player|{file.Activity.PlayerServices.Name}" };
                 if (file.Activity.Traffic != null)
                     Services = file.Activity.Traffic.Services.Select((service, index) =>
-                        String.Format("AI|{0}|{1}|{2}", service.Name, file.Activity.Traffic.Name, index)
+                        $"AI|{service.Name}|{file.Activity.Traffic.Name}|{index}"
                     );
                 else
-                    Services = new string[0];
+                    Services = Array.Empty<string>();
             }
             else if (System.IO.Path.GetExtension(content.PathName).Equals(".timetable_or", StringComparison.OrdinalIgnoreCase))
             {
@@ -65,7 +65,7 @@ namespace Orts.ContentManager.Models
                     services.Add(file.Strings[0][column]);
                 }
                 PlayerServices = services;
-                Services = new string[0];
+                Services = Array.Empty<string>();
             }
         }
     }

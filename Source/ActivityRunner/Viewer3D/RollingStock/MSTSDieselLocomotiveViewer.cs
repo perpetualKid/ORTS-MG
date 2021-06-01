@@ -34,8 +34,9 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 {
     public class MSTSDieselLocomotiveViewer : MSTSLocomotiveViewer
     {
-        MSTSDieselLocomotive DieselLocomotive { get { return (MSTSDieselLocomotive)Car; } }
-        List<ParticleEmitterViewer> Exhaust = new List<ParticleEmitterViewer>();
+        private MSTSDieselLocomotive DieselLocomotive { get { return (MSTSDieselLocomotive)Car; } }
+
+        private List<ParticleEmitterViewer> Exhaust = new List<ParticleEmitterViewer>();
 
         public MSTSDieselLocomotiveViewer(Viewer viewer, MSTSDieselLocomotive car)
             : base(viewer, car)

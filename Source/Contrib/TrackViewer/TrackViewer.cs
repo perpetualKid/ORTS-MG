@@ -59,7 +59,7 @@ namespace ORTS.TrackViewer
     {
         #region Public members
         /// <summary>String showing the date of the program</summary>
-        public readonly static string TrackViewerVersion = "2018/01/09";
+        public static readonly string TrackViewerVersion = "2018/01/09";
         /// <summary>Path where the content (like .png files) is stored</summary>
         public string ContentPath { get; private set; }
         /// <summary>Folder where MSTS is installed (or at least, where the files needed for tracks, routes and paths are stored)</summary>
@@ -98,30 +98,36 @@ namespace ORTS.TrackViewer
         #endregion
 
         #region Private members
-        GraphicsDeviceManager graphics;
-        SpriteBatch spriteBatch;
+        private GraphicsDeviceManager graphics;
+        private SpriteBatch spriteBatch;
 
         /// <summary>Draw area for the inset</summary>
-        ShadowDrawArea drawAreaInset;
+        private ShadowDrawArea drawAreaInset;
+
         /// <summary>The scale ruler to draw on screen</summary>
-        DrawScaleRuler drawScaleRuler;
+        private DrawScaleRuler drawScaleRuler;
+
         /// <summary>For drawing real world longitude and latitude</summary>
-        DrawLongitudeLatitude drawLongitudeLatitude;
+        private DrawLongitudeLatitude drawLongitudeLatitude;
+
         /// <summary>For drawing the action that the editor might be taking</summary>
-        DrawEditorAction drawEditorAction;
+        private DrawEditorAction drawEditorAction;
+
         /// <summary>The routines to draw the world tiles</summary>
-        DrawWorldTiles drawWorldTiles;
+        private DrawWorldTiles drawWorldTiles;
+
         /// <summary>The routines to draw the grade of a path</summary>
-        DrawPathChart drawPathChart;
+        private DrawPathChart drawPathChart;
         /// <summary>The routines to draw the terrain textures</summary>
         public DrawTerrain drawTerrain; //todo, get it private again: statusbar
 
-        DrawLabels drawLabels;
+        private DrawLabels drawLabels;
 
         /// <summary>The menu at the top</summary>
-        MenuControl menuControl;
+        private MenuControl menuControl;
+
         /// <summary>The status bar at the bottom</summary>
-        StatusBarControl statusBarControl;
+        private StatusBarControl statusBarControl;
 
         /// <summary>when we have lost focus, we do not want to enable shifting with mouse</summary>
         private bool lostFocus;
@@ -233,7 +239,7 @@ namespace ORTS.TrackViewer
         /// <summary>
         /// Set the sizes of the various subwindows that they can use to draw upon.
         /// </summary>
-        void SetSubwindowSizes()
+        private void SetSubwindowSizes()
         {
             int insetRatio = 10;
 
@@ -639,7 +645,7 @@ namespace ORTS.TrackViewer
             }
         }
 
-        void Window_ClientSizeChanged(object sender, EventArgs e)
+        private void Window_ClientSizeChanged(object sender, EventArgs e)
         {
             ScreenW = Window.ClientBounds.Width;
             ScreenH = Window.ClientBounds.Height;
@@ -692,7 +698,7 @@ namespace ORTS.TrackViewer
         #endregion
 
         #region Folder and Route methods
-        void HandleCommandLineArgs()
+        private void HandleCommandLineArgs()
         {
             if (this.commandLineArgs.Length == 0) return;
             string givenPathOrFile = this.commandLineArgs[0];
@@ -735,20 +741,20 @@ namespace ORTS.TrackViewer
                         break;
 
                     default:
-                        MessageBox.Show(string.Format(catalog.GetString("Route cannot be loaded.\nExtension {0} is not supported"), extension));
+                        MessageBox.Show(catalog.GetString($"Route cannot be loaded.\nExtension {extension} is not supported"));
                         return;
                 }
             }
             else
             {
                 //Obviously, this should only happen when ran on the command line, not when a file is opened using
-                MessageBox.Show(string.Format(catalog.GetString("Route cannot be loaded.\n{0} does not exist"), givenPathOrFile));
+                MessageBox.Show(catalog.GetString($"Route cannot be loaded.\n{givenPathOrFile} does not exist"));
                 return;
             }
 
             string installFolder = System.IO.Directory.GetParent(System.IO.Directory.GetParent(routeFolder).ToString()).ToString();
             if (!SetSelectedInstallFolder(installFolder)) {
-                MessageBox.Show(string.Format(catalog.GetString("Route cannot be loaded.\nWhile trying to open {0} the folder {1} was inferred as (MSTS or similar) install folder but does not contain expected files"), givenPathOrFile, installFolder));
+                MessageBox.Show(catalog.GetString($"Route cannot be loaded.\nWhile trying to open {givenPathOrFile} the folder {installFolder} was inferred as (MSTS or similar) install folder but does not contain expected files"));
                 return;
             }
 
@@ -763,7 +769,7 @@ namespace ORTS.TrackViewer
                     if (!givenFileIsPat) { return; }
                     foreach (Path availablePath in Paths)
                     {
-                        if (availablePath.FilePath.ToUpper() == givenPathOrFile.ToUpper())
+                        if (availablePath.FilePath.ToUpperInvariant() == givenPathOrFile.ToUpperInvariant())
                         {
                             SetPath(availablePath);
                             menuControl.InitUserSettings();
@@ -773,7 +779,7 @@ namespace ORTS.TrackViewer
                 }
             }
 
-            MessageBox.Show(string.Format(catalog.GetString("Route cannot be loaded.\n{0} somehow could not be translated into a loadable route"), givenPathOrFile));
+            MessageBox.Show(catalog.GetString($"Route cannot be loaded.\n{givenPathOrFile} somehow could not be translated into a loadable route"));
         }
 
         /// <summary>
@@ -948,7 +954,7 @@ namespace ORTS.TrackViewer
         /// <summary>
         /// Set the title of the window itself
         /// </summary>
-        void SetTitle()
+        private void SetTitle()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
             AssemblyTitleAttribute assemblyTitle = assembly.GetCustomAttributes(typeof(AssemblyTitleAttribute), false)[0] as AssemblyTitleAttribute;
@@ -1014,7 +1020,7 @@ namespace ORTS.TrackViewer
         /// If the path has been modified, ask the user if he really wants to discard it
         /// </summary>
         /// <returns>false if there is a modified path that the user does not want to discard.</returns>
-        bool CanDiscardModifiedPath()
+        private bool CanDiscardModifiedPath()
         {
             if (PathEditor == null) return true;
             if (!PathEditor.HasModifiedPath) return true;
@@ -1118,7 +1124,7 @@ namespace ORTS.TrackViewer
         #endregion
 
         #region Debug methods
-        void RunDebug()
+        private void RunDebug()
         {
             //Properties.Settings.Default.statusShowFPS = true;
             //ReloadRoute();
@@ -1133,7 +1139,7 @@ namespace ORTS.TrackViewer
 
         }
 
-        static void InitLogging()
+        private static void InitLogging()
         {   // debug only
             //string logFileName = "C:\\tvlog.txt";
             //System.IO.File.Delete(logFileName);
@@ -1143,7 +1149,7 @@ namespace ORTS.TrackViewer
             //Console.WriteLine("started logging");
         }
 
-        void CalculateFPS(GameTime gameTime)
+        private void CalculateFPS(GameTime gameTime)
         {
             float elapsedRealTime = (float)gameTime.TotalGameTime.TotalSeconds;
             FrameRate.Update(elapsedRealTime, 1f / elapsedRealTime);

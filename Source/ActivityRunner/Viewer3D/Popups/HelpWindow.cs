@@ -40,33 +40,31 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
     {
         public bool ActivityUpdated;
         public int lastLastEventID = -1;
+        private Dictionary<int, string> DbfEvalTaskName = new Dictionary<int, string>();//Debrief eval
+        private Dictionary<int, string> DbfEvalTaskLocation = new Dictionary<int, string>();//Debrief eval
+        private Dictionary<int, string> DbfEvalTaskStatus = new Dictionary<int, string>();//Debrief eval
+        private Dictionary<int, string> DbfEvalStationName = new Dictionary<int, string>();//Debrief eval
+        private Dictionary<int, string> DbfEvalSchArrive = new Dictionary<int, string>();//Debrief eval
+        private Dictionary<int, string> DbfEvalSchDepart = new Dictionary<int, string>();//Debrief eval
+        private Dictionary<int, string> DbfEvalActArrive = new Dictionary<int, string>();//Debrief eval
+        private Dictionary<int, string> DbfEvalActDepart = new Dictionary<int, string>();//Debrief eval
 
-        Dictionary<int, string> DbfEvalTaskName = new Dictionary<int, string>();//Debrief eval
-        Dictionary<int, string> DbfEvalTaskLocation = new Dictionary<int, string>();//Debrief eval
-        Dictionary<int, string> DbfEvalTaskStatus = new Dictionary<int, string>();//Debrief eval
-        Dictionary<int, string> DbfEvalStationName = new Dictionary<int, string>();//Debrief eval
-        Dictionary<int, string> DbfEvalSchArrive = new Dictionary<int, string>();//Debrief eval
-        Dictionary<int, string> DbfEvalSchDepart = new Dictionary<int, string>();//Debrief eval
-        Dictionary<int, string> DbfEvalActArrive = new Dictionary<int, string>();//Debrief eval
-        Dictionary<int, string> DbfEvalActDepart = new Dictionary<int, string>();//Debrief eval
+        private Dictionary<string, double> DbfEvalValues = new Dictionary<string, double>();//Debrief eval
 
-        Dictionary<string, double> DbfEvalValues = new Dictionary<string, double>();//Debrief eval
-        
-        ControlLayout scrollbox;
-        ControlLayoutHorizontal line;
-
-        bool lDebriefEvalFile = false;//Debrief eval
-        bool ldbfevalupdateautopilottime = false;//Debrief eval
-        bool actualStatusVisible = false; //Debrief eval
-        bool dbfevalActivityEnded = false; //Debrief eval
-        Label indicator;//Debrief eval
-        Label statusLabel;//Debrief eval
+        private ControlLayout scrollbox;
+        private ControlLayoutHorizontal line;
+        private bool lDebriefEvalFile = false;//Debrief eval
+        private bool ldbfevalupdateautopilottime = false;//Debrief eval
+        private bool actualStatusVisible = false; //Debrief eval
+        private bool dbfevalActivityEnded = false; //Debrief eval
+        private Label indicator;//Debrief eval
+        private Label statusLabel;//Debrief eval
         public string Star;//Debrief eval
-        StreamWriter wDbfEval;//Debrief eval
+        private StreamWriter wDbfEval;//Debrief eval
         public static float DbfEvalDistanceTravelled = 0;//Debrief eval
 
-        List<TabData> Tabs = new List<TabData>();
-        int ActiveTab;
+        private List<TabData> Tabs = new List<TabData>();
+        private int ActiveTab;
 
         private enum FuelTypes { Coal, DieselOil, Kwhr }
         private FuelTypes FuelType;
@@ -640,7 +638,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                 Directory.CreateDirectory(dbfevalDataFolder);
 
                             //.DbfEval.txt
-                            filename = String.Format("{0}{1:yyyyMMdd.HHmm}.DbfEval.txt", filename, DateTime.Now);
+                            filename = $"{filename}{DateTime.Now:yyyyMMdd.HHmm}.DbfEval.txt";
 
                             string logFileName = Path.Combine(dbfevalDataFolder, filename);
                             //Ensure we start with an empty file.
@@ -1079,7 +1077,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             Layout();
         }
 
-        string DrawStar(int value)
+        private string DrawStar(int value)
         {
             string star;
             string starBlack = " ★ ★ ★ ★ ★";
@@ -1201,13 +1199,13 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             return vbox;
         }
 
-        void label_Click(Control control, Point point)
+        private void label_Click(Control control, Point point)
         {
             ActiveTab = (int)control.Tag;
             Layout();
         }
 
-        enum Tab
+        private enum Tab
         {
             KeyboardShortcuts,
             ActivityBriefing,
@@ -1218,7 +1216,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             LocomotiveProcedures,
         }
 
-        class TabData
+        private class TabData
         {
             public readonly Tab Tab;
             public readonly string TabLabel;
@@ -1232,9 +1230,8 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             }
         }
 
-        
-        ActivityTask LastActivityTask;
-        bool StoppedAt;
+        private ActivityTask LastActivityTask;
+        private bool StoppedAt;
         
         public override void PrepareFrame(in ElapsedTime elapsedTime, bool updateFull)
         {
@@ -1280,7 +1277,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             //UpdateActivityStatus();
         }
 
-        static bool GetStoppedAt(ActivityTask task)
+        private static bool GetStoppedAt(ActivityTask task)
         {
             var stopAtTask = task as ActivityTaskPassengerStopAt;
             if (stopAtTask != null)
@@ -1289,7 +1286,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         }
     }
 
-    class Key : Label
+    internal class Key : Label
     {
         public Color KeyColor;
 

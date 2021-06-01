@@ -67,7 +67,7 @@ namespace Orts.Formats.Msts.Models
                     var trItemId = stf.ReadInt(-1);
                     if (trItemId != -1) {
                         if (trItemId >= trItems.Length) {
-                            STFException.TraceWarning(stf, string.Format("Ignored invalid TrItemId {0}", trItemId));
+                            STFException.TraceWarning(stf, $"Ignored invalid TrItemId {trItemId}");
                         } else {
                             TrackNodes.Add(trItemId);
                         }

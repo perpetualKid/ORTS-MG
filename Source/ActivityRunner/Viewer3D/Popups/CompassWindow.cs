@@ -27,9 +27,9 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class CompassWindow : Window
 	{
-		PopupCompass Compass;
-		Label Latitude;
-		Label Longitude;
+        private PopupCompass Compass;
+        private Label Latitude;
+        private Label Longitude;
 
 		public CompassWindow(WindowManager owner)
 			: base(owner, Window.DecorationSize.X + owner.TextFontDefault.Height * 15, Window.DecorationSize.Y + owner.TextFontDefault.Height * 4, Viewer.Catalog.GetString("Compass"))
@@ -73,9 +73,9 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 
 	public class PopupCompass : Control
 	{
-		static Texture2D CompassTexture;
-		static int[] HeadingHalfWidths;
-        WindowTextFont Font;
+        private static Texture2D CompassTexture;
+        private static int[] HeadingHalfWidths;
+        private WindowTextFont Font;
 		public float Heading;
 
 		public PopupCompass(int width, int height)

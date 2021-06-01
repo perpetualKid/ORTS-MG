@@ -65,14 +65,14 @@ namespace Orts.ActivityRunner.Viewer3D
         private Vector2D windSpeedInternalMpS;
         private Vector2D[] windSpeedMpS = new Vector2D[2];
         public float Time;
-        readonly double[] windChangeMpSS = { 40, 5 }; // Flurry, steady
+        private readonly double[] windChangeMpSS = { 40, 5 }; // Flurry, steady
         private const double windSpeedMaxMpS = 4.5f;
         private double windUpdateTimer = 0.0;
-        float WindGustUpdateTimeS = 1.0f;
-        bool InitialWind = true;
-        float BaseWindDirectionRad;
-        float WindDirectionVariationRad = (float)MathHelper.ToRadians(45.0f); // Set at 45 Deg
-        float calculatedWindDirection;
+        private float WindGustUpdateTimeS = 1.0f;
+        private bool InitialWind = true;
+        private float BaseWindDirectionRad;
+        private float WindDirectionVariationRad = (float)MathHelper.ToRadians(45.0f); // Set at 45 Deg
+        private float calculatedWindDirection;
 
 
         public WeatherControl(Viewer viewer)
@@ -341,7 +341,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         }
 
-        void UpdateSoundSources()
+        private void UpdateSoundSources()
         {
             viewer.SoundProcess.RemoveSoundSources(this);
             switch (viewer.Simulator.WeatherType)
@@ -352,7 +352,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        void UpdateVolume()
+        private void UpdateVolume()
         {
             if (viewer.RenderProcess.GraphicsDevice.GraphicsProfile == GraphicsProfile.HiDef)
             {
@@ -873,7 +873,7 @@ namespace Orts.ActivityRunner.Viewer3D
     {
         // Variables used for auto weather control
         // settings
-        List<WeatherCondition> weatherDetails = new List<WeatherCondition>();
+        private List<WeatherCondition> weatherDetails = new List<WeatherCondition>();
 
         // running values
         // general
@@ -943,7 +943,7 @@ namespace Orts.ActivityRunner.Viewer3D
         }
 
         // check weather details, set auto variables
-        void CheckWeatherDetails()
+        private void CheckWeatherDetails()
         {
             float prevTime = 0;
 
@@ -964,7 +964,7 @@ namespace Orts.ActivityRunner.Viewer3D
         }
 
         // check value, set random value if allowed and value not set
-        void CheckValue(ref float setValue, bool randomize, float minValue, float maxValue, TimeSpan acttime, string description)
+        private void CheckValue(ref float setValue, bool randomize, float minValue, float maxValue, TimeSpan acttime, string description)
         {
             // overcast
             if (setValue < 0 && randomize)
@@ -984,7 +984,7 @@ namespace Orts.ActivityRunner.Viewer3D
         }
 
         // set initial weather parameters
-        void SetInitialWeatherParameters(double realTime)
+        private void SetInitialWeatherParameters(double realTime)
         {
             Time = (float)realTime;
 
@@ -1256,7 +1256,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        float GetWeatherVisibility(WeatherCondition weatherDetail)
+        private float GetWeatherVisibility(WeatherCondition weatherDetail)
         {
             float nextVisibility = weather.FogDistance; // present visibility
             if (weatherDetail is FogCondition fogCondition)
@@ -1274,7 +1274,7 @@ namespace Orts.ActivityRunner.Viewer3D
             return (nextVisibility);
         }
 
-        void StartFog(FogCondition fogCondition, float startTime, int activeIndex)
+        private void StartFog(FogCondition fogCondition, float startTime, int activeIndex)
         {
             // fog fully set or fog at start of day
             if (startTime > (fogCondition.Time + fogCondition.SetTime) || activeIndex == 0)
@@ -1289,7 +1289,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        void CalculateFog(FogCondition fogCondition, int nextIndex)
+        private void CalculateFog(FogCondition fogCondition, int nextIndex)
         {
             if (AWFogLiftTime > 0 && Time > AWFogLiftTime && nextIndex > 0) // fog is lifting
             {
@@ -1305,7 +1305,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        void StartPrecipitation(PrecipitationCondition precipitationCondition, float startTime, bool allowImmediateStart)
+        private void StartPrecipitation(PrecipitationCondition precipitationCondition, float startTime, bool allowImmediateStart)
         {
             AWPrecipitationRequiredType = precipitationCondition.PrecipitationType;
 
@@ -1332,7 +1332,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
 
             // determine actual precipitation state - only if immediate start allowed
-            bool precipitationActive = allowImmediateStart ? Viewer.Random.Next(100) >= precipitationCondition.Probability : false;
+            bool precipitationActive = allowImmediateStart && Viewer.Random.Next(100) >= precipitationCondition.Probability;
 
 #if DEBUG_AUTOWEATHER
             Trace.TraceInformation("Precipitation active on start : {0}", precipitationActive.ToString());
@@ -1425,7 +1425,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        void StartPrecipitationSpell(PrecipitationCondition precipitationCondition, float nextWeatherTime)
+        private void StartPrecipitationSpell(PrecipitationCondition precipitationCondition, float nextWeatherTime)
         {
             int precvariation = (int)(precipitationCondition.Variation * 100);
             float baseDensitiy = PrecipitationViewer.MaxIntensityPPSPM2 * precipitationCondition.Density;
@@ -1472,7 +1472,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         }
 
-        void CalculatePrecipitation(PrecipitationCondition precipitationCondition, in ElapsedTime elapsedTime)
+        private void CalculatePrecipitation(PrecipitationCondition precipitationCondition, in ElapsedTime elapsedTime)
         {
             if (AWPrecipitationActualPPSPM2 < AWPrecipitationRequiredPPSPM2)
             {
@@ -1503,7 +1503,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 (reqVisibility - AWLastVisibility));
         }
 
-        void StopPrecipitationSpell(PrecipitationCondition precipitationCondition, in ElapsedTime elapsedTime)
+        private void StopPrecipitationSpell(PrecipitationCondition precipitationCondition, in ElapsedTime elapsedTime)
         {
             AWPrecipitationActualPPSPM2 = (float)Math.Max(PrecipitationViewer.MinIntensityPPSPM2, AWPrecipitationActualPPSPM2 - AWPrecipitationEndRate * elapsedTime.RealSeconds);
             AWActualVisibility = AWLastVisibility +
@@ -1511,7 +1511,7 @@ namespace Orts.ActivityRunner.Viewer3D
             AWOvercastCloudcover = CalculateOvercast(precipitationCondition.Overcast.Overcast, 0, precipitationCondition.OvercastDispersion, elapsedTime);
         }
 
-        float CalculateOvercast(float requiredOvercast, float overcastVariation, float overcastRateOfChange, in ElapsedTime elapsedTime)
+        private float CalculateOvercast(float requiredOvercast, float overcastVariation, float overcastRateOfChange, in ElapsedTime elapsedTime)
         {
             float requiredOvercastFactor = requiredOvercast / 100f;
             if (overcastRateOfChange == 0)

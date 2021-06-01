@@ -22,7 +22,6 @@ using System.IO;
 using System.Linq;
 
 using Orts.Common.Info;
-using Orts.Common.Native;
 using Orts.Formats.Msts.Files;
 
 namespace Orts.DataCollector
@@ -32,7 +31,6 @@ namespace Orts.DataCollector
 #pragma warning disable CA1303 // Do not pass literals as localized parameters
         private static void Main(string[] args)
         {
-            NativeMethods.SetProcessDpiAwareness(NativeMethods.PROCESS_DPI_AWARENESS.Process_Per_Monitor_DPI_Aware);
             Trace.Listeners.Add(new ConsoleTraceListener());
 
             if (args.Contains("/system", StringComparer.OrdinalIgnoreCase))

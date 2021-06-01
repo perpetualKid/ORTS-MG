@@ -1196,7 +1196,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <param name="offset">Offset from copy</param>
         /// <param name="len">Number of bytes to copy</param>
         /// <returns>New buffer with the extracted data</returns>
-        static byte[] GetFromArray(byte[] buffer, int offset, int len)
+        private static byte[] GetFromArray(byte[] buffer, int offset, int len)
         {
             byte[] retval = new byte[len];
             Buffer.BlockCopy(buffer, offset, retval, 0, len);

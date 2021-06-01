@@ -76,8 +76,6 @@ namespace Orts.Updater
             return base.WriteAsync(buffer, offset, count, cancellationToken); ;
         }
 
-#if NETCOREAPP
-
         public override ValueTask WriteAsync(ReadOnlyMemory<byte> source, CancellationToken cancellationToken = default)
         {
             if (base.CanWrite && ExpectedLength > 0 && (base.Position + source.Length) / (ExpectedLength / 100) > percentage)
@@ -86,7 +84,6 @@ namespace Orts.Updater
             }
             return base.WriteAsync(source, cancellationToken);
         }
-#endif
     }
 
 

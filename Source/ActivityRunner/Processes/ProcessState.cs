@@ -25,11 +25,12 @@ namespace Orts.ActivityRunner.Processes
     {
         public bool Finished { get; private set; }
         public bool Terminated { get; private set; }
-        readonly ManualResetEvent StartEvent = new ManualResetEvent(false);
-        readonly ManualResetEvent FinishEvent = new ManualResetEvent(true);
-        readonly ManualResetEvent TerminateEvent = new ManualResetEvent(false);
-        readonly WaitHandle[] StartEvents;
-        readonly WaitHandle[] FinishEvents;
+
+        private readonly ManualResetEvent StartEvent = new ManualResetEvent(false);
+        private readonly ManualResetEvent FinishEvent = new ManualResetEvent(true);
+        private readonly ManualResetEvent TerminateEvent = new ManualResetEvent(false);
+        private readonly WaitHandle[] StartEvents;
+        private readonly WaitHandle[] FinishEvents;
 #if DEBUG_THREAD_PERFORMANCE
         StreamWriter DebugFileStream;
 #endif

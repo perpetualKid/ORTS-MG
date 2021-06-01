@@ -129,8 +129,8 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class DynamicTrackViewer
     {
-        Viewer Viewer;
-        WorldPosition worldPosition;
+        private Viewer Viewer;
+        private WorldPosition worldPosition;
         public DynamicTrackPrimitive Primitive;
 
         public DynamicTrackViewer(Viewer viewer, DynamicTrackObject dtrack, in WorldPosition position, in WorldPosition endPosition)
@@ -362,7 +362,7 @@ namespace Orts.ActivityRunner.Viewer3D
         }
 
         // ValidationEventHandler callback function
-        void ValidationCallback(object sender, ValidationEventArgs args)
+        private void ValidationCallback(object sender, ValidationEventArgs args)
         {
             Console.WriteLine(); // Terminate pending Write
             if (args.Severity == XmlSeverityType.Warning)
@@ -1135,7 +1135,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <summary>
         /// Initializes member variables for straight track sections.
         /// </summary>
-        void LinearGen()
+        private void LinearGen()
         {
             // Define the number of track cross sections in addition to the base.
             NumSections = 1;
@@ -1149,7 +1149,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <summary>
         /// Initializes member variables for circular arc track sections.
         /// </summary>
-        void CircArcGen()
+        private void CircArcGen()
         {
             // Define the number of track cross sections in addition to the base.
             NumSections = (int)(Math.Abs(MathHelper.ToDegrees(DTrackData.Length)) / TrProfile.ChordSpan);

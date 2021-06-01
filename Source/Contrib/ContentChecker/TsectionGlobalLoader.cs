@@ -24,10 +24,10 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for the tsection.dat in the global directory files
     /// </summary>
-    class TsectionGlobalLoader : Loader
+    internal class TsectionGlobalLoader : Loader
     {
-        TrackSectionsFile TSectionDat;
-        string _routePath;
+        private TrackSectionsFile trackSectionDat;
+        private readonly string routePath;
 
         /// <summary>
         /// default constructor for when this file is checked directly
@@ -43,7 +43,7 @@ namespace Orts.ContentChecker
         /// <param name="routePath">The path (directory) of a route</param>
         public TsectionGlobalLoader(string routePath) : this()
         {
-            _routePath = routePath;
+            this.routePath = routePath;
         }
         /// <summary>
         /// Try to load the file.
@@ -52,20 +52,20 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            TSectionDat = new TrackSectionsFile(file);
+            trackSectionDat = new TrackSectionsFile(file);
         }
 
         protected override void AddDependentFiles()
         {
-            if (_routePath == null)
+            if (string.IsNullOrEmpty(routePath))
             { // we do not know which route needs to be loaded additionally
                 return;
             }
 
-            string routeTsectionDat = Path.Combine(_routePath, "tsection.dat");
+            string routeTsectionDat = Path.Combine(routePath, "tsection.dat");
             if (File.Exists(routeTsectionDat))
             {
-                var tsectionLoader = new TsectionLoader(TSectionDat);
+                TSectionLoader tsectionLoader = new TSectionLoader(trackSectionDat);
                 AddAdditionalFileAction.Invoke(routeTsectionDat, tsectionLoader);
             }
 

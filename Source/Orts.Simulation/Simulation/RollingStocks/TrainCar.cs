@@ -106,7 +106,7 @@ namespace Orts.Simulation.RollingStocks
         public static int DbfEvalTravellingTooFastSnappedBrakeHose;//Debrief eval
         public bool dbfEvalsnappedbrakehose = false;//Debrief eval
         public bool ldbfevalcurvespeed = false;//Debrief eval
-        static float dbfmaxsafecurvespeedmps;//Debrief eval
+        private static float dbfmaxsafecurvespeedmps;//Debrief eval
         public static int DbfEvalTrainOverturned;//Debrief eval
         public bool ldbfevaltrainoverturned = false;
                                         
@@ -122,13 +122,13 @@ namespace Orts.Simulation.RollingStocks
         public Interpolator TrainHeatBoilerFuelUsageGalukpH;
 
         // Input values to allow the water and fuel usage of steam heating boiler to be calculated based upon Spanner SwirlyFlo Mk111 Boiler
-        static double[] SteamUsageLbpH = {0.0, 3000.0};
+        private static double[] SteamUsageLbpH = {0.0, 3000.0};
 
         // Water Usage
-        static double[] WaterUsageGalukpH = { 0.0, 300.0 };
+        private static double[] WaterUsageGalukpH = { 0.0, 300.0 };
 
         // Fuel usage
-        static double[] FuelUsageGalukpH = { 0.0, 31.0};
+        private static double[] FuelUsageGalukpH = { 0.0, 31.0};
 
         public static Interpolator SteamHeatBoilerWaterUsageGalukpH { get; } = new Interpolator(SteamUsageLbpH, WaterUsageGalukpH);
 
@@ -225,9 +225,9 @@ namespace Orts.Simulation.RollingStocks
         public float BrakeShoeCoefficientFriction = 1.0f; // Brake Shoe coefficient - for simple adhesion model set to 1
         public float BrakeShoeCoefficientFrictionAdjFactor = 1.0f; // Factor to adjust Brake force by - based upon changing friction coefficient with speed, will change when wheel goes into skid
         public float BrakeShoeRetardCoefficientFrictionAdjFactor = 1.0f; // Factor of adjust Retard Brake force by - independent of skid
-        float DefaultBrakeShoeCoefficientFriction;  // A default value of brake shoe friction is no user settings are present.
-        float BrakeWheelTreadForceN; // The retarding force apparent on the tread of the wheel
-        float WagonBrakeAdhesiveForceN; // The adhesive force existing on the wheels of the wagon
+        private float DefaultBrakeShoeCoefficientFriction;  // A default value of brake shoe friction is no user settings are present.
+        private float BrakeWheelTreadForceN; // The retarding force apparent on the tread of the wheel
+        private float WagonBrakeAdhesiveForceN; // The adhesive force existing on the wheels of the wagon
         public float SkidFriction = 0.08f; // Friction if wheel starts skidding - based upon wheel dynamic friction of approx 0.08
 
         public float AuxTenderWaterMassKG;    // Water mass in auxiliary tender
@@ -287,35 +287,32 @@ namespace Orts.Simulation.RollingStocks
         public float HotBoxStartTimeS;
 
         // Setup for ambient temperature dependency
-        Interpolator OutsideWinterTempbyLatitudeC;
-        Interpolator OutsideAutumnTempbyLatitudeC;
-        Interpolator OutsideSpringTempbyLatitudeC;
-        Interpolator OutsideSummerTempbyLatitudeC;
+        private Interpolator OutsideWinterTempbyLatitudeC;
+        private Interpolator OutsideAutumnTempbyLatitudeC;
+        private Interpolator OutsideSpringTempbyLatitudeC;
+        private Interpolator OutsideSummerTempbyLatitudeC;
         public bool AmbientTemperatureInitialised;
 
         // Input values to allow the temperature for different values of latitude to be calculated
-        static double[] WorldLatitudeDeg = new double[]
+        private static double[] WorldLatitudeDeg = new double[]
         {
            -50.0f, -40.0f, -30.0f, -20.0f, -10.0f, 0.0f, 10.0f, 20.0f, 30.0f, 40.0f, 50.0f, 60.0f
         };
 
         // Temperature in deg Celcius
-        static double[] WorldTemperatureWinter = new double[]
+        private static double[] WorldTemperatureWinter = new double[]
         {
             0.9f, 8.7f, 12.4f, 17.2f, 20.9f, 25.9f, 22.8f, 18.2f, 11.1f, 1.1f, -10.2f, -18.7f
          };
-
-        static double[] WorldTemperatureAutumn = new double[]
+        private static double[] WorldTemperatureAutumn = new double[]
         {
             7.5f, 13.7f, 18.8f, 22.0f, 24.0f, 26.0f, 25.0f, 21.6f, 21.0f, 14.3f, 6.0f, 3.8f
          };
-
-        static double[] WorldTemperatureSpring = new double[]
+        private static double[] WorldTemperatureSpring = new double[]
         {
             8.5f, 13.1f, 17.6f, 18.6f, 24.6f, 25.9f, 26.8f, 23.4f, 18.5f, 12.6f, 6.1f, 1.7f
          };
-
-        static double[] WorldTemperatureSummer = new double[]
+        private static double[] WorldTemperatureSummer = new double[]
         {
             13.4f, 18.3f, 22.8f, 24.3f, 24.4f, 25.0f, 25.2f, 22.5f, 26.6f, 24.8f, 19.4f, 14.3f
          };
@@ -1504,17 +1501,18 @@ namespace Orts.Simulation.RollingStocks
         public virtual string GetStatus() { return null; }
         public virtual string GetDebugStatus()
         {
-            return String.Format("{0}\t{2}\t{1}\t{3}\t{4:F0}%\t{5}\t\t{6}\t{7}\t",
+            return string.Format(System.Globalization.CultureInfo.CurrentCulture, "{0}\t{2}\t{1}\t{3}\t{4:F0}%\t{5}\t\t{6}\t{7}\t",
                 CarID,
                 Flipped ? Simulator.Catalog.GetString("Yes") : Simulator.Catalog.GetString("No"),
                 Direction.GetLocalizedDescription(),
                 AcceptMUSignals ? Simulator.Catalog.GetString("Yes") : Simulator.Catalog.GetString("No"),
                 ThrottlePercent,
-                String.Format("{0}", FormatStrings.FormatSpeedDisplay(SpeedMpS, IsMetric)),
+                $"{FormatStrings.FormatSpeedDisplay(SpeedMpS, IsMetric)}",
                 // For Locomotive HUD display shows "forward" motive power (& force) as a positive value, braking power (& force) will be shown as negative values.
                 FormatStrings.FormatPower((MotiveForceN) * SpeedMpS, IsMetric, false, false),
-                String.Format("{0}{1}", FormatStrings.FormatForce(MotiveForceN, IsMetric), WheelSlip ? "!!!" : WheelSlipWarning ? "???" : ""));
+                $"{FormatStrings.FormatForce(MotiveForceN, IsMetric)}{(WheelSlip ? "!!!" : WheelSlipWarning ? "???" : "")}");
         }
+
         public virtual string GetTrainBrakeStatus() { return null; }
         public virtual string GetEngineBrakeStatus() { return null; }
         public virtual string GetBrakemanBrakeStatus() { return null; }
@@ -2231,7 +2229,7 @@ namespace Orts.Simulation.RollingStocks
         #endregion
 
         #region Super-elevation
-        void UpdateSuperElevation(Traveller traveler,  double elapsedTimeS)
+        private void UpdateSuperElevation(Traveller traveler,  double elapsedTimeS)
         {
             if (Simulator.Settings.UseSuperElevation == 0)
                 return;
@@ -2273,33 +2271,29 @@ namespace Orts.Simulation.RollingStocks
         //   k = m * 9.8 / 0.2
         // Finally, we assume a mass (m) of 1kg to calculate a mass-independent value:
         //   k' = 9.8 / 0.2
-        const float VibrationSpringConstantPrimepSpS = 9.8f / 0.2f; // 1/s/s
+        private const float VibrationSpringConstantPrimepSpS = 9.8f / 0.2f; // 1/s/s
 
         // 
-        const float VibratioDampingCoefficient = 0.01f;
+        private const float VibratioDampingCoefficient = 0.01f;
 
         // This is multiplied by the CarVibratingLevel (which goes up to 3).
-        const float VibrationIntroductionStrength = 0.03f;
+        private const float VibrationIntroductionStrength = 0.03f;
 
         // The tightest curve we care about has a radius of 100m. This is used as the basis for the most violent vibrations.
-        const float VibrationMaximumCurvaturepM = 1f / 100;
-
-        const float VibrationFactorDistance = 1;
-        const float VibrationFactorTrackVectorSection = 2;
-        const float VibrationFactorTrackNode = 4;
-
-        Vector3 VibrationOffsetM;
-        Vector3 VibrationRotationRad;
-        Vector3 VibrationRotationVelocityRadpS;
-        Vector2 VibrationTranslationM;
-        Vector2 VibrationTranslationVelocityMpS;
-
-        int VibrationTrackNode;
-        int VibrationTrackVectorSection;
-        float VibrationTrackCurvaturepM;
-
-        float PrevTiltingZRot; // previous tilting angle
-        float TiltingZRot; // actual tilting angle
+        private const float VibrationMaximumCurvaturepM = 1f / 100;
+        private const float VibrationFactorDistance = 1;
+        private const float VibrationFactorTrackVectorSection = 2;
+        private const float VibrationFactorTrackNode = 4;
+        private Vector3 VibrationOffsetM;
+        private Vector3 VibrationRotationRad;
+        private Vector3 VibrationRotationVelocityRadpS;
+        private Vector2 VibrationTranslationM;
+        private Vector2 VibrationTranslationVelocityMpS;
+        private int VibrationTrackNode;
+        private int VibrationTrackVectorSection;
+        private float VibrationTrackCurvaturepM;
+        private float PrevTiltingZRot; // previous tilting angle
+        private float TiltingZRot; // actual tilting angle
 
         internal void UpdateVibrationAndTilting(Traveller traveler, double elapsedTimeS, double distanceM, float speedMpS)
         {

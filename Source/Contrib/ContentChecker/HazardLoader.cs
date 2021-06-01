@@ -23,7 +23,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .haz files
     /// </summary>
-    class HazardLoader : Loader
+    internal class HazardLoader : Loader
     {
         /// <summary>
         /// Try to load the file.
@@ -32,7 +32,7 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            var hazF = new HazardFile(file);
+            _ = new HazardFile(file);
         }
     }
 }

@@ -139,7 +139,7 @@ namespace Orts.ContentManager.Models
         /// <summary>
         /// Convert <see cref="ActivityFile"/> arrival and departure times in to normalized times.
         /// </summary>
-        DateTime MSTSTimeToDateTime(DateTime mstsPlayerTime)
+        private DateTime MSTSTimeToDateTime(DateTime mstsPlayerTime)
         {
             return mstsPlayerTime.AddYears(1999);
         }
@@ -147,7 +147,7 @@ namespace Orts.ContentManager.Models
         /// <summary>
         /// Convert <see cref="TrafficFile"/> arrival and departure times in to normalized times.
         /// </summary>
-        DateTime MSTSTimeToDateTime(int mstsAITime)
+        private DateTime MSTSTimeToDateTime(int mstsAITime)
         {
             return new DateTime(2000, 1, 1).AddSeconds(mstsAITime);
         }

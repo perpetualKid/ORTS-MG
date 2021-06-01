@@ -54,7 +54,7 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
             State.SignalTerminate();
         }
 
-        void WebServerThread()
+        private void WebServerThread()
         {
             Profiler.SetThread();
             Game.SetThreadLanguage();

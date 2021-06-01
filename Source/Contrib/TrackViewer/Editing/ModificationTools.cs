@@ -113,7 +113,7 @@ namespace ORTS.TrackViewer.Editing
         /// <param name="nextTvnIndex">TrackNodeVector index along which to place the track</param>
         /// <param name="isMainPath">Are we adding a node on the main path (alternative is passing path)</param>
         /// <returns>The newly created junction path node</returns>
-        TrainpathJunctionNode AddAdditionalJunctionNode(TrainpathNode lastNode, int nextTvnIndex, bool isMainPath)
+        private TrainpathJunctionNode AddAdditionalJunctionNode(TrainpathNode lastNode, int nextTvnIndex, bool isMainPath)
         {
             // we add a new activeNodeAsJunction
             TrainpathJunctionNode newNode = new TrainpathJunctionNode(lastNode);

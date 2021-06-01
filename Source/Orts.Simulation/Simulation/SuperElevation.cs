@@ -98,7 +98,7 @@ namespace Orts.Simulation
             }
         }
 
-        void MarkSections(Simulator simulator, List<TrackVectorSection> SectionList, float Len)
+        private void MarkSections(Simulator simulator, List<TrackVectorSection> SectionList, float Len)
         {
             if (Len < simulator.SuperElevationMinLen || SectionList.Count == 0) return;//too short a curve or the list is empty
             var tSection = simulator.TSectionDat.TrackSections;
@@ -134,7 +134,7 @@ namespace Orts.Simulation
         }
 
         //find all sections in a tile, save the info to a look-up table
-        void MapWFiles2Sections(List<TrackVectorSection> sections)
+        private void MapWFiles2Sections(List<TrackVectorSection> sections)
         {
             foreach (var section in sections)
             {

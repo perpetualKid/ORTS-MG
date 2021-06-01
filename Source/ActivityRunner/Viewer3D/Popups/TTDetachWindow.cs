@@ -29,16 +29,13 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class TTDetachWindow : Window
     {
-        const int WindowImageSizeWidth = 600;
-        const int WindowImageSizeHeightFactor = 7;
-
-        Label ThisPortionLine;
-        Label OtherPortionLine;
-
-        Label ButtonDetach;
-
-        DetachInfo reqDetach = null;
-        TTTrain reqTrain;
+        private const int WindowImageSizeWidth = 600;
+        private const int WindowImageSizeHeightFactor = 7;
+        private Label ThisPortionLine;
+        private Label OtherPortionLine;
+        private Label ButtonDetach;
+        private DetachInfo reqDetach = null;
+        private TTTrain reqTrain;
         
         public TTDetachWindow(WindowManager owner)
             : base(owner, Window.DecorationSize.X + WindowImageSizeWidth, Window.DecorationSize.Y + owner.TextFontDefault.Height * WindowImageSizeHeightFactor + ControlLayout.SeparatorSize * 2, Viewer.Catalog.GetString("Timetable Detach Menu"))
@@ -121,7 +118,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             }
         }
 
-        void ButtonDetach_Click(Control arg1, Point arg2)
+        private void ButtonDetach_Click(Control arg1, Point arg2)
         {
             if (reqDetach != null)
             {

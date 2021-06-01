@@ -32,10 +32,10 @@ namespace ORTS.TrackViewer.Editing
     /// </summary>
     public static class SavePatFile
     {
-        static List<string> trackPDPs;
-        static List<string> trpathnodes;
-        const uint nonext = 4294967295;
-        static Dictionary<int, int> pdpOfJunction;
+        private static List<string> trackPDPs;
+        private static List<string> trpathnodes;
+        private const uint nonext = 4294967295;
+        private static Dictionary<int, int> pdpOfJunction;
 
         /// <summary>
         /// Write the path to file. This will need to confirm to the MSTS definition for .pat files.
@@ -79,13 +79,13 @@ namespace ORTS.TrackViewer.Editing
 
         }
 
-        static void DisplayNoPathAvailable()
+        private static void DisplayNoPathAvailable()
         {
             MessageBox.Show(TrackViewer.catalog.GetString("Path does not even have a start node.\nSaving is not possible."),
                         TrackViewer.catalog.GetString("Trackviewer Path Editor"), MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
 
-        static bool UserCancelledBecauseOfUnfinishedPath(Trainpath trainpath)
+        private static bool UserCancelledBecauseOfUnfinishedPath(Trainpath trainpath)
         {
             List<string> cancelReasons = new List<string>();
             if (!trainpath.HasEnd) cancelReasons.Add(TrackViewer.catalog.GetString("* The path does not have a well-defined end-point"));
@@ -104,7 +104,7 @@ namespace ORTS.TrackViewer.Editing
 
         }
 
-        static void InformUserPathIsBroken()
+        private static void InformUserPathIsBroken()
         {
             MessageBox.Show(
                 TrackViewer.catalog.GetString("Saving broken paths might not always work correctly.") + "\n" +
@@ -117,7 +117,7 @@ namespace ORTS.TrackViewer.Editing
         /// </summary>
         /// <param name="trainpath">The current path to get the default file path and name</param>
         /// <returns>Boolean describing whether user wants to write to file or not.</returns>
-        static bool GetFileName(Trainpath trainpath)
+        private static bool GetFileName(Trainpath trainpath)
         {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
             {
@@ -139,7 +139,7 @@ namespace ORTS.TrackViewer.Editing
         /// Run through all path nodes and create the trackPDPs and the trPathNodes
         /// </summary>
         /// <param name="trainpath">The path itself, that needs to be written</param>
-        static void CreatePDPsAndTrpathNodes(Trainpath trainpath)
+        private static void CreatePDPsAndTrpathNodes(Trainpath trainpath)
         {
             trackPDPs = new List<string>();
             trpathnodes = new List<string>();
@@ -314,7 +314,7 @@ namespace ORTS.TrackViewer.Editing
     /// <summary>
     /// Class to simply save a list of stationNames to a unicode text file.
     /// </summary>
-    class SaveStationNames
+    internal class SaveStationNames
     {
         /// <summary>
         /// Saves the station names to a file
@@ -333,7 +333,7 @@ namespace ORTS.TrackViewer.Editing
             file.Close();
         }
 
-        static string GetFileName()
+        private static string GetFileName()
         {
             Microsoft.Win32.SaveFileDialog dlg = new Microsoft.Win32.SaveFileDialog
             {

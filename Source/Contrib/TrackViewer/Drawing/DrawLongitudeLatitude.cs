@@ -26,7 +26,7 @@ namespace ORTS.TrackViewer.Drawing
     /// </summary>
     public class DrawLongitudeLatitude
     {
-        Vector2 lowerLeft;
+        private Vector2 lowerLeft;
 
         /// <summary>
         /// Constructor
@@ -50,8 +50,7 @@ namespace ORTS.TrackViewer.Drawing
             EarthCoordinates.ConvertWTC(mstsLocation.TileX, mstsLocation.TileZ, mstsLocation.Location, out double latitude, out double longitude);
             string latitudeDegrees = MathHelper.ToDegrees((float)latitude).ToString("F5", System.Globalization.CultureInfo.CurrentCulture);
             string longitudeDegrees = MathHelper.ToDegrees((float)longitude).ToString("F5", System.Globalization.CultureInfo.CurrentCulture);
-            string locationText = String.Format(System.Globalization.CultureInfo.CurrentCulture, 
-                "Lon = {0}; Lat = {1}", longitudeDegrees, latitudeDegrees);
+            string locationText = $"Lon = {longitudeDegrees}; Lat = {latitudeDegrees}";
             BasicShapes.DrawString(lowerLeft, DrawColors.colorsNormal.Text, locationText);           
         }
     }

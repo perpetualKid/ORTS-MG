@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text;
 
@@ -12,6 +13,7 @@ namespace Orts.Formats.Msts.Signalling
             Value = value;
             Type = type;
         }
+
         public Token(TokenType type, char value)
         {
             Value = value.ToString();
@@ -63,7 +65,7 @@ namespace Orts.Formats.Msts.Signalling
 
     internal class Tokenizer : IEnumerable<Token>
     {
-        private TextReader reader;
+        private readonly TextReader reader;
 
         internal int LineNumber { get; private set; }
 
@@ -74,7 +76,7 @@ namespace Orts.Formats.Msts.Signalling
         public Tokenizer(TextReader reader, int lineNumberOffset)
         {
             this.reader = reader;
-            this.LineNumber = lineNumberOffset;
+            LineNumber = lineNumberOffset;
         }
 
         public IEnumerator<Token> GetEnumerator()
@@ -82,13 +84,10 @@ namespace Orts.Formats.Msts.Signalling
             string line;
             CommentParserState state = CommentParserState.None;
             StringBuilder value = new StringBuilder(256);
-            bool lineContent = false;
-
             while ((line = reader.ReadLine()) != null)
             {
                 LineNumber++;
-                lineContent = false;
-
+                bool lineContent = false;
                 foreach (char c in line)
                 {
                     switch (c)
@@ -109,7 +108,7 @@ namespace Orts.Formats.Msts.Signalling
                                     if (value.Length == 1 && value[0] == '/')
                                     {
                                         state = CommentParserState.None;
-                                        value.Length = value.Length - 1;
+                                        value.Length--;
                                         goto SkipLineComment;
                                     }
                                     else
@@ -142,7 +141,7 @@ namespace Orts.Formats.Msts.Signalling
                                 case CommentParserState.Operator:
                                     if (value.Length == 1 && value[0] == '/')
                                     {
-                                        value.Length = value.Length - 1;
+                                        value.Length--;
                                         state = CommentParserState.OpenComment;
                                         continue;
                                     }
@@ -240,11 +239,11 @@ namespace Orts.Formats.Msts.Signalling
                                         value.Length = 0;
                                     }
                                     state = CommentParserState.None;
-                                    value.Append(char.ToUpper(c));
+                                    value.Append(char.ToUpper(c, CultureInfo.InvariantCulture));
                                     continue;
                                 default:
                                     state = CommentParserState.None;
-                                    value.Append(char.ToUpper(c));
+                                    value.Append(char.ToUpper(c, CultureInfo.InvariantCulture));
                                     continue;
                             }
                     }

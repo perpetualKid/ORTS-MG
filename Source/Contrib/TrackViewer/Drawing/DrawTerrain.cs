@@ -82,9 +82,9 @@ namespace ORTS.TrackViewer.Drawing
         private MessageDelegate messageDelegate;
 
         //Directory paths of various formats and files
-        string tilesPath;
-        string lotilesPath;
-        string terrtexPath;
+        private string tilesPath;
+        private string lotilesPath;
+        private string terrtexPath;
 
         //basic graphics
         private GraphicsDevice device;
@@ -229,7 +229,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <summary>
         /// Find and store the current visible area
         /// </summary>
-        void DetermineVisibleArea(DrawArea drawArea)
+        private void DetermineVisibleArea(DrawArea drawArea)
         {
             WorldLocation upperLeft = drawArea.LocationUpperLeft;
             WorldLocation lowerRight = drawArea.LocationLowerRight;
@@ -262,7 +262,7 @@ namespace ORTS.TrackViewer.Drawing
         /// </summary>
         /// <param name="tileX">The cornerIndexX-value of the tile number</param>
         /// <param name="tileZ">The cornerIndexZ-value of the tile number</param>
-        void EnsureTileIsLoaded(int tileX, int tileZ)
+        private void EnsureTileIsLoaded(int tileX, int tileZ)
         {
             uint index = this.locationTranslator.TileIndex(tileX, tileZ, 1);
             if (loadedTerrainTiles.Contains(index))
@@ -334,7 +334,7 @@ namespace ORTS.TrackViewer.Drawing
         /// Create the texture-name-indexed vertex buffers that the Graphics card will need.
         /// The vertex buffers are created from information pre-calculated in stored 'TerrainTile2D' objects.
         /// </summary>
-        void CreateVertexBuffers()
+        private void CreateVertexBuffers()
         {
             foreach (string textureName in textureManager.Keys)
             {
@@ -389,7 +389,7 @@ namespace ORTS.TrackViewer.Drawing
         /// Discard the vertexbuffers. No active signal is sent to the Graphics card to discard, but since we are not using the buffers anymore, 
         /// this should be save enough (we are not re-using the buffers until the user decides to draw terrain again).
         /// </summary>
-        void DiscardVertexBuffers()
+        private void DiscardVertexBuffers()
         {
             vertexBuffers = new Dictionary<string, VertexBuffer>();
             vertexBufferCounts = new Dictionary<string, int>();
@@ -475,7 +475,7 @@ namespace ORTS.TrackViewer.Drawing
         /// Place the (3D) camera such that the 3D terrain is drawn in exactly the same location as the other 2D elements
         /// </summary>
         /// <param name="drawArea">The area to draw upon (with physical location to pixel transformations)</param>
-        void UpdateCamera(DrawArea drawArea)
+        private void UpdateCamera(DrawArea drawArea)
         {
             // We create a view and projection matrix to allow viewing the world/terrain from the top.
             // All Vertices will be in real-world locations relative to a certain reference location
@@ -507,12 +507,11 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// This class translates a 3D WorldLocation (tile-based), into a 2D location (without tile reference) for the flat terrain (in X-Z plane) 
     /// </summary>
-    class Translate3Dto2D
+    internal class Translate3Dto2D
     {
         private int referenceTileX;
         private int referenceTileZ;
-
-        static Dictionary<int, TileHelper.Zoom> zoomFromInt = new Dictionary<int, TileHelper.Zoom> {
+        private static Dictionary<int, TileHelper.Zoom> zoomFromInt = new Dictionary<int, TileHelper.Zoom> {
             {1, TileHelper.Zoom.Small}, {2, TileHelper.Zoom.Large}, {8, TileHelper.Zoom.DMSmall}, {16, TileHelper.Zoom.DMLarge}
         };
 
@@ -585,7 +584,7 @@ namespace ORTS.TrackViewer.Drawing
     /// The manager that loads and stores the various terrain textures. Since normally the textures are shared over multiple tiles,
     /// we want to store them only once.
     /// </summary>
-    class TerrainTextureManager : Dictionary<string, ReducableTexture2D>, IDisposable
+    internal class TerrainTextureManager : Dictionary<string, ReducableTexture2D>, IDisposable
     {
         public int CurrentScaleFactor { get; private set; } = 1;
 
@@ -631,7 +630,7 @@ namespace ORTS.TrackViewer.Drawing
                 //The message delegate has quite some overhead, so print it only so often to keep the user informed
                 if (loadedAceFilesCounter % 100 == 0)
                 {
-                    messageDelegate(String.Format(TrackViewer.catalog.GetString("Loading terrain ace-files {0}-{1} (scaled down with a factor {2})"), loadedAceFilesCounter, loadedAceFilesCounter + 99, CurrentScaleFactor));
+                    messageDelegate(TrackViewer.catalog.GetString($"Loading terrain ace-files {loadedAceFilesCounter}-{loadedAceFilesCounter + 99} (scaled down with a factor {CurrentScaleFactor})"));
                 }
                 loadedAceFilesCounter++;
                 var originalTexture = AceFile.Texture2DFromFile(this.device, path);
@@ -657,7 +656,7 @@ namespace ORTS.TrackViewer.Drawing
             if (CurrentScaleFactor <= oldScaleFactor) { return; }
 
             //We need to rescale all already loaded ace files
-            messageDelegate(String.Format(TrackViewer.catalog.GetString("Rescaling previously loaded ace-files")));
+            messageDelegate(TrackViewer.catalog.GetString("Rescaling previously loaded ace-files"));
             foreach (string filename in this.Keys)
             {
                 this[filename].ReduceToFactor(newScaleFactor);
@@ -684,7 +683,7 @@ namespace ORTS.TrackViewer.Drawing
             GC.SuppressFinalize(this);
         }
 
-        void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (disposed) { return; }
             disposed = true;
@@ -706,7 +705,7 @@ namespace ORTS.TrackViewer.Drawing
     /// This will not actually do the drawing itself, because it is more efficient to combine all vertices of all tiles that use
     /// the same texture (only one draw call is then needed).
     /// </summary>
-    class TerrainTile2D
+    internal class TerrainTile2D
     {
         /// <summary>The size of the tile (1x1, 2x2, 8x8, 16x16</summary>
         public int TileSize { get; private set; }
@@ -860,11 +859,10 @@ namespace ORTS.TrackViewer.Drawing
             int patchIndexZ = (int)((snappedLocation.Location.Z + 1024) / totalSize * this.textureNames.GetLength(1));
             patchIndexZ = this.textureNames.GetLength(1) - patchIndexZ - 1;
 
-            return String.Format(System.Globalization.CultureInfo.CurrentCulture,
-                "({1}, {2}) for {3}x{3} tile: {0}", textureNames[patchIndexX, patchIndexZ], patchIndexX, patchIndexZ, this.TileSize);
+            return $"({patchIndexX}, {patchIndexZ}) for {this.TileSize}x{this.TileSize} tile: {textureNames[patchIndexX, patchIndexZ]}";
         }
 
-        static Dictionary<int, TileHelper.Zoom> zoomFromInt = new Dictionary<int, TileHelper.Zoom> {
+        private static Dictionary<int, TileHelper.Zoom> zoomFromInt = new Dictionary<int, TileHelper.Zoom> {
             {1, TileHelper.Zoom.Small}, {2, TileHelper.Zoom.Large}, {8, TileHelper.Zoom.DMSmall}, {16, TileHelper.Zoom.DMLarge}
         };
 
@@ -888,7 +886,7 @@ namespace ORTS.TrackViewer.Drawing
     /// When asked for a reduced version of a texture will be used, in place of the original texture.
     /// Multiple reductions are possible
     /// </summary>
-    class ReducableTexture2D : IDisposable
+    internal class ReducableTexture2D : IDisposable
     {
         /// <summary>The actual texture that this is a wrapper for</summary>
         public Texture2D Texture { get; private set; }
@@ -1051,7 +1049,7 @@ namespace ORTS.TrackViewer.Drawing
             GC.SuppressFinalize(this);
         }
 
-        void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (disposed) { return; }
             disposed = true;

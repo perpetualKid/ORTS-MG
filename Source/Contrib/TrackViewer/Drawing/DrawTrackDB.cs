@@ -247,10 +247,10 @@ namespace ORTS.TrackViewer.Drawing
         private Dictionary<uint, float> endnodeAngles = new Dictionary<uint, float>();
 
         // various fields to optimize drawing efficiency
-        int tileXIndexStart;
-        int tileXIndexStop;
-        int tileZIndexStart;
-        int tileZIndexStop;
+        private int tileXIndexStart;
+        private int tileXIndexStop;
+        private int tileZIndexStart;
+        private int tileZIndexStop;
         #endregion
 
         #region Constructor and initialization
@@ -308,7 +308,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <summary>
         /// Find, for each signal, the orientation/angle we need to draw it
         /// </summary>
-        void FindSignalDetails()
+        private void FindSignalDetails()
         {
             foreach (TrackNode tn in trackDB.TrackNodes)
             {
@@ -331,7 +331,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <summary>
         /// For each endnode, find its orientattion. So we can draw a line in the correct direction.
         /// </summary>
-        void FindEndnodeOrientations()
+        private void FindEndnodeOrientations()
         {
             for (int tni = 0; tni < trackDB.TrackNodes.Length; tni++)
             {
@@ -372,7 +372,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <summary>
         /// Generate a list of locations for all platforms and for all sidings, so people can go to these locations from menu
         /// </summary>
-        void FindSidingsAndPlatforms()
+        private void FindSidingsAndPlatforms()
         {
             SidingLocations = new Dictionary<string, WorldLocation>();
             PlatformLocations = new Dictionary<string, WorldLocation>();
@@ -401,7 +401,7 @@ namespace ORTS.TrackViewer.Drawing
         /// And then we translate the visible tiles to array/list start and stop indexes to be used
         /// </summary>
         /// <param name="drawArea">The area upon which we draw, which determines the visible tiles</param>
-        void PrepareDrawing(DrawArea drawArea)
+        private void PrepareDrawing(DrawArea drawArea)
         {
             // determine the min and max values of the tiles that we actually need to draw
             // in some cases (e.g. during initialization) the drawing area itself is really outside the track database,
@@ -428,17 +428,17 @@ namespace ORTS.TrackViewer.Drawing
         /// <summary>
         /// For each of the various types of tracknodes we list the ones per tile.
         /// </summary>
-        List<TrackVectorNode>[][] availableRailVectorNodeIndexes;
-        List<TrackVectorNode>[][] availableRoadVectorNodeIndexes;
-        List<TrackNode>[][] availablePointNodeIndexes;
-        List<DrawableTrackItem>[][] availableRailItemIndexes;
-        List<DrawableTrackItem>[][] availableRoadItemIndexes;
+        private List<TrackVectorNode>[][] availableRailVectorNodeIndexes;
+        private List<TrackVectorNode>[][] availableRoadVectorNodeIndexes;
+        private List<TrackNode>[][] availablePointNodeIndexes;
+        private List<DrawableTrackItem>[][] availableRailItemIndexes;
+        private List<DrawableTrackItem>[][] availableRoadItemIndexes;
 
         /// <summary>
         /// Run over the track databases, find the locations of nodes and items, and add the nodes and items to the correct
         /// 'available' list, indexed by tile.
         /// </summary>
-        void FillAvailableIndexes()
+        private void FillAvailableIndexes()
         {
             SetTileIndexes(MinTileX, MaxTileX, MinTileZ, MaxTileZ);
             availableRailVectorNodeIndexes = new List<TrackVectorNode>[tileXIndexStop + 1][];
@@ -541,7 +541,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <param name="location">Worldlocation of the item, that gives us the tile indexes</param>
         /// <param name="ArrayOfListsToAddTo">To which list we have to add the item</param>
         /// <param name="item">The item we want to add to the list, at the correct index</param>
-        void AddLocationToAvailableList<T>(in WorldLocation location, List<T>[][] ArrayOfListsToAddTo, T item)
+        private void AddLocationToAvailableList<T>(in WorldLocation location, List<T>[][] ArrayOfListsToAddTo, T item)
         {
             //possibly the location is out of the allowed region (e.g. because possibly undefined).
             if (location.TileX < MinTileX || location.TileX > MaxTileX || location.TileZ < MinTileZ || location.TileZ > MaxTileZ) return;
@@ -555,7 +555,7 @@ namespace ORTS.TrackViewer.Drawing
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="itemlist"></param>
-        void InitIndexedLists<T>(List<T>[][] itemlist)
+        private void InitIndexedLists<T>(List<T>[][] itemlist)
         {
             for (int xindex = tileXIndexStart; xindex <= tileXIndexStop; xindex++)
             {
@@ -572,7 +572,7 @@ namespace ORTS.TrackViewer.Drawing
         /// </summary>
         /// <typeparam name="T">Type of object that is in the list (not actually used)</typeparam>
         /// <param name="arrayOfLists">2D array containing non-null lists</param>
-        void MakeUniqueLists<T>(List<T>[][] arrayOfLists)
+        private void MakeUniqueLists<T>(List<T>[][] arrayOfLists)
         {
             for (int xindex = tileXIndexStart; xindex <= tileXIndexStop; xindex++)
             {
@@ -591,7 +591,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <param name="trackVectorSectionIndex">Index of the vector section in the tracknode</param>
         /// <param name="useRailTracks">Must we use rail or road tracks</param>
         /// <returns>A list of world locations on the vector section</returns>
-        List<WorldLocation> FindLocationList(uint trackNodeIndex, int trackVectorSectionIndex, bool useRailTracks)
+        private List<WorldLocation> FindLocationList(uint trackNodeIndex, int trackVectorSectionIndex, bool useRailTracks)
         {
             List<WorldLocation> resultList = new List<WorldLocation>();
 
@@ -796,7 +796,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <param name="tn">The tracknode from track database (assumed to be a vector node)</param>
         /// <param name="colors">Colorscheme to use</param>
         /// <param name="closeToMouseTrack">The object to track which vector node is closest to the mouse</param>
-        void DrawVectorNode(DrawArea drawArea, TrackVectorNode tn, ColorScheme colors, CloseToMouseTrack closeToMouseTrack)
+        private void DrawVectorNode(DrawArea drawArea, TrackVectorNode tn, ColorScheme colors, CloseToMouseTrack closeToMouseTrack)
         {
             if (tn == null) return;
             for (int tvsi = 0; tvsi < tn.TrackVectorSections.Length; tvsi++)
@@ -1056,7 +1056,7 @@ namespace ORTS.TrackViewer.Drawing
         /// not from being closest to the mouse), and if there is make sure the track to highlighted is indeed used.
         /// </summary>
         /// <returns>True in case the highlight needs to be drawn</returns>
-        bool CheckForHighlightOverrideTracks()
+        private bool CheckForHighlightOverrideTracks()
         {
             if (!IsHighlightOverridden)
             {
@@ -1082,7 +1082,7 @@ namespace ORTS.TrackViewer.Drawing
         /// not from being closest to the mouse), and if there is make sure the item to highlighted is indeed used.
         /// </summary>
         /// <returns>True in case the highlight needs to be drawn</returns>
-        bool CheckForHighlightOverrideItems()
+        private bool CheckForHighlightOverrideItems()
         {
             IsHighlightOverriddenTrItem = (IsHighlightOverridden && (searchTrItem != null));
             if (!IsHighlightOverridden)
@@ -1125,7 +1125,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <param name="nodeAhead">The junction or end node at the end of the vector node</param>
         /// <returns>The worldlocation describing the track</returns>
         /// <remarks>Obviously, a single location is always an estimate. Currently tries to find middle of end points</remarks>
-        static private WorldLocation TrackLocation(TrackNode tn, TrackNode nodeBehind, TrackNode nodeAhead)
+        private static WorldLocation TrackLocation(TrackNode tn, TrackNode nodeBehind, TrackNode nodeAhead)
         {
             if (!(tn is TrackVectorNode tvn))
                 return WorldLocation.None;
@@ -1165,7 +1165,7 @@ namespace ORTS.TrackViewer.Drawing
         /// <param name="location2">Location of second point</param>
         /// <returns>middle of both points</returns>
         /// <remarks>Should perhaps be in the WorldLocation class itself</remarks>
-        static WorldLocation MiddleLocation(in WorldLocation location1, in WorldLocation location2)
+        private static WorldLocation MiddleLocation(in WorldLocation location1, in WorldLocation location2)
         {
             int tileX = location1.TileX;
             int tileZ = location1.TileZ;

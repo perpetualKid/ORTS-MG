@@ -33,7 +33,7 @@ namespace ORTS.TrackViewer.Drawing
     /// This class also contains the creation of some textures like discs and rings, as well as the loading 
     /// of a number of needed textures. For the textures that are loaded also a highlight version is made, and they are mipmapped.
     /// </summary>
-    static class BasicShapes
+    internal static class BasicShapes
     {
         private static SpriteBatch spriteBatch;
         
@@ -131,7 +131,7 @@ namespace ORTS.TrackViewer.Drawing
 
         }
 
-        static Texture2D ColorScaledTexture(Texture2D texture, GraphicsDevice graphicsDevice, byte offset)
+        private static Texture2D ColorScaledTexture(Texture2D texture, GraphicsDevice graphicsDevice, byte offset)
         {
             int pixelCount = texture.Width * texture.Height;
             Color[] pixels = new Color[pixelCount];
@@ -293,7 +293,7 @@ namespace ORTS.TrackViewer.Drawing
             return texture;
         }
 
-        static private List<string> oldAceFiles;
+        private static List<string> oldAceFiles;
         public static void LoadAceFiles(GraphicsDevice graphicsDevice, string directory, IEnumerable<string> filenames)
         {
             //first remove content of old textures
@@ -633,7 +633,7 @@ namespace ORTS.TrackViewer.Drawing
     /// <summary>
     /// Load and store images in bitmap format (needed for WPF-parts)
     /// </summary>
-    class BitmapImageManager
+    internal class BitmapImageManager
     {
         //Singleton class
 

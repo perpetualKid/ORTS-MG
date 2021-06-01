@@ -26,7 +26,7 @@ namespace Orts.ActivityRunner.Viewer3D.Materials
         public int TextureWidth { get { return texture?.Width ?? 0; } }
         public int TextureHeight { get { return texture?.Height ?? 0; } }
 
-        virtual protected Texture2D GetTexture(Game game)
+        protected virtual Texture2D GetTexture(Game game)
         {
             return SharedTextureManager.Get(game.RenderProcess.GraphicsDevice, Path.Combine(game.ContentPath, "Loading.png"));
         }

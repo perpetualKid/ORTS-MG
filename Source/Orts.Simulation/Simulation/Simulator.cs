@@ -563,7 +563,7 @@ namespace Orts.Simulation
             Orts.Simulation.Activity.Save(outf, ActivityRun);
         }
 
-        Train InitializeTrains(CancellationToken cancellationToken)
+        private Train InitializeTrains(CancellationToken cancellationToken)
         {
             Train playerTrain = InitializePlayerTrain();
             InitializeStaticConsists();
@@ -577,7 +577,7 @@ namespace Orts.Simulation
             return (playerTrain);
         }
 
-        AITrain InitializeAPTrains(CancellationToken cancellationToken)
+        private AITrain InitializeAPTrains(CancellationToken cancellationToken)
         {
             AITrain playerTrain = InitializeAPPlayerTrain();
             InitializeStaticConsists();
@@ -770,9 +770,7 @@ namespace Orts.Simulation
             WeatherType = weather;
             Season = season;
 
-            var weatherChanged = WeatherChanged;
-            if (weatherChanged != null)
-                weatherChanged(this, EventArgs.Empty);
+            WeatherChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void FinishFrontCoupling(Physics.Train drivenTrain, Physics.Train train, TrainCar lead, bool sameDirection)
@@ -897,7 +895,7 @@ namespace Orts.Simulation
             AI.aiListChanged = true;
         }
 
-        static void UpdateUncoupled(Physics.Train drivenTrain, Physics.Train train, float d1, float d2, bool rear)
+        private static void UpdateUncoupled(Physics.Train drivenTrain, Physics.Train train, float d1, float d2, bool rear)
         {
             if (train == drivenTrain.UncoupledFrom && d1 > .5 && d2 > .5)
             {
@@ -2097,24 +2095,18 @@ namespace Orts.Simulation
 
         internal void OnAllowedSpeedRaised(Physics.Train train)
         {
-            var allowedSpeedRaised = AllowedSpeedRaised;
-            if (allowedSpeedRaised != null)
-                allowedSpeedRaised(train, EventArgs.Empty);
+            AllowedSpeedRaised?.Invoke(train, EventArgs.Empty);
         }
 
         internal void OnPlayerLocomotiveChanged()
         {
-            var playerLocomotiveChanged = PlayerLocomotiveChanged;
-            if (playerLocomotiveChanged != null)
-                playerLocomotiveChanged(this, EventArgs.Empty);
+            PlayerLocomotiveChanged?.Invoke(this, EventArgs.Empty);
         }
 
         internal void OnPlayerTrainChanged(Physics.Train oldTrain, Physics.Train newTrain)
         {
             var eventArgs = new PlayerTrainChangedEventArgs(oldTrain, newTrain);
-            var playerTrainChanged = PlayerTrainChanged;
-            if (playerTrainChanged != null)
-                playerTrainChanged(this, eventArgs);
+            PlayerTrainChanged?.Invoke(this, eventArgs);
         }
 
         internal void OnRequestTTDetachWindow()
@@ -2123,12 +2115,10 @@ namespace Orts.Simulation
             requestTTDetachWindow(this, EventArgs.Empty);
         }
 
-        bool OnQueryCarViewerLoaded(TrainCar car)
+        private bool OnQueryCarViewerLoaded(TrainCar car)
         {
             var query = new QueryCarViewerLoadedEventArgs(car);
-            var queryCarViewerLoaded = QueryCarViewerLoaded;
-            if (queryCarViewerLoaded != null)
-                queryCarViewerLoaded(this, query);
+            QueryCarViewerLoaded?.Invoke(this, query);
             return query.Loaded;
         }
 

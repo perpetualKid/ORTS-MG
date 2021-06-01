@@ -88,7 +88,7 @@ namespace Orts.MultiPlayer
 #region MSGMove
     public class MSGMove : Message
     {
-        class MSGMoveItem
+        private class MSGMoveItem
         {
             public string user;
             public float speed;
@@ -108,7 +108,8 @@ namespace Orts.MultiPlayer
                     count + " " + direction + " " + tdbDir + " " + Length.ToString(CultureInfo.InvariantCulture);
             }
         }
-        List<MSGMoveItem> items;
+
+        private List<MSGMoveItem> items;
         public MSGMove(string m)
         {
             m = m.Trim();
@@ -133,10 +134,10 @@ namespace Orts.MultiPlayer
             }
         }
 
-        static Dictionary<int, int> MissingTimes;
+        private static Dictionary<int, int> MissingTimes;
 
         //a train is missing, but will wait for 10 messages then ask
-        static bool CheckMissingTimes(int TNumber)
+        private static bool CheckMissingTimes(int TNumber)
         {
             if (MissingTimes == null) MissingTimes = new Dictionary<int, int>();
             try
@@ -580,7 +581,7 @@ namespace Orts.MultiPlayer
                                     try // Load could fail if file has bad data.
                                     {
                                         TrainCar car = RollingStock.Load(MPManager.Simulator, wagonFilePath);
-                                        car.Flipped = flipped[i] == 0 ? false : true;
+                                        car.Flipped = flipped[i] != 0;
                                         car.CarID = ids[i];
                                         var carID = car.CarID;
                                         carID = carID.Remove(0, carID.LastIndexOf('-') + 2);
@@ -837,7 +838,7 @@ namespace Orts.MultiPlayer
         public string user;
         public int TileX, TileZ, WorldID, Selection;
         public bool HandThrown;
-        bool OK = true;
+        private bool OK = true;
 
         public MSGSwitch(string m)
         {
@@ -961,10 +962,10 @@ namespace Orts.MultiPlayer
 #region MSGOrgSwitch
     public class MSGOrgSwitch : MSGRequired
     {
-        SortedList<uint, TrackJunctionNode> SwitchState;
+        private SortedList<uint, TrackJunctionNode> SwitchState;
         public string msgx = "";
-        string user = "";
-        byte[] switchStatesArray;
+        private string user = "";
+        private byte[] switchStatesArray;
         public MSGOrgSwitch(string u, string m)
         {
             user = u; msgx = m;
@@ -1048,10 +1049,10 @@ namespace Orts.MultiPlayer
 #region MSGSwitchStatus
     public class MSGSwitchStatus : Message
     {
-        static byte[] preState;
-        static SortedList<uint, TrackJunctionNode> SwitchState;
+        private static byte[] preState;
+        private static SortedList<uint, TrackJunctionNode> SwitchState;
         public bool OKtoSend = false;
-        static byte[] switchStatesArray;
+        private static byte[] switchStatesArray;
         public MSGSwitchStatus()
         {
             var i = 0;
@@ -1165,7 +1166,7 @@ namespace Orts.MultiPlayer
             }
         }
 
-        static bool SwitchOccupiedByPlayerTrain(TrackJunctionNode junctionNode)
+        private static bool SwitchOccupiedByPlayerTrain(TrackJunctionNode junctionNode)
         {
             if (MPManager.Simulator.PlayerLocomotive == null) return false;
             Train train = MPManager.Simulator.PlayerLocomotive.Train;
@@ -1210,15 +1211,15 @@ namespace Orts.MultiPlayer
     //message to add new train from either a string (received message), or a Train (building a message)
     public class MSGTrain : Message
     {
-        string[] cars;
-        string[] ids;
-        int[] flipped; //if a wagon is engine
-        int[] lengths;
-        int TrainNum;
-        int direction;
-        float Travelled;
-        int mDirection;
-        string name;
+        private string[] cars;
+        private string[] ids;
+        private int[] flipped; //if a wagon is engine
+        private int[] lengths;
+        private int TrainNum;
+        private int direction;
+        private float Travelled;
+        private int mDirection;
+        private string name;
 
         private WorldLocation location;
 
@@ -1395,15 +1396,15 @@ namespace Orts.MultiPlayer
     //message to add new train from either a string (received message), or a Train (building a message)
     public class MSGUpdateTrain : Message
     {
-        string[] cars;
-        string[] ids;
-        int[] flipped; //if a wagon is engine
-        int[] lengths; //if a wagon is engine
-        int TrainNum;
-        int direction;
-        float Travelled;
-        int mDirection;
-        string user;
+        private string[] cars;
+        private string[] ids;
+        private int[] flipped; //if a wagon is engine
+        private int[] lengths; //if a wagon is engine
+        private int TrainNum;
+        private int direction;
+        private float Travelled;
+        private int mDirection;
+        private string user;
         private WorldLocation location;
 
         public MSGUpdateTrain(string m)
@@ -1482,7 +1483,7 @@ namespace Orts.MultiPlayer
             mDirection = (int)t.MUDirection;
         }
 
-        static TrainCar findCar(Train t, string name)
+        private static TrainCar FindCar(Train t, string name)
         {
             foreach (TrainCar car in t.Cars)
             {
@@ -1521,7 +1522,7 @@ namespace Orts.MultiPlayer
                 for (var i = 0; i < cars.Length; i++)// cars.Length-1; i >= 0; i--) {
                 {
                     string wagonFilePath = MPManager.Simulator.BasePath + @"\trains\trainset\" + cars[i];
-                    TrainCar car = findCar(train, ids[i]);
+                    TrainCar car = FindCar(train, ids[i]);
                     try
                     {
                         if (car == null) car = RollingStock.Load(MPManager.Simulator, wagonFilePath);
@@ -1678,7 +1679,7 @@ namespace Orts.MultiPlayer
 #region MSGServer
     public class MSGServer : MSGRequired
     {
-        string user; //true: I am a server now, false, not
+        private string user; //true: I am a server now, false, not
         public MSGServer(string m)
         {
             user = m.Trim();
@@ -1733,7 +1734,7 @@ namespace Orts.MultiPlayer
 #region MSGAlive
     public class MSGAlive : Message
     {
-        string user;
+        private string user;
         public MSGAlive(string m)
         {
             user = m;
@@ -1758,11 +1759,11 @@ namespace Orts.MultiPlayer
     //message to add new train from either a string (received message), or a Train (building a message)
     public class MSGTrainMerge : Message
     {
-        int TrainNumRetain;
-        int TrainNumRemoved;
-        int direction;
-        int TileX, TileZ;
-        float X, Z, Travelled;
+        private int TrainNumRetain;
+        private int TrainNumRemoved;
+        private int direction;
+        private int TileX, TileZ;
+        private float X, Z, Travelled;
         public MSGTrainMerge(string m)
         {
             m = m.Trim();
@@ -1806,9 +1807,9 @@ namespace Orts.MultiPlayer
     //warning, error or information from the server, a client receives Error will disconnect itself
     public class MSGMessage : MSGRequired
     {
-        string msgx;
-        string level;
-        string user;
+        private string msgx;
+        private string level;
+        private string user;
         public MSGMessage(string m)
         {
             string[] t = m.Split('\t');
@@ -1895,10 +1896,10 @@ namespace Orts.MultiPlayer
     //message to ask for the control of a train or confirm it
     public class MSGControl : Message
     {
-        int num;
-        string level;
-        string user;
-        float trainmaxspeed;
+        private int num;
+        private string level;
+        private string user;
+        private float trainmaxspeed;
         public MSGControl(string m)
         {
             m.Trim();
@@ -1980,10 +1981,10 @@ namespace Orts.MultiPlayer
     //message to add new train from either a string (received message), or a Train (building a message)
     public class MSGLocoChange : Message
     {
-        int num;
-        string engine;
-        string user;
-        string frontOrRearCab;
+        private int num;
+        private string engine;
+        private string user;
+        private string frontOrRearCab;
         public MSGLocoChange(string m)
         {
             m.Trim();
@@ -2011,7 +2012,7 @@ namespace Orts.MultiPlayer
                     if (car.CarID == engine)
                     {
                         car.Train.LeadLocomotive = car;
-                        (car.Train.LeadLocomotive as MSTSLocomotive).UsingRearCab = frontOrRearCab == "F" ? false : true;
+                        (car.Train.LeadLocomotive as MSTSLocomotive).UsingRearCab = frontOrRearCab != "F";
                         foreach (var p in MPManager.OnlineTrains.Players)
                         {
                             if (p.Value.Train == t)
@@ -2108,7 +2109,7 @@ namespace Orts.MultiPlayer
             {
                 if (t.LeadLocomotive != null && t.LeadLocomotive is MSTSLocomotive)
                 {
-                    (t.LeadLocomotive as MSTSLocomotive).Bell = (EventState == 0 ? false : true);
+                    (t.LeadLocomotive as MSTSLocomotive).Bell = (EventState != 0);
                     t.LeadLocomotive.SignalEvent(EventState == 0 ? TrainEvent.BellOff : TrainEvent.BellOn);
                     MPManager.BroadCast(this.ToString()); //if the server, will broadcast
                 }
@@ -2334,15 +2335,15 @@ namespace Orts.MultiPlayer
         public int newTrainNumber;
         public int oldTrainNumber;
         public int whichIsPlayer;
-        string[] ids1;
-        string[] ids2;
-        int[] flipped1;
-        int[] flipped2;
+        private string[] ids1;
+        private string[] ids2;
+        private int[] flipped1;
+        private int[] flipped2;
 
         private WorldLocation location1;
         private WorldLocation location2;
 
-        static TrainCar FindCar(List<TrainCar> list, string id)
+        private static TrainCar FindCar(List<TrainCar> list, string id)
         {
             foreach (TrainCar car in list) if (car.CarID == id) return car;
             return null;
@@ -2500,7 +2501,7 @@ namespace Orts.MultiPlayer
             else whichIsPlayer = 2;
         }
 
-        string FillInString(int i)
+        private string FillInString(int i)
         {
             string tmp = "";
             if (i == 1)
@@ -2594,7 +2595,7 @@ namespace Orts.MultiPlayer
                         {
                             TrainCar car = FindCar(trainCars, ids1[i]);
                             if (car == null) continue;
-                            car.Flipped = flipped1[i] == 0 ? false : true;
+                            car.Flipped = flipped1[i] != 0;
                             tmpcars.Add(car);
                         }
                         if (tmpcars.Count == 0) return;
@@ -2651,7 +2652,7 @@ namespace Orts.MultiPlayer
                     TrainCar car = FindCar(trainCars, ids2[i]);
                     if (car == null) continue;
                     tmpcars2.Add(car);
-                    car.Flipped = flipped2[i] == 0 ? false : true;
+                    car.Flipped = flipped2[i] != 0;
                 }
                 if (tmpcars2.Count == 0) return;
                 train2.Cars.Clear();
@@ -2756,15 +2757,15 @@ namespace Orts.MultiPlayer
 #region MSGCouple
     public class MSGCouple : Message
     {
-        string[] cars;
-        string[] ids;
-        int[] flipped; //if a wagon is engine
-        int TrainNum;
-        int RemovedTrainNum;
-        int direction;
-        int Lead, mDirection;
-        float Travelled;
-        string whoControls;
+        private string[] cars;
+        private string[] ids;
+        private int[] flipped; //if a wagon is engine
+        private int TrainNum;
+        private int RemovedTrainNum;
+        private int direction;
+        private int Lead, mDirection;
+        private float Travelled;
+        private string whoControls;
 
         private WorldLocation location;
 
@@ -2905,7 +2906,7 @@ namespace Orts.MultiPlayer
             return " " + tmp.Length + ": " + tmp;
         }
 
-        static TrainCar FindCar(Train t1, Train t2, string carID)
+        private static TrainCar FindCar(Train t1, Train t2, string carID)
         {
             foreach (TrainCar c in t1.Cars) if (c.CarID == carID) return c;
             foreach (TrainCar c in t2.Cars) if (c.CarID == carID) return c;
@@ -3005,14 +3006,14 @@ namespace Orts.MultiPlayer
 #region MSGSignalStatus
     public class MSGSignalStatus : Message
     {
-        static byte[] preState;
-        static SortedList<long, SignalHead> signals;
+        private static byte[] preState;
+        private static SortedList<long, SignalHead> signals;
         public bool OKtoSend = false;
-        bool SendEverything;
-        static byte[] signalsStates;
-        static List<int> changedAspectIndex = new List<int>();
-        static string[] signalTextStates;
-        static string[] preTextState;
+        private bool SendEverything;
+        private static byte[] signalsStates;
+        private static List<int> changedAspectIndex = new List<int>();
+        private static string[] signalTextStates;
+        private static string[] preTextState;
 
         /// <summary>
         /// Constructor to create a message from signal data
@@ -3189,10 +3190,9 @@ namespace Orts.MultiPlayer
 #region MSGLocoInfo
     public class MSGLocoInfo : Message
     {
-
-        float EB, DB, TT, VL, CC, BC, DC, FC, I1, I2, SH, SE, LE;
-        string user;
-        int tnum; //train number
+        private float EB, DB, TT, VL, CC, BC, DC, FC, I1, I2, SH, SE, LE;
+        private string user;
+        private int tnum; //train number
 
         //constructor to create a message from signal data
         public MSGLocoInfo(TrainCar c, string u)
@@ -3257,7 +3257,7 @@ namespace Orts.MultiPlayer
                     {
                         if (car.CarID.StartsWith(user) && car is MSTSLocomotive)
                         {
-                            updateValue((MSTSLocomotive)car);
+                            UpdateValue((MSTSLocomotive)car);
                         }
                     }
                     return;
@@ -3265,7 +3265,7 @@ namespace Orts.MultiPlayer
             }
         }
 
-        private void updateValue(MSTSLocomotive loco)
+        private void UpdateValue(MSTSLocomotive loco)
         {
             if (loco is MSTSSteamLocomotive)
             {
@@ -3356,9 +3356,9 @@ namespace Orts.MultiPlayer
     //message to add new train from either a string (received message), or a Train (building a message)
     public class MSGText : MSGRequired
     {
-        string msgx;
-        string sender;
-        string user;
+        private string msgx;
+        private string sender;
+        private string user;
         public MSGText(string m)
         {
             string[] t = m.Split('\t');
@@ -3517,9 +3517,9 @@ namespace Orts.MultiPlayer
 #region MSGSignalChange
     public class MSGSignalChange : Message
     {
-        int index;
-        int pick;
-        string sender;
+        private int index;
+        private int pick;
+        private string sender;
         //constructor to create a message from signal data
         public MSGSignalChange(Signal signal, int p)
         {
@@ -3592,7 +3592,7 @@ namespace Orts.MultiPlayer
 #region MSGExhaust
     public class MSGExhaust : Message
     {
-        class MSGExhaustItem
+        private class MSGExhaustItem
         {
             public string user;
             public int num;
@@ -3612,7 +3612,8 @@ namespace Orts.MultiPlayer
                     " " + exhColorR.ToString(CultureInfo.InvariantCulture) + " " + exhColorG.ToString(CultureInfo.InvariantCulture) + " " + exhColorB.ToString(CultureInfo.InvariantCulture);
             }
         }
-        List<MSGExhaustItem> items;
+
+        private List<MSGExhaustItem> items;
 
         public MSGExhaust(string m)
         {
@@ -3686,20 +3687,20 @@ namespace Orts.MultiPlayer
     // message contains data before flip
     public class MSGFlip : Message
     {
-        string[] cars;
-        string[] ids;
-        int[] flipped; //if a wagon is engine
-        int TrainNum;
-        int direction;
-        int TileX, TileZ;
-        float X, Z, Travelled;
-        int mDirection;
-        float speed;
-        int tni;
-        int count;
-        int tdir;
-        float len;
-        int reverseMU;
+        private string[] cars;
+        private string[] ids;
+        private int[] flipped; //if a wagon is engine
+        private int TrainNum;
+        private int direction;
+        private int TileX, TileZ;
+        private float X, Z, Travelled;
+        private int mDirection;
+        private float speed;
+        private int tni;
+        private int count;
+        private int tdir;
+        private float len;
+        private int reverseMU;
 
         public MSGFlip(string m)
         {
@@ -3818,7 +3819,7 @@ namespace Orts.MultiPlayer
                             {
                                 c = c.Remove(0, index + 17);
                             }//c: wagon path without folder name
-                            if (t.Cars[i].Flipped != (flipped[i] == 0 ? false : true))
+                            if (t.Cars[i].Flipped != (flipped[i] != 0))
                             {
                                 Trace.TraceWarning("Invalid data have prevented flipping: car number {0} local flip state {1} remote flip state {2}",
                                     i, t.Cars[i].Flipped, flipped[i]);

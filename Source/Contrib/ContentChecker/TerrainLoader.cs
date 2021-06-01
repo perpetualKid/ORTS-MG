@@ -23,9 +23,9 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .s files
     /// </summary>
-    class TerrainLoader : Loader
+    internal class TerrainLoader : Loader
     {
-        TerrainFile tFile;
+        private TerrainFile tFile;
 
         /// <summary>
         /// Try to load the file.
@@ -40,11 +40,11 @@ namespace Orts.ContentChecker
 
         protected override void AddDependentFiles()
         {
-            var baseFileWithDir = Path.Combine(Path.GetDirectoryName(loadedFile), Path.GetFileNameWithoutExtension(loadedFile));
-            var sampleCount = tFile.Terrain.Samples.SampleCount;
+            string baseFileWithDir = Path.Combine(Path.GetDirectoryName(loadedFile), Path.GetFileNameWithoutExtension(loadedFile));
+            int sampleCount = tFile.Terrain.Samples.SampleCount;
             AddAdditionalFileAction.Invoke(baseFileWithDir + "_y.raw", new TerrainAltitudeLoader(sampleCount));
 
-            var f_raw_file = baseFileWithDir + "_f.raw";
+            string f_raw_file = baseFileWithDir + "_f.raw";
             if (File.Exists(f_raw_file))
             {   // we need to check here if it exists, because we do not want an error popping up later
                 AddAdditionalFileAction.Invoke(f_raw_file, new TerrainFlagsLoader(sampleCount));

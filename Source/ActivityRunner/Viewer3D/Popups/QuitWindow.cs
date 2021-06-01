@@ -64,17 +64,17 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             return vbox;
         }
 
-        void buttonQuit_Click(Control arg1, Point arg2)
+        private void buttonQuit_Click(Control arg1, Point arg2)
         {
             Owner.Viewer.Game.PopState();
         }
 
-        void buttonSave_Click(Control arg1, Point arg2)
+        private void buttonSave_Click(Control arg1, Point arg2)
         {
             GameStateRunActivity.Save();
         }
 
-        void buttonContinue_Click(Control arg1, Point arg2)
+        private void buttonContinue_Click(Control arg1, Point arg2)
         {
             Visible = Owner.Viewer.Simulator.Paused = false;
             if( Owner.Viewer.Log.PauseState == ReplayPauseState.During ) {

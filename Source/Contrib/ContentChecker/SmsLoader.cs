@@ -15,12 +15,13 @@
 // You should have received a copy of the GNU General Public License
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
-using Orts.ActivityRunner.Viewer3D;
+using System.Collections.Generic;
+using System.Diagnostics;
+
 using Orts.Formats.Msts;
 using Orts.Formats.Msts.Files;
 using Orts.Formats.Msts.Models;
-using System.Collections.Generic;
-using System.Diagnostics;
+
 using Path = System.IO.Path;
 
 namespace Orts.ContentChecker
@@ -28,9 +29,9 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .sms files
     /// </summary>
-    class SmsLoader : Loader
+    internal class SmsLoader : Loader
     {
-        SoundManagmentFile sms;
+        private SoundManagmentFile sms;
         /// <summary>
         /// Try to load the file.
         /// Possibly this might raise an exception. That exception is not caught here
@@ -39,14 +40,13 @@ namespace Orts.ContentChecker
         public override void TryLoading(string file)
         {
             loadedFile = file;
-            sms = SharedSMSFileManager.Get(file);
+            sms = new SoundManagmentFile(file);
+
         }
 
         protected override void AddReferencedFiles()
         {
-            string routePath;
-            string basePath;
-            GetRouteAndBasePath(loadedFile, out routePath, out basePath);
+            GetRouteAndBasePath(loadedFile, out string routePath, out string basePath);
 
             List<string> possiblePaths = new List<string>
             {
@@ -62,12 +62,15 @@ namespace Orts.ContentChecker
             }
 
             // Try to also load all sound files. This is tricky, because quite deep into the structure of a sms
-            foreach (var group in sms.ScalabiltyGroups)
+            foreach (ScalabiltyGroup group in sms.ScalabiltyGroups)
             {
-                if (group.Streams == null) { continue; }
-                foreach (var stream in group.Streams)
+                if (group.Streams == null)
+                { 
+                    continue; 
+                }
+                foreach (SmsStream stream in group.Streams)
                 {
-                    foreach (var trigger in stream.Triggers)
+                    foreach (Trigger trigger in stream.Triggers)
                     {
                         SoundPlayCommand playCommand = trigger.SoundCommand as SoundPlayCommand;
                         if (playCommand == null) { continue; }
@@ -81,7 +84,7 @@ namespace Orts.ContentChecker
 
                             //The file can be in multiple places
                             //Assume .wav file for now
-                            var fullPath = FolderStructure.FindFileFromFolders(possiblePaths, file);
+                            string fullPath = FolderStructure.FindFileFromFolders(possiblePaths, file);
                             if (fullPath == null)
                             {
                                 //apparently the file does not exist, but we want to make that known to the user, so we make a path anyway
@@ -95,32 +98,32 @@ namespace Orts.ContentChecker
             }
         }
 
-        void GetRouteAndBasePath(string file, out string routePath, out string basePath)
+        private static void GetRouteAndBasePath(string file, out string routePath, out string basePath)
         {
             routePath = null;
             basePath = null;
             Stack<string> subDirectories = new Stack<string>();
             string directory = Path.GetDirectoryName(file);
-            var root=Path.GetPathRoot(file);
-            while (directory.Length > root.Length )
+            string root = Path.GetPathRoot(file);
+            while (directory.Length > root.Length)
             {
                 string subdDirectoryName = Path.GetFileName(directory);
-                if (subdDirectoryName.ToLowerInvariant().Equals("routes"))
+                if (subdDirectoryName.Equals("routes", System.StringComparison.OrdinalIgnoreCase))
                 {
                     routePath = Path.Combine(directory, subDirectories.Pop());
                     basePath = Path.GetDirectoryName(Path.GetDirectoryName(routePath));
                     return;
                 }
-                if (subdDirectoryName.ToLowerInvariant().Equals("trains"))
+                if (subdDirectoryName.Equals("trains", System.StringComparison.OrdinalIgnoreCase))
                 {
                     basePath = Path.GetDirectoryName(directory);
                     return;
                 }
-                if (subdDirectoryName.ToLowerInvariant().Equals("trains"))
+                if (subdDirectoryName.Equals("trains", System.StringComparison.OrdinalIgnoreCase))
                 {
                     basePath = Path.GetDirectoryName(directory);
                 }
-                if (subdDirectoryName.ToLowerInvariant().Equals("sound"))
+                if (subdDirectoryName.Equals("sound", System.StringComparison.OrdinalIgnoreCase))
                 {
                     basePath = Path.GetDirectoryName(directory);
                 }

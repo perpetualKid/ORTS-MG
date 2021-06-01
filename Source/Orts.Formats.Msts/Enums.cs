@@ -428,6 +428,7 @@ namespace Orts.Formats.Msts
         Orts_TCS46,
         Orts_TCS47,
         Orts_TCS48,
+        Orts_Etcs,
 
         // Further CabViewControlTypes must be added above this line, to avoid their malfunction in 3DCabs
         ExternalWipers,

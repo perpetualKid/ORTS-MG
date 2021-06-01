@@ -112,7 +112,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         /// <summary>
         /// Axle drive represented by a motor, covered by ElectricMotor interface
         /// </summary>
-        ElectricMotor motor;
+        private ElectricMotor motor;
         /// <summary>
         /// Read/Write Motor drive parameter.
         /// With setting a value the totalInertiaKgm2 is updated
@@ -157,12 +157,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         /// <summary>
         /// Sum of inertia over all axle conected rotating mass, in kg.m^2
         /// </summary>
-        float totalInertiaKgm2;
+        private float totalInertiaKgm2;
 
         /// <summary>
         /// Axle inertia covered by InertiaKgm2 interface, in kg.m^2
         /// </summary>
-        float inertiaKgm2;
+        private float inertiaKgm2;
         /// <summary>
         /// Read/Write positive non zero only axle inertia, in kg.m^2
         /// By setting this parameter the totalInertiaKgm2 is updated
@@ -199,7 +199,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         /// <summary>
         /// Transmission ratio on gearbox covered by TransmissionRatio interface
         /// </summary>
-        float transmissionRatio;
+        private float transmissionRatio;
         /// <summary>
         /// Read/Write positive nonzero transmission ratio, given by n1:n2 ratio
         /// Throws an exception when negative or zero value is passed
@@ -221,7 +221,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         /// <summary>
         /// Transmission efficiency, relative to 1.0, covered by TransmissionEfficiency interface
         /// </summary>
-        float transmissionEfficiency;
+        private float transmissionEfficiency;
         /// <summary>
         /// Read/Write transmission efficiency, relative to 1.0, within range of 0.0 to 1.0 (1.0 means 100%, 0.5 means 50%)
         /// Throws an exception when out of range value is passed
@@ -247,7 +247,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         /// <summary>
         /// Axle diameter value, covered by AxleDiameterM interface, in metric meters
         /// </summary>
-        float axleDiameterM;
+        private float axleDiameterM;
         /// <summary>
         /// Read/Write nonzero positive axle diameter parameter, in metric meters
         /// Throws exception when zero or negative value is passed
@@ -311,10 +311,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         /// Should not be zero
         /// </summary>
         public float Adhesion2 { set; get; }
+
         /// <summary>
         /// Axle speed value, covered by AxleSpeedMpS interface, in metric meters per second
         /// </summary>
-        float axleSpeedMpS;
+        private float axleSpeedMpS;
         /// <summary>
         /// Read only axle speed value, in metric meters per second
         /// </summary>
@@ -333,7 +334,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerTransmissions
         /// <summary>
         /// Axle force value, covered by AxleForceN interface, in Newtons
         /// </summary>
-        float axleForceN;
+        private float axleForceN;
         /// <summary>
         /// Read only axle force value, in Newtons
         /// </summary>

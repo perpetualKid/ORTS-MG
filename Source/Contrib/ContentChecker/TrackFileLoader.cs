@@ -20,8 +20,8 @@ using System.Collections.Generic;
 using System.IO;
 
 using Orts.Common;
-using Orts.Formats.Msts;
 using Orts.Formats.Msts.Files;
+
 using Path = System.IO.Path;
 
 namespace Orts.ContentChecker
@@ -29,11 +29,11 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .trk files
     /// </summary>
-    class TrackFileLoader : Loader
+    internal class TrackFileLoader : Loader
     {
-        RouteFile TRK;
-        string routePath;
-        string basePath;
+        private RouteFile routeFile;
+        private string routePath;
+        private string basePath;
 
         /// <summary>
         /// Try to load the file.
@@ -43,37 +43,37 @@ namespace Orts.ContentChecker
         public override void TryLoading(string file)
         {
             loadedFile = file;
-            TRK = new RouteFile(file);
+            routeFile = new RouteFile(file);
         }
 
         protected override void AddReferencedFiles()
         {
             routePath = Path.GetDirectoryName(loadedFile);
             basePath = Path.GetDirectoryName(Path.GetDirectoryName(routePath));
-            string loadingScreen = Path.Combine(routePath, TRK.Route.LoadingScreen);
+            string loadingScreen = Path.Combine(routePath, routeFile.Route.LoadingScreen);
             AddAdditionalFileAction.Invoke(loadingScreen, new AceLoader());
-            string graphic = Path.Combine(routePath, TRK.Route.Thumbnail);
+            string graphic = Path.Combine(routePath, routeFile.Route.Thumbnail);
             AddAdditionalFileAction.Invoke(graphic, new AceLoader());
 
-            AddAdditionalSMS(TRK.Route.DefaultCrossingSMS);
-            AddAdditionalSMS(TRK.Route.DefaultCoalTowerSMS);
-            AddAdditionalSMS(TRK.Route.DefaultDieselTowerSMS);
-            AddAdditionalSMS(TRK.Route.DefaultSignalSMS);
-            AddAdditionalSMS(TRK.Route.DefaultTurntableSMS);
-            AddAdditionalSMS(TRK.Route.DefaultWaterTowerSMS);
+            AddAdditionalSMS(routeFile.Route.DefaultCrossingSMS);
+            AddAdditionalSMS(routeFile.Route.DefaultCoalTowerSMS);
+            AddAdditionalSMS(routeFile.Route.DefaultDieselTowerSMS);
+            AddAdditionalSMS(routeFile.Route.DefaultSignalSMS);
+            AddAdditionalSMS(routeFile.Route.DefaultTurntableSMS);
+            AddAdditionalSMS(routeFile.Route.DefaultWaterTowerSMS);
 
             foreach (SeasonType season in Enum.GetValues(typeof(SeasonType)))
             {
                 foreach (WeatherType weather in Enum.GetValues(typeof(WeatherType)))
                 {
-                    string environmentFile = TRK.Route.Environment.GetEnvironmentFileName(season, weather);
+                    string environmentFile = routeFile.Route.Environment.GetEnvironmentFileName(season, weather);
                     string envFileFull = Path.Combine(Path.Combine(routePath, "ENVFILES"), environmentFile);
                     AddAdditionalFileAction.Invoke(envFileFull, new EnvironmentFileLoader());
                 }
             }
         }
 
-        void AddAdditionalSMS(string smsFileName)
+        private void AddAdditionalSMS(string smsFileName)
         {
             if (smsFileName == null) { return;  }
             string smsInRoute = Path.Combine(Path.Combine(routePath, "SOUND"), smsFileName);
@@ -95,16 +95,16 @@ namespace Orts.ContentChecker
             AddAllWorldFiles();
         }
 
-        void AddMainFiles()
+        private void AddMainFiles()
         {
 
             string globalTsectionDat = Path.Combine(Path.Combine(basePath, "Global"), "tsection.dat");
             AddAdditionalFileAction.Invoke(globalTsectionDat, new TsectionGlobalLoader(routePath));
 
-            AddAdditionalFileAction.Invoke(Path.Combine(routePath, TRK.Route.FileName + ".tdb"), new TrackDataBaseLoader());
-            AddAdditionalFileAction.Invoke(Path.Combine(routePath, TRK.Route.FileName + ".rdb"), new RoadDataBaseLoader());
+            AddAdditionalFileAction.Invoke(Path.Combine(routePath, routeFile.Route.FileName + ".tdb"), new TrackDataBaseLoader());
+            AddAdditionalFileAction.Invoke(Path.Combine(routePath, routeFile.Route.FileName + ".rdb"), new RoadDataBaseLoader());
             AddAdditionalFileAction.Invoke(Path.Combine(routePath, "carspawn.dat"), new CarSpawnLoader());
-            string ORfilepath = System.IO.Path.Combine(routePath, "OpenRails");
+            string ORfilepath = Path.Combine(routePath, "OpenRails");
             if (File.Exists(ORfilepath + @"\sigcfg.dat"))
             {
                 AddAdditionalFileAction.Invoke(Path.Combine(ORfilepath, "sigcfg.dat"), new SignalConfigLoader());
@@ -115,9 +115,9 @@ namespace Orts.ContentChecker
             }
         }
 
-        void AddAllActivities()
+        private void AddAllActivities()
         {
-            var activityPath = Path.Combine(routePath, "Activities");
+            string activityPath = Path.Combine(routePath, "Activities");
             if (Directory.Exists(activityPath))
             {
                 foreach (string activity in Directory.GetFiles(activityPath, "*.act"))
@@ -126,7 +126,7 @@ namespace Orts.ContentChecker
                 }
             }
 
-            var activityPathOr = Path.Combine(Path.Combine(routePath, "Activities"), "OpenRails");
+            string activityPathOr = Path.Combine(Path.Combine(routePath, "Activities"), "OpenRails");
             if (Directory.Exists(activityPathOr))
             {
                 List<string> timetableFiles = new List<string>();
@@ -141,9 +141,9 @@ namespace Orts.ContentChecker
             }
         }
 
-        void AddAllTiles()
+        private void AddAllTiles()
         {
-            var tiles = Path.Combine(routePath, "Tiles");
+            string tiles = Path.Combine(routePath, "Tiles");
             if (Directory.Exists(tiles))
             {
                 foreach (string tile in Directory.GetFiles(tiles, "*.t"))
@@ -152,7 +152,7 @@ namespace Orts.ContentChecker
                 }
             }
 
-            var loTiles = Path.Combine(routePath, "Lo_Tiles");
+            string loTiles = Path.Combine(routePath, "Lo_Tiles");
             if (Directory.Exists(loTiles))
             {
                 foreach (string tile in Directory.GetFiles(loTiles, "*.t"))
@@ -162,9 +162,9 @@ namespace Orts.ContentChecker
             }
         }
 
-        void AddAllPaths()
+        private void AddAllPaths()
         {
-            var paths = Path.Combine(routePath, "Paths");
+            string paths = Path.Combine(routePath, "Paths");
             if (Directory.Exists(paths))
             {
                 foreach (string pat in Directory.GetFiles(paths, "*.pat"))
@@ -174,9 +174,9 @@ namespace Orts.ContentChecker
             }
         }
 
-        void AddAllWorldFiles()
+        private void AddAllWorldFiles()
         {
-            var world = Path.Combine(routePath, "World");
+            string world = Path.Combine(routePath, "World");
             if (Directory.Exists(world))
             {
                 foreach (string pat in Directory.GetFiles(world, "*.w"))

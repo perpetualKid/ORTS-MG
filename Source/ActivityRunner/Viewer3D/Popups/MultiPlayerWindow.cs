@@ -29,31 +29,30 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class MultiPlayerWindow : Window
     {
-        bool ResizeWindow;
-        int FirstColLenght = 0;
-        int FirstColOverFlow = 0;
-        int LastColLenght = 0;
-        int LastColOverFlow = 0;
-        int LinesCount = 0;
-        const int TrainDrivingInfoHeightInLinesOfText = 1;
-        bool UpdateDataEnded = false;
+        private bool ResizeWindow;
+        private int FirstColLenght = 0;
+        private int FirstColOverFlow = 0;
+        private int LastColLenght = 0;
+        private int LastColOverFlow = 0;
+        private int LinesCount = 0;
+        private const int TrainDrivingInfoHeightInLinesOfText = 1;
+        private bool UpdateDataEnded = false;
 
         public static bool StandardHUD = true;// Standard full text or not.
 
-        int WindowHeightMax = 0;
-        int WindowHeightMin = 0;
-        int WindowWidthMin = 0;
-        int WindowWidthMax = 0;
-
-        char expandWindow;
-        const int TextSize = 15;
+        private int WindowHeightMax = 0;
+        private int WindowHeightMin = 0;
+        private int WindowWidthMin = 0;
+        private int WindowWidthMax = 0;
+        private char expandWindow;
+        private const int TextSize = 15;
         public int keyPresLenght;
         public int OffSetX = 0;
-        string keyPressed;// display a symbol when a control key is pressed.
+        private string keyPressed;// display a symbol when a control key is pressed.
 
-        Label ExpandWindow;
-        Label indicator;
-        Label LabelFontToBold;
+        private Label ExpandWindow;
+        private Label indicator;
+        private Label LabelFontToBold;
         public static bool FontToBold;
         public static bool MonoFont;
 
@@ -67,10 +66,11 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             public bool ChangeColWidth { get; set; }
             public string keyPressed { get; set; }
         }
-        List<ListLabel> ListToLabel = new List<ListLabel>();
+
+        private List<ListLabel> ListToLabel = new List<ListLabel>();
 
         // Change text color
-        Dictionary<string, Color> ColorCode = new Dictionary<string, Color>
+        private Dictionary<string, Color> ColorCode = new Dictionary<string, Color>
         {
             { "!!!", Color.OrangeRed },
             { "!!?", Color.Orange },
@@ -92,7 +92,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             WindowWidthMax = Location.Width + owner.TextFontDefault.Height * 20; // 20 char
         }
 
-        protected internal override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter outf)
         {
             base.Save(outf);
             outf.Write(StandardHUD);
@@ -102,7 +102,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             outf.Write(Location.Height);
         }
 
-        protected internal override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader inf)
         {
             base.Restore(inf);
             Rectangle LocationRestore;
@@ -117,7 +117,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             MoveTo(LocationRestore.X, LocationRestore.Y);
         }
 
-        protected internal override void Initialize()
+        internal protected override void Initialize()
         {
             base.Initialize();
             // Reset window size
@@ -228,12 +228,12 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             return vbox;
         }
 
-        void FontToBold_Click(Control arg1, Point arg2)
+        private void FontToBold_Click(Control arg1, Point arg2)
         {
             FontToBold = FontToBold ? false : true;
         }
 
-        void ExpandWindow_Click(Control arg1, Point arg2)
+        private void ExpandWindow_Click(Control arg1, Point arg2)
         {
             StandardHUD = StandardHUD ? false : true;
             UpdateWindowSize();

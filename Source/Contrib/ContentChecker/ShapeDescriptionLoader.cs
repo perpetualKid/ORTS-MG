@@ -23,7 +23,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .sd files
     /// </summary>
-    class ShapeDescriptorLoader : Loader
+    internal class ShapeDescriptorLoader : Loader
     {
         /// <summary>
         /// Try to load the file.
@@ -32,7 +32,7 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            var sFile = new ShapeDescriptorFile(file);
+            _ = new ShapeDescriptorFile(file);
         }
     }
 }

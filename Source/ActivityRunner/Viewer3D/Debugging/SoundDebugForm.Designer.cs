@@ -107,8 +107,8 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
             this.inactiveSoundList.Name = "inactiveSoundList";
             this.inactiveSoundList.Size = new System.Drawing.Size(416, 320);
             this.inactiveSoundList.TabIndex = 0;
-            this.inactiveSoundList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.inactiveSoundList_KeyDown);
-            this.inactiveSoundList.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.inactiveSoundList_KeyPress);
+            this.inactiveSoundList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.InactiveSoundList_KeyDown);
+            this.inactiveSoundList.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.InactiveSoundList_KeyPress);
             // 
             // activeSoundList
             // 
@@ -118,8 +118,8 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
             this.activeSoundList.Name = "activeSoundList";
             this.activeSoundList.Size = new System.Drawing.Size(416, 602);
             this.activeSoundList.TabIndex = 0;
-            this.activeSoundList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.activeSoundList_KeyDown);
-            this.activeSoundList.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.activeSoundList_KeyPress);
+            this.activeSoundList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.ActiveSoundList_KeyDown);
+            this.activeSoundList.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.ActiveSoundList_KeyPress);
             // 
             // splitContainer1
             // 

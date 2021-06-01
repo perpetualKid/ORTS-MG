@@ -23,14 +23,14 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for the tsection.dat file in a Route folder
     /// </summary>
-    class TsectionLoader : Loader
+    internal class TSectionLoader : Loader
     {
-        TrackSectionsFile _globalTsection;
+        private TrackSectionsFile globalTsection;
 
         /// <summary>
         /// default constructor when not enough information is available
         /// </summary>
-        public TsectionLoader() : base()
+        public TSectionLoader() : base()
         {
             IsDependent = true;
         }
@@ -39,9 +39,9 @@ namespace Orts.ContentChecker
         /// Constructor giving the information this loaded depends on
         /// </summary>
         /// <param name="globalTsection">The global Tsection that is used as a base</param>
-        public TsectionLoader(TrackSectionsFile globalTsection) : this()
+        public TSectionLoader(TrackSectionsFile globalTsection) : this()
         {
-            _globalTsection = globalTsection;
+            this.globalTsection = globalTsection;
         }
 
 
@@ -52,19 +52,20 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            var subdirname = Path.GetFileName(Path.GetDirectoryName(file)).ToLowerInvariant();
-            if (subdirname == "openrails")
+            string subdirname = Path.GetFileName(Path.GetDirectoryName(file));
+            if (subdirname.Equals("openrails", System.StringComparison.OrdinalIgnoreCase))
             {
                 //todo Need good examples for this. Might not actually be found via SIMIS header
                 //Also not clear if this needs a global tracksection or not
-                var TSectionDat = new TrackSectionsFile(file);
+                _ = new TrackSectionsFile(file);
             }
             else
             {
-                _globalTsection.AddRouteTSectionDatFile(file);
+                globalTsection.AddRouteTSectionDatFile(file);
             }
 
 
         }
     }
 }
+

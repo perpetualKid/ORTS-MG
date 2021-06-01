@@ -30,7 +30,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
     {
         public static readonly int MinPantoID = 1; // minimum value of PantoID, applies to Pantograph 1
         public static readonly int MaxPantoID = 4; // maximum value of PantoID, applies to Pantograph 4
-        readonly MSTSWagon Wagon;
+        private readonly MSTSWagon Wagon;
 
         public List<Pantograph> List = new List<Pantograph>();
 
@@ -189,7 +189,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
 
     public class Pantograph
     {
-        readonly MSTSWagon Wagon;
+        private readonly MSTSWagon Wagon;
 
         public PantographState State { get; private set; }
         public float DelayS { get; private set; }

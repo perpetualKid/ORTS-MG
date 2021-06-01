@@ -163,7 +163,7 @@ namespace Orts.ActivityRunner.Viewer3D
         public Vector3 Location { get { return cameraLocation.Location; } }
         public WorldLocation CameraWorldLocation { get { return cameraLocation; } }
         protected int MouseScrollValue;
-        protected internal float FieldOfView;
+        internal protected float FieldOfView;
 
         private Matrix xnaView;
         public ref Matrix XnaView => ref xnaView;
@@ -179,9 +179,9 @@ namespace Orts.ActivityRunner.Viewer3D
         // This sucks. It's really not camera-related at all.
         public static ref Matrix XNASkyProjection => ref skyProjection;
 
-        Vector3 frustumRightProjected;
-        Vector3 frustumLeft;
-        Vector3 frustumRight;
+        private Vector3 frustumRightProjected;
+        private Vector3 frustumLeft;
+        private Vector3 frustumRight;
 
         // The following group of properties are used by other code to vary
         // behavior by camera; e.g. Style is used for activating sounds,
@@ -198,7 +198,8 @@ namespace Orts.ActivityRunner.Viewer3D
         public virtual float NearPlane { get { return 1.0f; } }
 
         public float ReplaySpeed { get; set; }
-        const int SpeedFactorFastSlow = 8;  // Use by GetSpeed
+
+        private const int SpeedFactorFastSlow = 8;  // Use by GetSpeed
         protected const float SpeedAdjustmentForRotation = 0.1f;
 
         protected Camera(Viewer viewer)
@@ -218,13 +219,13 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        protected internal virtual void Save(BinaryWriter output)
+        internal protected virtual void Save(BinaryWriter output)
         {
             WorldLocation.Save(cameraLocation, output);
             output.Write(FieldOfView);
         }
 
-        protected internal virtual void Restore(BinaryReader input)
+        internal protected virtual void Restore(BinaryReader input)
         {
             cameraLocation = WorldLocation.Restore(input);
             FieldOfView = input.ReadSingle();
@@ -415,8 +416,8 @@ namespace Orts.ActivityRunner.Viewer3D
 
         protected class CameraAngleClamper
         {
-            readonly float Minimum;
-            readonly float Maximum;
+            private readonly float Minimum;
+            private readonly float Maximum;
 
             public CameraAngleClamper(float minimum, float maximum)
             {
@@ -488,13 +489,13 @@ namespace Orts.ActivityRunner.Viewer3D
         {
         }
 
-        protected internal override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter outf)
         {
             base.Save(outf);
             WorldLocation.Save(targetLocation, outf);
         }
 
-        protected internal override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader inf)
         {
             base.Restore(inf);
             targetLocation = WorldLocation.Restore(inf);
@@ -539,14 +540,14 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        protected internal override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter outf)
         {
             base.Save(outf);
             outf.Write(RotationXRadians);
             outf.Write(RotationYRadians);
         }
 
-        protected internal override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader inf)
         {
             base.Restore(inf);
             RotationXRadians = inf.ReadSingle();
@@ -712,8 +713,8 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class FreeRoamCamera : RotatingCamera
     {
-        const float maxCameraHeight = 1000f;
-        const float ZoomFactor = 2f;
+        private const float maxCameraHeight = 1000f;
+        private const float ZoomFactor = 2f;
 
         public override string Name { get { return Viewer.Catalog.GetString("Free"); } }
 
@@ -919,7 +920,7 @@ namespace Orts.ActivityRunner.Viewer3D
         {
         }
 
-        protected internal override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter outf)
         {
             base.Save(outf);
             if (attachedCar != null && attachedCar.Train != null && attachedCar.Train == Viewer.SelectedTrain)
@@ -931,7 +932,7 @@ namespace Orts.ActivityRunner.Viewer3D
             outf.Write(attachedLocation.Z);
         }
 
-        protected internal override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader inf)
         {
             base.Restore(inf);
             var carIndex = inf.ReadInt32();
@@ -1056,13 +1057,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class TrackingCamera : AttachedCamera
     {
-        const float StartPositionDistance = 20;
-        const float StartPositionXRadians = 0.399f;
-        const float StartPositionYRadians = 0.387f;
+        private const float StartPositionDistance = 20;
+        private const float StartPositionXRadians = 0.399f;
+        private const float StartPositionYRadians = 0.387f;
 
         protected readonly bool Front;
         public enum AttachedTo { Front, Rear }
-        const float ZoomFactor = 0.1f;
+
+        private const float ZoomFactor = 0.1f;
 
         protected float PositionDistance = StartPositionDistance;
         protected float PositionXRadians = StartPositionXRadians;
@@ -1073,7 +1075,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         protected bool browseBackwards;
         protected bool browseForwards;
-        const float BrowseSpeedMpS = 4;
+        private const float BrowseSpeedMpS = 4;
         protected float ZDistanceM; // used to browse train;
         protected Traveller browsedTraveller;
         protected float BrowseDistance = 20;
@@ -1101,7 +1103,7 @@ namespace Orts.ActivityRunner.Viewer3D
             RotationYRadians = PositionYRadians - MathHelper.Pi;
         }
 
-        protected internal override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter outf)
         {
             base.Save(outf);
             outf.Write(PositionDistance);
@@ -1113,7 +1115,7 @@ namespace Orts.ActivityRunner.Viewer3D
             outf.Write(ZDistanceM);
         }
 
-        protected internal override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader inf)
         {
             base.Restore(inf);
             PositionDistance = inf.ReadSingle();
@@ -2119,13 +2121,13 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        protected internal override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter outf)
         {
             base.Save(outf);
             outf.Write(PrevCabWasRear);
         }
 
-        protected internal override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader inf)
         {
             base.Restore(inf);
             PrevCabWasRear = inf.ReadBoolean();
@@ -2223,7 +2225,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 {
                     if (pointedControl != control)
                         // say what control you have here
-                        Viewer.Simulator.Confirmer.Message(ConfirmLevel.None, (Viewer.PlayerLocomotive as MSTSLocomotive).TrainControlSystem.GetDisplayString(pointedControl.GetControlType().ToString()));
+                        Viewer.Simulator.Confirmer.Message(ConfirmLevel.None, pointedControl.GetControlName(pointerCommandArgs.Position));
                     Viewer.RenderProcess.ActualCursor = Cursors.Hand;
                 }
                 else
@@ -2314,13 +2316,13 @@ namespace Orts.ActivityRunner.Viewer3D
         {
         }
 
-        protected internal override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter outf)
         {
             base.Save(outf);
             outf.Write(SideLocation);
         }
 
-        protected internal override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader inf)
         {
             base.Restore(inf);
             SideLocation = inf.ReadInt32();
@@ -2396,7 +2398,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// Switches to another cab view (e.g. side view).
         /// Applies the inclination of the previous external view due to PanUp() to the new external view. 
         /// </summary>
-        void ShiftView(int index)
+        private void ShiftView(int index)
         {
             var loco = attachedCar as MSTSLocomotive;
 
@@ -2423,7 +2425,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// and pans the image down to reveal details at the top of the cab.
         /// The external view also moves down by a similar amount.
         /// </summary>
-        void PanUp(bool up, float speed)
+        private void PanUp(bool up, float speed)
         {
             int max = 0;
             int min = Viewer.DisplaySize.Y - Viewer.CabHeightPixels - 2 * Viewer.CabYLetterboxPixels; // -ve value
@@ -2457,7 +2459,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// and pans the image left/right to reveal details at the sides of the cab.
         /// The external view also moves sidewards by a similar amount.
         /// </summary>
-        void ScrollRight(bool right, float speed)
+        private void ScrollRight(bool right, float speed)
         {
             int min = 0;
             int max = Viewer.CabWidthPixels - Viewer.DisplaySize.X - 2 * Viewer.CabXLetterboxPixels; // -ve value
@@ -2577,7 +2579,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 {
                     if (pointedControl != control)
                         // say what control you have here
-                        Viewer.Simulator.Confirmer.Message(ConfirmLevel.None, (Viewer.PlayerLocomotive as MSTSLocomotive).TrainControlSystem.GetDisplayString(pointedControl.GetControlType().ToString()));
+                        Viewer.Simulator.Confirmer.Message(ConfirmLevel.None, pointedControl.GetControlName(pointerCommandArgs.Position));
                     Viewer.RenderProcess.ActualCursor = Cursors.Hand;
                 }
                 else
@@ -2796,14 +2798,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class SpecialTracksideCamera : TracksideCamera
     {
-        const int MaximumSpecialPointDistance = 300;
-        const float PlatformOffsetM = 3.3f;
+        private const int MaximumSpecialPointDistance = 300;
+        private const float PlatformOffsetM = 3.3f;
         protected bool SpecialPointFound = false;
-        const float CheckIntervalM = 50f; // every 50 meters it is checked wheter there is a near special point
+        private const float CheckIntervalM = 50f; // every 50 meters it is checked wheter there is a near special point
         protected float DistanceRunM = 0f; // distance run since last check interval
         protected bool FirstUpdateLoop = true; // first update loop
 
-        const float MaxDistFromRoadCarM = 200.0f; // maximum distance of train traveller to spawned roadcar
+        private const float MaxDistFromRoadCarM = 200.0f; // maximum distance of train traveller to spawned roadcar
         protected RoadCar NearRoadCar;
         protected bool RoadCarFound;
 

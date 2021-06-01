@@ -24,9 +24,9 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .tdb files
     /// </summary>
-    class TrackDataBaseLoader : Loader
+    internal class TrackDataBaseLoader : Loader
     {
-        TrackDatabaseFile TDBfile;
+        private TrackDatabaseFile tdbfile;
         /// <summary>
         /// Try to load the file.
         /// Possibly this might raise an exception. That exception is not caught here
@@ -35,18 +35,21 @@ namespace Orts.ContentChecker
         public override void TryLoading(string file)
         {
             loadedFile = file;
-            TDBfile = new TrackDatabaseFile(file);
+            tdbfile = new TrackDatabaseFile(file);
         }
 
         protected override void AddDependentFiles()
         {
             string worldDirectory = Path.Combine(Path.GetDirectoryName(loadedFile), "WORLD");
-            if (!Directory.Exists(worldDirectory)) { return; }
+            if (!Directory.Exists(worldDirectory)) 
+            { 
+                return; 
+            }
 
-            var worldSoundFiles = Directory.GetFiles(worldDirectory, "*.ws", SearchOption.TopDirectoryOnly);
+            string[] worldSoundFiles = Directory.GetFiles(worldDirectory, "*.ws", SearchOption.TopDirectoryOnly);
             foreach (string soundFile in worldSoundFiles)
             {
-                AddAdditionalFileAction.Invoke(soundFile, new WorldSoundLoader(TDBfile.TrackDB));
+                AddAdditionalFileAction.Invoke(soundFile, new WorldSoundLoader(tdbfile.TrackDB));
             }
         }
     }

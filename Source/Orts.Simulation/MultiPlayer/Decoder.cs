@@ -21,7 +21,7 @@ namespace Orts.MultiPlayer
 {
     public class Decoder
 	{
-		string msg = "";
+        private string msg = "";
 		/*
 		static Decoder decoder= null;
 		private Decoder()

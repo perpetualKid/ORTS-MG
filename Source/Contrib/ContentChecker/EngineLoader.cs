@@ -23,7 +23,7 @@ namespace Orts.ContentChecker
     /// <summary>
     /// Loader class for .eng files
     /// </summary>
-    class EngineLoader : Loader
+    internal class EngineLoader : Loader
     {
         /// <summary>
         /// Try to load the file.
@@ -32,7 +32,7 @@ namespace Orts.ContentChecker
         /// <param name="file">The file that needs to be loaded</param>
         public override void TryLoading(string file)
         {
-            var engine = new EngineFile(file);
+            _ = new EngineFile(file);
         }
     }
 }

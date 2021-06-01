@@ -456,12 +456,12 @@ namespace ORTS.TrackViewer.Editing
         /// List of main-track nodes that were actually drawn and can therefore be selected for editing
         /// </summary>     
         public Collection<TrainpathNode> DrawnNodes { get; private set; }
-        
+
         /// <summary>
         /// Keys are tracknode indexes, value is a list of (main) track node (in pairs) that are both
         /// on the tracknode and the path between them has been drawn 
         /// </summary>
-        Dictionary<int, List<TrainpathNode>> DrawnTrackIndexes = new Dictionary<int, List<TrainpathNode>>();
+        private Dictionary<int, List<TrainpathNode>> DrawnTrackIndexes = new Dictionary<int, List<TrainpathNode>>();
 
         /// <summary>
         /// Constructor, just creates new empty collections

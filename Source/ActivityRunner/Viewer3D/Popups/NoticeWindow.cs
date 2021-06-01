@@ -26,26 +26,26 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class NoticeWindow : LayeredWindow
     {
-        const double LocationX = 0.5;
-        const double LocationY = 0.25;
-        const double PaddingX = 0.1;
-        const double PaddingY = 0;
-        const double AnimationLength = 0.4;
-        const double AnimationFade = 0.1;
-        const double NoticeTextSize = 0.02;
+        private const double LocationX = 0.5;
+        private const double LocationY = 0.25;
+        private const double PaddingX = 0.1;
+        private const double PaddingY = 0;
+        private const double AnimationLength = 0.4;
+        private const double AnimationFade = 0.1;
+        private const double NoticeTextSize = 0.02;
 
         // Screen-related data
-        WindowTextFont Font;
+        private WindowTextFont Font;
 
         // Updated data
-        string Camera;
-        float FieldOfView;
+        private string Camera;
+        private float FieldOfView;
 
         // Notice data
-        string NoticeText;
-        Point NoticeSize;
-        bool Animation;
-        double AnimationStart = -1;
+        private string NoticeText;
+        private Point NoticeSize;
+        private bool Animation;
+        private double AnimationStart = -1;
 
         public NoticeWindow(WindowManager owner)
             : base(owner, 10, 10, "Field of View")
@@ -114,7 +114,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             }
         }
 
-        void SetNotice(string noticeText)
+        private void SetNotice(string noticeText)
         {
             NoticeText = noticeText;
             NoticeSize = new Point(Font.MeasureString(noticeText), Font.Height);

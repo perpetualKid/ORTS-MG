@@ -47,7 +47,7 @@ namespace Orts.Formats.OR.Parsers
 
         public string Path { get; private set; }
 
-        JsonReader(string fileName, JsonTextReader reader)
+        private JsonReader(string fileName, JsonTextReader reader)
         {
             this.fileName = fileName;
             this.reader = reader;

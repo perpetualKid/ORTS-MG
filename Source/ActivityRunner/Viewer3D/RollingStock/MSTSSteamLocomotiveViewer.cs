@@ -31,23 +31,24 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 {
     public class MSTSSteamLocomotiveViewer : MSTSLocomotiveViewer
     {
-        float Throttlepercent;
-        float Color_Value;
+        private float Throttlepercent;
+        private float Color_Value;
 
-        MSTSSteamLocomotive SteamLocomotive { get { return (MSTSSteamLocomotive)Car; } }
-        List<ParticleEmitterViewer> Cylinders = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> Cylinders2 = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> Blowdown = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> Drainpipe = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> Injectors1 = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> Injectors2 = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> Compressor = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> Generator = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> SafetyValves = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> Stack = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> Whistle = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> SmallEjector = new List<ParticleEmitterViewer>();
-        List<ParticleEmitterViewer> LargeEjector = new List<ParticleEmitterViewer>();
+        private MSTSSteamLocomotive SteamLocomotive { get { return (MSTSSteamLocomotive)Car; } }
+
+        private List<ParticleEmitterViewer> Cylinders = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> Cylinders2 = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> Blowdown = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> Drainpipe = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> Injectors1 = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> Injectors2 = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> Compressor = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> Generator = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> SafetyValves = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> Stack = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> Whistle = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> SmallEjector = new List<ParticleEmitterViewer>();
+        private List<ParticleEmitterViewer> LargeEjector = new List<ParticleEmitterViewer>();
 
         public MSTSSteamLocomotiveViewer(Viewer viewer, MSTSSteamLocomotive car)
             : base(viewer, car)

@@ -540,12 +540,12 @@ namespace ORTS.TrackViewer.Editing.Charts
         /// </summary>
         public override string ToString()
         {
-            string basicInfo = string.Format("pathChartPoint {0:F1} {1:F1} {2:F1} {3:F1}% {4:F3} ", this.DistanceAlongPath, this.DistanceAlongNextSection, this.HeightM, this.GradePercent, this.Curvature);
-            if (this.TrackItemText == string.Empty)
+            string basicInfo = $"pathChartPoint {DistanceAlongPath:F1} {DistanceAlongNextSection:F1} {HeightM:F1} {GradePercent:F1}% {Curvature:F3} ";
+            if (string.IsNullOrEmpty(this.TrackItemText))
             {
                 return basicInfo;
             }
-            return basicInfo + " (" + this.TrackItemText + ")";
+            return basicInfo + $" ({TrackItemText})";
         }
     }
     #endregion
@@ -571,7 +571,7 @@ namespace ORTS.TrackViewer.Editing.Charts
     /// <summary>
     /// For each requested tracknode find the track items we want to keep (stations, speed, mile markers, ...) and their location and store this information
     /// </summary>
-    class TrackItemManager
+    internal class TrackItemManager
     {
         private TrackDB trackDB;
         private TrackSectionsFile tsectionDat;
@@ -649,7 +649,7 @@ namespace ORTS.TrackViewer.Editing.Charts
     /// <summary>
     /// Store the text of a trackItem (e.g. station name) as well as its type and its location inside a tracknode
     /// </summary>
-    struct ChartableTrackItem
+    internal struct ChartableTrackItem
     {
         /// <summary>The text of this item that needs to be shown in a chart</summary>
         public string ItemText;
