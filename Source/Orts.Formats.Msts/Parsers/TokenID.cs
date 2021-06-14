@@ -18,12 +18,13 @@
 
 namespace Orts.Formats.Msts.Parsers
 {
+#pragma warning disable CA1707 // Identifiers should not contain underscores
     /// <summary>
     /// Provides an enum for all the binary tokens used
     /// in the header record in the Kuju compressed
     /// binary file format.
     /// </summary>
-    public enum TokenID : uint
+    public enum TokenID
     {
         //////////////////////////////////////////////////////////////
         /// These were taken from coreids.tok ( in the UTILS folder )
@@ -1707,5 +1708,5 @@ namespace Orts.Formats.Msts.Parsers
         OrtsPantographToggle3,
         OrtsPantographToggle4
     }
-
+#pragma warning restore CA1707 // Identifiers should not contain underscores
 }

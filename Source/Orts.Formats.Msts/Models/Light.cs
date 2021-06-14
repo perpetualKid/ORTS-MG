@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -38,7 +39,7 @@ namespace Orts.Formats.Msts.Models
         public bool Transition { get; private set; }
         public float Angle { get; private set; }
 
-        public LightState(STFReader stf)
+        internal LightState(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new[] {
@@ -61,7 +62,7 @@ namespace Orts.Formats.Msts.Models
             }.PackedValue;
         }
 
-        public LightState(LightState state, bool reverse)
+        internal LightState(LightState state, bool reverse)
         {
             Duration = state.Duration;
             Color = state.Color;
@@ -74,7 +75,7 @@ namespace Orts.Formats.Msts.Models
 
             if (reverse)
             {
-                Azimuth = new Vector3((Azimuth.X+180)%360, (Azimuth.Y + 180) % 360, (Azimuth.Z + 180) % 360);
+                Azimuth = new Vector3((Azimuth.X + 180) % 360, (Azimuth.Y + 180) % 360, (Azimuth.Z + 180) % 360);
                 Position = new Vector3(-Position.X, Position.Y, -Position.Z);
             }
         }
@@ -99,9 +100,9 @@ namespace Orts.Formats.Msts.Models
         public bool Cycle { get; private set; }
         public float FadeIn { get; private set; }
         public float FadeOut { get; private set; }
-        public List<LightState> States { get; } = new List<LightState>();
+        public IList<LightState> States { get; } = new List<LightState>();
 
-        public Light(int index, STFReader stf)
+        internal Light(int index, STFReader stf)
         {
             Index = index;
             stf.MustMatchBlockStart();
@@ -122,7 +123,7 @@ namespace Orts.Formats.Msts.Models
                 new STFReader.TokenProcessor("fadeout", ()=>{ FadeOut = stf.ReadFloatBlock(STFReader.Units.None, null); }),
                 new STFReader.TokenProcessor("states", ()=>{
                     stf.MustMatchBlockStart();
-                    var count = stf.ReadInt(null);
+                    int count = stf.ReadInt(null);
                     stf.ParseBlock(new[] {
                         new STFReader.TokenProcessor("state", ()=>{
                             if (States.Count >= count)
@@ -132,27 +133,30 @@ namespace Orts.Formats.Msts.Models
                         }),
                     });
                     if (States.Count < count)
-                        STFException.TraceWarning(stf, (count - States.Count).ToString() + " missing State(s)");
+                        STFException.TraceWarning(stf, $"{count - States.Count} missing State(s)");
                 }),
             });
         }
 
-        public Light(Light light, bool reverse)
+        public Light(Light source, bool reverse)
         {
-            Index = light.Index;
-            Type = light.Type;
-            Headlight = light.Headlight;
-            Unit = light.Unit;
-            Penalty = light.Penalty;
-            Control = light.Control;
-            Service = light.Service;
-            TimeOfDay = light.TimeOfDay;
-            Weather = light.Weather;
-            Coupling = light.Coupling;
-            Cycle = light.Cycle;
-            FadeIn = light.FadeIn;
-            FadeOut = light.FadeOut;
-            foreach (var state in light.States)
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            Index = source.Index;
+            Type = source.Type;
+            Headlight = source.Headlight;
+            Unit = source.Unit;
+            Penalty = source.Penalty;
+            Control = source.Control;
+            Service = source.Service;
+            TimeOfDay = source.TimeOfDay;
+            Weather = source.Weather;
+            Coupling = source.Coupling;
+            Cycle = source.Cycle;
+            FadeIn = source.FadeIn;
+            FadeOut = source.FadeOut;
+            foreach (LightState state in source.States)
                 States.Add(new LightState(state, reverse));
 
             if (reverse)
@@ -171,10 +175,13 @@ namespace Orts.Formats.Msts.Models
     /// Light objects.
     /// Called from within the MSTSWagon class.
     /// </summary>
-    public class Lights: List<Light>
-        { 
+    public class Lights : List<Light>
+    {
         public Lights(STFReader stf)
         {
+            if (null == stf)
+                throw new ArgumentNullException(nameof(stf));
+
             stf.MustMatchBlockStart();
             stf.ReadInt(null); // count; ignore this because its not always correct
             stf.ParseBlock(new[] {
@@ -185,10 +192,10 @@ namespace Orts.Formats.Msts.Models
 
             // MSTSBin created reverse headlight cones automatically, so we shall do so too.
             List<Light> reverseLights = new List<Light>();
-            foreach (var light in this)
+            foreach (Light light in this)
                 if (light.Type == LightType.Cone)
                     reverseLights.Add(new Light(light, true));
-            this.AddRange(reverseLights);
+            AddRange(reverseLights);
         }
     }
 }

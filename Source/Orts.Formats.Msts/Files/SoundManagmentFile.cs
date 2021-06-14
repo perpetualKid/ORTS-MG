@@ -28,7 +28,7 @@ namespace Orts.Formats.Msts.Files
     /// </summary>
     public class SoundManagmentFile
 	{
-        public List<ScalabiltyGroup> ScalabiltyGroups { get; } = new List<ScalabiltyGroup>();
+        public IList<ScalabilityGroup> ScalabiltyGroups { get; } = new List<ScalabilityGroup>();
 
         public SoundManagmentFile( string fileName )
 		{
@@ -42,7 +42,7 @@ namespace Orts.Formats.Msts.Files
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
-                new STFReader.TokenProcessor("scalabiltygroup", ()=>{ ScalabiltyGroups.Add(new ScalabiltyGroup(stf)); }),
+                new STFReader.TokenProcessor("scalabiltygroup", ()=>{ ScalabiltyGroups.Add(new ScalabilityGroup(stf)); }),
             });
         }
     }

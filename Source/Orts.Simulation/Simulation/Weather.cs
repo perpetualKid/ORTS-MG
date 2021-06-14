@@ -48,7 +48,7 @@ namespace Orts.Simulation
         // Precipitation liquidity; =1 for rain, =0 for snow; intermediate values possible with dynamic weather;
         public float PrecipitationLiquidity;
         public float CalculatedWindDirection;
-        public Vector2 WindSpeedMpS = new Vector2();
+        public Vector2 WindSpeedMpS;
         public float WindSpeed {get { return WindSpeedMpS.Length(); } }
         //        public float WindDirection { get { return (float)Math.Atan2(WindSpeedMpS.X, WindSpeedMpS.Y); } }
         public float WindDirection { get { return CalculatedWindDirection; } }

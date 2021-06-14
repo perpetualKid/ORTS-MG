@@ -33,7 +33,7 @@ namespace Orts.Formats.Msts.Files
         public EngineFile(string fileName)
         {
             Name = Path.GetFileNameWithoutExtension(fileName);
-            using (var stf = new STFReader(fileName, false))
+            using (STFReader stf = new STFReader(fileName, false))
                 stf.ParseFile(new STFReader.TokenProcessor[] {
                     new STFReader.TokenProcessor("engine", ()=>{
                         stf.ReadString();

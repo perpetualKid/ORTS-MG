@@ -34,18 +34,18 @@ namespace Orts.Simulation.RollingStocks.SubSystems
     public class FreightAnimations
     {
         public List<FreightAnimation> Animations = new List<FreightAnimation>();
-        public float FreightWeight = 0;
-        public float StaticFreightWeight = 0;
+        public float FreightWeight;
+        public float StaticFreightWeight;
         public PickupType FreightType;
         public bool MSTSFreightAnimEnabled = true;
         public float WagonEmptyWeight = -1;
-        public FreightAnimationContinuous LoadedOne = null;
+        public FreightAnimationContinuous LoadedOne;
         public FreightAnimationContinuous FullPhysicsContinuousOne; // Allow reading of full physics parameters for continuous freight animation
         public FreightAnimationStatic FullPhysicsStaticOne; // Allow reading of full physics for static freight animation
-        public FreightAnimationDiscrete DiscreteLoadedOne = null;
-        public float LoadingStartDelay = 0;
-        public float UnloadingStartDelay = 0;
-        public bool IsGondola = false;
+        public FreightAnimationDiscrete DiscreteLoadedOne;
+        public float LoadingStartDelay;
+        public float UnloadingStartDelay;
+        public bool IsGondola;
  
         // additions to manage consequences of variable weight on friction and brake forces
         public float EmptyORTSDavis_A = -9999;
@@ -56,8 +56,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float EmptyMaxBrakeForceN = -9999;
         public float EmptyMaxHandbrakeForceN = -9999;
         public float EmptyCentreOfGravityM_Y = -9999; // get centre of gravity after adjusted for freight animation
-        public bool ContinuousFreightAnimationsPresent = false; // Flag to indicate that a continuous freight animation is present
-        public bool StaticFreightAnimationsPresent = false; // Flag to indicate that a continuous freight animation is present
+        public bool ContinuousFreightAnimationsPresent; // Flag to indicate that a continuous freight animation is present
+        public bool StaticFreightAnimationsPresent; // Flag to indicate that a continuous freight animation is present
 
         public FreightAnimations(STFReader stf, MSTSWagon wagon)
         {
@@ -224,12 +224,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
     public class FreightAnimationContinuous : FreightAnimation
     {
         public bool TriggerOnStop;  // Value assumed if property not found.
-        public float MaxHeight = 0;
-        public float MinHeight = 0;
+        public float MaxHeight;
+        public float MinHeight;
         public float FreightWeightWhenFull;
-        public bool FullAtStart = false;
-        public float LoadPerCent = 0;
-        public IntakePoint LinkedIntakePoint = null;
+        public bool FullAtStart;
+        public float LoadPerCent;
+        public IntakePoint LinkedIntakePoint;
 
         // additions to manage consequences of variable weight on friction and brake forces
         public float FullORTSDavis_A = -9999;
@@ -311,12 +311,12 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             Cab3D
         }
         public Type SubType;
-        public float XOffset = 0;
-        public float YOffset = 0;
-        public float ZOffset = 0;
-        public float FreightWeight = 0;
-        public bool Flipped = false;
-        public bool Cab3DFreightAnim = false;
+        public float XOffset;
+        public float YOffset;
+        public float ZOffset;
+        public float FreightWeight;
+        public bool Flipped;
+        public bool Cab3DFreightAnim;
         public bool[] Visibility = { true, false, false };
 
         // additions to manage consequences of variable weight on friction and brake forces
@@ -418,11 +418,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             DEFAULT
         }
         public Type SubType;
-        public float XOffset = 0;
-        public float YOffset = 0;
-        public float ZOffset = 0;
-        public float LoadWeight = 0;
-        public bool LoadedAtStart = false;
+        public float XOffset;
+        public float YOffset;
+        public float ZOffset;
+        public float LoadWeight;
+        public bool LoadedAtStart;
 
         public FreightAnimationDiscrete(STFReader stf)
         {

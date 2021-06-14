@@ -238,18 +238,18 @@ namespace Orts.Simulation.Signalling
         }
 
         // Compare To (to allow sort)
-        public int CompareTo(StationStop otherStop)
+        public int CompareTo(StationStop other)
         {
-            if (otherStop == null)
+            if (other == null)
                 return 1;
 
-            int result = SubrouteIndex.CompareTo(otherStop.SubrouteIndex);
+            int result = SubrouteIndex.CompareTo(other.SubrouteIndex);
             if (result != 0)
                 return result / Math.Abs(result);
-            result = RouteIndex.CompareTo(otherStop.RouteIndex);
+            result = RouteIndex.CompareTo(other.RouteIndex);
             if (result != 0)
                 return result / Math.Abs(result);
-            result = StopOffset.CompareTo(otherStop.StopOffset);
+            result = StopOffset.CompareTo(other.StopOffset);
             if (result != 0)
                 return result / Math.Abs(result);
             return 0;

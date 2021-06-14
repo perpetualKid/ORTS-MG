@@ -24,7 +24,7 @@ namespace Orts.Formats.OR.Files
 {
     public class ORCarSpawnerFile
     {
-        public List<CarSpawnerList> CarSpawners { get; private set; } = new List<CarSpawnerList>();
+        public List<CarSpawners> CarSpawners { get; private set; } = new List<CarSpawners>();
 
         public ORCarSpawnerFile(string fileName, string shapePath)
         {
@@ -41,7 +41,7 @@ namespace Orts.Formats.OR.Files
                             stf.MustMatchBlockStart();
                             stf.MustMatch("ListName");
                             listName = stf.ReadStringBlock(null);
-                            CarSpawners.Add( new CarSpawnerList(stf, shapePath, listName));
+                            CarSpawners.Add( new CarSpawners(stf, shapePath, listName));
                         }
                     }),
                 });

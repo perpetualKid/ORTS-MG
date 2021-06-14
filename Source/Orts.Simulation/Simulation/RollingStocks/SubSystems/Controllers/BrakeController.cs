@@ -405,9 +405,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
             Script.InitializeMoving();
         }
 
-        public float Update(double elapsedClockSeconds)
+        public float Update(double elapsedSeconds)
         {
-            return Script?.Update(elapsedClockSeconds) ?? 0;
+            return Script?.Update(elapsedSeconds) ?? 0;
         }
 
         public (double pressurePSI, double epPressureBar) UpdatePressure(double pressurePSI, double epPressureBar, double elapsedClockSeconds)

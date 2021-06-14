@@ -3,6 +3,7 @@ using System.ComponentModel;
 
 namespace Orts.Formats.Msts
 {
+#pragma warning disable CA1707 // Identifiers should not contain underscores
     #region Activity
     public enum EventType
     {
@@ -110,7 +111,9 @@ namespace Orts.Formats.Msts
     // Bit 3 - 'other exit' is used (8/x8)
     // Bit 4 - 'optional Route' active (16/x10)
      [Flags]
-    public enum PathFlags: uint
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
+    public enum PathFlags
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         None = 0x0,
         ReversalPoint = 1 << 0,
@@ -127,13 +130,14 @@ namespace Orts.Formats.Msts
     [Flags]
     public enum SimisAceFormatOptions
     {
-        Default = 0,
+        None = 0,
         MipMaps = 0x01,
         RawData = 0x10,
     }
 
     public enum SimisAceChannelId
     {
+        None = 0,
         Mask = 2,
         Red = 3,
         Green = 4,
@@ -378,6 +382,7 @@ namespace Orts.Formats.Msts
         Orts_Overcharge,
         Orts_Battery,
         Orts_PowerKey,
+        Orts_2DExternalWipers,
 
         // TCS Controls
         Orts_TCS1,
@@ -441,7 +446,9 @@ namespace Orts.Formats.Msts
     {
         None,
         Needle,
+#pragma warning disable CA1720 // Identifier contains type name
         Pointer,
+#pragma warning restore CA1720 // Identifier contains type name
         Solid,
         Liquid,
         Sprung,
@@ -492,7 +499,10 @@ namespace Orts.Formats.Msts
 
     #region WorldFile
     // These relate to the general properties settable for scenery objects in RE
+    [Flags]
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
     public enum StaticFlag
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     {
         RoundShadow = 0x00002000,
         RectangularShadow = 0x00004000,
@@ -504,7 +514,8 @@ namespace Orts.Formats.Msts
         Global = 0x00200000,
     }
 
-    public enum PlatformDataFlag
+    [Flags]
+    public enum PlatformData
     {
         PlatformLeft = 0x00000002,
         PlatformRight = 0x00000004,
@@ -536,4 +547,5 @@ namespace Orts.Formats.Msts
     #region TrackItem
 
     #endregion
+#pragma warning restore CA1707 // Identifiers should not contain underscores
 }

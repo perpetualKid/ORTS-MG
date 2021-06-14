@@ -23,16 +23,18 @@ namespace Orts.Formats.Msts.Files
 {
     public class TerrainFlagsFile
     {
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
         private readonly byte[,] flags;
 
         public TerrainFlagsFile(string fileName, int sampleCount)
         {
             flags = new byte[sampleCount, sampleCount];
+#pragma warning restore CA1814 // Prefer jagged arrays over multidimensional
             try
             {
-                using (var reader = new BinaryReader(File.OpenRead(fileName)))
-                    for (var z = 0; z < sampleCount; z++)
-                        for (var x = 0; x < sampleCount; x++)
+                using (BinaryReader reader = new BinaryReader(File.OpenRead(fileName)))
+                    for (int z = 0; z < sampleCount; z++)
+                        for (int x = 0; x < sampleCount; x++)
                             flags[x, z] = reader.ReadByte();
             }
             catch (Exception error)

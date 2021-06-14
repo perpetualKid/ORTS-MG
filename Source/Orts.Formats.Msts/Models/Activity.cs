@@ -48,7 +48,7 @@ namespace Orts.Formats.Msts.Models
 
         public ActivityHeader Header { get; } = new ActivityHeader();
 
-        public Activity(STFReader stf)
+        internal Activity(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -124,7 +124,7 @@ namespace Orts.Formats.Msts.Models
     /// </summary>
     public class ActivityObjects : List<ActivityObject>
     {
-        public ActivityObjects(STFReader stf)
+        internal ActivityObjects(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -141,7 +141,7 @@ namespace Orts.Formats.Msts.Models
         public int ID { get; private set; }
         public ref readonly WorldLocation Location => ref location;
 
-        public ActivityObject(STFReader stf)
+        internal ActivityObject(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -164,7 +164,7 @@ namespace Orts.Formats.Msts.Models
         public float A { get; private set; }
         public float B { get; private set; } = 0.001f;
 
-        public MaxVelocity(STFReader stf)
+        internal MaxVelocity(STFReader stf)
         {
             stf.MustMatchBlockStart();
             A = stf.ReadFloat(STFReader.Units.Speed, null);
@@ -176,7 +176,7 @@ namespace Orts.Formats.Msts.Models
     public class PlatformPassengersWaiting : List<PlatformData>
     {  // For use, see file EUROPE1\ACTIVITIES\aftstorm.act
 
-        public PlatformPassengersWaiting(STFReader stf)
+        internal PlatformPassengersWaiting(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -196,7 +196,7 @@ namespace Orts.Formats.Msts.Models
             PassengerCount = passengerCount;
         }
 
-        public PlatformData(STFReader stf)
+        internal PlatformData(STFReader stf)
         {
             stf.MustMatchBlockStart();
             ID = stf.ReadInt(null);
@@ -208,7 +208,7 @@ namespace Orts.Formats.Msts.Models
     public class FailedSignals : List<int>
     { // e.g. ActivityFailedSignals ( ActivityFailedSignal ( 50 ) )
 
-        public FailedSignals(STFReader stf)
+        internal FailedSignals(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -220,7 +220,7 @@ namespace Orts.Formats.Msts.Models
     public class RestrictedSpeedZones : List<RestrictedSpeedZone>
     {  // For use, see file EUROPE1\ACTIVITIES\aftstorm.act
 
-        public RestrictedSpeedZones(STFReader stf)
+        internal RestrictedSpeedZones(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -237,7 +237,7 @@ namespace Orts.Formats.Msts.Models
         public ref readonly WorldLocation StartPosition => ref startPosition;
         public ref readonly WorldLocation EndPosition => ref endPosition;
 
-        public RestrictedSpeedZone(STFReader stf)
+        internal RestrictedSpeedZone(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -264,7 +264,7 @@ namespace Orts.Formats.Msts.Models
         public int DelayToRestart { get; private set; }
         public int MatchingWPDelay { get; private set; }
 
-        public RestartWaitingTrain(STFReader stf)
+        internal RestartWaitingTrain(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {

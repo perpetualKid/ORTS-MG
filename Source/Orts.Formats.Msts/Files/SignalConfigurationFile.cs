@@ -61,7 +61,7 @@ namespace Orts.Formats.Msts.Files
         {
             ScriptPath = Path.GetDirectoryName(fileName);
 
-            OrSignalTypes.Instance.Reset();
+            OrSignalTypes.Reset();
             // preset OR function types and related MSTS function types for default types
             OrSignalTypes.Instance.FunctionTypes.AddRange(EnumExtension.GetNames<SignalFunction>());
 
@@ -97,7 +97,7 @@ namespace Orts.Formats.Msts.Files
             ScriptFiles = CheckAndInitialize(ScriptFiles, nameof(ScriptFiles), fileName);
         }
 
-        private T CheckAndInitialize<T>(T obj, string name, string fileName) where T: new()
+        private static T CheckAndInitialize<T>(T obj, string name, string fileName) where T: new()
         {
             if (obj == null)
             {
@@ -107,7 +107,7 @@ namespace Orts.Formats.Msts.Files
             return obj;
         }
 
-        private void ReadOrtsSignalFunctionTypes(STFReader stf)
+        private static void ReadOrtsSignalFunctionTypes(STFReader stf)
         {
             stf.MustMatchBlockStart();
             int count = stf.ReadInt(null);
@@ -148,7 +148,7 @@ namespace Orts.Formats.Msts.Files
             });
         }
 
-        private void ReadOrtsNormalSubtypes(STFReader stf)
+        private static void ReadOrtsNormalSubtypes(STFReader stf)
         {
             stf.MustMatchBlockStart();
             int count = stf.ReadInt(null);
@@ -179,7 +179,7 @@ namespace Orts.Formats.Msts.Files
             });
         }
 
-        private Dictionary<string, LightTexture> ReadLightTextures(STFReader stf)
+        private static Dictionary<string, LightTexture> ReadLightTextures(STFReader stf)
         {
             stf.MustMatchBlockStart();
             int count = stf.ReadInt(null);
@@ -199,11 +199,11 @@ namespace Orts.Formats.Msts.Files
                 }),
             });
             if (lightTextures.Count < count)
-                STFException.TraceWarning(stf, (count - lightTextures.Count).ToString() + " missing LightTex(s)");
+                STFException.TraceWarning(stf, $"{count - lightTextures.Count} missing LightTex(s)");
             return lightTextures;
         }
 
-        private Dictionary<string, LightTableEntry> ReadLightsTable(STFReader stf)
+        private static Dictionary<string, LightTableEntry> ReadLightsTable(STFReader stf)
         {
             stf.MustMatchBlockStart();
             int count = stf.ReadInt(null);
@@ -223,11 +223,11 @@ namespace Orts.Formats.Msts.Files
                 }),
             });
             if (lightsTable.Count < count)
-                STFException.TraceWarning(stf, (count - lightsTable.Count).ToString() + " missing LightsTabEntry(s)");
+                STFException.TraceWarning(stf, $"{count - lightsTable.Count} missing LightsTabEntry(s)");
             return lightsTable;
         }
 
-        private Dictionary<string, SignalType> ReadSignalTypes(STFReader stf, bool orMode)
+        private static Dictionary<string, SignalType> ReadSignalTypes(STFReader stf, bool orMode)
         {
             stf.MustMatchBlockStart();
             int count = stf.ReadInt(null);
@@ -247,11 +247,11 @@ namespace Orts.Formats.Msts.Files
                 }),
             });
             if (signalTypes.Count < count)
-                STFException.TraceWarning(stf, (count - signalTypes.Count).ToString() + " missing SignalType(s)");
+                STFException.TraceWarning(stf, $"{count - signalTypes.Count} missing SignalType(s)");
             return signalTypes;
         }
 
-        private Dictionary<string, SignalShape> ReadSignalShapes(STFReader stf)
+        private static Dictionary<string, SignalShape> ReadSignalShapes(STFReader stf)
         {
             stf.MustMatchBlockStart();
             int count = stf.ReadInt(null);
@@ -271,11 +271,11 @@ namespace Orts.Formats.Msts.Files
                 }),
             });
             if (signalShapes.Count < count)
-                STFException.TraceWarning(stf, (count - signalShapes.Count).ToString() + " missing SignalShape(s)");
+                STFException.TraceWarning(stf, $"{count - signalShapes.Count} missing SignalShape(s)");
             return signalShapes;
         }
 
-        private List<string> ReadScriptFiles(STFReader stf)
+        private static List<string> ReadScriptFiles(STFReader stf)
         {
             stf.MustMatchBlockStart();
             List<string> scriptFiles = new List<string>();

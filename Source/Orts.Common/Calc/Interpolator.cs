@@ -63,6 +63,9 @@ namespace Orts.Common.Calc
         /// <returns></returns>
         public static Interpolator InverseInterpolator(Interpolator source)
         {
+            if (null == source)
+                throw new ArgumentNullException(nameof(source));
+
             return new Interpolator(source.yArray, source.xArray);
         }
 

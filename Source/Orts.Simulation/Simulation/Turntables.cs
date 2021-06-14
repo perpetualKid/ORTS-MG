@@ -88,12 +88,12 @@ namespace Orts.Simulation
         public List<string> Animations = new List<string>();
         public Vector3 CenterOffset; // shape offset of center of moving table;
         public bool Continuous; // continuous motion on
-        public int ConnectedTrackEnd = 0; // 
-        public bool GoToTarget = false;
-        public bool GoToAutoTarget = false;
+        public int ConnectedTrackEnd; // 
+        public bool GoToTarget;
+        public bool GoToAutoTarget;
         public int? TurntableFrameRate;
         public bool SendNotifications = true;      // send simulator confirmations
-        public bool InUse = false;                 // turntable is in use (used in auto mode for timetable)
+        public bool InUse;                 // turntable is in use (used in auto mode for timetable)
         public Queue<int> Q = new Queue<int>();    // Queue of trains waiting to access table
 
         // additions to manage rotation or transfer of wagons
@@ -301,12 +301,12 @@ namespace Orts.Simulation
         }
 
 
-        public virtual void StartContinuous (bool isClockwise)
+        public virtual void StartContinuous (bool clockwise)
         {
 
         }
 
-        public virtual void ComputeTarget(bool isClockwise)
+        public virtual void ComputeTarget(bool clockwise)
         {
 
         }
@@ -344,20 +344,20 @@ namespace Orts.Simulation
     {
         // Fixed data
         public List<float> Angles = new List<float>();
-        public float StartingY = 0; // starting yaw angle
+        public float StartingY; // starting yaw angle
         // Dynamic data
         public bool Clockwise; // clockwise motion on
         public bool Counterclockwise; // counterclockwise motion on
         public bool AutoClockwise; // clockwise motion is on - auto control mode
         public bool AutoCounterclockwise; // clockwise motion is on - auto control mode
-        public float YAngle = 0; // Y angle of animated part, to be compared with Y angles of endpoints
+        public float YAngle; // Y angle of animated part, to be compared with Y angles of endpoints
         public bool ForwardConnected = true; // Platform has its forward part connected to a track
-        public bool RearConnected = false; // Platform has its rear part connected to a track
+        public bool RearConnected; // Platform has its rear part connected to a track
         public bool SaveForwardConnected = true; // Platform has its forward part connected to a track
-        public bool SaveRearConnected = false; // Platform has its rear part connected to a track
+        public bool SaveRearConnected; // Platform has its rear part connected to a track
         public int ForwardConnectedTarget = -1; // index of trackend connected
         public int RearConnectedTarget = -1; // index of trackend connected
-        public float TargetY = 0; //final target for Viewer;
+        public float TargetY; //final target for Viewer;
 
         public SignalEnvironment signalRef { get; protected set; }
 
@@ -473,13 +473,13 @@ namespace Orts.Simulation
         /// Computes the nearest turntable exit in the actual direction
         /// Returns the Y angle to be compared.
         /// </summary>
-        public override void ComputeTarget(bool isClockwise)
+        public override void ComputeTarget(bool clockwise)
         {
             if (!Continuous) return;
             Continuous = false;
             GoToTarget = false;
-            Clockwise = isClockwise;
-            Counterclockwise = !isClockwise;
+            Clockwise = clockwise;
+            Counterclockwise = !clockwise;
             if (Clockwise)
             {
                 var forwardAngleDiff = 3.5f;
@@ -591,7 +591,7 @@ namespace Orts.Simulation
         /// 
         /// </summary>
         /// 
-        public override void StartContinuous(bool isClockwise)
+        public override void StartContinuous(bool clockwise)
         {
             if (TrainsOnMovingTable.Count > 1 || (TrainsOnMovingTable.Count == 1 && TrainsOnMovingTable[0].FrontOnBoard ^ TrainsOnMovingTable[0].BackOnBoard))
             {
@@ -620,8 +620,8 @@ namespace Orts.Simulation
                 if (SendNotifications) Simulator.Confirmer.Information(Simulator.Catalog.GetString("Turntable starting rotation with train"));
 
             }
-            Clockwise = isClockwise;
-            Counterclockwise = !isClockwise;
+            Clockwise = clockwise;
+            Counterclockwise = !clockwise;
             Continuous = true;
         }
 

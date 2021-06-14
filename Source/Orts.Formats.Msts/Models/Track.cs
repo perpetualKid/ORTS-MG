@@ -23,7 +23,7 @@ namespace Orts.Formats.Msts.Models
         public float Radius { get; private set; }    // meters
         public float Angle { get; private set; }	// degrees
 
-        public TrackSection(STFReader stf, bool routeTrackSection)
+        internal TrackSection(STFReader stf, bool routeTrackSection)
         {
             if (routeTrackSection)
             {
@@ -62,7 +62,7 @@ namespace Orts.Formats.Msts.Models
         /// TrackSection from WorldFile
         /// </summary>
         /// <param name="block"></param>
-        public TrackSection(SBR block)
+        internal TrackSection(SBR block)
         {
             // TrackSection  ==> :SectionCurve :uint,UiD :float,param1 :float,param2
             // SectionCurve  ==> :uint,isCurved
@@ -74,7 +74,7 @@ namespace Orts.Formats.Msts.Models
             // param2 = 0 for straight, radius (m) for curved
 
             block.VerifyID(TokenID.TrackSection);
-            using (var subBlock = block.ReadSubBlock())
+            using (SBR subBlock = block.ReadSubBlock())
             {
                 subBlock.VerifyID(TokenID.SectionCurve);
                 Curved = subBlock.ReadUInt() != 0;
@@ -117,12 +117,12 @@ namespace Orts.Formats.Msts.Models
     {
         public uint MaxSectionIndex { get; private set; }
 
-        public TrackSections(STFReader stf)
+        internal TrackSections(STFReader stf)
         {
             AddRouteStandardTrackSections(stf);
         }
 
-        public void AddRouteStandardTrackSections(STFReader stf)
+        internal void AddRouteStandardTrackSections(STFReader stf)
         {
             stf.MustMatchBlockStart();
             MaxSectionIndex = stf.ReadUInt(null);
@@ -131,7 +131,7 @@ namespace Orts.Formats.Msts.Models
             });
         }
 
-        public void AddRouteTrackSections(STFReader stf)
+        internal void AddRouteTrackSections(STFReader stf)
         {
             stf.MustMatchBlockStart();
             MaxSectionIndex = stf.ReadUInt(null);
@@ -161,13 +161,13 @@ namespace Orts.Formats.Msts.Models
 
     public class SectionIndex
     {
-        private Vector3 offset;
+        private readonly Vector3 offset;
         public uint SectionsCount { get; private set; }
         public ref readonly Vector3 Offset => ref offset;
         public float AngularOffset { get; private set; }  // Angular offset 
         public uint[] TrackSections { get; private set; }
 
-        public SectionIndex(STFReader stf)
+        internal SectionIndex(STFReader stf)
         {
             stf.MustMatchBlockStart();
             SectionsCount = stf.ReadUInt(null);
@@ -201,7 +201,7 @@ namespace Orts.Formats.Msts.Models
         public bool TunnelShape { get; private set; }
         public bool RoadShape { get; private set; }
 
-        public TrackShape(STFReader stf)
+        internal TrackShape(STFReader stf)
         {
             stf.MustMatchBlockStart();
             ShapeIndex = stf.ReadUInt(null);
@@ -227,12 +227,12 @@ namespace Orts.Formats.Msts.Models
 
         public uint MaxShapeIndex { get; private set; }
 
-        public TrackShapes(STFReader stf)
+        internal TrackShapes(STFReader stf)
         {
             AddRouteTrackShapes(stf);
         }
 
-        public void AddRouteTrackShapes(STFReader stf)
+        internal void AddRouteTrackShapes(STFReader stf)
         {
             stf.MustMatchBlockStart();
             MaxShapeIndex = stf.ReadUInt(null);
@@ -252,7 +252,7 @@ namespace Orts.Formats.Msts.Models
 
     public class TrackPaths : Dictionary<uint, TrackPath> //SectionIdx in the route's tsection.dat
     {
-        public TrackPaths(STFReader stf)
+        internal TrackPaths(STFReader stf)
         {
             stf.MustMatchBlockStart();
             uint sectionNumber = stf.ReadUInt(null);
@@ -269,7 +269,7 @@ namespace Orts.Formats.Msts.Models
             {
                 Add(path.DynamicSectionIndex, path);
             }
-            catch (Exception e)
+            catch (ArgumentException e)
             {
                 STFException.TraceWarning(stf, "Warning: in route tsection.dat " + e.Message);
             }
@@ -282,7 +282,7 @@ namespace Orts.Formats.Msts.Models
         public uint DynamicSectionIndex { get; private set; }
         public uint[] TrackSections { get; private set; }
 
-        public TrackPath(STFReader stf)
+        internal TrackPath(STFReader stf)
         {
             stf.MustMatchBlockStart();
             DynamicSectionIndex = stf.ReadUInt(null);
@@ -309,7 +309,7 @@ namespace Orts.Formats.Msts.Models
         public string InsideSound { get; private set; }
         public string OutsideSound { get; private set; }
 
-        public TrackType(STFReader stf)
+        internal TrackType(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Label = stf.ReadString();
@@ -342,7 +342,7 @@ namespace Orts.Formats.Msts.Models
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        public TrackDB(STFReader stf)
+        internal TrackDB(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -393,6 +393,9 @@ namespace Orts.Formats.Msts.Models
         /// <param name="trackItems">The array of new items.</param>
         public void AddTrackItems(TrackItem[] trackItems)
         {
+            if (null == trackItems)
+                throw new ArgumentNullException(nameof(trackItems));
+
             TrackItem[] tempTrackItems;
 
             if (TrackItems == null)
@@ -575,7 +578,7 @@ namespace Orts.Formats.Msts.Models
             }
         }
 
-        protected TrackNode(STFReader stf, uint index, int maxTrackNode, int expectedPins)
+        private protected TrackNode(STFReader stf, uint index, int maxTrackNode, int expectedPins)
         {
             Index = index;
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -589,14 +592,14 @@ namespace Orts.Formats.Msts.Models
                 Trace.TraceWarning("Track node {0} has unexpected number of pins; expected {1}, got {2}", Index, expectedPins, TrackPins.Length);
         }
 
-        protected abstract void ReadNodeData(STFReader stf);
+        private protected abstract void ReadNodeData(STFReader stf);
 
-        protected UiD ReadUiD(STFReader stf)
+        private protected static UiD ReadUiD(STFReader stf)
         {
             return new UiD(stf);
         }
 
-        protected void ReadPins(STFReader stf, int maxTrackNode)
+        private protected void ReadPins(STFReader stf, int maxTrackNode)
         {
             stf.MustMatchBlockStart();
             InPins = stf.ReadInt(null);
@@ -622,16 +625,13 @@ namespace Orts.Formats.Msts.Models
                 throw new STFException(stf, "Unknown TrackNode type");
             }
             stf.StepBackOneItem();
-            switch (nodeType)
+            return nodeType switch
             {
-                case NodeType.TrEndNode:
-                    return new TrackEndNode(stf, index, maxNodeIndex);
-                case NodeType.TrJunctionNode:
-                    return new TrackJunctionNode(stf, index, maxNodeIndex);
-                case NodeType.TrVectorNode:
-                    return new TrackVectorNode(stf, index, maxNodeIndex);
-            }
-            return null;
+                NodeType.TrEndNode => new TrackEndNode(stf, index, maxNodeIndex),
+                NodeType.TrJunctionNode => new TrackJunctionNode(stf, index, maxNodeIndex),
+                NodeType.TrVectorNode => new TrackVectorNode(stf, index, maxNodeIndex),
+                _ => null,
+            };
         }
     }
 
@@ -642,12 +642,12 @@ namespace Orts.Formats.Msts.Models
     [DebuggerDisplay("\\{MSTS.TrEndNode\\}")]
     public class TrackEndNode : TrackNode
     {
-        public TrackEndNode(STFReader stf, uint index, int maxTrackNode) :
+        internal TrackEndNode(STFReader stf, uint index, int maxTrackNode) :
             base(stf, index, maxTrackNode, 1)
         {
         }
 
-        protected override void ReadNodeData(STFReader stf)
+        private protected override void ReadNodeData(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.SkipRestOfBlock();
@@ -670,12 +670,12 @@ namespace Orts.Formats.Msts.Models
         /// <summary>The angle of this junction</summary>
         private float angle = float.MaxValue;
 
-        public TrackJunctionNode(STFReader stf, uint index, int maxTrackNode) :
+        internal TrackJunctionNode(STFReader stf, uint index, int maxTrackNode) :
             base(stf, index, maxTrackNode, 3)
         {
         }
 
-        protected override void ReadNodeData(STFReader stf)
+        private protected override void ReadNodeData(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ReadString();
@@ -731,19 +731,19 @@ namespace Orts.Formats.Msts.Models
     [DebuggerDisplay("\\{MSTS.TrVectorNode\\} TrVectorSections={TrackVectorSections?.Length ?? null}, TrItemsRefs={TrackItemIndices?.Length ?? null}")]
     public class TrackVectorNode : TrackNode
     {
-        private static readonly int[] emptyTrackItemIndices = new int[0];
+        private static readonly int[] emptyTrackItemIndices = Array.Empty<int>();
         /// <summary>Array of sections that together form the vectorNode</summary>
         public TrackVectorSection[] TrackVectorSections { get; private set; }
         /// <summary>Array of indexes of TrItems (track items) that are located on this vectorNode</summary>
         public int[] TrackItemIndices { get; private set; } = emptyTrackItemIndices;
         /// <summary>The amount of TrItems in TrItemRefs</summary>
 
-        public TrackVectorNode(STFReader stf, uint index, int maxTrackNode) :
+        internal TrackVectorNode(STFReader stf, uint index, int maxTrackNode) :
             base(stf, index, maxTrackNode, 2)
         {
         }
 
-        protected override void ReadNodeData(STFReader stf)
+        private protected override void ReadNodeData(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -786,7 +786,7 @@ namespace Orts.Formats.Msts.Models
         {
             int[] temp = new int[TrackItemIndices.Length + 1];
             TrackItemIndices.CopyTo(temp, 0);
-            temp[temp.Length - 1] = trackItemIndex;
+            temp[^1] = trackItemIndex;
             TrackItemIndices = temp; //use the new item lists for the track node
         }
 
@@ -818,7 +818,7 @@ namespace Orts.Formats.Msts.Models
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        public TrackPin(STFReader stf)
+        internal TrackPin(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Link = stf.ReadInt(null);
@@ -870,7 +870,7 @@ namespace Orts.Formats.Msts.Models
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        public UiD(STFReader stf)
+        internal UiD(STFReader stf)
         {
             stf.MustMatchBlockStart();
             int worldTileX = stf.ReadInt(null);
@@ -894,8 +894,8 @@ namespace Orts.Formats.Msts.Models
     /// </summary>
     public class TrackVectorSection
     {
-        private WorldLocation location;
-        private Vector3 direction;
+        private readonly WorldLocation location;
+        private readonly Vector3 direction;
 
         public ref readonly WorldLocation Location => ref location;
         public ref readonly Vector3 Direction => ref direction;
@@ -922,7 +922,7 @@ namespace Orts.Formats.Msts.Models
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        public TrackVectorSection(STFReader stf)
+        internal TrackVectorSection(STFReader stf)
         {
             SectionIndex = stf.ReadUInt(null);
             ShapeIndex = stf.ReadUInt(null);

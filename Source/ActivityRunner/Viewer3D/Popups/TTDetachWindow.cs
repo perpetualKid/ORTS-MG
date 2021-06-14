@@ -34,7 +34,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         private Label ThisPortionLine;
         private Label OtherPortionLine;
         private Label ButtonDetach;
-        private DetachInfo reqDetach = null;
+        private DetachInfo reqDetach;
         private TTTrain reqTrain;
         
         public TTDetachWindow(WindowManager owner)

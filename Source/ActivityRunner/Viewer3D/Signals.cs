@@ -180,7 +180,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         private class SignalShapeHead
         {
-            private static readonly Dictionary<string, SignalTypeData> SignalTypes = new Dictionary<string, SignalTypeData>();
+            private static readonly Dictionary<string, SignalTypeData> SignalTypes = new Dictionary<string, SignalTypeData>(StringComparer.OrdinalIgnoreCase);
             private readonly Viewer Viewer;
             private readonly SignalShape SignalShape;
 #if DEBUG_SIGNAL_SHAPES
@@ -211,7 +211,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 for (int mindex = 0; mindex <= signalShape.SharedShape.MatrixNames.Count - 1; mindex++)
                 {
                     string MatrixName = signalShape.SharedShape.MatrixNames[mindex];
-                    if (String.Equals(MatrixName, mstsSignalSubObj.MatrixName))
+                    if (string.Equals(MatrixName, mstsSignalSubObj.MatrixName, StringComparison.OrdinalIgnoreCase))
                         MatrixIndices.Add(mindex);
                 }
 
@@ -555,7 +555,7 @@ namespace Orts.ActivityRunner.Viewer3D
     internal class SignalLightState
     {
         private readonly float transitionTime; // Transition time in seconds.
-        private double intensity = 0;
+        private double intensity;
         private bool firstUpdate = true;
 
         public SignalLightState(float transitionTime)

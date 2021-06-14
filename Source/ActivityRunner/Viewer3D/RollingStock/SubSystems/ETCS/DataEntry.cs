@@ -61,17 +61,17 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
                 Letters = letters;
                 SetText();
             }
-            public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
+            public override void Draw(SpriteBatch spriteBatch, Point position)
             {
-                base.Draw(spriteBatch, drawPosition);
+                base.Draw(spriteBatch, position);
                 {
-                    int x = drawPosition.X + (int)Math.Round(NumberText.Position.X * Scale);
-                    int y = drawPosition.Y + (int)Math.Round(NumberText.Position.Y * Scale);
+                    int x = position.X + (int)Math.Round(NumberText.Position.X * Scale);
+                    int y = position.Y + (int)Math.Round(NumberText.Position.Y * Scale);
                     NumberText.Draw(spriteBatch, new Point(x, y));
                 }
                 {
-                    int x = drawPosition.X + (int)Math.Round(LettersText.Position.X * Scale);
-                    int y = drawPosition.Y + (int)Math.Round(LettersText.Position.Y * Scale);
+                    int x = position.X + (int)Math.Round(LettersText.Position.X * Scale);
+                    int y = position.Y + (int)Math.Round(LettersText.Position.Y * Scale);
                     LettersText.Draw(spriteBatch, new Point(x, y));
                 }
             }
@@ -190,17 +190,17 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
                 BackgroundColor = ColorDarkGrey;
                 SetText();
             }
-            public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
+            public override void Draw(SpriteBatch spriteBatch, Point position)
             {
-                base.Draw(spriteBatch, drawPosition);
+                base.Draw(spriteBatch, position);
 
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, 1, Height, ColorMediumGrey);
-                DrawIntRectangle(spriteBatch, drawPosition, Width - 1, 0, 1, Height, ColorMediumGrey);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, Width, 1, ColorMediumGrey);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, Height - 1, Width, 1, ColorMediumGrey);
+                DrawIntRectangle(spriteBatch, position, 0, 0, 1, Height, ColorMediumGrey);
+                DrawIntRectangle(spriteBatch, position, Width - 1, 0, 1, Height, ColorMediumGrey);
+                DrawIntRectangle(spriteBatch, position, 0, 0, Width, 1, ColorMediumGrey);
+                DrawIntRectangle(spriteBatch, position, 0, Height - 1, Width, 1, ColorMediumGrey);
 
-                int x = drawPosition.X + (int)Math.Round(Label.Position.X * Scale);
-                int y = drawPosition.Y + (int)Math.Round(Label.Position.Y * Scale);
+                int x = position.X + (int)Math.Round(Label.Position.X * Scale);
+                int y = position.Y + (int)Math.Round(Label.Position.Y * Scale);
                 Label.Draw(spriteBatch, new Point(x, y));
             }
             public override void ScaleChanged()
@@ -229,22 +229,22 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
                 Enabled = true;
                 SetFont();
             }
-            public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
+            public override void Draw(SpriteBatch spriteBatch, Point position)
             {
-                base.Draw(spriteBatch, drawPosition);
+                base.Draw(spriteBatch, position);
 
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, 1, Height, ColorMediumGrey);
-                DrawIntRectangle(spriteBatch, drawPosition, Width - 1, 0, 1, Height, ColorMediumGrey);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, Width, 1, ColorMediumGrey);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, Height - 1, Width, 1, ColorMediumGrey);
+                DrawIntRectangle(spriteBatch, position, 0, 0, 1, Height, ColorMediumGrey);
+                DrawIntRectangle(spriteBatch, position, Width - 1, 0, 1, Height, ColorMediumGrey);
+                DrawIntRectangle(spriteBatch, position, 0, 0, Width, 1, ColorMediumGrey);
+                DrawIntRectangle(spriteBatch, position, 0, Height - 1, Width, 1, ColorMediumGrey);
 
                 if (CursorVisible && DMI.Blinker2Hz)
                 {
-                    DrawIntRectangle(spriteBatch, drawPosition, Cursor.X, Cursor.Y, Cursor.Width, Cursor.Height, Color.Black);
+                    DrawIntRectangle(spriteBatch, position, Cursor.X, Cursor.Y, Cursor.Width, Cursor.Height, Color.Black);
                 }
 
-                int x = drawPosition.X + (int)Math.Round(Data.Position.X * Scale);
-                int y = drawPosition.Y + (int)Math.Round(Data.Position.Y * Scale);
+                int x = position.X + (int)Math.Round(Data.Position.X * Scale);
+                int y = position.Y + (int)Math.Round(Data.Position.Y * Scale);
                 Data.Draw(spriteBatch, new Point(x, y));
             }
             public override void ScaleChanged()
@@ -470,17 +470,17 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
             {
                 SetText();
             }
-            public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
+            public override void Draw(SpriteBatch spriteBatch, Point position)
             {
-                DrawRectangle(spriteBatch, drawPosition, 0, 0, Width, Height, Enabled ? ColorGrey : ColorDarkGrey);
+                DrawRectangle(spriteBatch, position, 0, 0, Width, Height, Enabled ? ColorGrey : ColorDarkGrey);
 
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, 1, Height, ColorMediumGrey);
-                DrawIntRectangle(spriteBatch, drawPosition, Width - 1, 0, 1, Height, ColorMediumGrey);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, Width, 1, ColorMediumGrey);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, Height - 1, Width, 1, ColorMediumGrey);
+                DrawIntRectangle(spriteBatch, position, 0, 0, 1, Height, ColorMediumGrey);
+                DrawIntRectangle(spriteBatch, position, Width - 1, 0, 1, Height, ColorMediumGrey);
+                DrawIntRectangle(spriteBatch, position, 0, 0, Width, 1, ColorMediumGrey);
+                DrawIntRectangle(spriteBatch, position, 0, Height - 1, Width, 1, ColorMediumGrey);
 
-                int x = drawPosition.X + (int)Math.Round(Yes.Position.X * Scale);
-                int y = drawPosition.Y + (int)Math.Round(Yes.Position.Y * Scale);
+                int x = position.X + (int)Math.Round(Yes.Position.X * Scale);
+                int y = position.Y + (int)Math.Round(Yes.Position.Y * Scale);
                 Yes.Draw(spriteBatch, new Point(x, y));
             }
             public override void ScaleChanged()
@@ -606,22 +606,22 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
             base.PrepareFrame(status);
             Fields[ActiveField].UpdateCursor();
         }
-        public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
+        public override void Draw(SpriteBatch spriteBatch, Point position)
         {
-            base.Draw(spriteBatch, drawPosition);
+            base.Draw(spriteBatch, position);
             if (!FullScreen) return;
             for (int i = 0; i < Fields.Count; i++)
             {
                 {
                     var text = Fields[i].LabelEchoText;
-                    int x = drawPosition.X + (int)Math.Round((204 - text.Position.X - 5) * Scale);
-                    int y = drawPosition.Y + (int)Math.Round((100 + 2 * i * FontHeightLabel) * Scale);
+                    int x = position.X + (int)Math.Round((204 - text.Position.X - 5) * Scale);
+                    int y = position.Y + (int)Math.Round((100 + 2 * i * FontHeightLabel) * Scale);
                     text.Draw(spriteBatch, new Point(x, y));
                 }
                 {
                     var text = Fields[i].DataEchoText;
-                    int x = drawPosition.X + (int)Math.Round((204 + 5) * Scale);
-                    int y = drawPosition.Y + (int)Math.Round((100 + 2*i*FontHeightLabel) * Scale);
+                    int x = position.X + (int)Math.Round((204 + 5) * Scale);
+                    int y = position.Y + (int)Math.Round((100 + 2*i*FontHeightLabel) * Scale);
                     text.Draw(spriteBatch, new Point(x, y));
                 }
             }

@@ -153,7 +153,7 @@ namespace Orts.Simulation
         public bool InControl = true;//For multiplayer, a player may not control his/her own train (as helper)
         public TurntableFile TurntableFile;
         public List<MovingTable> MovingTables = new List<MovingTable>();
-        public List<CarSpawnerList> CarSpawnerLists;
+        public List<CarSpawners> CarSpawnerLists;
         public ClockList Clocks;           // List of OR-Clocks given by externe file "openrails\clocks.dat"
 
         // timetable pools
@@ -169,15 +169,15 @@ namespace Orts.Simulation
         public TrainEvent SoundNotify = TrainEvent.None;
         public ScriptManager ScriptManager;
 
-        public bool IsAutopilotMode = false;
+        public bool IsAutopilotMode;
 
-        public bool soundProcessWorking = false;
-        public bool updaterWorking = false;
-        public Physics.Train selectedAsPlayer = null;
-        public Physics.Train OriginalPlayerTrain = null; // Used in Activity mode
-        public bool playerSwitchOngoing = false;
+        public bool soundProcessWorking;
+        public bool updaterWorking;
+        public Train selectedAsPlayer;
+        public Train OriginalPlayerTrain; // Used in Activity mode
+        public bool playerSwitchOngoing;
 
-        public bool PlayerIsInCab = false;
+        public bool PlayerIsInCab;
         public readonly bool MilepostUnitsMetric;
         public bool OpenDoorsInAITrains;
 
@@ -341,7 +341,7 @@ namespace Orts.Simulation
             if (File.Exists(carSpawnFile))
             {
                 Trace.Write(" CARSPAWN");
-                CarSpawnerLists = new List<CarSpawnerList>();
+                CarSpawnerLists = new List<CarSpawners>();
                 CarSpawnerFile csf = new CarSpawnerFile(RoutePath + @"\carspawn.dat", RoutePath + @"\shapes\");
                 CarSpawnerLists.Add(csf.CarSpawners);
 
@@ -352,7 +352,7 @@ namespace Orts.Simulation
             if (File.Exists(extCarSpawnFile))
             {
                 if (CarSpawnerLists == null)
-                    CarSpawnerLists = new List<CarSpawnerList>();
+                    CarSpawnerLists = new List<CarSpawners>();
                 Trace.Write(" EXTCARSPAWN");
                 ORCarSpawnerFile acsf = new ORCarSpawnerFile(RoutePath + @"\openrails\carspawn.dat", RoutePath + @"\shapes\");
                 CarSpawnerLists.AddRange(acsf.CarSpawners);

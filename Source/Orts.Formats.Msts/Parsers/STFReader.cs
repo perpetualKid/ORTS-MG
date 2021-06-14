@@ -1539,7 +1539,7 @@ namespace Orts.Formats.Msts.Parsers
             while (!Eof)
             {
 #line default
-                if (breakout()) break; // Press F11 'Step Into' to debug the Breakout delegate
+                if (breakout != null && breakout()) break; // Press F11 'Step Into' to debug the Breakout delegate
 #if DEBUG
                 else { } // Press F10 'Step Over' to jump to the next token
 #endif
@@ -1547,7 +1547,9 @@ namespace Orts.Formats.Msts.Parsers
                 if (token?.Length > 0 && token[0] == '(') { SkipRestOfBlock(); continue; }
                 int index = Array.BinarySearch(processors, token, TokenProcessorComparer.Instance);
                 if (index > -1)
+#pragma warning disable CA1062 // Validate arguments of public methods
                     processors[index].Processor();
+#pragma warning restore CA1062 // Validate arguments of public methods
             } // Press F10 'Step Over' to jump to the next token
         }
         /// <summary>Parse an STF file until the end of block ')' marker, using the array of lower case tokens, with a processor delegate/lambda
@@ -1563,7 +1565,9 @@ namespace Orts.Formats.Msts.Parsers
                 if (token?.Length > 0 && token[0] == '(') { SkipRestOfBlock(); continue; }
                 int index = Array.BinarySearch(processors, token, TokenProcessorComparer.Instance);
                 if (index > -1)
+#pragma warning disable CA1062 // Validate arguments of public methods
                     processors[index].Processor();
+#pragma warning restore CA1062 // Validate arguments of public methods
             } 
         }
 
@@ -1579,7 +1583,7 @@ namespace Orts.Formats.Msts.Parsers
             while (!EndOfBlock())
             {
 #line default
-                if (breakout()) { SkipRestOfBlock(); break; } // Press F11 'Step Into' to debug the Breakout delegate
+                if (breakout != null && breakout()) { SkipRestOfBlock(); break; } // Press F11 'Step Into' to debug the Breakout delegate
 #if DEBUG
                 else { } // Press F10 'Step Over' to jump to the next token
 #endif
@@ -1587,7 +1591,9 @@ namespace Orts.Formats.Msts.Parsers
                 if (token?.Length > 0 && token[0] == '(') { SkipRestOfBlock(); continue; }
                 int index = Array.BinarySearch(processors, token, TokenProcessorComparer.Instance);
                 if (index > -1)
+#pragma warning disable CA1062 // Validate arguments of public methods
                     processors[index].Processor();
+#pragma warning restore CA1062 // Validate arguments of public methods
             } // Press F10 'Step Over' to jump to the next token
         }
 
@@ -1602,7 +1608,11 @@ namespace Orts.Formats.Msts.Parsers
         /// <summary>A structure used to index lambda functions to a lower cased token.
         /// </summary>
         [DebuggerDisplay("Token = {Token}")]
+#pragma warning disable CA1034 // Nested types should not be visible
+#pragma warning disable CA1815 // Override equals and operator equals on value types
         public readonly struct TokenProcessor
+#pragma warning restore CA1815 // Override equals and operator equals on value types
+#pragma warning restore CA1034 // Nested types should not be visible
         {
             /// <summary>This constructor is used for the arguments to ParseFile and ParseBlock.
             /// </summary>
@@ -1615,8 +1625,10 @@ namespace Orts.Formats.Msts.Parsers
                 Processor = processor;
             }
 
+#pragma warning disable CA1051 // Do not declare visible instance fields
             public readonly string Token;
             public readonly Processor Processor;
+#pragma warning restore CA1051 // Do not declare visible instance fields
         }
 
         private class TokenProcessorComparer: IComparer<TokenProcessor>, System.Collections.IComparer
@@ -1656,8 +1668,8 @@ namespace Orts.Formats.Msts.Parsers
         /// </summary>
         private string tree_cache;
 
-        private static readonly NumberStyles parseHex = NumberStyles.AllowLeadingWhite | NumberStyles.AllowHexSpecifier | NumberStyles.AllowTrailingWhite;
-        private static readonly NumberStyles parseNum = NumberStyles.AllowLeadingWhite | NumberStyles.AllowLeadingSign | NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent | NumberStyles.AllowTrailingWhite;
+        private const NumberStyles parseHex = NumberStyles.AllowLeadingWhite | NumberStyles.AllowHexSpecifier | NumberStyles.AllowTrailingWhite;
+        private const NumberStyles parseNum = NumberStyles.AllowLeadingWhite | NumberStyles.AllowLeadingSign | NumberStyles.AllowThousands | NumberStyles.AllowDecimalPoint | NumberStyles.AllowExponent | NumberStyles.AllowTrailingWhite;
         private static readonly IFormatProvider parseNFI = NumberFormatInfo.InvariantInfo;
         #region *** StepBack Variables - It is important that all state variables in this STFReader class have a equivalent in the BackStep structure
         /// <summary>This flag is set in StepBackOneItem(), and causes ReadItem(), to use the stepback* variables to do an item repeat
@@ -1684,7 +1696,7 @@ namespace Orts.Formats.Msts.Parsers
             public int BlockDepth;
             //tree_cache can just be set to null, so it is re-evaluated from the stepback'd tree state variable if Tree is called
         };
-        private BackStep stepback = new BackStep();
+        private readonly BackStep stepback = new BackStep();
         #endregion
 
         #region *** Private Class Implementation
@@ -1718,7 +1730,7 @@ namespace Orts.Formats.Msts.Parsers
 
         /// <summary>This is really a local variable in the function ReadItem(...) but it is a class member to stop unnecessary memory re-allocations.
         /// </summary>
-        private StringBuilder itemBuilder = new StringBuilder(256);
+        private readonly StringBuilder itemBuilder = new StringBuilder(256);
 
         /// <summary>Internal Implementation - This is the main function that reads an item from the STF stream.
         /// </summary>
@@ -1834,7 +1846,7 @@ namespace Orts.Formats.Msts.Parsers
                             STFException.TraceWarning(this, "Reading an item started with a double-quote character and followed by the + operator but then the next item must also be double-quoted.");
                             return UpdateTreeAndStepBack(itemBuilder.ToString());
                         }
-                        c = ReadChar(); // Read the open quote
+                        _ = ReadChar(); // Read the open quote
                     }
                 }
             }
@@ -1849,7 +1861,7 @@ namespace Orts.Formats.Msts.Parsers
                     if ((c == '(') || (c == ')')) break;
                     if (c == '"') // Also delimit by a trailing " in case the leading " is missing. 
                     {
-                        c = ReadChar();
+                        _ = ReadChar();
                         break;
                     }
                     c = ReadChar();
@@ -1874,10 +1886,10 @@ namespace Orts.Formats.Msts.Parsers
             string result = itemBuilder.ToString();
             if (!string_mode)  // in string mode we don't exclude comments
             {
-                switch (result.ToLower())
+                switch (result.ToUpperInvariant())
                 {
                     #region Process special token - include
-                    case "include":
+                    case "INCLUDE":
                         string fileName = ReadItem(skip_mode, string_mode);
                         if (fileName.Length > 0 && fileName[0] == '(')
                         {
@@ -1891,8 +1903,8 @@ namespace Orts.Formats.Msts.Parsers
                         return ReadItem(skip_mode, string_mode); // Which will recurse down when includeReader is tested
                     #endregion
                     #region Process special token - skip and comment
-                    case "skip":
-                    case "comment":
+                    case "SKIP":
+                    case "COMMENT":
                         {
                             #region Skip the comment item or block
                             string comment = ReadItem(skip_mode, string_mode);
@@ -1962,20 +1974,24 @@ namespace Orts.Formats.Msts.Parsers
     }
 
     [Serializable]
+#pragma warning disable CA1032 // Implement standard exception constructors
+#pragma warning disable CA2229 // Implement serialization constructors
     public class STFException : Exception
+#pragma warning restore CA2229 // Implement serialization constructors
+#pragma warning restore CA1032 // Implement standard exception constructors
     {
         public static void TraceWarning(STFReader stf, string message)
         {
-            Trace.TraceWarning("{2} in {0}:line {1}", stf.FileName, stf.LineNumber, message);
+            Trace.TraceWarning($"{message} in {stf?.FileName}:line {stf.LineNumber}");
         }
 
         public static void TraceInformation(STFReader stf, string message)
         {
-            Trace.TraceInformation("{2} in {0}:line {1}", stf.FileName, stf.LineNumber, message);
+            Trace.TraceInformation($"{message} in {stf?.FileName}:line {stf.LineNumber}");
         }
 
         public STFException(STFReader stf, string message)
-            : base($"{message} in {stf.FileName}:line {stf.LineNumber}\n")
+            : base($"{message} in {stf?.FileName}:line {stf.LineNumber}\n")
         {
         }
     }
@@ -3446,7 +3462,7 @@ namespace Orts.Parsers.Msts
             if (UpcomingTokenFromSource.IsBlockEnd)
             {
                 STFException.TraceWarning(UpcomingTokenFromSource,
-                    String.Format(System.Globalization.CultureInfo.CurrentCulture,
+                    eString.Format(System.Globalization.CultureInfo.CurrentCulture,
                                     "When expecting a {0}, we found a ) marker. Using the default {1}", description, defaultValue));
                 return defaultValue.GetValueOrDefault(default(T));
             }

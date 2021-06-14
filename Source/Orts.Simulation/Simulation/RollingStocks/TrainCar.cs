@@ -104,11 +104,11 @@ namespace Orts.Simulation.RollingStocks
 
         public static int DbfEvalTravellingTooFast;//Debrief eval
         public static int DbfEvalTravellingTooFastSnappedBrakeHose;//Debrief eval
-        public bool dbfEvalsnappedbrakehose = false;//Debrief eval
-        public bool ldbfevalcurvespeed = false;//Debrief eval
+        public bool dbfEvalsnappedbrakehose;//Debrief eval
+        public bool ldbfevalcurvespeed;//Debrief eval
         private static float dbfmaxsafecurvespeedmps;//Debrief eval
         public static int DbfEvalTrainOverturned;//Debrief eval
-        public bool ldbfevaltrainoverturned = false;
+        public bool ldbfevaltrainoverturned;
                                         
         // original consist of which car was part (used in timetable for couple/uncouple options)
         public string OrgConsist = string.Empty;
@@ -138,7 +138,7 @@ namespace Orts.Simulation.RollingStocks
         public float MainSteamHeatPipeInnerDiaM = (float)Size.Length.FromIn(1.50f); // Steel pipe ID = 1.5"
         public float CarConnectSteamHoseOuterDiaM = (float)Size.Length.FromIn(2.05f); // Rubber hose OD = 2.05"
         public float CarConnectSteamHoseInnerDiaM = (float)Size.Length.FromIn(1.50f); // Rubber hose ID = 1.5"
-        public bool IsSteamHeatBoilerLockedOut = false;
+        public bool IsSteamHeatBoilerLockedOut;
         public float MaximumSteamHeatingBoilerSteamUsageRateLbpS;
         public float MaximiumSteamHeatBoilerFuelTankCapacityL = 1500.0f; // Capacity of the fuel tank for the steam heating boiler
         public float CurrentCarSteamHeatBoilerWaterCapacityL;  // Current water level
@@ -147,8 +147,8 @@ namespace Orts.Simulation.RollingStocks
         public float CompartmentHeatingPipeAreaFactor = 3.0f;
         public float DesiredCompartmentTempSetpointC = (float)Temperature.Celsius.FromF(55.0f); // This is the desired temperature for the passenger compartment heating
         public float WindowDeratingFactor = 0.275f;   // fraction of windows in carriage side - 27.5% of space are windows
-        public bool SteamHeatingBoilerOn = false;
-        public bool SteamHeatingCompartmentSteamTrapOn = false;
+        public bool SteamHeatingBoilerOn;
+        public bool SteamHeatingCompartmentSteamTrapOn;
         public float TotalCarCompartmentHeatLossWpT;      // Transmission loss for the wagon
         public float CarHeatCompartmentPipeAreaM2;  // Area of surface of car pipe
         public bool IsCarSteamHeatInitial = true; // Allow steam heat to be initialised.
@@ -159,7 +159,7 @@ namespace Orts.Simulation.RollingStocks
         public float CarCompartmentSteamPipeHeatConvW;
         public float CarCompartmentSteamHeatPipeRadW;
         public float DisplayTrainNetSteamHeatLossWpTime;  // Display Net Steam loss - Loss in Cars vs Steam Pipe Heat
-        public bool CarHeatCompartmentHeaterOn = false;
+        public bool CarHeatCompartmentHeaterOn;
         public float CarHeatSteamTrapUsageLBpS;
         public float CarHeatConnectingSteamHoseLeakageLBpS;
         public float SteamHoseLeakRateRandom;
@@ -176,9 +176,9 @@ namespace Orts.Simulation.RollingStocks
         public float MassKG = 10000;        // Mass in KG at runtime; coincides with InitialMassKG if there is no load and no ORTS freight anim
         public float InitialMassKG = 10000;
         public bool IsDriveable;
-        public bool HasFreightAnim = false;
-        public bool HasPassengerCapacity = false;
-        public bool HasInsideView = false;
+        public bool HasFreightAnim;
+        public bool HasPassengerCapacity;
+        public bool HasInsideView;
         public float CarHeightAboveSeaLevelM;
 
         public float MaxHandbrakeForceN;
@@ -196,8 +196,8 @@ namespace Orts.Simulation.RollingStocks
         public float FrontCouplerOpenAnimLengthM;
         public float FrontCouplerOpenAnimWidthM;
         public float FrontCouplerOpenAnimHeightM;
-        public bool FrontCouplerOpenFitted = false;
-        public bool FrontCouplerOpen = false;
+        public bool FrontCouplerOpenFitted;
+        public bool FrontCouplerOpen;
 
         public string RearCouplerShapeFileName;
         public float RearCouplerAnimLengthM;
@@ -208,8 +208,8 @@ namespace Orts.Simulation.RollingStocks
         public float RearCouplerOpenAnimLengthM;
         public float RearCouplerOpenAnimWidthM;
         public float RearCouplerOpenAnimHeightM;
-        public bool RearCouplerOpenFitted = false;
-        public bool RearCouplerOpen = false;
+        public bool RearCouplerOpenFitted;
+        public bool RearCouplerOpen;
 
         // Used to calculate Carriage Steam Heat Loss
         public float CarHeatLossWpT;      // Transmission loss for the wagon
@@ -220,8 +220,8 @@ namespace Orts.Simulation.RollingStocks
         public bool IsTrainHeatingBoilerInitialised { get; set; }
 
         // Used to calculate wheel sliding for locked brake
-        public bool BrakeSkid = false;
-        public bool HUDBrakeSkid = false;
+        public bool BrakeSkid;
+        public bool HUDBrakeSkid;
         public float BrakeShoeCoefficientFriction = 1.0f; // Brake Shoe coefficient - for simple adhesion model set to 1
         public float BrakeShoeCoefficientFrictionAdjFactor = 1.0f; // Factor to adjust Brake force by - based upon changing friction coefficient with speed, will change when wheel goes into skid
         public float BrakeShoeRetardCoefficientFrictionAdjFactor = 1.0f; // Factor of adjust Retard Brake force by - independent of skid
@@ -252,9 +252,9 @@ namespace Orts.Simulation.RollingStocks
         public float _PrevSpeedMpS;
         public float AbsSpeedMpS; // Math.Abs(SpeedMps) expression is repeated many times in the subclasses, maybe this deserves a class variable
         public float CouplerSlackM;  // extra distance between cars (calculated based on relative speeds)
-        public int HUDCouplerForceIndication = 0; // Flag to indicate whether coupler is 1 - pulling, 2 - pushing or 0 - neither
+        public int HUDCouplerForceIndication; // Flag to indicate whether coupler is 1 - pulling, 2 - pushing or 0 - neither
         public float CouplerSlack2M;  // slack calculated using draft gear force
-        public bool IsAdvancedCoupler = false; // Flag to indicate that coupler is to be treated as an advanced coupler
+        public bool IsAdvancedCoupler; // Flag to indicate that coupler is to be treated as an advanced coupler
         public float FrontCouplerSlackM; // Slack in car front coupler
         public float RearCouplerSlackM;  // Slack in rear coupler
 
@@ -270,17 +270,17 @@ namespace Orts.Simulation.RollingStocks
 
         public float WheelBearingTemperatureDegC = 40.0f;
         public string DisplayWheelBearingTemperatureStatus;
-        public float WheelBearingTemperatureRiseTimeS = 0;
-        public float HotBoxTemperatureRiseTimeS = 0;
-        public float WheelBearingTemperatureDeclineTimeS = 0;
+        public float WheelBearingTemperatureRiseTimeS;
+        public float HotBoxTemperatureRiseTimeS;
+        public float WheelBearingTemperatureDeclineTimeS;
         public float InitialWheelBearingDeclineTemperatureDegC;
         public float InitialWheelBearingRiseTemperatureDegC;
         public float InitialHotBoxRiseTemperatureDegS;
-        public bool WheelBearingFailed = false;
-        public bool WheelBearingHot = false;
-        public bool HotBoxActivated = false;
-        public bool HotBoxHasBeenInitialized = false;
-        public bool HotBoxSoundActivated = false;
+        public bool WheelBearingFailed;
+        public bool WheelBearingHot;
+        public bool HotBoxActivated;
+        public bool HotBoxHasBeenInitialized;
+        public bool HotBoxSoundActivated;
         public float HotBoxDelayS;
         public float ActivityHotBoxDurationS;
         public float ActivityElapsedDurationS;
@@ -462,7 +462,7 @@ namespace Orts.Simulation.RollingStocks
 
         // TrainCar.Update() must set these variables
         public float MotiveForceN;   // ie motor power in Newtons  - signed relative to direction of car -
-        public float TractiveForceN = 0f; // Raw tractive force for electric sound variable2
+        public float TractiveForceN; // Raw tractive force for electric sound variable2
         public SmoothedData MotiveForceSmoothedN = new SmoothedData(0.5f);
         public float PrevMotiveForceN;
         // Gravity forces have negative values on rising grade. 
@@ -470,7 +470,7 @@ namespace Orts.Simulation.RollingStocks
         public float GravityForceN;  // Newtons  - signed relative to direction of car.
         public float CurveForceN;   // Resistive force due to curve, in Newtons
         public float WindForceN;  // Resistive force due to wind
-        public float DynamicBrakeForceN = 0f; // Raw dynamic brake force for diesel and electric locomotives
+        public float DynamicBrakeForceN; // Raw dynamic brake force for diesel and electric locomotives
 
         // Derailment variables
         public float WagonVerticalDerailForceN; // Vertical force of wagon/car - essentially determined by the weight
@@ -538,9 +538,9 @@ namespace Orts.Simulation.RollingStocks
         protected float SuperelevationM; // Super elevation on the curve
         protected float UnbalancedSuperElevationM;  // Unbalanced superelevation, read from MSTS Wagon File
         protected float SuperElevationTotalM; // Total superelevation
-        protected bool IsMaxSafeCurveSpeed = false; // Has equal loading speed around the curve been exceeded, ie are all the wheesl still on the track?
-        public bool IsCriticalMaxSpeed = false; // Has the critical maximum speed around the curve been reached, is the wagon about to overturn?
-        public bool IsCriticalMinSpeed = false; // Is the speed less then the minimum required for the wagon to travel around the curve
+        protected bool IsMaxSafeCurveSpeed; // Has equal loading speed around the curve been exceeded, ie are all the wheesl still on the track?
+        public bool IsCriticalMaxSpeed; // Has the critical maximum speed around the curve been reached, is the wagon about to overturn?
+        public bool IsCriticalMinSpeed; // Is the speed less then the minimum required for the wagon to travel around the curve
         protected float MaxCurveEqualLoadSpeedMps; // Max speed that rolling stock can do whist maintaining equal load on track
         protected float StartCurveResistanceFactor = 2.0f; // Set curve friction at Start = 200%
         protected float RouteSpeedMpS; // Max Route Speed Limit
@@ -595,8 +595,8 @@ namespace Orts.Simulation.RollingStocks
         protected float SingleTunnelCrossSectAreaM2;
         protected float DoubleTunnelPerimeterM;
         protected float SingleTunnelPerimeterAreaM;
-        protected float TunnelCrossSectionAreaM2 = 0.0f;
-        protected float TunnelPerimeterM = 0.0f;
+        protected float TunnelCrossSectionAreaM2;
+        protected float TunnelPerimeterM;
 
         // used by tunnel processing
         public struct CarTunnelInfoData
@@ -770,7 +770,7 @@ namespace Orts.Simulation.RollingStocks
             {
                 _AccelerationMpSS = (_SpeedMpS - _PrevSpeedMpS) / (float)elapsedClockSeconds;
 
-                if (Simulator.UseAdvancedAdhesion)
+                if (Simulator.UseAdvancedAdhesion && !Simulator.Settings.SimpleControlPhysics)
                     _AccelerationMpSS = (float)AccelerationFilter.Filter(_AccelerationMpSS, elapsedClockSeconds);
 
                 _PrevSpeedMpS = _SpeedMpS;
@@ -841,8 +841,8 @@ namespace Orts.Simulation.RollingStocks
         public virtual void UpdateBrakeSlideCalculation()
         {
 
-            // Only apply slide, and advanced brake friction, if advanced adhesion is selected, and it is a Player train
-            if (Simulator.UseAdvancedAdhesion && IsPlayerTrain)
+            // Only apply slide, and advanced brake friction, if advanced adhesion is selected, simplecontrolphysics is not set, and it is a Player train
+            if (Simulator.UseAdvancedAdhesion && !Simulator.Settings.SimpleControlPhysics && IsPlayerTrain)
             {
 
                 // Get user defined brake shoe coefficient if defined in WAG file
@@ -1518,7 +1518,7 @@ namespace Orts.Simulation.RollingStocks
         public virtual string GetBrakemanBrakeStatus() { return null; }
         public virtual string GetDynamicBrakeStatus() { return null; }
         public virtual bool GetSanderOn() { return false; }
-        protected bool WheelHasBeenSet = false; //indicating that the car shape has been loaded, thus no need to reset the wheels
+        protected bool WheelHasBeenSet; //indicating that the car shape has been loaded, thus no need to reset the wheels
 
         public TrainCar()
         {
@@ -2408,9 +2408,9 @@ namespace Orts.Simulation.RollingStocks
         #endregion
 
         // TODO These three fields should be in the TrainCarViewer.
-        public int TrackSoundType = 0;
+        public int TrackSoundType;
         public WorldLocation TrackSoundLocation = WorldLocation.None;
-        public float TrackSoundDistSquared = 0;
+        public float TrackSoundDistSquared;
 
 
         /// <summary>
@@ -2586,10 +2586,10 @@ namespace Orts.Simulation.RollingStocks
             BogieIndex = bogie;
             BogieMatrix = parentMatrix;
         }
-        public int Compare(WheelAxle a, WheelAxle b)
+        public int Compare(WheelAxle x, WheelAxle y)
         {
-            if (a.OffsetM > b.OffsetM) return 1;
-            if (a.OffsetM < b.OffsetM) return -1;
+            if (x.OffsetM > y.OffsetM) return 1;
+            if (x.OffsetM < y.OffsetM) return -1;
             return 0;
         }
     }
@@ -2600,7 +2600,7 @@ namespace Orts.Simulation.RollingStocks
         public float OffsetM;   // distance from center of model, positive forward
         public int iMatrix;     // matrix in shape that needs to be moved
         public float Cos = 1;       // truck angle cosine
-        public float Sin = 0;       // truck angle sin
+        public float Sin;       // truck angle sin
         // line fitting variables
         public double SumWgt;
         public double SumOffset;

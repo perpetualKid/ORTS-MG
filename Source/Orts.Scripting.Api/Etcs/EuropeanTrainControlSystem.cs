@@ -330,9 +330,9 @@ namespace Orts.Scripting.Api.Etcs
             Acknowledged = false;
             Displayed = false;
         }
-        public bool Equals(TextMessage o)
+        public bool Equals(TextMessage other)
         {
-            return o.Text == Text && o.TimestampS == TimestampS;
+            return other.Text == Text && other.TimestampS == TimestampS;
         }
     }
     public abstract class DMIButtonDefinition

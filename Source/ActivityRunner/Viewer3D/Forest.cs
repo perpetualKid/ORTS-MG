@@ -40,8 +40,8 @@ namespace Orts.ActivityRunner.Viewer3D
         private readonly Material Material;
         private readonly ForestPrimitive Primitive;
 
-        public float MaximumCenterlineOffset = 0.0f;
-        public bool CheckRoadsToo = false;
+        public float MaximumCenterlineOffset;
+        public bool CheckRoadsToo;
 
         public ForestViewer(Viewer viewer, ForestObject forest, in WorldPosition position)
         {

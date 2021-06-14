@@ -63,7 +63,7 @@ namespace Orts.Simulation
 
         // Location and directionVector are only valid if locationSet == true.
         private bool locationSet;
-        private WorldLocation location = new WorldLocation();
+        private WorldLocation location = WorldLocation.None;
         private Vector3 directionVector;
 
         // Length and offset only valid if lengthSet = true.

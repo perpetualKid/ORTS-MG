@@ -31,7 +31,7 @@ namespace Orts.Formats.Msts.Files
     /// </summary>
     public class CameraConfigurationFile
     {
-        public List<Camera> Cameras = new List<Camera>();
+        public IList<Camera> Cameras { get; } = new List<Camera>();
 
         public CameraConfigurationFile(string fileName)
         {

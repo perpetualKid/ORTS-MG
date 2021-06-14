@@ -95,7 +95,7 @@ namespace Orts.Common.Logging
                 Trace.WriteLine($"{"Version",-12}= {VersionInfo.Version}");
                 Trace.WriteLine($"{"Code Version",-12}= {VersionInfo.CodeVersion}");
                 if (logFileName.Length > 0)
-                    Trace.WriteLine($"{"Logfile",-12}= {logFileName.Replace(Environment.UserName, "********")}");
+                    Trace.WriteLine($"{"Logfile",-12}= {logFileName.Replace(Environment.UserName, "********", StringComparison.OrdinalIgnoreCase)}");
                 Trace.WriteLine($"{"Executable",-12}= {Path.GetFileName(Assembly.GetEntryAssembly().Location)}");
                 foreach (string arg in Environment.GetCommandLineArgs())
                     Trace.WriteLine($"{"Argument",-12}= {arg}");

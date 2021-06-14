@@ -79,7 +79,7 @@ namespace Orts.Simulation.Timetables
         private List<string> reportedPaths = new List<string>();                                                      // reported path fails
         private Dictionary<int, string> TrainRouteXRef = new Dictionary<int, string>();                               // path name referenced from train index    
 
-        public bool BinaryPaths = false;
+        public bool BinaryPaths;
 
         //================================================================================================//
         /// <summary>
@@ -1290,12 +1290,12 @@ namespace Orts.Simulation.Timetables
             public string TTDescription;
             public int columnIndex;
             public bool validTrain = true;
-            public bool playerTrain = false;
+            public bool playerTrain;
             public Dictionary<string, StopInfo> Stops = new Dictionary<string, StopInfo>();
             public List<string> reportedConsistFailures = new List<string>();
             public int Index;
             public List<TTTrainCommands> TrainCommands = new List<TTTrainCommands>();
-            public DisposeInfo DisposeDetails = null;
+            public DisposeInfo DisposeDetails;
 
             public readonly TimetableInfo parentInfo;
 

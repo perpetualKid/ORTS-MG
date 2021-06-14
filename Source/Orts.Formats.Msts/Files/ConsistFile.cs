@@ -31,7 +31,7 @@ namespace Orts.Formats.Msts.Files
 
         public ConsistFile(string fileName)
         {
-            using (var stf = new STFReader(fileName, false))
+            using (STFReader stf = new STFReader(fileName, false))
                 stf.ParseFile(new STFReader.TokenProcessor[] {
                     new STFReader.TokenProcessor("train", ()=>{ Train = new TrainSet(stf); }),
                 });

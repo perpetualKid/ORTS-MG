@@ -35,18 +35,22 @@ namespace Orts.Formats.Msts.Files
         {
         }
 
-        public WorldFile(string fileName, List<TokenID> allowedTokens)
+        public WorldFile(string fileName, IList<TokenID> allowedTokens)
         {
             try
             {
+                if (string.IsNullOrEmpty(fileName))
+                    throw new InvalidDataException($"Empty filename could not be parsed for for X and Z tile information.");
                 // Parse the tile location out of the filename.
-                var p = fileName.LastIndexOf("\\WORLD\\W", StringComparison.OrdinalIgnoreCase);
-                TileX = int.Parse(fileName.Substring(p + 8, 7));
-                TileZ = int.Parse(fileName.Substring(p + 15, 7));
+                int p = fileName.LastIndexOf("\\WORLD\\W", StringComparison.OrdinalIgnoreCase);
+                if (!int.TryParse(fileName.Substring(p + 8, 7), out int tileX) || !int.TryParse(fileName.Substring(p + 15, 7), out int tileZ))
+                    throw new InvalidDataException($"Could not parse filename {fileName} for X and Z tile information.");
+                TileX = tileX;
+                TileZ = tileZ;
 
-                using (var sbr = SBR.Open(fileName))
+                using (SBR sbr = SBR.Open(fileName))
                 {
-                    using (var block = sbr.ReadSubBlock())
+                    using (SBR block = sbr.ReadSubBlock())
                     {
                         Objects = new WorldObjects(block, allowedTokens, TileX, TileZ);
                     }
@@ -63,9 +67,9 @@ namespace Orts.Formats.Msts.Files
 
         public void InsertORSpecificData (string fileName)
         {
-            using (var sbr = SBR.Open(fileName))
+            using (SBR sbr = SBR.Open(fileName))
             {
-                using (var block = sbr.ReadSubBlock())
+                using (SBR block = sbr.ReadSubBlock())
                 {
                     Objects.InsertORSpecificData(block);
                 }

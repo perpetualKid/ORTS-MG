@@ -55,7 +55,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             public float TriggerOnOverspeedMpS;                 // OverspeedMonitor only
             public bool TriggerOnTrackOverspeed;                // OverspeedMonitor only
             public float TriggerOnTrackOverspeedMarginMpS = 4;  // OverspeedMonitor only
-            public bool ResetOnDirectionNeutral = false;
+            public bool ResetOnDirectionNeutral ;
             public bool ResetOnZeroSpeed = true;
             public bool ResetOnResetButton;                     // OverspeedMonitor only
 
@@ -118,8 +118,8 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public float NextSpeedLimitMpS { get; set; }
         public TrackMonitorSignalAspect CabSignalAspect { get; set; }
 
-        public bool Activated = false;
-        public bool CustomTCSScript = false;
+        public bool Activated;
+        public bool CustomTCSScript;
         private readonly MSTSLocomotive Locomotive;
         private readonly Simulator Simulator;
         private float ItemSpeedLimit;
@@ -146,7 +146,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         // List of customized control strings;
         public string[] CustomizedCabviewControlNames = new string[TCSCabviewControlCount];
         // TODO : Delete this when SetCustomizedTCSControlString is deleted
-        protected int NextCabviewControlNameToEdit = 0;
+        protected int NextCabviewControlNameToEdit;
         private string ScriptName;
         private string SoundFileName;
         private string ParametersFileName;
@@ -198,14 +198,14 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         }
 
         //Debrief Eval
-        public static int DbfevalFullBrakeAbove16kmh = 0;
-        public bool ldbfevalfullbrakeabove16kmh = false;
+        public static int DbfevalFullBrakeAbove16kmh;
+        public bool ldbfevalfullbrakeabove16kmh;
 
         public void Initialize()
         {
             if (!Activated)
             {
-                if (!Simulator.Settings.DisableTCSScripts && ScriptName != null && ScriptName != "MSTS" && ScriptName != "")
+                if (!Simulator.Settings.DisableTCSScripts && !string.IsNullOrEmpty( ScriptName) && !ScriptName.Equals("MSTS", StringComparison.OrdinalIgnoreCase))
                 {
                     Script = Simulator.ScriptManager.Load(Path.Combine(Path.GetDirectoryName(Locomotive.WagFilePath), "Script"), ScriptName) as TrainControlSystem;
                     CustomTCSScript = true;
@@ -267,7 +267,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Script.AlerterSound = () => Locomotive.AlerterSnd;
                 Script.TrainSpeedLimitMpS = () => Math.Min(Locomotive.Train.AllowedMaxSpeedMpS, Locomotive.Train.TrainMaxSpeedMpS);
                 Script.TrainMaxSpeedMpS = () => Locomotive.Train.TrainMaxSpeedMpS; // max speed for train in a specific section, independently from speedpost and signal limits
-                Script.CurrentSignalSpeedLimitMpS = () => Locomotive.Train.allowedMaxSpeedSignalMpS;
+                Script.CurrentSignalSpeedLimitMpS = () => Locomotive.Train.AllowedMaxSpeedSignalMpS;
                 Script.NextSignalSpeedLimitMpS = (value) => NextGenericSignalItem<float>(value, ref ItemSpeedLimit, float.MaxValue, TrainPathItemType.Signal, "NORMAL");
                 Script.NextSignalAspect = (value) => NextGenericSignalItem<TrackMonitorSignalAspect>(value, ref ItemAspect, float.MaxValue, TrainPathItemType.Signal, "NORMAL");
                 Script.NextSignalDistanceM = (value) => NextGenericSignalItem<float>(value, ref ItemDistance, float.MaxValue, TrainPathItemType.Signal, "NORMAL");
@@ -285,7 +285,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                     NextGenericSignalItem<float>(0, ref ItemDistance, GenericItemDistance, TrainPathItemType.Signal, type);
                 Script.NextGenericSignalFeatures = (arg1, arg2, arg3) => NextGenericSignalFeatures(arg1, arg2, arg3, TrainPathItemType.Signal);
                 Script.DoesNextNormalSignalHaveRepeaterHead = () => DoesNextNormalSignalHaveRepeaterHead();
-                Script.CurrentPostSpeedLimitMpS = () => Locomotive.Train.allowedMaxSpeedLimitMpS;
+                Script.CurrentPostSpeedLimitMpS = () => Locomotive.Train.AllowedMaxSpeedLimitMpS;
                 Script.NextPostSpeedLimitMpS = (value) => NextGenericSignalItem<float>(value, ref ItemSpeedLimit, float.MaxValue, TrainPathItemType.Speedpost);
                 Script.NextPostDistanceM = (value) => NextGenericSignalItem<float>(value, ref ItemDistance, float.MaxValue, TrainPathItemType.Speedpost);
                 Script.NextTunnel = (value) =>
@@ -806,7 +806,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
             if (originalString.Length < 9) return originalString;
             if (originalString.Substring(0, 8) != "ORTS_TCS") return originalString;
             var commandIndex = Convert.ToInt32(originalString.Substring(8));
-            return commandIndex > 0 && commandIndex <= TCSCabviewControlCount && CustomizedCabviewControlNames[commandIndex - 1] != ""
+            return commandIndex > 0 && commandIndex <= TCSCabviewControlCount && !string.IsNullOrEmpty(CustomizedCabviewControlNames[commandIndex - 1])
                 ? CustomizedCabviewControlNames[commandIndex - 1]
                 : originalString;
         }
@@ -814,14 +814,14 @@ namespace Orts.Simulation.RollingStocks.SubSystems
         public void Save(BinaryWriter outf)
         {
             outf.Write(ScriptName ?? "");
-            if (ScriptName != "")
+            if (!string.IsNullOrEmpty(ScriptName))
                 Script.Save(outf);
         }
 
         public void Restore(BinaryReader inf)
         {
             ScriptName = inf.ReadString();
-            if (ScriptName != "")
+            if (!string.IsNullOrEmpty(ScriptName))
             {
                 Initialize();
                 Script.Restore(inf);

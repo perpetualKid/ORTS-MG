@@ -30,24 +30,24 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
     public class MultiPlayerWindow : Window
     {
         private bool ResizeWindow;
-        private int FirstColLenght = 0;
-        private int FirstColOverFlow = 0;
-        private int LastColLenght = 0;
-        private int LastColOverFlow = 0;
-        private int LinesCount = 0;
+        private int FirstColLenght;
+        private int FirstColOverFlow;
+        private int LastColLenght;
+        private int LastColOverFlow;
+        private int LinesCount;
         private const int TrainDrivingInfoHeightInLinesOfText = 1;
-        private bool UpdateDataEnded = false;
+        private bool UpdateDataEnded;
 
         public static bool StandardHUD = true;// Standard full text or not.
 
-        private int WindowHeightMax = 0;
-        private int WindowHeightMin = 0;
-        private int WindowWidthMin = 0;
-        private int WindowWidthMax = 0;
+        private int WindowHeightMax;
+        private int WindowHeightMin;
+        private int WindowWidthMin;
+        private int WindowWidthMax;
         private char expandWindow;
         private const int TextSize = 15;
         public int keyPresLenght;
-        public int OffSetX = 0;
+        public int OffSetX;
         private string keyPressed;// display a symbol when a control key is pressed.
 
         private Label ExpandWindow;

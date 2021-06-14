@@ -54,16 +54,16 @@ namespace Orts.Simulation.Timetables
         public float DefMaxDecelMpSSF = 0.8f;               // maximum decelleration
         public float DefMaxAccelMpSSF = 0.5f;               // maximum accelleration
 
-        public bool Closeup = false;                           // closeup to other train when stabling
+        public bool Closeup;                           // closeup to other train when stabling
         public static float keepDistanceCloseupM = 2.5f;       // stay 2.5m from end of route when closeup required (for stabling only)
         public static float keepDistanceTrainAheadCloseupM = 0.5f;       // stay 0.5m from train ahead when closeup required (for stabling only)
         public static float keepDistanceCloseupSignalM = 7.0f;          // stay 10m from signal ahead when signalcloseup required
         public static float endOfRouteDistance = 150f;         // Max length to remain for train to continue on route
 
         public int? ActivateTime;                           // time train is activated
-        public bool TriggeredActivationRequired = false;    // train activation is triggered by other train
+        public bool TriggeredActivationRequired;    // train activation is triggered by other train
 
-        public bool Created = false;                        // train is created at start
+        public bool Created;                        // train is created at start
         public string CreateAhead = String.Empty;           // train is created ahead of other train
         public string CreateInPool = String.Empty;          // train is to be created in pool at start of timetable
         public string CreateFromPool = String.Empty;        // train is to be created from pool
@@ -72,11 +72,11 @@ namespace Orts.Simulation.Timetables
         public string ForcedConsistName = String.Empty;     // forced consist name for extraction from pool
 
         // Timetable Commands info
-        public List<WaitInfo> WaitList = null;                            //used when in timetable mode for wait instructions
-        public Dictionary<int, List<WaitInfo>> WaitAnyList = null;        //used when in timetable mode for waitany instructions
-        public bool Stable_CallOn = false;                                //used when in timetable mode to show stabled train is allowed to call on
-        public bool DriverOnlyOperation = false;                          //used when in timetable mode to indicate driver only operation
-        public bool ForceReversal = false;                                //used when in timetable mode to force reversal at diverging point ignoring signals
+        public List<WaitInfo> WaitList;                            //used when in timetable mode for wait instructions
+        public Dictionary<int, List<WaitInfo>> WaitAnyList;        //used when in timetable mode for waitany instructions
+        public bool Stable_CallOn;                                //used when in timetable mode to show stabled train is allowed to call on
+        public bool DriverOnlyOperation;                          //used when in timetable mode to indicate driver only operation
+        public bool ForceReversal;                                //used when in timetable mode to force reversal at diverging point ignoring signals
 
         public enum FormCommand                                           //enum to indicate type of form sequence
         {
@@ -88,7 +88,7 @@ namespace Orts.Simulation.Timetables
         }
 
         public int Forms = -1;                                            //indicates which train is to be formed out of this train on termination
-        public bool FormsStatic = false;                                  //indicate if train is to remain as static
+        public bool FormsStatic;                                  //indicate if train is to remain as static
         public string ExitPool = String.Empty;                            //set if train is to be stabled in pool
         public int PoolAccessSection = -1;                                //set to last section index if train is to be stabled in pool, section is access section to pool
 
@@ -103,23 +103,23 @@ namespace Orts.Simulation.Timetables
 
         public TimetablePool.PoolExitDirectionEnum PoolExitDirection = TimetablePool.PoolExitDirectionEnum.Undefined;
                                                                           // required exit direction from pool (if applicable) 
-        public TimetableTurntableControl ActiveTurntable = null;          //active turntable
+        public TimetableTurntableControl ActiveTurntable;          //active turntable
 
         public int FormedOf = -1;                                         //indicates out of which train this train is formed
         public FormCommand FormedOfType = FormCommand.None;               //indicates type of formed-of command
         public int OrgAINumber = -1;                                      //original AI number of formed player train
-        public bool SetStop = false;                                      //indicates train must copy station stop from formed train
-        public bool FormsAtStation = false;                               //indicates train must form into next service at last station, route must be curtailed to that stop
-        public bool leadLocoAntiSlip = false;                             //anti slip indication for original leading engine
+        public bool SetStop;                                      //indicates train must copy station stop from formed train
+        public bool FormsAtStation;                               //indicates train must form into next service at last station, route must be curtailed to that stop
+        public bool leadLocoAntiSlip;                             //anti slip indication for original leading engine
 
         // detach details
         public Dictionary<int, List<DetachInfo>> DetachDetails = new Dictionary<int, List<DetachInfo>>();
         // key is platform reference (use -1 for detach at start or end), list is detach commands at that location
         public int[] DetachActive = new int[2] { -1, -1 };                // detach is activated - first index is key in DetachDetails, second index is index in valuelist
         // 2nd index = -1 indicates invalid (first index -1 is a valid index)
-        public int DetachUnits = 0;                                       // no. of units to detach
-        public bool DetachPosition = false;                               // if true detach from front
-        public bool DetachPending = false;                                // true when player detach window is displayed
+        public int DetachUnits;                                       // no. of units to detach
+        public bool DetachPosition;                               // if true detach from front
+        public bool DetachPending;                                // true when player detach window is displayed
 
         // attach details
         public AttachInfo AttachDetails;                                  // attach details
@@ -130,23 +130,23 @@ namespace Orts.Simulation.Timetables
         public List<PickUpInfo> PickUpDetails = new List<PickUpInfo>();   // only used during train building
         public List<int> PickUpTrains = new List<int>();                  // list of train to be picked up
         public List<int> PickUpStatic = new List<int>();                  // index of locations where static consists are to be picked up
-        public bool PickUpStaticOnForms = false;                          // set if pickup of static is required when forming next train
-        public bool NeedPickUp = false;                                   // indicates pickup is required
+        public bool PickUpStaticOnForms;                          // set if pickup of static is required when forming next train
+        public bool NeedPickUp;                                   // indicates pickup is required
 
         // transfer details
         public Dictionary<int, TransferInfo> TransferStationDetails = new Dictionary<int, TransferInfo>();
         // list of transfer to take place in station
         public Dictionary<int, List<TransferInfo>> TransferTrainDetails = new Dictionary<int, List<TransferInfo>>();
         // list of transfers defined per train - if int = -1, transfer is to be performed on static train
-        public bool NeedTransfer = false;                                 // indicates transfer is required
+        public bool NeedTransfer;                                 // indicates transfer is required
         public Dictionary<int, List<int>> NeedStationTransfer = new Dictionary<int, List<int>>();
         // list of required station transfers, per station index
         public Dictionary<int, int> NeedTrainTransfer = new Dictionary<int, int>();
         // number of required train transfers per section
 
         // delayed restart
-        public bool DelayedStart = false;                                 // start is delayed
-        public float RestdelayS = 0.0f;                                   // time to wait
+        public bool DelayedStart;                                 // start is delayed
+        public float RestdelayS;                                   // time to wait
         public AiStartMovement DelayedStartState;               // state to start
 
         public struct DelayedStartBase
@@ -181,8 +181,8 @@ namespace Orts.Simulation.Timetables
             public bool restrictedSet;                                    // special speed has been set
         }
 
-        public DelayedStartValues DelayedStartSettings = new DelayedStartValues();
-        public SpeedValues SpeedSettings = new SpeedValues();
+        public DelayedStartValues DelayedStartSettings;
+        public SpeedValues SpeedSettings;
 
         // special patch conditions
         public enum LastSignalStop
@@ -2263,8 +2263,8 @@ namespace Orts.Simulation.Timetables
                     TrainMaxSpeedMpS = otherTrain.TrainMaxSpeedMpS;
                 }
                 AllowedMaxSpeedMpS = otherTrain.AllowedMaxSpeedMpS;
-                allowedMaxSpeedSignalMpS = otherTrain.allowedMaxSpeedSignalMpS;
-                allowedMaxSpeedLimitMpS = otherTrain.allowedMaxSpeedLimitMpS;
+                AllowedMaxSpeedSignalMpS = otherTrain.AllowedMaxSpeedSignalMpS;
+                AllowedMaxSpeedLimitMpS = otherTrain.AllowedMaxSpeedLimitMpS;
 
                 FrontTDBTraveller = new Traveller(otherTrain.FrontTDBTraveller);
                 RearTDBTraveller = new Traveller(otherTrain.RearTDBTraveller);
@@ -3198,13 +3198,13 @@ namespace Orts.Simulation.Timetables
         /// Update when train on turntable
         /// </summary>
 
-        public override void UpdateTurntableState(double elapsedClockSeconds, int presentTime)
+        public override void UpdateTurntableState(double elapsedTimeSeconds, int presentTime)
         {
 
             // check if delayed action is due
             if (DelayedStart)
             {
-                RestdelayS -= (float)elapsedClockSeconds;
+                RestdelayS -= (float)elapsedTimeSeconds;
                 if (RestdelayS <= 0)   // wait time has elapsed - start moving
                 {
                     DelayedStart = false;
@@ -3225,7 +3225,7 @@ namespace Orts.Simulation.Timetables
 
             if (ActiveTurntable.CheckTurntableAvailable())
             {
-                ActiveTurntable.UpdateTurntableStateAI(elapsedClockSeconds, presentTime);
+                ActiveTurntable.UpdateTurntableStateAI(elapsedTimeSeconds, presentTime);
             }
         }
 
@@ -11707,12 +11707,12 @@ namespace Orts.Simulation.Timetables
 
         // common for Wait, Follow and Connect
         public int waitTrainNumber;                           // number of train for which to wait
-        public int? maxDelayS = null;                         // max. delay for waiting (in seconds)
-        public int? ownDelayS = null;                         // min. own delay for waiting to be active (in seconds)
-        public bool? notStarted = null;                       // also wait if not yet started
-        public bool? atStart = null;                          // wait at start of wait section, otherwise wait at first not-common section
-        public int? waittrigger = null;                       // time at which wait is triggered
-        public int? waitendtrigger = null;                    // time at which wait is cancelled
+        public int? maxDelayS;                         // max. delay for waiting (in seconds)
+        public int? ownDelayS;                         // min. own delay for waiting to be active (in seconds)
+        public bool? notStarted;                       // also wait if not yet started
+        public bool? atStart;                          // wait at start of wait section, otherwise wait at first not-common section
+        public int? waittrigger;                       // time at which wait is triggered
+        public int? waitendtrigger;                    // time at which wait is cancelled
 
         // wait types Wait and Follow :
         public int waitTrainSubpathIndex;                     // subpath index for train - set to -1 if wait is always active
@@ -11723,7 +11723,7 @@ namespace Orts.Simulation.Timetables
         public int? holdTimeS;                                // required hold time (in seconds)
 
         // wait types WaitInfo (no post-processing required) :
-        public TrackCircuitPartialPathRoute CheckPath = null;         // required path to check in case of WaitAny
+        public TrackCircuitPartialPathRoute CheckPath;         // required path to check in case of WaitAny
 
         public CheckPathDirection PathDirection = CheckPathDirection.Same; // required path direction
 
@@ -11941,23 +11941,23 @@ namespace Orts.Simulation.Timetables
         // Compare To (to allow sort)
         //
 
-        public int CompareTo(WaitInfo otherItem)
+        public int CompareTo(WaitInfo other)
         {
             // all connects are moved to the end of the queue
             if (this.WaitType == WaitInfoType.Connect)
             {
-                if (otherItem.WaitType != WaitInfoType.Connect)
+                if (other.WaitType != WaitInfoType.Connect)
                     return (1);
                 return (0);
             }
-            if (otherItem.WaitType == WaitInfoType.Connect)
+            if (other.WaitType == WaitInfoType.Connect)
                 return (-1);
 
-            if (this.activeSubrouteIndex < otherItem.activeSubrouteIndex)
+            if (this.activeSubrouteIndex < other.activeSubrouteIndex)
                 return (-1);
-            if (this.activeSubrouteIndex == otherItem.activeSubrouteIndex && this.activeRouteIndex < otherItem.activeRouteIndex)
+            if (this.activeSubrouteIndex == other.activeSubrouteIndex && this.activeRouteIndex < other.activeRouteIndex)
                 return (-1);
-            if (this.activeSubrouteIndex == otherItem.activeSubrouteIndex && this.activeRouteIndex == otherItem.activeRouteIndex)
+            if (this.activeSubrouteIndex == other.activeSubrouteIndex && this.activeRouteIndex == other.activeRouteIndex)
                 return (0);
             return (1);
         }
@@ -13157,7 +13157,7 @@ namespace Orts.Simulation.Timetables
     {
         public int PickUpTrain;                             // train number to which to attach
         public string PickUpTrainName = String.Empty;       // train name to which to attach
-        public bool PickUpStatic = false;                         // pickup unnamed static consist
+        public bool PickUpStatic;                         // pickup unnamed static consist
 
         public int StationPlatformReference;                // station platform reference - set to -1 if attaching to static train in dispose command
         public bool Valid;                                  // attach info is valid
@@ -13355,7 +13355,7 @@ namespace Orts.Simulation.Timetables
         public TransferType TypeOfTransfer;                     // type of transfer
         public DetachInfo.DetachUnitsInfo TransferUnitsInfo;    // type of unit definition
         public int TransferUnitCount;                           // no. of units (if defined as units)
-        public List<string> TransferConsist = null;             // consists to transfer (if defined as consist)
+        public List<string> TransferConsist;             // consists to transfer (if defined as consist)
         public int TransferTrain;                               // Number of other train
         public string TransferTrainName = String.Empty;         // Name of other train
         public int StationPlatformReference;                    // platform reference of transfer location

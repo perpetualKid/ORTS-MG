@@ -28,33 +28,26 @@ namespace Orts.ActivityRunner.Processes
 {
     public class Profiler
     {
-        public readonly string Name;
+        private readonly string name;
         public SmoothedData Wall { get; private set; }
         public SmoothedData CPU { get; private set; }
         public SmoothedData Wait { get; private set; }
 
-        private readonly Stopwatch TimeTotal;
-        private readonly Stopwatch TimeRunning;
-        private TimeSpan TimeCPU;
-        private TimeSpan LastCPU;
-        private ProcessThread ProcessThread;
-#if DEBUG_THREAD_PERFORMANCE
-        StreamWriter DebugFileStream;
-#endif
+        private readonly Stopwatch timeTotal;
+        private readonly Stopwatch timeRunning;
+        private TimeSpan timeCPU;
+        private TimeSpan lastCPU;
+        private ProcessThread processThread;
 
         public Profiler(string name)
         {
-            Name = name;
+            this.name = name;
             Wall = new SmoothedData();
             CPU = new SmoothedData();
             Wait = new SmoothedData();
-            TimeTotal = new Stopwatch();
-            TimeRunning = new Stopwatch();
-            TimeTotal.Start();
-#if DEBUG_THREAD_PERFORMANCE
-            DebugFileStream = new StreamWriter(File.OpenWrite("debug_thread_" + name.ToLowerInvariant() + "_profiler.csv"));
-            DebugFileStream.Write("Time,Event\n");
-#endif
+            timeTotal = new Stopwatch();
+            timeRunning = new Stopwatch();
+            timeTotal.Start();
         }
 
         public void SetThread()
@@ -62,7 +55,7 @@ namespace Orts.ActivityRunner.Processes
             // This is so that you can identify threads from debuggers like Visual Studio.
             try
             {
-                Thread.CurrentThread.Name = $"{Name} Process";
+                Thread.CurrentThread.Name = $"{name} Process";
             }
             catch (InvalidOperationException) { }
 
@@ -70,59 +63,52 @@ namespace Orts.ActivityRunner.Processes
             // should always fail but will appear in Process Monitor's log against the correct thread.
             try
             {
-                File.ReadAllBytes($@"DEBUG\THREAD\{Name} Process");
+                File.ReadAllBytes($@"DEBUG\THREAD\{name} Process");
             }
-            catch { }
-
-#pragma warning disable 618 // Although obsolete GetCurrentThreadId() is required to link to ProcessThread
+            catch (DirectoryNotFoundException) { }
+            
+            int threadId = Thread.CurrentThread.ManagedThreadId;
             foreach (ProcessThread thread in Process.GetCurrentProcess().Threads)
             {
-                if (thread.Id == AppDomain.GetCurrentThreadId())
+                if (thread.Id == threadId)
                 {
-                    ProcessThread = thread;
+                    processThread = thread;
                     break;
                 }
             }
-#pragma warning restore 618
         }
 
         public void Start()
         {
-#if DEBUG_THREAD_PERFORMANCE
-            DebugFileStream.Write("{0},+\n", DateTime.UtcNow.Ticks);
-#endif
-            TimeRunning.Start();
-            if (ProcessThread != null)
-                LastCPU = ProcessThread.TotalProcessorTime;
+            timeRunning.Start();
+            if (processThread != null)
+                lastCPU = processThread.TotalProcessorTime;
         }
 
         public void Stop()
         {
-#if DEBUG_THREAD_PERFORMANCE
-            DebugFileStream.Write("{0},-\n", DateTime.UtcNow.Ticks);
-#endif
-            TimeRunning.Stop();
-            if (ProcessThread != null)
-                TimeCPU += ProcessThread.TotalProcessorTime - LastCPU;
+            timeRunning.Stop();
+            if (processThread != null)
+                timeCPU += processThread.TotalProcessorTime - lastCPU;
         }
 
         public void Mark()
         {
             // Collect timing data from the timers while they're running and reset them.
-            var running = TimeRunning.IsRunning;
-            var timeTotal = (float)TimeTotal.ElapsedMilliseconds;
-            var timeRunning = (float)TimeRunning.ElapsedMilliseconds;
-            var timeCPU = (float)TimeCPU.TotalMilliseconds;
+            bool running = this.timeRunning.IsRunning;
+            double timeTotal = this.timeTotal.ElapsedMilliseconds;
+            double timeRunning = this.timeRunning.ElapsedMilliseconds;
+            double timeCPU = this.timeCPU.TotalMilliseconds;
 
-            TimeTotal.Reset();
-            TimeTotal.Start();
-            TimeRunning.Reset();
-            if (running) TimeRunning.Start();
-            TimeCPU = TimeSpan.Zero;
+            this.timeTotal.Reset();
+            this.timeTotal.Start();
+            this.timeRunning.Reset();
+            if (running) this.timeRunning.Start();
+            this.timeCPU = TimeSpan.Zero;
 
             // Calculate the Wall and CPU times from timer data.
-            Wall.Update(timeTotal / 1000, 100f * timeRunning / timeTotal);
-            CPU.Update(timeTotal / 1000, 100f * timeCPU / timeTotal);
+            Wall.Update(timeTotal / 1000, 100 * timeRunning / timeTotal);
+            CPU.Update(timeTotal / 1000, 100 * timeCPU / timeTotal);
             Wait.Update(timeTotal / 1000, Math.Max(0, (timeRunning - timeCPU) / timeTotal));
         }
     }

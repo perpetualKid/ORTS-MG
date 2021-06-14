@@ -157,7 +157,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         protected readonly Viewer Viewer;
 
-        protected WorldLocation cameraLocation = new WorldLocation();
+        protected WorldLocation cameraLocation;
         public int TileX { get { return cameraLocation.TileX; } }
         public int TileZ { get { return cameraLocation.TileZ; } }
         public Vector3 Location { get { return cameraLocation.Location; } }
@@ -472,7 +472,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public abstract class LookAtCamera : RotatingCamera
     {
-        protected WorldLocation targetLocation = new WorldLocation();
+        protected WorldLocation targetLocation;
         public WorldLocation TargetWorldLocation { get { return targetLocation; } }
 
         public override bool IsUnderground
@@ -489,16 +489,16 @@ namespace Orts.ActivityRunner.Viewer3D
         {
         }
 
-        internal protected override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter output)
         {
-            base.Save(outf);
-            WorldLocation.Save(targetLocation, outf);
+            base.Save(output);
+            WorldLocation.Save(targetLocation, output);
         }
 
-        internal protected override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader input)
         {
-            base.Restore(inf);
-            targetLocation = WorldLocation.Restore(inf);
+            base.Restore(input);
+            targetLocation = WorldLocation.Restore(input);
         }
 
         protected override Matrix GetCameraView()
@@ -540,18 +540,18 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        internal protected override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter output)
         {
-            base.Save(outf);
-            outf.Write(RotationXRadians);
-            outf.Write(RotationYRadians);
+            base.Save(output);
+            output.Write(RotationXRadians);
+            output.Write(RotationYRadians);
         }
 
-        internal protected override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader input)
         {
-            base.Restore(inf);
-            RotationXRadians = inf.ReadSingle();
-            RotationYRadians = inf.ReadSingle();
+            base.Restore(input);
+            RotationXRadians = input.ReadSingle();
+            RotationYRadians = input.ReadSingle();
         }
 
         public override void Reset()
@@ -920,22 +920,22 @@ namespace Orts.ActivityRunner.Viewer3D
         {
         }
 
-        internal protected override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter output)
         {
-            base.Save(outf);
+            base.Save(output);
             if (attachedCar != null && attachedCar.Train != null && attachedCar.Train == Viewer.SelectedTrain)
-                outf.Write(Viewer.SelectedTrain.Cars.IndexOf(attachedCar));
+                output.Write(Viewer.SelectedTrain.Cars.IndexOf(attachedCar));
             else
-                outf.Write((int)-1);
-            outf.Write(attachedLocation.X);
-            outf.Write(attachedLocation.Y);
-            outf.Write(attachedLocation.Z);
+                output.Write((int)-1);
+            output.Write(attachedLocation.X);
+            output.Write(attachedLocation.Y);
+            output.Write(attachedLocation.Z);
         }
 
-        internal protected override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader input)
         {
-            base.Restore(inf);
-            var carIndex = inf.ReadInt32();
+            base.Restore(input);
+            var carIndex = input.ReadInt32();
             if (carIndex != -1 && Viewer.SelectedTrain != null)
             {
                 if (carIndex < Viewer.SelectedTrain.Cars.Count)
@@ -943,9 +943,9 @@ namespace Orts.ActivityRunner.Viewer3D
                 else if (Viewer.SelectedTrain.Cars.Count > 0)
                     attachedCar = Viewer.SelectedTrain.Cars[Viewer.SelectedTrain.Cars.Count - 1];
             }
-            attachedLocation.X = inf.ReadSingle();
-            attachedLocation.Y = inf.ReadSingle();
-            attachedLocation.Z = inf.ReadSingle();
+            attachedLocation.X = input.ReadSingle();
+            attachedLocation.Y = input.ReadSingle();
+            attachedLocation.Z = input.ReadSingle();
         }
 
         protected override void OnActivate(bool sameCamera)
@@ -1079,7 +1079,7 @@ namespace Orts.ActivityRunner.Viewer3D
         protected float ZDistanceM; // used to browse train;
         protected Traveller browsedTraveller;
         protected float BrowseDistance = 20;
-        public bool BrowseMode = false;
+        public bool BrowseMode;
         protected float LowWagonOffsetLimit;
         protected float HighWagonOffsetLimit;
 
@@ -1103,28 +1103,28 @@ namespace Orts.ActivityRunner.Viewer3D
             RotationYRadians = PositionYRadians - MathHelper.Pi;
         }
 
-        internal protected override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter output)
         {
-            base.Save(outf);
-            outf.Write(PositionDistance);
-            outf.Write(PositionXRadians);
-            outf.Write(PositionYRadians);
-            outf.Write(BrowseMode);
-            outf.Write(browseForwards);
-            outf.Write(browseBackwards);
-            outf.Write(ZDistanceM);
+            base.Save(output);
+            output.Write(PositionDistance);
+            output.Write(PositionXRadians);
+            output.Write(PositionYRadians);
+            output.Write(BrowseMode);
+            output.Write(browseForwards);
+            output.Write(browseBackwards);
+            output.Write(ZDistanceM);
         }
 
-        internal protected override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader input)
         {
-            base.Restore(inf);
-            PositionDistance = inf.ReadSingle();
-            PositionXRadians = inf.ReadSingle();
-            PositionYRadians = inf.ReadSingle();
-            BrowseMode = inf.ReadBoolean();
-            browseForwards = inf.ReadBoolean();
-            browseBackwards = inf.ReadBoolean();
-            ZDistanceM = inf.ReadSingle();
+            base.Restore(input);
+            PositionDistance = input.ReadSingle();
+            PositionXRadians = input.ReadSingle();
+            PositionYRadians = input.ReadSingle();
+            BrowseMode = input.ReadBoolean();
+            browseForwards = input.ReadBoolean();
+            browseBackwards = input.ReadBoolean();
+            ZDistanceM = input.ReadSingle();
             if (attachedCar != null && attachedCar.Train == Viewer.SelectedTrain)
             {
                 var trainCars = GetCameraCars();
@@ -1770,15 +1770,15 @@ namespace Orts.ActivityRunner.Viewer3D
         }
 
         protected Vector3 viewPointLocation;
-        protected float viewPointRotationXRadians = 0;
-        protected float viewPointRotationYRadians = 0;
+        protected float viewPointRotationXRadians;
+        protected float viewPointRotationYRadians;
         protected Vector3 StartViewPointLocation;
-        protected float StartViewPointRotationXRadians = 0;
-        protected float StartViewPointRotationYRadians = 0;
+        protected float StartViewPointRotationXRadians;
+        protected float StartViewPointRotationYRadians;
         protected string prevcar = "";
-        protected int ActViewPoint = 0;
+        protected int ActViewPoint;
         protected int prevViewPoint = -1;
-        protected bool PrevCabWasRear = false;
+        protected bool PrevCabWasRear;
         private float x, y, z;
 
         /// <summary>
@@ -1944,30 +1944,30 @@ namespace Orts.ActivityRunner.Viewer3D
             viewPointRotationYRadians = RotationYRadians;
         }
 
-        internal protected override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter output)
         {
-            base.Save(outf);
-            outf.Write(ActViewPoint);
-            outf.Write(prevViewPoint);
-            outf.Write(prevcar);
-            outf.Write(StartViewPointLocation.X);
-            outf.Write(StartViewPointLocation.Y);
-            outf.Write(StartViewPointLocation.Z);
-            outf.Write(StartViewPointRotationXRadians);
-            outf.Write(StartViewPointRotationYRadians);
+            base.Save(output);
+            output.Write(ActViewPoint);
+            output.Write(prevViewPoint);
+            output.Write(prevcar);
+            output.Write(StartViewPointLocation.X);
+            output.Write(StartViewPointLocation.Y);
+            output.Write(StartViewPointLocation.Z);
+            output.Write(StartViewPointRotationXRadians);
+            output.Write(StartViewPointRotationYRadians);
         }
 
-        internal protected override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader input)
         {
-            base.Restore(inf);
-            ActViewPoint = inf.ReadInt32();
-            prevViewPoint = inf.ReadInt32();
-            prevcar = inf.ReadString();
-            StartViewPointLocation.X = inf.ReadSingle();
-            StartViewPointLocation.Y = inf.ReadSingle();
-            StartViewPointLocation.Z = inf.ReadSingle();
-            StartViewPointRotationXRadians = inf.ReadSingle();
-            StartViewPointRotationYRadians = inf.ReadSingle();
+            base.Restore(input);
+            ActViewPoint = input.ReadInt32();
+            prevViewPoint = input.ReadInt32();
+            prevcar = input.ReadString();
+            StartViewPointLocation.X = input.ReadSingle();
+            StartViewPointLocation.Y = input.ReadSingle();
+            StartViewPointLocation.Z = input.ReadSingle();
+            StartViewPointRotationXRadians = input.ReadSingle();
+            StartViewPointRotationYRadians = input.ReadSingle();
         }
 
         public override void Reset()
@@ -2121,16 +2121,16 @@ namespace Orts.ActivityRunner.Viewer3D
             }
         }
 
-        internal protected override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter output)
         {
-            base.Save(outf);
-            outf.Write(PrevCabWasRear);
+            base.Save(output);
+            output.Write(PrevCabWasRear);
         }
 
-        internal protected override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader input)
         {
-            base.Restore(inf);
-            PrevCabWasRear = inf.ReadBoolean();
+            base.Restore(input);
+            PrevCabWasRear = input.ReadBoolean();
         }
 
         public override bool IsUnderground
@@ -2316,16 +2316,16 @@ namespace Orts.ActivityRunner.Viewer3D
         {
         }
 
-        internal protected override void Save(BinaryWriter outf)
+        internal protected override void Save(BinaryWriter output)
         {
-            base.Save(outf);
-            outf.Write(SideLocation);
+            base.Save(output);
+            output.Write(SideLocation);
         }
 
-        internal protected override void Restore(BinaryReader inf)
+        internal protected override void Restore(BinaryReader input)
         {
-            base.Restore(inf);
-            SideLocation = inf.ReadInt32();
+            base.Restore(input);
+            SideLocation = input.ReadInt32();
         }
 
         public override void Reset()
@@ -2800,9 +2800,9 @@ namespace Orts.ActivityRunner.Viewer3D
     {
         private const int MaximumSpecialPointDistance = 300;
         private const float PlatformOffsetM = 3.3f;
-        protected bool SpecialPointFound = false;
+        protected bool SpecialPointFound;
         private const float CheckIntervalM = 50f; // every 50 meters it is checked wheter there is a near special point
-        protected float DistanceRunM = 0f; // distance run since last check interval
+        protected float DistanceRunM; // distance run since last check interval
         protected bool FirstUpdateLoop = true; // first update loop
 
         private const float MaxDistFromRoadCarM = 200.0f; // maximum distance of train traveller to spawned roadcar

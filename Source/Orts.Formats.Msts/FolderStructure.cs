@@ -191,7 +191,7 @@ namespace Orts.Formats.Msts
                 DirectoryInfo mstsFolder = new DirectoryInfo((string)key?.GetValue("Path", mstsLocation) ?? mstsLocation);
 
                 // Verify installation at this location
-                if (!mstsFolder?.Exists ?? true)
+                if (!mstsFolder.Exists)
                     Trace.TraceInformation($"MSTS directory '{mstsLocation}' does not exist.");
                 return mstsFolder.FullName;
             }

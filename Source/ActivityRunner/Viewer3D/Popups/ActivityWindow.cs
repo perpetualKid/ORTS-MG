@@ -28,8 +28,8 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 {
     public class ActivityWindow : Window
     {
-        private int WindowHeightMin = 0;
-        private int WindowHeightMax = 0;
+        private int WindowHeightMin;
+        private int WindowHeightMax;
         private Activity Activity;
         private ControlLayoutScrollbox MessageScroller;
         private TextFlow Message;

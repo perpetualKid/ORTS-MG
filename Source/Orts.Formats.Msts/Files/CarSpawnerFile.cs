@@ -22,13 +22,13 @@ namespace Orts.Formats.Msts.Files
 {
     public class CarSpawnerFile
 	{
-        public CarSpawnerList CarSpawners { get; private set; }
+        public CarSpawners CarSpawners { get; private set; }
 
         public CarSpawnerFile(string fileName, string shapePath)
         {
             using (STFReader stf = new STFReader(fileName, false))
             {
-                CarSpawners = new CarSpawnerList(stf, shapePath, "Default");
+                CarSpawners = new CarSpawners(stf, shapePath, "Default");
             }
         }
     }

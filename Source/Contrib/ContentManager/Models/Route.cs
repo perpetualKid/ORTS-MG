@@ -30,7 +30,7 @@ namespace Orts.ContentManager.Models
         public Route(Content content)
         {
             Debug.Assert(content.Type == ContentType.Route);
-            if (System.IO.Path.GetExtension(content.PathName).Equals("", StringComparison.OrdinalIgnoreCase))
+            if (string.IsNullOrEmpty(System.IO.Path.GetExtension(content.PathName)))
             {
                 var file = new RouteFile(GetTRKFileName(content.PathName));
                 Name = file.Route.Name;

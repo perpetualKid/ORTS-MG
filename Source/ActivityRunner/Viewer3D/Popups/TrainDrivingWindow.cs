@@ -47,26 +47,26 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         private const string arrowToRight = "\u25BA???"; // ►
         private const char smallDiamond = '\u25C6'; // ●
         private const string marker = "???";
-        private bool DynBrakeSetup = false;
-        private bool ResizeWindow = false;
-        private bool UpdateDataEnded = false;
+        private bool DynBrakeSetup;
+        private bool ResizeWindow;
+        private bool UpdateDataEnded;
         private double StartTime;
-        private int FirstColIndex = 0;//first string that does not fit
-        private int FirstColLenght = 0;
-        private int FirstColOverFlow = 0;
-        private int LastColLenght = 0;
-        private int LastColOverFlow = 0;
-        private int LinesCount = 0;
+        private int FirstColIndex;//first string that does not fit
+        private int FirstColLenght;
+        private int FirstColOverFlow;
+        private int LastColLenght;
+        private int LastColOverFlow;
+        private int LinesCount;
 
         public bool StandardHUD = true;// Standard text
 
-        private int WindowHeightMin = 0;
-        private int WindowHeightMax = 0;
-        private int WindowWidthMin = 0;
-        private int WindowWidthMax = 0;
+        private int WindowHeightMin;
+        private int WindowHeightMax;
+        private int WindowWidthMin;
+        private int WindowWidthMax;
         private char expandWindow;
         private string Gradient;
-        public int OffSetX = 0;
+        public int OffSetX;
         private const int TextSize = 15;
         public int keyPresLenght;
         private Label indicator;
@@ -421,13 +421,13 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                 indicatorMono.Color = colorFirstColEndsWith;
                             }
 
-                            if (data.keyPressed != null && data.keyPressed != "")
+                            if (!string.IsNullOrEmpty(data.keyPressed))
                             {
                                 hbox.Add(indicator = new Label(-TextSize, 0, TextSize, hbox.RemainingHeight, keyPressed, LabelAlignment.Right));
                                 indicator.Color = colorKeyPressed;
                             }
 
-                            if (data.SymbolCol != null && data.SymbolCol != "")
+                            if (!string.IsNullOrEmpty(data.SymbolCol))
                             {
                                 hbox.Add(indicator = new Label(-(TextSize + 3), 0, TextSize, hbox.RemainingHeight, SymbolCol, LabelAlignment.Right));
                                 indicator.Color = colorSymbolCol;

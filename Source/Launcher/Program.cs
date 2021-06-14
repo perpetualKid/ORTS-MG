@@ -2,7 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 
-[assembly: CLSCompliant(true)]
+[assembly: CLSCompliant(false)]
+
 namespace Orts.Launcher
 {
     internal static class Program

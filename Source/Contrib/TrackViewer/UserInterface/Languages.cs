@@ -71,7 +71,7 @@ namespace ORTS.TrackViewer.UserInterface
                             }
                             catch (ArgumentException)
                             {
-                                return new Language[0];
+                                return Array.Empty<Language>();
                             }
                         })
                     .OrderBy(l => l.Name)

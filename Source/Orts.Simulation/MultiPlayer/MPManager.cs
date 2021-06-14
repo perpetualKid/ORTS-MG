@@ -57,7 +57,7 @@ namespace Orts.MultiPlayer
         public int version = 15;
         private double lastMoveTime;
         public double lastSwitchTime;
-        public double lastSyncTime = 0;
+        public double lastSyncTime;
         private double lastSendTime;
         private string metric = "";
         private double metricbase = 1.0f;
@@ -71,21 +71,21 @@ namespace Orts.MultiPlayer
 
         private List<Train> uncoupledTrains;
 
-		public bool weatherChanged = false;
+		public bool weatherChanged;
 		public int weather = -1;
         public float fogDistance = -1f;
         public float pricipitationIntensity = -1f;
         public float overcastFactor = -1f;
-        public double serverTimeDifference = 0;
+        public double serverTimeDifference;
 
         public double lastPlayerAddedTime;
 		public int MPUpdateInterval = 10;
 		public static bool AllowedManualSwitch = true;
 		public bool TrySwitch = true;
 		public bool AllowNewPlayer = true;
-		public bool ComposingText = false;
+		public bool ComposingText;
 		public string lastSender = ""; //who last sends me a message
-		public bool AmAider = false; //am I aiding the dispatcher?
+		public bool AmAider; //am I aiding the dispatcher?
 		public List<string> aiderList;
 		public Dictionary<string, OnlinePlayer> lostPlayer = new Dictionary<string,OnlinePlayer>();
 		public bool NotServer = true;
@@ -254,7 +254,7 @@ namespace Orts.MultiPlayer
                 }
                 // Broadcast also exhaust
                 var exhaustMessage = OnlineTrains.ExhaustingLocos(exhaust);
-                if (exhaustMessage != "") Server.BroadCast(exhaustMessage);
+                if (!string.IsNullOrEmpty(exhaustMessage)) Server.BroadCast(exhaustMessage);
 
                 lastMoveTime = lastSendTime = newtime;
 
@@ -477,7 +477,7 @@ namespace Orts.MultiPlayer
 			return true;
 		}
 
-		public bool PlayerAdded = false;
+		public bool PlayerAdded;
 
 		public void AddPlayer()
 		{
@@ -572,10 +572,10 @@ namespace Orts.MultiPlayer
 			catch (Exception)
 			{
 			}
-			if (metric == "")
+			if (string.IsNullOrEmpty(metric))
 			{
-				metric = Simulator.TRK.Route.MilepostUnitsMetric == true ? " m" : " yd";
-				metricbase = Simulator.TRK.Route.MilepostUnitsMetric == true ? 1.0f : 1.0936133f;
+				metric = Simulator.TRK.Route.MilepostUnitsMetric ? " m" : " yd";
+				metricbase = Simulator.TRK.Route.MilepostUnitsMetric ? 1.0f : 1.0936133f;
 			}
 
 			int count = 0;

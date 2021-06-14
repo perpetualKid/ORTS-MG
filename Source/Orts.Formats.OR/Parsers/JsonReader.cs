@@ -80,7 +80,7 @@ namespace Orts.Formats.OR.Parsers
                         break;
                     case JsonToken.StartObject:
                         pathPositions.Push(path.Length);
-                        if (pathPositions.Count > 1) path.Append(".");
+                        if (pathPositions.Count > 1) path.Append('.');
                         pathPositions.Push(path.Length);
                         break;
                     case JsonToken.PropertyName:

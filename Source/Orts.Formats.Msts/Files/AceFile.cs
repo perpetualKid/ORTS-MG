@@ -31,15 +31,15 @@ namespace Orts.Formats.Msts.Files
     {
         public static Texture2D Texture2DFromFile(GraphicsDevice graphicsDevice, string fileName)
         {
-            using (var stream = File.OpenRead(fileName))
+            using (FileStream stream = File.OpenRead(fileName))
                 return Texture2DFromStream(graphicsDevice, stream);
         }
 
         private static Texture2D Texture2DFromStream(GraphicsDevice graphicsDevice, Stream stream)
         {
-            using (var reader = new BinaryReader(stream))
+            using (BinaryReader reader = new BinaryReader(stream))
             {
-                var signature = new string(reader.ReadChars(8));
+                string signature = new string(reader.ReadChars(8));
                 if (signature == "SIMISA@F")
                 {
                     // Compressed header has the uncompressed size embedded in the @-padding.
@@ -50,16 +50,19 @@ namespace Orts.Formats.Msts.Files
 
                     // The stream is technically ZLIB, but we assume the selected ZLIB compression is DEFLATE (though we verify that here just in case). The ZLIB
                     // header for DEFLATE is 0x78 0x9C.
-                    var zlib = reader.ReadUInt16();
+                    ushort zlib = reader.ReadUInt16();
                     if ((zlib & 0x20FF) != 0x0078)
                         throw new InvalidDataException($"Incorrect signature; expected 'xx78', got '{zlib:X4}'");
 
-                    return Texture2DFromReader(graphicsDevice, new BinaryReader(new DeflateStream(stream, CompressionMode.Decompress)));
+                    using (BinaryReader binaryReader = new BinaryReader(new DeflateStream(stream, CompressionMode.Decompress)))
+                    {
+                        return Texture2DFromReader(graphicsDevice, binaryReader);
+                    }
                 }
                 if (signature == "SIMISA@@")
                 {
                     // Uncompressed header is all @-padding.
-                    signature = new String(reader.ReadChars(8));
+                    signature = new string(reader.ReadChars(8));
                     if (signature != "@@@@@@@@")
                         throw new InvalidDataException($"Incorrect signature; expected '@@@@@@@@', got '{signature}'");
 
@@ -111,36 +114,34 @@ namespace Orts.Formats.Msts.Files
                 texture = new Texture2D(graphicsDevice, width, height, true, textureFormat);
 
             // Read in the color channels; each one defines a size (in bits) and type (reg, green, blue, mask, alpha).
-            var channels = new List<SimisAceChannel>();
-            for (var channel = 0; channel < channelCount; channel++)
+            List<SimisAceChannel> channels = new List<SimisAceChannel>();
+            for (int channel = 0; channel < channelCount; channel++)
             {
-                var size = (byte)reader.ReadUInt64();
+                byte size = (byte)reader.ReadUInt64();
                 if ((size != 1) && (size != 8))
                     throw new InvalidDataException($"Unsupported color channel size {size}");
-                var type = reader.ReadUInt64();
+                ulong type = reader.ReadUInt64();
                 if ((type < 2) || (type > 6))
                     throw new InvalidDataException($"Unknown color channel type {type}");
                 channels.Add(new SimisAceChannel(size, (SimisAceChannelId)type));
             }
 
             // Construct some info about this texture for the game to use in optimisations.
-            var aceInfo = new AceInfo();
-            texture.Tag = aceInfo;
             if (channels.Any(c => c.Type == SimisAceChannelId.Alpha))
-                aceInfo.AlphaBits = 8;
+                texture.Tag = (byte)8;
             else if (channels.Any(c => c.Type == SimisAceChannelId.Mask))
-                aceInfo.AlphaBits = 1;
+                texture.Tag = (byte)1;
 
             if ((options & SimisAceFormatOptions.RawData) != 0)
             {
                 // Raw data is stored as a table of 32bit int offsets to each mipmap level.
                 reader.ReadBytes(imageCount * 4);
 
-                var buffer = new byte[0];
-                for (var imageIndex = 0; imageIndex < imageCount; imageIndex++)
+                byte[] buffer = Array.Empty<byte>();
+                for (int imageIndex = 0; imageIndex < imageCount; imageIndex++)
                 {
-                    var imageWidth = width / (int)Math.Pow(2, imageIndex);
-                    var imageHeight = height / (int)Math.Pow(2, imageIndex);
+                    int imageWidth = width / (int)Math.Pow(2, imageIndex);
+                    int imageHeight = height / (int)Math.Pow(2, imageIndex);
 
                     // If the mipmap level is width>=4, it is stored as raw data with a 32bit int length header.
                     // Otherwise, it is stored as a 32bit ARGB block.
@@ -156,25 +157,25 @@ namespace Orts.Formats.Msts.Files
             else
             {
                 // Structured data is stored as a table of 32bit offsets to each scanline of each image.
-                for (var imageIndex = 0; imageIndex < imageCount; imageIndex++)
+                for (int imageIndex = 0; imageIndex < imageCount; imageIndex++)
                     reader.ReadBytes(4 * height / (int)Math.Pow(2, imageIndex));
 
-                var buffer = new int[width * height];
-                var channelBuffers = new byte[8][];
-                for (var imageIndex = 0; imageIndex < imageCount; imageIndex++)
+                int[] buffer = new int[width * height];
+                byte[][] channelBuffers = new byte[8][];
+                for (int imageIndex = 0; imageIndex < imageCount; imageIndex++)
                 {
-                    var imageWidth = width / (int)Math.Pow(2, imageIndex);
-                    var imageHeight = height / (int)Math.Pow(2, imageIndex);
-                    for (var y = 0; y < imageHeight; y++)
+                    int imageWidth = width / (int)Math.Pow(2, imageIndex);
+                    int imageHeight = height / (int)Math.Pow(2, imageIndex);
+                    for (int y = 0; y < imageHeight; y++)
                     {
-                        foreach (var channel in channels)
+                        foreach (SimisAceChannel channel in channels)
                         {
                             if (channel.Size == 1)
                             {
                                 // 1bpp channels start with the MSB and work down to LSB and then the next byte.
-                                var bytes = reader.ReadBytes((int)Math.Ceiling((double)channel.Size * imageWidth / 8));
+                                byte[] bytes = reader.ReadBytes((int)Math.Ceiling((double)channel.Size * imageWidth / 8));
                                 channelBuffers[(int)channel.Type] = new byte[imageWidth];
-                                for (var x = 0; x < imageWidth; x++)
+                                for (int x = 0; x < imageWidth; x++)
                                     channelBuffers[(int)channel.Type][x] = (byte)(((bytes[x / 8] >> (7 - (x % 8))) & 1) * 0xFF);
                             }
                             else
@@ -183,7 +184,7 @@ namespace Orts.Formats.Msts.Files
                                 channelBuffers[(int)channel.Type] = reader.ReadBytes(imageWidth);
                             }
                         }
-                        for (var x = 0; x < imageWidth; x++)
+                        for (int x = 0; x < imageWidth; x++)
                         {
                             buffer[imageWidth * y + x] = channelBuffers[(int)SimisAceChannelId.Red][x] + (channelBuffers[(int)SimisAceChannelId.Green][x] << 8) + (channelBuffers[(int)SimisAceChannelId.Blue][x] << 16);
                             if (channelBuffers[(int)SimisAceChannelId.Alpha] != null)
@@ -203,7 +204,7 @@ namespace Orts.Formats.Msts.Files
 
         private static string StringToHex(string signature)
         {
-            return String.Join(" ", signature.ToCharArray().Select(c => ((byte)c).ToString("X2")).ToArray());
+            return string.Join(" ", signature.ToCharArray().Select(c => ((byte)c).ToString("X2", System.Globalization.CultureInfo.InvariantCulture)).ToArray());
         }
 
         // This is a mapping between the 'surface format' found in ACE files and XNA's enum.

@@ -344,16 +344,16 @@ namespace Orts.ActivityRunner.Viewer3D.WebServices
         /// <param name="label">A reference to the ListLabel to check.</param>
         private static void CheckLabel(ref ListLabel label)
         {
-            void CheckString(ref string s) => s = (s ?? "") == "" ? " " : s;
-            void CheckRectangle(ref Rectangle r) => r = r == null ? new Rectangle(0, 0, 0, 0) : r;
+            void CheckString(ref string s) => s = (s ?? "").Length == 0 ? " " : s;
+//            void CheckRectangle(ref Rectangle r) => r = r == null ? new Rectangle(0, 0, 0, 0) : r;
             CheckString(ref label.FirstCol);
             CheckString(ref label.TrackColLeft);
             CheckString(ref label.TrackCol);
-            CheckRectangle(ref label.TrackColItem);
+//            CheckRectangle(ref label.TrackColItem);
             CheckString(ref label.TrackColRight);
             CheckString(ref label.LimitCol);
             CheckString(ref label.SignalCol);
-            CheckRectangle(ref label.SignalColItem);
+//            CheckRectangle(ref label.SignalColItem);
             CheckString(ref label.DistCol);
         }
 

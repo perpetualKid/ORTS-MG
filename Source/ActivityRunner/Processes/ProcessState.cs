@@ -17,84 +17,84 @@
 
 // This file is the responsibility of the 3D & Environment Team. 
 
+using System;
 using System.Threading;
 
 namespace Orts.ActivityRunner.Processes
 {
-    public class ProcessState
+    public class ProcessState : IDisposable
     {
         public bool Finished { get; private set; }
         public bool Terminated { get; private set; }
 
-        private readonly ManualResetEvent StartEvent = new ManualResetEvent(false);
-        private readonly ManualResetEvent FinishEvent = new ManualResetEvent(true);
-        private readonly ManualResetEvent TerminateEvent = new ManualResetEvent(false);
-        private readonly WaitHandle[] StartEvents;
-        private readonly WaitHandle[] FinishEvents;
-#if DEBUG_THREAD_PERFORMANCE
-        StreamWriter DebugFileStream;
-#endif
+        private readonly ManualResetEvent startEvent = new ManualResetEvent(false);
+        private readonly ManualResetEvent finishEvent = new ManualResetEvent(true);
+        private readonly ManualResetEvent terminateEvent = new ManualResetEvent(false);
+        private readonly WaitHandle[] startEvents;
+        private readonly WaitHandle[] finishEvents;
+        private bool disposedValue;
+        private readonly string processName;
 
         public ProcessState(string name)
         {
+            processName = name;
             Finished = true;
-            StartEvents = new[] { StartEvent, TerminateEvent };
-            FinishEvents = new[] { FinishEvent, TerminateEvent };
-#if DEBUG_THREAD_PERFORMANCE
-            DebugFileStream = new StreamWriter(File.OpenWrite("debug_thread_" + name.ToLowerInvariant() + "_state.csv"));
-            DebugFileStream.Write("Time,Event\n");
-#endif
+            startEvents = new[] { startEvent, terminateEvent };
+            finishEvents = new[] { finishEvent, terminateEvent };
         }
 
         public void SignalStart()
         {
-#if DEBUG_THREAD_PERFORMANCE
-            DebugFileStream.Write("{0},SS\n", DateTime.UtcNow.Ticks);
-#endif
             Finished = false;
-            FinishEvent.Reset();
-            StartEvent.Set();
+            finishEvent.Reset();
+            startEvent.Set();
         }
 
         public void SignalFinish()
         {
-#if DEBUG_THREAD_PERFORMANCE
-            DebugFileStream.Write("{0},SF\n", DateTime.UtcNow.Ticks);
-#endif
             Finished = true;
-            StartEvent.Reset();
-            FinishEvent.Set();
+            startEvent.Reset();
+            finishEvent.Set();
         }
 
         public void SignalTerminate()
         {
-#if DEBUG_THREAD_PERFORMANCE
-            DebugFileStream.Write("{0},ST\n", DateTime.UtcNow.Ticks);
-#endif
             Terminated = true;
-            TerminateEvent.Set();
+            terminateEvent.Set();
         }
 
         public void WaitTillStarted()
         {
-#if DEBUG_THREAD_PERFORMANCE
-            DebugFileStream.Write("{0},WTS+\n", DateTime.UtcNow.Ticks);
-#endif
-            WaitHandle.WaitAny(StartEvents);
-#if DEBUG_THREAD_PERFORMANCE
-            DebugFileStream.Write("{0},WTS-\n", DateTime.UtcNow.Ticks);
-#endif
+            WaitHandle.WaitAny(startEvents);
         }
 
         public void WaitTillFinished()
         {
-#if DEBUG_THREAD_PERFORMANCE
-            DebugFileStream.Write("{0},WTF+\n", DateTime.UtcNow.Ticks);
-#endif
-            WaitHandle.WaitAny(FinishEvents);
-#if DEBUG_THREAD_PERFORMANCE
-            DebugFileStream.Write("{0},WTF-\n", DateTime.UtcNow.Ticks);
-#endif
+            WaitHandle.WaitAny(finishEvents);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    startEvent?.Dispose();
+                    finishEvent?.Dispose();
+                    terminateEvent?.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }

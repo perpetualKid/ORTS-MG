@@ -702,7 +702,7 @@ namespace ORTS.TrackViewer
         {
             if (this.commandLineArgs.Length == 0) return;
             string givenPathOrFile = this.commandLineArgs[0];
-            this.commandLineArgs = new string[0]; // discard the arguments, no longer needed
+            this.commandLineArgs = Array.Empty<string>(); // discard the arguments, no longer needed
 
             // given_path_or_file should be something like
             // * C:\...\MSTS\Routes\USA2                        , for a directory

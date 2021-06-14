@@ -95,7 +95,7 @@ namespace Orts.Simulation.Physics
                 if (car.CouplerSlackM < 0 || car.CouplerForceB >= 1)
                     continue;
 
-                if (car.IsPlayerTrain && simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
+                if (car.IsPlayerTrain && !simulator.Settings.SimpleControlPhysics && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
                 {
                     double MaxZ1TensionM = car.GetMaximumCouplerTensionSlack1M() * AdvancedCouplerDuplicationFactor;
                     // If coupler in Zone 1 tension, ie ( -ve CouplerForceU ) then set coupler forces to zero, as coupler faces not touching yet
@@ -126,7 +126,7 @@ namespace Orts.Simulation.Physics
                 if (car.CouplerSlackM > 0 || car.CouplerForceB >= 1)
                     continue;
 
-                if (car.IsPlayerTrain && simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
+                if (car.IsPlayerTrain && !simulator.Settings.SimpleControlPhysics && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
                 {
                     double maxZ1CompressionM = -car.GetMaximumCouplerCompressionSlack1M() * AdvancedCouplerDuplicationFactor;
 
@@ -164,7 +164,7 @@ namespace Orts.Simulation.Physics
                 // if coupler in compression on this car, or coupler is not to be solved, then jump car
                 if (car.CouplerSlackM < 0 || car.CouplerForceB >= 1) // if coupler in compression on this car, or coupler is not to be solved, then jump to next car and skip processing this one
                     continue;
-                if (car.IsPlayerTrain && simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
+                if (car.IsPlayerTrain && !simulator.Settings.SimpleControlPhysics && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
                 {
                     float maxZ3TensionM = car.AdvancedCouplerDynamicTensionSlackLimitM;
 
@@ -194,7 +194,7 @@ namespace Orts.Simulation.Physics
                 // Coupler in tension on this car or coupler force is "zero" then jump to next car
                 if (car.CouplerSlackM > 0 || car.CouplerForceB >= 1)
                     continue;
-                if (simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
+                if (!simulator.Settings.SimpleControlPhysics && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
                 {
                     float maxZ3CompressionM = car.AdvancedCouplerDynamicCompressionSlackLimitM;
 
@@ -228,7 +228,7 @@ namespace Orts.Simulation.Physics
             {
                 TrainCar car = Cars[i];
 
-                if (car.IsPlayerTrain && simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler"
+                if (car.IsPlayerTrain && !simulator.Settings.SimpleControlPhysics && car.IsAdvancedCoupler) // "Advanced coupler"
                 {
                     float maxTensionCouplerLimitM = car.AdvancedCouplerDynamicTensionSlackLimitM;
                     float maxCompressionCouplerLimitM = car.AdvancedCouplerDynamicCompressionSlackLimitM;
@@ -268,7 +268,7 @@ namespace Orts.Simulation.Physics
                 car.ImpulseCouplerForceUN = car.CouplerForceU;
 
                 // This section seems to be required to get car moving
-                if (car.IsPlayerTrain && simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler"
+                if (car.IsPlayerTrain && !simulator.Settings.SimpleControlPhysics && car.IsAdvancedCoupler) // "Advanced coupler"
                 {
                     Cars[i].SpeedMpS += Cars[i].CouplerForceU / Cars[i].MassKG;
                     Cars[i + 1].SpeedMpS -= Cars[i].CouplerForceU / Cars[i + 1].MassKG;
@@ -346,7 +346,7 @@ namespace Orts.Simulation.Physics
             for (int i = 0; i < Cars.Count - 1; i++)
             {
                 TrainCar car = Cars[i];
-                if (car.IsPlayerTrain && simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
+                if (car.IsPlayerTrain && !simulator.Settings.SimpleControlPhysics && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
                 {
 
                     //Force on coupler is set so that no force is applied until coupler faces come into contact with each other
@@ -419,7 +419,7 @@ namespace Orts.Simulation.Physics
                 // to a "fixed" value until the last car has commenced moving. This is consistent with real life as the coupler would be extended as each car starts moving. 
                 // A damping factor is also used to reduce any large variations during train start. CouplerForce is also smoothed slightly to also reduce any jerkiness
 
-                if (car.IsPlayerTrain && simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
+                if (car.IsPlayerTrain && !simulator.Settings.SimpleControlPhysics && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
                 {
 
                     // Note different slack lengths can be used depending upon whether the coupler is in tension or compression
@@ -858,7 +858,7 @@ namespace Orts.Simulation.Physics
 
                 // Make sure that coupler slack does not exceed the maximum (dynamic) coupler slack
 
-                if (car.IsPlayerTrain && simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
+                if (car.IsPlayerTrain && !simulator.Settings.SimpleControlPhysics && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
                 {
                     float advancedCouplerCompressionLimitM = car.AdvancedCouplerDynamicCompressionSlackLimitM;
                     float advancedCouplerTensionLimitM = car.AdvancedCouplerDynamicTensionSlackLimitM;

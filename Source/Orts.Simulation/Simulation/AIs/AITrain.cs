@@ -66,8 +66,8 @@ namespace Orts.Simulation.AIs
         public int? StartTime;                           // starting time
         public bool PowerState = true;                   // actual power state : true if power in on
         public float MaxVelocityA = 30.0f;               // max velocity as set in .con file
-        public Services ServiceDefinition = null; // train's service definition in .act file
-        public bool UncondAttach = false;                       // if false it states that train will unconditionally attach to a train on its path
+        public Services ServiceDefinition; // train's service definition in .act file
+        public bool UncondAttach;                       // if false it states that train will unconditionally attach to a train on its path
 
         public float doorOpenDelay = -1f;
         public float doorCloseAdvance = -1f;
@@ -3089,8 +3089,8 @@ namespace Orts.Simulation.AIs
             var allowedMaxSpeedPathMpS = Math.Min(allowedAbsoluteMaxSpeedSignalMpS, allowedAbsoluteMaxSpeedLimitMpS);
             allowedMaxSpeedPathMpS = Math.Min(allowedMaxSpeedPathMpS, allowedAbsoluteMaxTempSpeedLimitMpS);
             AllowedMaxSpeedMpS = Math.Min(allowedMaxSpeedPathMpS, TrainMaxSpeedMpS);
-            allowedMaxSpeedSignalMpS = (Math.Min(allowedAbsoluteMaxSpeedSignalMpS, TrainMaxSpeedMpS));
-            allowedMaxSpeedLimitMpS = (Math.Min(allowedAbsoluteMaxSpeedLimitMpS, TrainMaxSpeedMpS));
+            AllowedMaxSpeedSignalMpS = (Math.Min(allowedAbsoluteMaxSpeedSignalMpS, TrainMaxSpeedMpS));
+            AllowedMaxSpeedLimitMpS = (Math.Min(allowedAbsoluteMaxSpeedLimitMpS, TrainMaxSpeedMpS));
             allowedMaxTempSpeedLimitMpS = (Math.Min(allowedAbsoluteMaxTempSpeedLimitMpS, TrainMaxSpeedMpS));
         }
 
@@ -3414,7 +3414,7 @@ namespace Orts.Simulation.AIs
             return (returnValue);
         }
 
-        public virtual void ProcessEndOfPathReached(ref bool[] returnValue, int PresentTime)
+        public virtual void ProcessEndOfPathReached(ref bool[] returnValue, int presentTime)
         {
             var removeIt = true;
             var distanceThreshold = PreUpdate ? 5.0f : 2.0f;
@@ -4420,21 +4420,21 @@ namespace Orts.Simulation.AIs
         {
             if (speedInfo.MaxSpeedMpSSignal > 0)
             {
-                allowedMaxSpeedSignalMpS = simulator.TimetableMode ? speedInfo.MaxSpeedMpSSignal : allowedAbsoluteMaxSpeedSignalMpS;
-                AllowedMaxSpeedMpS = Math.Min(speedInfo.MaxSpeedMpSSignal, Math.Min(allowedMaxSpeedLimitMpS, allowedMaxTempSpeedLimitMpS));
+                AllowedMaxSpeedSignalMpS = simulator.TimetableMode ? speedInfo.MaxSpeedMpSSignal : allowedAbsoluteMaxSpeedSignalMpS;
+                AllowedMaxSpeedMpS = Math.Min(speedInfo.MaxSpeedMpSSignal, Math.Min(AllowedMaxSpeedLimitMpS, allowedMaxTempSpeedLimitMpS));
             }
             if (speedInfo.MaxSpeedMpSLimit > 0)
             {
-                allowedMaxSpeedLimitMpS = simulator.TimetableMode ? speedInfo.MaxSpeedMpSLimit : allowedAbsoluteMaxSpeedLimitMpS;
+                AllowedMaxSpeedLimitMpS = simulator.TimetableMode ? speedInfo.MaxSpeedMpSLimit : allowedAbsoluteMaxSpeedLimitMpS;
                 if (simulator.TimetableMode)
                     AllowedMaxSpeedMpS = speedInfo.MaxSpeedMpSLimit;
                 else
-                    AllowedMaxSpeedMpS = Math.Min(speedInfo.MaxSpeedMpSLimit, Math.Min(allowedMaxSpeedSignalMpS, allowedMaxTempSpeedLimitMpS));
+                    AllowedMaxSpeedMpS = Math.Min(speedInfo.MaxSpeedMpSLimit, Math.Min(AllowedMaxSpeedSignalMpS, allowedMaxTempSpeedLimitMpS));
             }
             if (speedInfo.MaxTempSpeedMpSLimit > 0 && !simulator.TimetableMode)
             {
                 allowedMaxTempSpeedLimitMpS = allowedAbsoluteMaxTempSpeedLimitMpS;
-                AllowedMaxSpeedMpS = Math.Min(speedInfo.MaxTempSpeedMpSLimit, Math.Min(allowedMaxSpeedSignalMpS, allowedMaxSpeedLimitMpS));
+                AllowedMaxSpeedMpS = Math.Min(speedInfo.MaxTempSpeedMpSLimit, Math.Min(AllowedMaxSpeedSignalMpS, AllowedMaxSpeedLimitMpS));
             }
             // <CScomment> following statement should be valid in general, as it seems there was a bug here in the original SW
             AllowedMaxSpeedMpS = Math.Min(AllowedMaxSpeedMpS, TrainMaxSpeedMpS);

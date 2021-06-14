@@ -59,9 +59,9 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         public ThreeDimentionCabViewer CabViewer3D { get; private set; }
         public CabRenderer CabRenderer3D { get; internal set; } //allow user to have different setting of .cvf file under CABVIEW3D
 
-        public static int DbfEvalEBPBstopped = 0;//Debrief eval
-        public static int DbfEvalEBPBmoving = 0;//Debrief eval
-        public bool lemergencybuttonpressed = false;
+        public static int DbfEvalEBPBstopped;//Debrief eval
+        public static int DbfEvalEBPBmoving;//Debrief eval
+        public bool lemergencybuttonpressed;
 
         public MSTSLocomotiveViewer(Viewer viewer, MSTSLocomotive car)
             : base(viewer, car)
@@ -971,7 +971,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             if (frameGrid.X < 1 || frameGrid.Y < 1 || frameCount < 1)
             {
                 Trace.TraceWarning("Cab control has invalid frame data {1}*{2}={3} (no frames will be shown) for {0}", fileName, frameGrid.X, frameGrid.Y, frameCount);
-                return new Texture2D[0];
+                return Array.Empty<Texture2D>();
             }
 
             var frameSize = new Point(texture.Width / frameGrid.X, texture.Height / frameGrid.Y);
@@ -1244,7 +1244,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         private MSTSLocomotive _Locomotive;
         private int _Location;
         private bool _isNightTexture;
-        private bool HasCabLightDirectory = false;
+        private bool HasCabLightDirectory;
         public Dictionary<int, CabViewControlRenderer> ControlMap;
 
         public CabRenderer(Viewer viewer, MSTSLocomotive car)
@@ -1352,6 +1352,16 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                             aspr.SortIndex = controlSortIndex;
                             CabViewControlRenderersList[i].Add(aspr);
                             if (!ControlMap.ContainsKey(key)) ControlMap.Add(key, aspr);
+                            count[(int)cvc.ControlType]++;
+                            continue;
+                        }
+                        CabViewAnimatedDisplayControl anim = cvc as CabViewAnimatedDisplayControl;
+                        if (anim != null)
+                        {
+                            CabViewAnimationsRenderer animr = new CabViewAnimationsRenderer(viewer, car, anim, _Shader);
+                            animr.SortIndex = controlSortIndex;
+                            CabViewControlRenderersList[i].Add(animr);
+                            if (!ControlMap.ContainsKey(key)) ControlMap.Add(key, animr);
                             count[(int)cvc.ControlType]++;
                             continue;
                         }
@@ -1771,7 +1781,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
     {
         private readonly CabViewGaugeControl Gauge;
         private readonly Rectangle SourceRectangle;
-        private Rectangle DestinationRectangle = new Rectangle();
+        private Rectangle DestinationRectangle;
 
         //      bool LoadMeterPositive = true;
         private Color DrawColor;
@@ -1998,7 +2008,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
     {
         private readonly CabViewFramedControl ControlDiscrete;
         private readonly Rectangle SourceRectangle;
-        private Rectangle DestinationRectangle = new Rectangle();
+        private Rectangle DestinationRectangle;
         public readonly float CVCFlashTimeOn = 0.75f;
         public readonly float CVCFlashTimeTotal = 1.5f;
         private float CumulativeTime;
@@ -2030,6 +2040,12 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                 if ((mS.Styles.Count > index) && (mS.Styles[index] == 1) && (CumulativeTime > CVCFlashTimeOn))
                     return;
             }
+
+            PrepareFrameForIndex(frame, elapsedTime, index);
+        }
+
+        protected void PrepareFrameForIndex(RenderFrame frame, ElapsedTime elapsedTime, int index)
+        {
             var dark = Viewer.MaterialManager.sunDirection.Y <= -0.085f || Viewer.Camera.IsUnderground;
 
             Texture = CABTextureManager.GetTextureByIndexes(Control.AceFile, index, dark, Locomotive.CabLightOn, out IsNightTexture, HasCabLightDirectory);
@@ -2495,7 +2511,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         /// </summary>
         /// <param name="percent">Percent to be translated</param>
         /// <returns>The calculated display index by the Control's Values</returns>
-        private int PercentToIndex(float percent)
+        protected int PercentToIndex(float percent)
         {
             var index = 0;
 
@@ -2527,6 +2543,51 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             return index;
         }
     }
+
+    /// <summary>
+    /// Discrete renderer for animated controls, like external 2D wiper
+    /// </summary>
+    public class CabViewAnimationsRenderer : CabViewDiscreteRenderer
+    {
+        private double cumulativeTime;
+        private readonly float cycleTimeS;
+        private bool animationOn;
+
+        public CabViewAnimationsRenderer(Viewer viewer, MSTSLocomotive locomotive, CabViewAnimatedDisplayControl control, CabShader shader)
+            : base(viewer, locomotive, control, shader)
+        {
+            cycleTimeS = control.CycleTimeS;
+        }
+
+        public override void PrepareFrame(RenderFrame frame, in ElapsedTime elapsedTime)
+        {
+            var animate = Locomotive.GetDataOf(Control) != 0;
+            if (animate)
+                animationOn = true;
+
+            int index;
+            var halfCycleS = cycleTimeS / 2f;
+            if (animationOn)
+            {
+                cumulativeTime += elapsedTime.ClockSeconds;
+                if (cumulativeTime > cycleTimeS && !animate)
+                    animationOn = false;
+                cumulativeTime %= cycleTimeS;
+
+                if (cumulativeTime < halfCycleS)
+                    index = PercentToIndex((float)(cumulativeTime / halfCycleS));
+                else
+                    index = PercentToIndex((float)(cycleTimeS - cumulativeTime) / halfCycleS);
+            }
+            else
+            {
+                index = 0;
+            }
+
+            PrepareFrameForIndex(frame, elapsedTime, index);
+        }
+    }
+
 
     /// <summary>
     /// Digital Cab Control renderer
@@ -2793,14 +2854,14 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
     {
         private MSTSLocomotive Locomotive;
 
-        public PoseableShape TrainCarShape = null;
-        public Dictionary<int, AnimatedPartMultiState> AnimateParts = null;
-        private Dictionary<int, ThreeDimCabGaugeNative> Gauges = null;
-        private Dictionary<int, AnimatedPart> OnDemandAnimateParts = null; //like external wipers, and other parts that will be switched on by mouse in the future
+        public PoseableShape TrainCarShape;
+        public Dictionary<int, AnimatedPartMultiState> AnimateParts;
+        private Dictionary<int, ThreeDimCabGaugeNative> Gauges;
+        private Dictionary<int, AnimatedPart> OnDemandAnimateParts; //like external wipers, and other parts that will be switched on by mouse in the future
                                                                           //Dictionary<int, DigitalDisplay> DigitParts = null;
 
-        private Dictionary<int, ThreeDimCabDigit> DigitParts3D = null;
-        private AnimatedPart ExternalWipers = null; // setting to zero to prevent a warning. Probably this will be used later. TODO
+        private Dictionary<int, ThreeDimCabDigit> DigitParts3D;
+        private AnimatedPart ExternalWipers; // setting to zero to prevent a warning. Probably this will be used later. TODO
         protected MSTSLocomotive MSTSLocomotive { get { return (MSTSLocomotive)Car; } }
 
         private MSTSLocomotiveViewer LocoViewer;
@@ -3008,10 +3069,11 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         {
 
             Size = int.Parse(size) * 0.001f;//input size is in mm
-            if (aceFile != "")
+            if (!string.IsNullOrEmpty(aceFile))
             {
-                AceFile = aceFile.ToUpper();
-                if (!AceFile.EndsWith(".ACE")) AceFile = AceFile + ".ACE"; //need to add ace into it
+                if (".ace".Equals(Path.GetExtension(aceFile), StringComparison.OrdinalIgnoreCase))
+                    aceFile = Path.ChangeExtension(aceFile, ".ace");
+                AceFile = aceFile.ToUpperInvariant();
             }
             else { AceFile = ""; }
 
@@ -3097,7 +3159,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             CabViewControlType controltype = CVFR.GetControlType();
             Material material = null;
 
-            if (AceFile != "")
+            if (!string.IsNullOrEmpty(AceFile))
             {
                 imageName = AceFile;
             }
@@ -3263,8 +3325,10 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         private int Direction, Orientation;
         public ThreeDimCabGaugeNative(Viewer viewer, int iMatrix, string size, string len, PoseableShape trainCarShape, CabViewControlRenderer c)
         {
-            if (size != string.Empty) width = float.Parse(size) / 1000f; //in mm
-            if (len != string.Empty) maxLen = float.Parse(len) / 1000f; //in mm
+            if (float.TryParse(size, out width))
+                width /= 1000f; //in mm
+            if (float.TryParse(len, out maxLen))
+                maxLen/= 1000f; //in mm
 
             CVFR = (CabViewGaugeRenderer)c;
             Direction = CVFR.GetGauge().Direction;
@@ -3505,7 +3569,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         private Viewer Viewer;
         private SpriteBatchMaterial _Sprite2DCabView;
         private WindowTextFont _Font;
-        private PoseableShape TrainCarShape = null;
+        private PoseableShape TrainCarShape;
         private int digitPart;
         private int height;
         private Point coor = new Point(0, 0);

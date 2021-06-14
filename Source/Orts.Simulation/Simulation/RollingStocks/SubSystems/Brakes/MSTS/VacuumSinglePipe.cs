@@ -49,18 +49,18 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
         public float VacResVolM3 = (float)Size.Volume.FromIn3(((24 / 2) * (24 / 2) * 16 * Math.PI));
 
         // volume units need to be consistent but otherwise don't matter, defaults are cubic inches
-        private bool HasDirectAdmissionValue = false;
-        private float DirectAdmissionValve = 0.0f;
+        private bool HasDirectAdmissionValue;
+        private float DirectAdmissionValve;
         protected float MaxReleaseRatePSIpS = 2.5f;
         protected float MaxApplicationRatePSIpS = 2.5f;
         protected float LargeEjectorChargingRate;
-        protected bool TrainBrakePressureChanging = false;
-        protected bool BrakePipePressureChanging = false;
-        protected int SoundTriggerCounter = 0;
-        protected float prevCylPressurePSIA = 0f;
-        protected float prevBrakePipePressurePSI = 0f;
-        private bool LocomotiveSteamBrakeFitted = false;
-        private float SteamBrakeCylinderPressurePSI = 0;
+        protected bool TrainBrakePressureChanging;
+        protected bool BrakePipePressureChanging;
+        protected int SoundTriggerCounter;
+        protected float prevCylPressurePSIA;
+        protected float prevBrakePipePressurePSI;
+        private bool LocomotiveSteamBrakeFitted;
+        private float SteamBrakeCylinderPressurePSI;
         private float SteamBrakeCompensation;
         private float SteamBrakingCurrentFraction;
 

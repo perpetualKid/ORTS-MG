@@ -143,8 +143,8 @@ namespace ORTS.TrackViewer.Editing.Charts
             }
         }
 
-        private bool mouseIsMoving = false;
-        private double realXatMouse=0;
+        private bool mouseIsMoving;
+        private double realXatMouse;
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton != MouseButtonState.Pressed)

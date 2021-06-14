@@ -45,7 +45,7 @@ namespace Orts.Common.Logging
         public override void TraceEvent(TraceEventCache eventCache, string source, TraceEventType eventType, int id, string format, params object[] args)
         {
             if ((Filter == null) || Filter.ShouldTrace(eventCache, source, eventType, id, format, args, null, null))
-                TraceEventInternal(eventCache, source, eventType, id, format, args);
+                TraceEventInternal(eventCache, source, eventType, id, format, args ?? Array.Empty<object>());
         }
 
         private void TraceEventInternal(TraceEventCache eventCache, string source, TraceEventType eventType, int id, string format, object[] args)

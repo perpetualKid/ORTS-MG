@@ -165,9 +165,9 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         }
 
         public static int DbfEvalOverSpeed;//Debrief eval
-        private bool istrackColorRed = false;//Debrief eval
-        public static Double DbfEvalOverSpeedTimeS = 0;//Debrief eval
-        public static double DbfEvalIniOverSpeedTimeS = 0;//Debrief eval
+        private bool istrackColorRed;//Debrief eval
+        public static Double DbfEvalOverSpeedTimeS;//Debrief eval
+        public static double DbfEvalIniOverSpeedTimeS;//Debrief eval
 
         private TrainInfo validInfo;
         private const int DesignWidth = 150; // All Width/X values are relative to this width.
@@ -189,7 +189,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         private readonly int distanceTextOffset = 117;
         private readonly int trackOffset = 42;
         private readonly int speedTextOffset = 70;
-        private readonly int milepostTextOffset = 0;
+        private readonly int milepostTextOffset;
 
         // position definition arrays
         // contents :
@@ -689,7 +689,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         {
             var displayItem = new Rectangle(0, 0, 0, 0);
             var displayRequired = false;
-            var offsetArray = new int[0];
+            var offsetArray = Array.Empty<int>();
 
             if (thisItem.AuthorityType == EndAuthorityType.EndOfAuthority ||
                 thisItem.AuthorityType == EndAuthorityType.EndOfPath ||

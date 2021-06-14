@@ -152,45 +152,45 @@ namespace Orts.Formats.OR.Models
             json.ReadBlock(TryParse);
         }
 
-        internal protected override bool TryParse(JsonReader item)
+        internal protected override bool TryParse(JsonReader reader)
         {
             // read items
-            if (base.TryParse(item))
+            if (base.TryParse(reader))
                 return true;
-            switch (item.Path)
+            switch (reader.Path)
             {
                 case "PrecipitationType":
-                    PrecipitationType = item.AsEnum(PrecipitationType); break;
+                    PrecipitationType = reader.AsEnum(PrecipitationType); break;
                 case "PrecipitationDensity":
-                    Density = item.AsFloat(Density); break;
+                    Density = reader.AsFloat(Density); break;
                 case "PrecipitationVariation":
-                    Variation = item.AsFloat(Variation); break;
+                    Variation = reader.AsFloat(Variation); break;
                 case "PrecipitationRateOfChange":
-                    RateOfChange = item.AsFloat(RateOfChange); break;
+                    RateOfChange = reader.AsFloat(RateOfChange); break;
                 case "PrecipitationProbability":
-                    Probability = item.AsFloat(Probability); break;
+                    Probability = reader.AsFloat(Probability); break;
                 case "PrecipitationSpread":
-                    Spread = item.AsFloat(Spread); break;
+                    Spread = reader.AsFloat(Spread); break;
                 case "PrecipitationVisibilityAtMinDensity":
-                    VisibilityAtMinDensity = item.AsFloat(VisibilityAtMinDensity); break;
+                    VisibilityAtMinDensity = reader.AsFloat(VisibilityAtMinDensity); break;
                 case "PrecipitationVisibilityAtMaxDensity":
-                    VisibilityAtMaxDensity = item.AsFloat(VisibilityAtMaxDensity); break;
+                    VisibilityAtMaxDensity = reader.AsFloat(VisibilityAtMaxDensity); break;
                 case "OvercastPrecipitationStart":
-                    OvercastPrecipitationStart = item.AsFloat(OvercastPrecipitationStart); break;
+                    OvercastPrecipitationStart = reader.AsFloat(OvercastPrecipitationStart); break;
                 case "OvercastBuildUp":
-                    OvercastBuildUp = item.AsFloat(OvercastBuildUp); break;
+                    OvercastBuildUp = reader.AsFloat(OvercastBuildUp); break;
                 case "PrecipitationStartPhase":
-                    PrecipitationStartPhase = item.AsFloat(PrecipitationStartPhase); break;
+                    PrecipitationStartPhase = reader.AsFloat(PrecipitationStartPhase); break;
                 case "OvercastDispersion":
-                    OvercastDispersion = item.AsFloat(OvercastDispersion); break;
+                    OvercastDispersion = reader.AsFloat(OvercastDispersion); break;
                 case "PrecipitationEndPhase":
-                    PrecipitationEndPhase = item.AsFloat(PrecipitationEndPhase); break;
+                    PrecipitationEndPhase = reader.AsFloat(PrecipitationEndPhase); break;
 
                 case "Overcast":
                 case "OvercastVariation":
                 case "OvercastRateOfChange":
                 case "OvercastVisibility":
-                    Overcast.TryParse(item); break;
+                    Overcast.TryParse(reader); break;
                 default: return false;
             }
 
@@ -281,15 +281,15 @@ namespace Orts.Formats.OR.Models
             json.ReadBlock(TryParse);
         }
 
-        internal protected override bool TryParse(JsonReader item)
+        internal protected override bool TryParse(JsonReader reader)
         {
-            if (base.TryParse(item)) return true;
-            switch (item.Path)
+            if (base.TryParse(reader)) return true;
+            switch (reader.Path)
             {
-                case "FogVisibility": Visibility = item.AsFloat(Visibility); break;
-                case "FogSetTime": SetTime = item.AsFloat(SetTime); break;
-                case "FogLiftTime": LiftTime = item.AsFloat(LiftTime); break;
-                case "FogOvercast": Overcast = item.AsFloat(Overcast); break;
+                case "FogVisibility": Visibility = reader.AsFloat(Visibility); break;
+                case "FogSetTime": SetTime = reader.AsFloat(SetTime); break;
+                case "FogLiftTime": LiftTime = reader.AsFloat(LiftTime); break;
+                case "FogOvercast": Overcast = reader.AsFloat(Overcast); break;
                 default: return false;
             }
 

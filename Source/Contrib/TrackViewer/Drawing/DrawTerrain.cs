@@ -208,10 +208,10 @@ namespace ORTS.TrackViewer.Drawing
                 newScaleFactor = 1;
                 //Some way to determine the scaling automatically. We use the loaded .ace files
                 //The scaling below keeps the memory more or less constant
-                if (textureManager.Count() > 100) { newScaleFactor = 2; }
-                if (textureManager.Count() > 400) { newScaleFactor = 4; }
-                if (textureManager.Count() > 1600) { newScaleFactor = 8; }
-                if (textureManager.Count() > 6400) { newScaleFactor = 16; }
+                if (textureManager.Count > 100) { newScaleFactor = 2; }
+                if (textureManager.Count > 400) { newScaleFactor = 4; }
+                if (textureManager.Count > 1600) { newScaleFactor = 8; }
+                if (textureManager.Count > 6400) { newScaleFactor = 16; }
             }
             if (newScaleFactor < textureManager.CurrentScaleFactor)
             {
@@ -353,10 +353,10 @@ namespace ORTS.TrackViewer.Drawing
                     }
                 }
 
-                if (vertices.Count() > 0)
+                if (vertices.Count > 0)
                 {
-                    VertexBuffer buffer = new VertexBuffer(device, typeof(VertexPositionTexture), vertices.Count(), BufferUsage.WriteOnly);
-                    int vertexCount = vertices.Count();
+                    VertexBuffer buffer = new VertexBuffer(device, typeof(VertexPositionTexture), vertices.Count, BufferUsage.WriteOnly);
+                    int vertexCount = vertices.Count;
                     buffer.SetData(vertices.ToArray(), 0, vertexCount);
                     vertexBuffers.Add(textureName, buffer);
                     vertexBufferCounts.Add(textureName, vertexCount);
@@ -588,7 +588,7 @@ namespace ORTS.TrackViewer.Drawing
     {
         public int CurrentScaleFactor { get; private set; } = 1;
 
-        private int loadedAceFilesCounter = 0;
+        private int loadedAceFilesCounter;
         private HashSet<string> unloadableTerrainTextures;
         private string terrtexPath;
         private MessageDelegate messageDelegate;
@@ -754,7 +754,7 @@ namespace ORTS.TrackViewer.Drawing
             }
             else
             {
-                return new VertexPositionTexture[0];
+                return Array.Empty<VertexPositionTexture>();
             }
         }
 

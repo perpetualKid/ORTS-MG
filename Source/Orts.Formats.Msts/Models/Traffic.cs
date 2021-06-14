@@ -6,6 +6,8 @@ using System.IO;
 using Orts.Formats.Msts.Files;
 using Orts.Formats.Msts.Parsers;
 
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TextBox;
+
 namespace Orts.Formats.Msts.Models
 {
     /// <summary>
@@ -15,9 +17,9 @@ namespace Orts.Formats.Msts.Models
     {
         public string Name { get; private set; }
         public int Serial { get; private set; }
-        public List<ServiceTraffics> ServiceTraffics { get; } = new List<ServiceTraffics>();
+        public IList<ServiceTraffics> ServiceTraffics { get; } = new List<ServiceTraffics>();
 
-        public ServiceTraffic(STFReader stf)
+        internal ServiceTraffic(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Name = stf.ReadString();
@@ -32,7 +34,7 @@ namespace Orts.Formats.Msts.Models
     /// <summary>
     /// Parses Traffic Definition Items in Traffic Definitions in Traffic File
     /// </summary>
-    public class ServiceTraffics: List<ServiceTrafficItem>
+    public class ServiceTraffics : List<ServiceTrafficItem>
     {
         public string Name { get; private set; }
         public int Time { get; private set; }
@@ -42,7 +44,7 @@ namespace Orts.Formats.Msts.Models
             Time = serviceTime;
         }
 
-        public ServiceTraffics(STFReader stf)
+        internal ServiceTraffics(STFReader stf)
         {
             int arrivalTime = 0;
             int departTime = 0;
@@ -68,7 +70,7 @@ namespace Orts.Formats.Msts.Models
         public ServiceTraffics(string serviceName, PlayerTraffics playerTraffic)
         {
             Name = serviceName;
-            Time = playerTraffic.Time;
+            Time = playerTraffic?.Time ?? throw new ArgumentNullException(nameof(playerTraffic));
 
             AddRange(playerTraffic);
         }
@@ -96,6 +98,9 @@ namespace Orts.Formats.Msts.Models
             : this(arrivalTime, departTime, skipCount, distanceDownPath, platformStartID)
 
         {
+            if (parent == null)
+                throw new ArgumentNullException(nameof(parent));
+
             if (arrivalTime < 0)
             {
                 ArrivalTime = departTime < 0 ? parent.Time : Math.Min(departTime, parent.Time);
@@ -141,7 +146,7 @@ namespace Orts.Formats.Msts.Models
         private float distanceDownPath;
         private int platformStartID;
 
-        public Services(STFReader stf)
+        internal Services(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Name = stf.ReadString();
@@ -163,7 +168,7 @@ namespace Orts.Formats.Msts.Models
         public Services(string serviceName, PlayerTraffics playerTraffic)
         {
             Name = serviceName;
-            Time = playerTraffic.Time;
+            Time = playerTraffic?.Time ?? throw new ArgumentNullException(nameof(playerTraffic));
             UiD = 0;
 
             AddRange(playerTraffic.ConvertAll(x => new TrafficItem(0.95f, x.SkipCount, x.DistanceDownPath, x.PlatformStartID)));
@@ -174,6 +179,9 @@ namespace Orts.Formats.Msts.Models
 
         public void Save(BinaryWriter outf)
         {
+            if (null == outf)
+                throw new ArgumentNullException(nameof(outf));
+
             if (Count == 0)
             {
                 outf.Write(-1);
@@ -197,9 +205,9 @@ namespace Orts.Formats.Msts.Models
     {
         public string Name { get; private set; }
         public TrafficFile TrafficFile { get; private set; }
-        public List<Services> Services { get; } = new List<Services>();
+        public IList<Services> Services { get; } = new List<Services>();
 
-        public Traffic(STFReader stf)
+        internal Traffic(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Name = stf.ReadString();
@@ -207,7 +215,7 @@ namespace Orts.Formats.Msts.Models
                 new STFReader.TokenProcessor("service_definition", ()=>{ Services.Add(new Services(stf)); }),
             });
 
-//            TrafficFile = new TrafficFile(FolderStructure.TrafficFile(Name));
+            //            TrafficFile = new TrafficFile(FolderStructure.TrafficFile(Name));
             TrafficFile = new TrafficFile(FolderStructure.RouteFromActivity(stf.FileName).TrafficFile(Name));
 
         }
@@ -217,7 +225,7 @@ namespace Orts.Formats.Msts.Models
     {
         public int Time { get; private set; }
 
-        public PlayerTraffics(STFReader stf)
+        internal PlayerTraffics(STFReader stf)
         {
             int arrivalTime = 0;
             int departTime = 0;
@@ -251,7 +259,7 @@ namespace Orts.Formats.Msts.Models
         public string Name { get; private set; }
         public PlayerTraffics PlayerTraffics { get; private set; }
 
-        public PlayerServices(STFReader stf)
+        internal PlayerServices(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Name = stf.ReadString();

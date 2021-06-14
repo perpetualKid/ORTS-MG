@@ -40,5 +40,41 @@ namespace Orts.Common.Xna
             }
             return dx * dx + dy * dy + dz * dz;
         }
+
+        public static Vector3 ParseVector3(this string s)
+        {
+            if (!string.IsNullOrEmpty(s))
+            {
+                string[] ax = s.Split(new char[] { ' ', ',', ':' });
+                if (ax.Length == 3 && float.TryParse(ax[0], out float x) && float.TryParse(ax[1], out float y) && float.TryParse(ax[2], out float z))
+                    return new Vector3(x, y, z);
+            }
+            return Vector3.Zero;
+        }
+
+        public static Vector4 ParseVector4(this string s)
+        {
+            if (!string.IsNullOrEmpty(s))
+            {
+                string[] ax = s.Split(new char[] { ' ', ',', ':' });
+                if (ax.Length == 4 && float.TryParse(ax[0], out float x) && float.TryParse(ax[1], out float y) && float.TryParse(ax[2], out float z) && float.TryParse(ax[3], out float w))
+                    return new Vector4(x, y, z, w);
+            }
+            return Vector4.Zero;
+        }
+
+        public static Color ParseColor(this string s)
+        {
+            if (!string.IsNullOrEmpty(s))
+            {
+                string[] ax = s.Split(new char[] { ' ', ',', ':' });
+                if (ax.Length == 4 && float.TryParse(ax[0], out float a) && float.TryParse(ax[1], out float r) && float.TryParse(ax[2], out float g) && float.TryParse(ax[3], out float b))
+                    return new Color(a, r, g, b);
+                else if (ax.Length == 3 && float.TryParse(ax[0], out r) && float.TryParse(ax[1], out g) && float.TryParse(ax[2], out b))
+                    return new Color(255, r, g, b);
+            }
+            return Color.Transparent;
+        }
+
     }
 }

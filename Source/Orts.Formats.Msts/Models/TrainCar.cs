@@ -7,7 +7,7 @@ namespace Orts.Formats.Msts.Models
     {
         public uint UiD { get; private set; }
 
-        public WorkOrderWagons(STFReader stf, EventType eventType)
+        internal WorkOrderWagons(STFReader stf)
         {
             stf.MustMatchBlockStart();
             // "Drop Off" Wagon_List sometimes lacks a Description attribute, so we create the wagon _before_ description
@@ -43,12 +43,11 @@ namespace Orts.Formats.Msts.Models
         public int Serial { get; private set; } = 1;
         public MaxVelocity MaxVelocity { get; private set; }
         public float Durability { get; private set; } = 1.0f;   // Value assumed if attribute not found.
-        private int nextWagonUiD;
 
-        public List<Wagon> Wagons { get; } = new List<Wagon>();
+        public IList<Wagon> Wagons { get; } = new List<Wagon>();
 
 
-        public TrainSet(STFReader stf)
+        internal TrainSet(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -64,7 +63,7 @@ namespace Orts.Formats.Msts.Models
                 new STFReader.TokenProcessor("name", ()=>{ Name = stf.ReadStringBlock(null); }),
                 new STFReader.TokenProcessor("serial", ()=>{ Serial = stf.ReadIntBlock(null); }),
                 new STFReader.TokenProcessor("maxvelocity", ()=>{ MaxVelocity = new MaxVelocity(stf); }),
-                new STFReader.TokenProcessor("nextwagonuid", ()=>{ nextWagonUiD = stf.ReadIntBlock(null); }),
+                new STFReader.TokenProcessor("nextwagonuid", ()=>{ _ = stf.ReadIntBlock(null); }),
                 new STFReader.TokenProcessor("durability", ()=>{ Durability = stf.ReadFloatBlock(STFReader.Units.None, null); }),
                 new STFReader.TokenProcessor("wagon", ()=>{ Wagons.Add(new Wagon(stf)); }),
                 new STFReader.TokenProcessor("engine", ()=>{ Wagons.Add(new Wagon(stf)); }),
@@ -80,7 +79,7 @@ namespace Orts.Formats.Msts.Models
         public bool IsEngine { get; private set; }
         public bool Flip { get; private set; }
 
-        public Wagon(STFReader stf)
+        internal Wagon(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -91,10 +90,10 @@ namespace Orts.Formats.Msts.Models
             });
         }
 
-        public string GetName(uint uId, List<Wagon> wagonList)
-        {
-            return wagonList.Find((w) => w.UiD == uId)?.Name ?? "<unknown name>";
-        }
+        //public string GetName(uint uId, List<Wagon> wagonList)
+        //{
+        //    return wagonList.Find((w) => w.UiD == uId)?.Name ?? "<unknown name>";
+        //}
     }
 
 }

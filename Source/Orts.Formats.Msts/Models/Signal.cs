@@ -19,7 +19,7 @@ namespace Orts.Formats.Msts.Models
     /// </summary>
     public class LightTexture
     {
-        private Matrix2x2 uv;
+        private readonly Matrix2x2 uv;
 
         /// <summary>Name of the light texture</summary>
         public string Name { get; private set; }
@@ -32,10 +32,10 @@ namespace Orts.Formats.Msts.Models
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        public LightTexture(STFReader stf)
+        internal LightTexture(STFReader stf)
         {
             stf.MustMatchBlockStart();
-            Name = stf.ReadString().ToLowerInvariant();
+            Name = stf.ReadString();
             TextureFile = stf.ReadString();
             uv = new Matrix2x2(stf.ReadFloat(null), stf.ReadFloat(null), stf.ReadFloat(null), stf.ReadFloat(null));
             stf.SkipRestOfBlock();
@@ -58,10 +58,10 @@ namespace Orts.Formats.Msts.Models
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        public LightTableEntry(STFReader stf)
+        internal LightTableEntry(STFReader stf)
         {
             stf.MustMatchBlockStart();
-            Name = stf.ReadString().ToLowerInvariant();
+            Name = stf.ReadString();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("colour", ()=>{
                     stf.MustMatchBlockStart();
@@ -97,7 +97,7 @@ namespace Orts.Formats.Msts.Models
             }
         }
 
-        public void Reset()
+        public static void Reset()
         {
             instance = null;
         }
@@ -142,27 +142,27 @@ namespace Orts.Formats.Msts.Models
         /// <summary>The name of the texture to use for the lights</summary>
         public string LightTextureName { get; private set; }
         /// <summary></summary>
-        public List<SignalLight> Lights { get; private set; }
+        public IList<SignalLight> Lights { get; private set; }
         /// <summary>Name-indexed draw states</summary>
         public Dictionary<string, SignalDrawState> DrawStates { get; private set; }
         /// <summary>List of aspects this signal type can have</summary>
-        public List<SignalAspect> Aspects { get; private set; }
+        public IList<SignalAspect> Aspects { get; private set; }
         /// <summary>Number of blocks ahead which need to be cleared in order to maintain a 'clear' indication
         /// in front of a train. MSTS calculation</summary>
-        public int NumClearAhead_MSTS { get; private set; }
+        public int ClearAheadNumberMsts { get; private set; }
         /// <summary>Number of blocks ahead which need to be cleared in order to maintain a 'clear' indication
         /// in front of a train. ORTS calculation</summary>
-        public int NumClearAhead_ORTS { get; private set; }
+        public int ClearAheadNumberOrts { get; private set; }
         /// <summary>Number of seconds to spend animating a semaphore signal.</summary>
         public float SemaphoreInfo { get; private set; }
         public ApproachControlLimits ApproachControlDetails { get; private set; }
 
         /// <summary> Glow value for daytime (optional).</summary>
-        public float? DayGlow = null;
+        public float? DayGlow { get; private set; }
         /// <summary> Glow value for nighttime (optional).</summary>
-        public float? NightGlow = null;
+        public float? NightGlow { get; private set; }
         /// <summary> Lights switched off or on during daytime (default : on) (optional).</summary>
-        public bool DayLight = true;
+        public bool DayLight { get; private set; } = true;
 
         /// <summary>
         /// Common initialization part for constructors
@@ -185,7 +185,7 @@ namespace Orts.Formats.Msts.Models
             FunctionType = function;
             Name = "UNDEFINED";
             Semaphore = false;
-            DrawStates = new Dictionary<string, SignalDrawState>
+            DrawStates = new Dictionary<string, SignalDrawState>(StringComparer.OrdinalIgnoreCase)
             {
                 { "CLEAR", new SignalDrawState("CLEAR", 1) }
             };
@@ -200,25 +200,25 @@ namespace Orts.Formats.Msts.Models
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="orMode">Process SignalType for ORTS mode (always set NumClearAhead_ORTS only)</param>
-        public SignalType(STFReader stf, bool orMode)
+        internal SignalType(STFReader stf, bool orMode)
             : this()
         {
             stf.MustMatchBlockStart();
-            Name = stf.ReadString().ToLowerInvariant();
+            Name = stf.ReadString();
             int numClearAhead = -2;
             int numdefs = 0;
             string ortsFunctionType = string.Empty;
             string ortsNormalSubType = string.Empty;
 
             stf.ParseBlock(new STFReader.TokenProcessor[] {
-                new STFReader.TokenProcessor("ortsscript", ()=>{ Script = stf.ReadStringBlock("").ToLowerInvariant(); }),
+                new STFReader.TokenProcessor("ortsscript", ()=>{ Script = stf.ReadStringBlock(""); }),
                 new STFReader.TokenProcessor("signalfntype", ()=>{
                     if (orMode)
                         ortsFunctionType = ReadOrtsFunctionType(stf);
                     else
                         FunctionType = ReadFunctionType(stf);
                 }),
-                new STFReader.TokenProcessor("signallighttex", ()=>{ LightTextureName = stf.ReadStringBlock("").ToLowerInvariant(); }),
+                new STFReader.TokenProcessor("signallighttex", ()=>{ LightTextureName = stf.ReadStringBlock(""); }),
                 new STFReader.TokenProcessor("signallights", ()=>{ Lights = ReadLights(stf); }),
                 new STFReader.TokenProcessor("signaldrawstates", ()=>{ DrawStates = ReadDrawStates(stf); }),
                 new STFReader.TokenProcessor("signalaspects", ()=>{ Aspects = ReadAspects(stf); }),
@@ -239,11 +239,11 @@ namespace Orts.Formats.Msts.Models
                 new STFReader.TokenProcessor("signalflags", ()=>{
                     stf.MustMatchBlockStart();
                     while (!stf.EndOfBlock())
-                        switch (stf.ReadString().ToLower())
+                        switch (stf.ReadString().ToUpperInvariant())
                         {
-                            case "abs": Abs = true; break;
-                            case "no_gantry": NoGantry = true; break;
-                            case "semaphore": Semaphore = true; break;
+                            case "ABS": Abs = true; break;
+                            case "NO_GANTRY": NoGantry = true; break;
+                            case "SEMAPHORE": Semaphore = true; break;
                             default: stf.StepBackOneItem(); STFException.TraceInformation(stf, "Skipped unknown SignalType flag " + stf.ReadString()); break;
                         }
                 }),
@@ -262,8 +262,8 @@ namespace Orts.Formats.Msts.Models
                 OrtsNormalSubTypeIndex = OrSignalTypes.Instance.NormalSubTypes.FindIndex(i => StringComparer.OrdinalIgnoreCase.Equals(i, ortsNormalSubType));
 
                 // set SNCA
-                NumClearAhead_MSTS = -2;
-                NumClearAhead_ORTS = numClearAhead;
+                ClearAheadNumberMsts = -2;
+                ClearAheadNumberOrts = numClearAhead;
             }
             else
             {
@@ -271,12 +271,14 @@ namespace Orts.Formats.Msts.Models
                 OrtsFunctionTypeIndex = (int)FunctionType;
 
                 // set SNCA
-                NumClearAhead_MSTS = numdefs == 1 ? numClearAhead : -2;
-                NumClearAhead_ORTS = numdefs == 2 ? numClearAhead : -2;
+#pragma warning disable CA1508 // Avoid dead conditional code
+                ClearAheadNumberMsts = numdefs == 1 ? numClearAhead : -2;
+                ClearAheadNumberOrts = numdefs == 2 ? numClearAhead : -2;
+#pragma warning restore CA1508 // Avoid dead conditional code
             }
         }
 
-        private SignalFunction ReadFunctionType(STFReader stf)
+        private static SignalFunction ReadFunctionType(STFReader stf)
         {
             string signalType = stf.ReadStringBlock(null);
             if (!EnumExtension.GetValue(signalType, out SignalFunction result))
@@ -287,7 +289,7 @@ namespace Orts.Formats.Msts.Models
             return result;
         }
 
-        private string ReadOrtsFunctionType(STFReader stf)
+        private static string ReadOrtsFunctionType(STFReader stf)
         {
             string type = stf.ReadStringBlock(null);
             if (OrSignalTypes.Instance.FunctionTypes.Contains(type, StringComparer.OrdinalIgnoreCase))
@@ -311,7 +313,7 @@ namespace Orts.Formats.Msts.Models
             else
             {
                 STFException.TraceInformation(stf, "Skipped unknown ORTSNormalSubtype " + type);
-                return (String.Empty);
+                return (string.Empty);
             }
         }
 
@@ -335,11 +337,11 @@ namespace Orts.Formats.Msts.Models
             return lights;
         }
 
-        private Dictionary<string, SignalDrawState> ReadDrawStates(STFReader stf)
+        private static Dictionary<string, SignalDrawState> ReadDrawStates(STFReader stf)
         {
             stf.MustMatchBlockStart();
             int count = stf.ReadInt(null);
-            Dictionary<string, SignalDrawState> drawStates = new Dictionary<string, SignalDrawState>(count);
+            Dictionary<string, SignalDrawState> drawStates = new Dictionary<string, SignalDrawState>(count, StringComparer.OrdinalIgnoreCase);
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("signaldrawstate", ()=>{
                     if (drawStates.Count >= count)
@@ -361,11 +363,11 @@ namespace Orts.Formats.Msts.Models
                 }),
             });
             if (drawStates.Count < count)
-                STFException.TraceWarning(stf, (count - drawStates.Count).ToString() + " missing SignalDrawState(s)");
+                STFException.TraceWarning(stf, $"{count - drawStates.Count} missing SignalDrawState(s)");
             return drawStates;
         }
 
-        private List<SignalAspect> ReadAspects(STFReader stf)
+        private static List<SignalAspect> ReadAspects(STFReader stf)
         {
             stf.MustMatchBlockStart();
             int count = stf.ReadInt(null);
@@ -387,7 +389,7 @@ namespace Orts.Formats.Msts.Models
             return aspects;
         }
 
-        private ApproachControlLimits ReadApproachControlDetails(STFReader stf)
+        private static ApproachControlLimits ReadApproachControlDetails(STFReader stf)
         {
             stf.MustMatchBlockStart();
             return new ApproachControlLimits(stf);
@@ -487,11 +489,11 @@ namespace Orts.Formats.Msts.Models
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        public SignalLight(STFReader stf)
+        internal SignalLight(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Index = stf.ReadInt(null);
-            Name = stf.ReadString().ToLowerInvariant();
+            Name = stf.ReadString();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("radius", ()=>{ Radius = stf.ReadFloatBlock(STFReader.Units.None, null); }),
                 new STFReader.TokenProcessor("position", ()=>{
@@ -502,9 +504,9 @@ namespace Orts.Formats.Msts.Models
                 new STFReader.TokenProcessor("signalflags", ()=>{
                     stf.MustMatchBlockStart();
                     while (!stf.EndOfBlock())
-                        switch (stf.ReadString().ToLower())
+                        switch (stf.ReadString().ToUpperInvariant())
                         {
-                            case "semaphore_change":
+                            case "SEMAPHORE_CHANGE":
                                 SemaphoreChange = true;
                                 break;
                             default:
@@ -524,7 +526,7 @@ namespace Orts.Formats.Msts.Models
         /// <returns>integer describing whether first light needs to be sorted before second light (so less than 0, 0, or larger than 0)</returns>
         public static int Comparer(SignalLight lightA, SignalLight lightB)
         {
-            return lightA.Index - lightB.Index;
+            return lightA?.Index - lightB?.Index ?? 0;
         }
     }
     #endregion
@@ -540,7 +542,7 @@ namespace Orts.Formats.Msts.Models
         /// <summary>Name identifying the draw state</summary>
         public string Name { get; private set; }
         /// <summary>The lights to draw in this state</summary>
-        public List<SignalDrawLight> DrawLights { get; private set; }
+        public IList<SignalDrawLight> DrawLights { get; private set; }
         /// <summary>The position of the semaphore for this draw state (as a keyframe)</summary>
         public float SemaphorePosition { get; private set; }
 
@@ -559,11 +561,11 @@ namespace Orts.Formats.Msts.Models
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        public SignalDrawState(STFReader stf)
+        internal SignalDrawState(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Index = stf.ReadInt(null);
-            Name = stf.ReadString().ToLowerInvariant();
+            Name = stf.ReadString();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("drawlights", ()=>{ DrawLights = ReadDrawLights(stf); }),
                 new STFReader.TokenProcessor("semaphorepos", ()=>{ SemaphorePosition = stf.ReadFloatBlock(STFReader.Units.None, 0); }),
@@ -594,7 +596,7 @@ namespace Orts.Formats.Msts.Models
         /// <returns>integer describing whether first draw state needs to be sorted before second state (so less than 0, 0, or larger than 0)</returns>
         public static int Comparer(SignalDrawState drawStateA, SignalDrawState drawStateB)
         {
-            return drawStateA.Index - drawStateB.Index;
+            return drawStateA?.Index - drawStateB?.Index ?? 0;
         }
     }
     #endregion
@@ -614,7 +616,7 @@ namespace Orts.Formats.Msts.Models
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        public SignalDrawLight(STFReader stf)
+        internal SignalDrawLight(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Index = stf.ReadInt(null);
@@ -622,9 +624,9 @@ namespace Orts.Formats.Msts.Models
                 new STFReader.TokenProcessor("signalflags", ()=>{
                     stf.MustMatchBlockStart();
                     while (!stf.EndOfBlock())
-                        switch (stf.ReadString().ToLower())
+                        switch (stf.ReadString().ToUpperInvariant())
                         {
-                            case "flashing":
+                            case "FLASHING":
                                 Flashing = true;
                                 break;
                             default:
@@ -673,7 +675,7 @@ namespace Orts.Formats.Msts.Models
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        public SignalAspect(STFReader stf)
+        internal SignalAspect(STFReader stf)
         {
             SpeedLimit = -1;
             stf.MustMatchBlockStart();
@@ -685,22 +687,22 @@ namespace Orts.Formats.Msts.Models
             }
             else
                 Aspect = aspect;
-            DrawStateName = stf.ReadString().ToLowerInvariant();
+            DrawStateName = stf.ReadString();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("speedmph", ()=>{ SpeedLimit = (float)Speed.MeterPerSecond.FromMpH(stf.ReadFloatBlock(STFReader.Units.None, 0)); }),
                 new STFReader.TokenProcessor("speedkph", ()=>{ SpeedLimit = (float)Speed.MeterPerSecond.FromKpH(stf.ReadFloatBlock(STFReader.Units.None, 0)); }),
                 new STFReader.TokenProcessor("signalflags", ()=>{
                     stf.MustMatchBlockStart();
                     while (!stf.EndOfBlock())
-                        switch (stf.ReadString().ToLower())
+                        switch (stf.ReadString().ToUpperInvariant())
                         {
-                            case "asap":
+                            case "ASAP":
                                 Asap = true;
                                 break;
-                            case "or_speedreset":
+                            case "OR_SPEEDRESET":
                                 Reset = true;
                                 break;
-                            case "or_nospeedreduction":
+                            case "OR_NOSPEEDREDUCTION":
                                 NoSpeedReduction = true;
                                 break;
                             default:
@@ -724,7 +726,7 @@ namespace Orts.Formats.Msts.Models
         public float? ApproachControlPositionM { get; private set; }
         public float? ApproachControlSpeedMpS { get; private set; }
 
-        public ApproachControlLimits(STFReader stf)
+        internal ApproachControlLimits(STFReader stf)
         {
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("positionmiles", ()=>{ ApproachControlPositionM = (float)Size.Length.FromMi(stf.ReadFloatBlock(STFReader.Units.None, 0)); }),
@@ -744,13 +746,13 @@ namespace Orts.Formats.Msts.Models
         /// <summary>Description of the signal shape</summary>
         public string Description { get; private set; }
         /// <summary>List of sub-objects that are belong to this shape</summary>
-        public List<SignalSubObject> SignalSubObjs { get; private set; }
+        public IList<SignalSubObject> SignalSubObjs { get; private set; }
 
         /// <summary>
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        public SignalShape(STFReader stf)
+        internal SignalShape(STFReader stf)
         {
             stf.MustMatchBlockStart();
             ShapeFileName = Path.GetFileName(stf.ReadString());
@@ -813,33 +815,33 @@ namespace Orts.Formats.Msts.Models
             /// Default constructor used during file parsing.
             /// </summary>
             /// <param name="stf">The STFreader containing the file stream</param>
-            public SignalSubObject(STFReader stf)
+            internal SignalSubObject(STFReader stf)
             {
                 SignalSubType = SignalSubType.None;
                 stf.MustMatchBlockStart();
                 Index = stf.ReadInt(null);
-                MatrixName = stf.ReadString().ToUpper();
+                MatrixName = stf.ReadString().ToUpperInvariant();
                 Description = stf.ReadString();
                 stf.ParseBlock(new STFReader.TokenProcessor[] {
                     new STFReader.TokenProcessor("sigsubtype", ()=>{
                         if (EnumExtension.GetValue(stf.ReadStringBlock(null), out SignalSubType subType))
                             SignalSubType = subType;
                     }),
-                    new STFReader.TokenProcessor("sigsubstype", ()=>{ SignalSubSignalType = stf.ReadStringBlock(null).ToLowerInvariant(); }),
+                    new STFReader.TokenProcessor("sigsubstype", ()=>{ SignalSubSignalType = stf.ReadStringBlock(null); }),
                     new STFReader.TokenProcessor("signalflags", ()=>{
                         stf.MustMatchBlockStart();
                         while (!stf.EndOfBlock())
-                            switch (stf.ReadString().ToLower())
+                            switch (stf.ReadString().ToUpperInvariant())
                             {
-                                case "optional":
+                                case "OPTIONAL":
                                     Optional = true;
                                     break;
-                                case "default":
+                                case "DEFAULT":
                                     Default = true; break;
-                                case "back_facing":
+                                case "BACK_FACING":
                                     BackFacing = true;
                                     break;
-                                case "jn_link":
+                                case "JN_LINK":
                                     JunctionLink = true;
                                     break;
                                 default:

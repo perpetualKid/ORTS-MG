@@ -18,7 +18,10 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+
 using Microsoft.Xna.Framework;
+
+using Orts.Common.Xna;
 using Orts.Formats.Msts.Parsers;
 
 namespace Orts.Simulation.RollingStocks
@@ -40,67 +43,68 @@ namespace Orts.Simulation.RollingStocks
     */
     public partial class MSTSLocomotive
     {
-        internal virtual void InitializeFromORTSSpecific(string wagFilePath, object initWhat)
+        internal virtual void InitializeFromORTSSpecific(string wagFilePath, object initObject)
         {
             object[] fattrs;
-            if (initWhat == null)
-                initWhat = this;
-            System.Reflection.MemberInfo info = initWhat.GetType();
-            fattrs = Attribute.GetCustomAttributes(info, typeof(ORTSPhysicsFileAttribute), true);
+            initObject ??= this;
+            MemberInfo info = initObject.GetType();
+            fattrs = Attribute.GetCustomAttributes(info, typeof(OrtsPhysicsFileAttribute), true);
 
             bool setdef = true;
 
             foreach (object fattr in fattrs)
             {
-                ORTSPhysicsFileAttribute opfa = fattr as ORTSPhysicsFileAttribute;
-                STFReader stf = opfa.OpenSTF(wagFilePath);
-                bool hasFile = stf != null;
-
-                object[] attrs;
-                STFReader.TokenProcessor tp;
-                List<STFReader.TokenProcessor> result = new List<STFReader.TokenProcessor>();
-
-                ORTSPhysicsAttribute attr;
-                FieldInfo[] fields = initWhat.GetType().GetFields();
-                foreach (FieldInfo fi in fields)
+                OrtsPhysicsFileAttribute opfa = fattr as OrtsPhysicsFileAttribute;
+                using (STFReader stf = opfa.OpenSTF(wagFilePath))
                 {
-                    attrs = fi.GetCustomAttributes(typeof(ORTSPhysicsAttribute), false);
-                    if (attrs.Length > 0)
+                    bool hasFile = stf != null;
+
+                    object[] attrs;
+                    STFReader.TokenProcessor tp;
+                    List<STFReader.TokenProcessor> result = new List<STFReader.TokenProcessor>();
+
+                    OrtsPhysicsAttribute attr;
+                    FieldInfo[] fields = initObject.GetType().GetFields();
+                    foreach (FieldInfo fi in fields)
                     {
-                        attr = attrs[0] as ORTSPhysicsAttribute;
-
-                        if (setdef)
-                            fi.SetValue2(initWhat, attr.DefaultValue);
-
-                        if (hasFile && opfa.FileID == attr.FileID)
+                        attrs = fi.GetCustomAttributes(typeof(OrtsPhysicsAttribute), false);
+                        if (attrs.Length > 0)
                         {
-                            AttributeProcessor ap = new AttributeProcessor(initWhat, fi, stf, attr.DefaultValue);
-                            tp = new STFReader.TokenProcessor(attr.Token, ap.P);
+                            attr = attrs[0] as OrtsPhysicsAttribute;
 
-                            result.Add(tp);
+                            if (setdef)
+                                fi.SetValue2(initObject, attr.DefaultValue);
+
+                            if (hasFile && opfa.FileID == attr.FileID)
+                            {
+                                AttributeProcessor ap = new AttributeProcessor(initObject, fi, stf, attr.DefaultValue);
+                                tp = new STFReader.TokenProcessor(attr.Token, ap.Processor);
+
+                                result.Add(tp);
+                            }
                         }
                     }
-                }
 
-                setdef = false;
+                    setdef = false;
 
-                if (hasFile)
-                {
-                    stf.MustMatch(opfa.Token);
-                    stf.MustMatch("(");
-                    stf.ParseBlock(result.ToArray());
-                    stf.Dispose();
+                    if (hasFile)
+                    {
+                        stf.MustMatch(opfa.Token);
+                        stf.MustMatch("(");
+                        stf.ParseBlock(result.ToArray());
+                        stf.Dispose();
+                    }
                 }
             }
         }
 
         internal virtual void InitializeFromORTSSpecificCopy(MSTSLocomotive locoFrom)
         {
-            FieldInfo[] fields = this.GetType().GetFields();
+            FieldInfo[] fields = GetType().GetFields();
             object[] attrs;
             foreach (FieldInfo fi in fields)
             {
-                attrs = fi.GetCustomAttributes(typeof(ORTSPhysicsAttribute), false);
+                attrs = fi.GetCustomAttributes(typeof(OrtsPhysicsAttribute), false);
                 if (attrs.Length > 0)
                 {
                     fi.SetValue(this, fi.GetValue(locoFrom));
@@ -111,7 +115,7 @@ namespace Orts.Simulation.RollingStocks
 
     #region Attributes
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class ORTSPhysicsFileAttribute : Attribute
+    internal sealed class OrtsPhysicsFileAttribute : Attribute
     {
         public string NamePattern { get; private set; }
         public string Token { get; private set; }
@@ -124,10 +128,12 @@ namespace Orts.Simulation.RollingStocks
         /// </summary>
         /// <param name="namePattern">Extension of STF file</param>
         /// <param name="token">Token in STF file</param>
-        public ORTSPhysicsFileAttribute(string namePattern, string token)
+        public OrtsPhysicsFileAttribute(string namePattern, string token)
         {
             NamePattern = namePattern;
-            Token = token.ToLower();
+#pragma warning disable CA1308 // Normalize strings to uppercase
+            Token = token.ToLowerInvariant();
+#pragma warning restore CA1308 // Normalize strings to uppercase
             FileID = "default";
         }
 
@@ -139,10 +145,12 @@ namespace Orts.Simulation.RollingStocks
         /// <param name="namePattern">Extension of STF file</param>
         /// <param name="token">Token in STF file</param>
         /// <param name="fileID">ID of the file, used to separate attributes specified in different files. Default value is 'default'.</param>
-        public ORTSPhysicsFileAttribute(string namePattern, string token, string fileID)
+        public OrtsPhysicsFileAttribute(string namePattern, string token, string fileID)
         {
             NamePattern = namePattern;
-            Token = token.ToLower();
+#pragma warning disable CA1308 // Normalize strings to uppercase
+            Token = token.ToLowerInvariant();
+#pragma warning restore CA1308 // Normalize strings to uppercase
             FileID = fileID;
         }
 
@@ -152,7 +160,7 @@ namespace Orts.Simulation.RollingStocks
             {
                 string name = engFile;
 
-                if (!NamePattern.StartsWith("."))
+                if (!NamePattern.StartsWith(".", StringComparison.Ordinal))
                 {
                     int lp = name.LastIndexOf('.');
                     name = name.Substring(0, lp + 1);
@@ -169,7 +177,7 @@ namespace Orts.Simulation.RollingStocks
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class ORTSPhysicsAttribute : Attribute
+    internal sealed class OrtsPhysicsAttribute : Attribute
     {
         public string Title { get; private set; }
         public string Token { get; private set; }
@@ -186,10 +194,12 @@ namespace Orts.Simulation.RollingStocks
         /// <param name="description">Longer description of the physics Attribute, displayed in the Editor progam</param>
         /// <param name="defaultvalue">Default value of the physics Attribute -- BE CAUTIOUS of the given value's type, it is checked at runtime ONLY!
         /// <para>Vector3 values must be specified as string, numeric values separated by space, ',' or ':'</para></param>
-        public ORTSPhysicsAttribute(string title, string token, string description, object defaultvalue)
+        public OrtsPhysicsAttribute(string title, string token, string description, object defaultvalue)
         {
             Title = title;
-            Token = token.ToLower();
+#pragma warning disable CA1308 // Normalize strings to uppercase
+            Token = token.ToLowerInvariant();
+#pragma warning restore CA1308 // Normalize strings to uppercase
             Description = description;
             DefaultValue = defaultvalue;
             FileID = "default";
@@ -205,86 +215,88 @@ namespace Orts.Simulation.RollingStocks
         /// <param name="defaultvalue">Default value of the physics Attribute -- BE CAUTIOUS of the given value's type, it is checked at runtime ONLY!
         /// <para>Vector3 values must be specified as string, numeric values separated by space, ',' or ':'</para></param>
         /// <param name="fileID">Optional, string ID of the file containing the Attribute. The ID is specified at ORTSPhysicsFileAttribute on the class. Default value is 'default'.</param>
-        public ORTSPhysicsAttribute(string title, string token, string description, object defaultvalue, string fileID)
+        public OrtsPhysicsAttribute(string title, string token, string description, object defaultvalue, string fileID)
         {
             Title = title;
-            Token = token.ToLower();
+#pragma warning disable CA1308 // Normalize strings to uppercase
+            Token = token.ToLowerInvariant();
+#pragma warning restore CA1308 // Normalize strings to uppercase
             Description = description;
             DefaultValue = defaultvalue;
             FileID = fileID;
         }
     }
 
-    public class AttributeProcessor
+    internal class AttributeProcessor
     {
-        public STFReader.Processor P;
-        private FieldInfo _fi;
+        public STFReader.Processor Processor { get; }
+        private readonly FieldInfo fieldInfo;
 
         public AttributeProcessor(object setWhom, FieldInfo fi, STFReader stf, object defaultValue)
         {
-            _fi = fi;
+            fieldInfo = fi;
 
-            P = () =>
+            Processor = () =>
             {
-                switch (_fi.FieldType.Name.ToLower())
+                switch (fieldInfo.FieldType.Name.ToUpperInvariant())
                 {
-                    case "int":
-                    case "int32":
+                    case "INT":
+                    case "INT32":
                         {
                             int? i = defaultValue as int?;
-                            _fi.SetValue(setWhom,
+                            fieldInfo.SetValue(setWhom,
                                 stf.ReadIntBlock(i));
                             break;
                         }
-                    case "bool":
-                    case "boolean":
+                    case "BOOL":
+                    case "BOOLEAN":
                         {
                             bool? b = defaultValue as bool?;
-                            _fi.SetValue(setWhom,
+                            fieldInfo.SetValue(setWhom,
                                 stf.ReadBoolBlock(b.Value));
                             break;
                         }
-                    case "string":
+                    case "STRING":
                         {
                             string s = defaultValue as string;
-                            _fi.SetValue(setWhom,
+                            fieldInfo.SetValue(setWhom,
                                 stf.ReadStringBlock(s));
                             break;
                         }
-                    case "float":
-                    case "single":
+                    case "FLOAT":
+                    case "SINGLE":
                         {
                             float? f = defaultValue as float?;
-                            _fi.SetValue(setWhom,
+                            fieldInfo.SetValue(setWhom,
                                 stf.ReadFloatBlock(STFReader.Units.Any, f));
                             break;
                         }
-                    case "double":
+                    case "DOUBLE":
                         {
                             double? d = defaultValue as double?;
-                            _fi.SetValue(setWhom,
+                            fieldInfo.SetValue(setWhom,
                                 stf.ReadDoubleBlock(d));
                             break;
                         }
-                    case "vector3":
+                    case "VECTOR3":
                         {
                             Vector3 v3 = (defaultValue as string).ParseVector3();
                             {
-                                _fi.SetValue(setWhom,
+                                fieldInfo.SetValue(setWhom,
                                     stf.ReadVector3Block(STFReader.Units.Any, v3));
                             }
                             break;
                         }
-                    case "vector4":
+                    case "VECTOR4":
                         {
                             Vector4 v4 = (defaultValue as string).ParseVector4();
                             {
                                 stf.ReadVector4Block(STFReader.Units.Any, ref v4);
-                                _fi.SetValue(setWhom, v4);
+                                fieldInfo.SetValue(setWhom, v4);
                             }
                             break;
                         }
-                    case "color":
+                    case "COLOR":
                         {
                             Color c = (defaultValue as string).ParseColor();
                             {
@@ -304,7 +316,7 @@ namespace Orts.Simulation.RollingStocks
                                     c.G = v4.Z == -1 ? c.G : (byte)v4.Z;
                                     c.B = v4.W == -1 ? c.B : (byte)v4.W;
                                 }
-                                _fi.SetValue(setWhom, c);
+                                fieldInfo.SetValue(setWhom, c);
                             }
                             break;
                         }
@@ -313,85 +325,37 @@ namespace Orts.Simulation.RollingStocks
         }
     }
 
-    public static class VectorExt
+    internal static class VectorExt
     {
-        public static Vector3 ParseVector3(this string s)
-        {
-            Vector3 v = new Vector3();
-            if (!string.IsNullOrEmpty(s))
-            {
-                string[] ax = s.Split(new char[] { ' ', ',', ':' });
-                if (ax.Length == 3)
-                {
-                    v.X = float.Parse(ax[0]);
-                    v.Y = float.Parse(ax[1]);
-                    v.Z = float.Parse(ax[2]);
-                }
-            }
-            return v;
-        }
-
-        public static Vector4 ParseVector4(this string s)
-        {
-            Vector4 v = new Vector4();
-            if (!string.IsNullOrEmpty(s))
-            {
-                string[] ax = s.Split(new char[] { ' ', ',', ':' });
-                if (ax.Length == 4)
-                {
-                    v.X = float.Parse(ax[0]);
-                    v.Y = float.Parse(ax[1]);
-                    v.Z = float.Parse(ax[2]);
-                    v.W = float.Parse(ax[3]);
-                }
-            }
-            return v;
-        }
-
-        public static Color ParseColor(this string s)
-        {
-            Color c = new Color();
-            if (!string.IsNullOrEmpty(s))
-            {
-                string[] ax = s.Split(new char[] { ' ', ',', ':' });
-                if (ax.Length == 4)
-                {
-                    c.A = byte.Parse(ax[0]);
-                    c.R = byte.Parse(ax[1]);
-                    c.G = byte.Parse(ax[2]);
-                    c.B = byte.Parse(ax[3]);
-                }
-                else if (ax.Length == 3)
-                {
-                    c.A = 255;
-                    c.R = byte.Parse(ax[0]);
-                    c.G = byte.Parse(ax[1]);
-                    c.B = byte.Parse(ax[2]);
-                }
-            }
-            return c;
-        }
 
         public static void SetValue2(this FieldInfo fi, object obj, object value)
         {
-            if (fi.FieldType.Name == "Vector3")
+            switch (fi.FieldType.Name)
             {
-                Vector3 v3 = (value as string).ParseVector3();
-                fi.SetValue(obj, v3);
-            }
-            else if (fi.FieldType.Name == "Vector4")
-            {
-                Vector4 v4 = (value as string).ParseVector4();
-                fi.SetValue(obj, v4);
-            }
-            else if (fi.FieldType.Name == "Color")
-            {
-                Color c = (value as string).ParseColor();
-                fi.SetValue(obj, c);
-            }
-            else
-            {
-                fi.SetValue(obj, value);
+                case "Vector3":
+                    {
+                        Vector3 v3 = (value as string).ParseVector3();
+                        fi.SetValue(obj, v3);
+                        break;
+                    }
+
+                case "Vector4":
+                    {
+                        Vector4 v4 = (value as string).ParseVector4();
+                        fi.SetValue(obj, v4);
+                        break;
+                    }
+
+                case "Color":
+                    {
+                        Color c = (value as string).ParseColor();
+                        fi.SetValue(obj, c);
+                        break;
+                    }
+
+                default:
+                    fi.SetValue(obj, value);
+                    break;
             }
         }
     }

@@ -44,7 +44,7 @@ namespace Orts.MultiPlayer
 		public double quitTime = -100f;
 		public enum Status {Valid, Quit, Removed};
 		public Status status = Status.Valid;//is this player removed by the dispatcher
-        public bool protect = false; //when in true, will not force this player out, to protect the one that others uses the same name
+        public bool protect; //when in true, will not force this player out, to protect the one that others uses the same name
 
         // Used to restore
         public OnlinePlayer(BinaryReader inf)

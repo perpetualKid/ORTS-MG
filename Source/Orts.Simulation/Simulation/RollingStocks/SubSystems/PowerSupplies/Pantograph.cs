@@ -59,7 +59,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
                         }
                     );
 
-                    if (List.Count() == 0)
+                    if (List.Count == 0)
                         throw new InvalidDataException("ORTSPantographs block with no pantographs");
 
                     break;
@@ -91,7 +91,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
 
         public void Initialize()
         {
-            while (List.Count() < 2)
+            while (List.Count < 2)
             {
                 Add(new Pantograph(Wagon));
             }
@@ -141,7 +141,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
 
         public void Save(BinaryWriter outf)
         {
-            outf.Write(List.Count());
+            outf.Write(List.Count);
             foreach (Pantograph pantograph in List)
             {
                 pantograph.Save(outf);

@@ -1,4 +1,5 @@
-﻿using Microsoft.Xna.Framework;
+﻿
+using Microsoft.Xna.Framework;
 
 using Orts.Formats.Msts.Parsers;
 
@@ -9,7 +10,7 @@ namespace Orts.Formats.Msts.Models
     /// </summary>
     public class Camera
     {
-        public Camera(STFReader stf)
+        internal Camera(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -37,6 +38,5 @@ namespace Orts.Formats.Msts.Models
         public ref readonly Vector3 ObjectOffset => ref objectOffset;
         public ref readonly Vector3 RotationLimit => ref rotationLimit;
         public string Description { get; private set; } = "";
-
     }
 }

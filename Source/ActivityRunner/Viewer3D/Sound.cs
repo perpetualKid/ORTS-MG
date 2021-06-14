@@ -146,7 +146,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// If needs active management or can be left to OpenAL to deal with sound properties
         /// </summary>
         public bool NeedsFrequentUpdate;
-        public bool TrackSound = false;
+        public bool TrackSound;
 
         public abstract void Dispose();
     }
@@ -165,9 +165,9 @@ namespace Orts.ActivityRunner.Viewer3D
         private float prevDist = -1; // initial distance to sond region backward
         private float initDist = -1; // initial distance run when last ttype selected
         private int initTrackSection = -1; // track section when last ttype selected
-        private MSTSWagon initCar = null; // initial leading car (to accommodate in case of change of direction)
-        private bool CarOnSwitch = false;
-        private bool CarOnCurve = false;
+        private MSTSWagon initCar; // initial leading car (to accommodate in case of change of direction)
+        private bool CarOnSwitch;
+        private bool CarOnCurve;
 
 
         public TrackSoundSource(MSTSWagon car, Viewer viewer)
@@ -560,7 +560,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <summary>
         /// Used for InGame sounds and activity sounds of type "Overall"
         /// </summary>
-        public bool IsUnattenuated = false;
+        public bool IsUnattenuated;
         /// <summary>
         /// Used for Horns
         /// </summary>
@@ -755,7 +755,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
             if (iSG < smsFile.ScalabiltyGroups.Count && smsFile.ScalabiltyGroups[iSG].Streams != null)  // else we want less sound so don't provide any
             {
-                ScalabiltyGroup mstsScalabiltyGroup = smsFile.ScalabiltyGroups[iSG];
+                ScalabilityGroup mstsScalabiltyGroup = smsFile.ScalabiltyGroups[iSG];
 
                 ActivationConditions = mstsScalabiltyGroup.Activation;
                 DeactivationConditions = mstsScalabiltyGroup.Deactivation;
@@ -1420,7 +1420,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <returns></returns>
         private static float Interpolate(float x, Curve Curve)
         {
-            if (Curve.CurvePoints.Count() < 2)
+            if (Curve.CurvePoints.Length < 2)
                 return Curve.CurvePoints[0].Y;
 
             CurvePoint[] curvePoints = Curve.CurvePoints;
@@ -1588,7 +1588,7 @@ namespace Orts.ActivityRunner.Viewer3D
     /// <summary>
     /// Play this sound when a discrete TrainCar event occurs in the simulator
     /// </summary>
-    public class ORTSDiscreteTrigger: ORTSTrigger, Orts.Common.IEventHandler
+    public class ORTSDiscreteTrigger: ORTSTrigger, IEventHandler
     {
         /// <summary>
         /// Event this trigger listens to
@@ -1626,10 +1626,10 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <summary>
         /// Check if this trigger listens to an event
         /// </summary>
-        /// <param name="eventID">Occured event</param>
-        public void HandleEvent(TrainEvent eventID)
+        /// <param name="trainEvent">Occured event</param>
+        public void HandleEvent(TrainEvent trainEvent)
         {
-            if (eventID == TriggerID)
+            if (trainEvent == TriggerID)
             {
                 Triggered = true;
             }
@@ -1638,11 +1638,11 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <summary>
         /// Check if this trigger listens to an event, and if also belongs to the object
         /// </summary>
-        /// <param name="eventID">Occured event</param>
+        /// <param name="trainEvent">Occured event</param>
         /// <param name="viewer">Object the event belongs to</param>
-        public void HandleEvent(TrainEvent eventID, object viewer)
+        public void HandleEvent(TrainEvent trainEvent, object viewer)
         {
-            if (eventID == TriggerID)
+            if (trainEvent == TriggerID)
             {
                 try
                 {
@@ -2011,7 +2011,7 @@ namespace Orts.ActivityRunner.Viewer3D
         public override void Run()
         {
             string p = GetNextFile();
-            if (p != "")
+            if (!string.IsNullOrEmpty(p))
             {
                 if (ORTSStream != null && ORTSStream.ALSoundSource != null)
                     ORTSStream.ALSoundSource.Queue(p, PlayMode.OneShot, ORTSStream.SoundSource.IsExternal, ORTSStream.RepeatedTrigger);
@@ -2032,7 +2032,7 @@ namespace Orts.ActivityRunner.Viewer3D
         {
             // Support for Loop functions - by GeorgeS
             string p = GetNextFile();
-            if (p != "")
+            if (!string.IsNullOrEmpty(p))
             {
                 if (ORTSStream != null && ORTSStream.ALSoundSource != null)
                     ORTSStream.ALSoundSource.Queue(p, PlayMode.Loop, ORTSStream.SoundSource.IsExternal, false);
@@ -2071,7 +2071,7 @@ namespace Orts.ActivityRunner.Viewer3D
         public override void Run()
         {
             string p = GetNextFile();
-            if (p != "")
+            if (!string.IsNullOrEmpty(p))
             {
                 if (ORTSStream != null && ORTSStream.ALSoundSource != null)
                     ORTSStream.ALSoundSource.Queue(p, PlayMode.LoopRelease, ORTSStream.SoundSource.IsExternal, ORTSStream.IsReleasedWithJump);
@@ -2267,7 +2267,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <summary>
         /// File names to select from for playing
         /// </summary>
-        public String[] Files;
+        public IList<string> Files { get; private set; }
         /// <summary>
         /// How to select from available files
         /// </summary>
@@ -2280,7 +2280,7 @@ namespace Orts.ActivityRunner.Viewer3D
         public ORTSSoundPlayCommand(SoundStream ortsStream, SoundPlayCommand mstsSoundPlayCommand)
             : base(ortsStream)
         {
-            Files = mstsSoundPlayCommand.Files;
+            Files = mstsSoundPlayCommand?.Files;
             SelectionMethod = mstsSoundPlayCommand.SelectionMethod;
         }
 
@@ -2288,8 +2288,7 @@ namespace Orts.ActivityRunner.Viewer3D
         public ORTSSoundPlayCommand(SoundStream ortsStream, string wavFileName)
             : base(ortsStream)
         {
-            Files = new String[1];
-            Files[0] = wavFileName;
+            Files = new List<string>() { wavFileName };
             SelectionMethod = SoundPlayCommand.Selection.Sequential;
         }
 
@@ -2302,12 +2301,12 @@ namespace Orts.ActivityRunner.Viewer3D
             if (SelectionMethod == SoundPlayCommand.Selection.Sequential)
             {
                 ++iFile;
-                if (iFile >= Files.Length)
+                if (iFile >= Files.Count)
                     iFile = 0;
             }
             else if (SelectionMethod == SoundPlayCommand.Selection.Random)
             {
-                iFile = Viewer.Random.Next(Files.Length);
+                iFile = Viewer.Random.Next(Files.Count);
             }
 
             string[] pathArray = {  Path.Combine(Simulator.Instance.RoutePath, "SOUND"),
@@ -2319,7 +2318,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
     public class WorldSounds
     {
-        private Dictionary<string, List<WorldSoundRegion>> SoundRegions = new Dictionary<string, List<WorldSoundRegion>>();
+        private Dictionary<string, IList<WorldSoundRegion>> SoundRegions = new Dictionary<string, IList<WorldSoundRegion>>();
         private Viewer Viewer;
         private SoundSource ss;
 

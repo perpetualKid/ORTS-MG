@@ -198,7 +198,7 @@ namespace Orts.Simulation.Physics
 
         //To investigate coupler breaks on route
         private bool numOfCouplerBreaksNoted;
-        public static int NumOfCouplerBreaks = 0;//Debrief Eval //TODO 20201130 this sure is bound to the instance
+        public static int NumOfCouplerBreaks;//Debrief Eval //TODO 20201130 this sure is bound to the instance
         public bool DbfEvalValueChanged { get; set; }//Debrief Eval
 
         public TrainType TrainType { get; internal set; } = TrainType.Player;
@@ -215,8 +215,8 @@ namespace Orts.Simulation.Physics
         // max speed of player locomotive, max speed of consist (MaxVelocityA)
         internal float TrainMaxSpeedMpS { get; set; }
         public float AllowedMaxSpeedMpS { get; internal set; }                 // Max speed as allowed
-        internal float allowedMaxSpeedSignalMpS { get; set; }           // Max speed as set by signal
-        internal float allowedMaxSpeedLimitMpS { get; set; }            // Max speed as set by limit
+        internal float AllowedMaxSpeedSignalMpS { get; set; }           // Max speed as set by signal
+        internal float AllowedMaxSpeedLimitMpS { get; set; }            // Max speed as set by limit
         private protected float allowedMaxTempSpeedLimitMpS;        // Max speed as set by temp speed limit
         private protected float allowedAbsoluteMaxSpeedSignalMpS;   // Max speed as set by signal independently from train features
         private protected float allowedAbsoluteMaxSpeedLimitMpS;    // Max speed as set by limit independently from train features
@@ -518,8 +518,8 @@ namespace Orts.Simulation.Physics
             ControlMode = source.ControlMode;
 
             AllowedMaxSpeedMpS = source.AllowedMaxSpeedMpS;
-            allowedMaxSpeedLimitMpS = source.allowedMaxSpeedLimitMpS;
-            allowedMaxSpeedSignalMpS = source.allowedMaxSpeedSignalMpS;
+            AllowedMaxSpeedLimitMpS = source.AllowedMaxSpeedLimitMpS;
+            AllowedMaxSpeedSignalMpS = source.AllowedMaxSpeedSignalMpS;
             allowedAbsoluteMaxSpeedLimitMpS = source.allowedAbsoluteMaxSpeedLimitMpS;
             allowedAbsoluteMaxSpeedSignalMpS = source.allowedAbsoluteMaxSpeedSignalMpS;
 
@@ -572,8 +572,8 @@ namespace Orts.Simulation.Physics
             SlipperySpotLengthM = inf.ReadSingle();
             TrainMaxSpeedMpS = inf.ReadSingle();
             AllowedMaxSpeedMpS = inf.ReadSingle();
-            allowedMaxSpeedSignalMpS = inf.ReadSingle();
-            allowedMaxSpeedLimitMpS = inf.ReadSingle();
+            AllowedMaxSpeedSignalMpS = inf.ReadSingle();
+            AllowedMaxSpeedLimitMpS = inf.ReadSingle();
             allowedMaxTempSpeedLimitMpS = inf.ReadSingle();
             allowedAbsoluteMaxSpeedSignalMpS = inf.ReadSingle();
             allowedAbsoluteMaxSpeedLimitMpS = inf.ReadSingle();
@@ -879,8 +879,8 @@ namespace Orts.Simulation.Physics
             outf.Write(SlipperySpotLengthM);
             outf.Write(TrainMaxSpeedMpS);
             outf.Write(AllowedMaxSpeedMpS);
-            outf.Write(allowedMaxSpeedSignalMpS);
-            outf.Write(allowedMaxSpeedLimitMpS);
+            outf.Write(AllowedMaxSpeedSignalMpS);
+            outf.Write(AllowedMaxSpeedLimitMpS);
             outf.Write(allowedMaxTempSpeedLimitMpS);
             outf.Write(allowedAbsoluteMaxSpeedSignalMpS);
             outf.Write(allowedAbsoluteMaxSpeedLimitMpS);
@@ -2610,7 +2610,7 @@ namespace Orts.Simulation.Physics
                 if ((TrainMaxSpeedMpS <= 0f) && (LeadLocomotive != null))
                     TrainMaxSpeedMpS = (LeadLocomotive as MSTSLocomotive).MaxSpeedMpS;
                 AllowedMaxSpeedMpS = TrainMaxSpeedMpS;   // set default
-                allowedMaxSpeedSignalMpS = TrainMaxSpeedMpS;   // set default
+                AllowedMaxSpeedSignalMpS = TrainMaxSpeedMpS;   // set default
                 allowedMaxTempSpeedLimitMpS = AllowedMaxSpeedMpS; // set default
 
                 //  try to find first speed limits behind the train
@@ -2687,7 +2687,7 @@ namespace Orts.Simulation.Physics
                     }
                 }
 
-                allowedMaxSpeedLimitMpS = AllowedMaxSpeedMpS;   // set default
+                AllowedMaxSpeedLimitMpS = AllowedMaxSpeedMpS;   // set default
             }
 
             float distanceToLastObject = 9E29f;  // set to overlarge value
@@ -2884,11 +2884,11 @@ namespace Orts.Simulation.Physics
 
                             if (firstObject.SignalDetails.IsSignal)
                             {
-                                allowedMaxSpeedSignalMpS = tempMaxSpeedMps;
+                                AllowedMaxSpeedSignalMpS = tempMaxSpeedMps;
                             }
                             else if (firstObject.SpeedInfo.LimitedSpeedReduction == 0)
                             {
-                                allowedMaxSpeedLimitMpS = tempMaxSpeedMps;
+                                AllowedMaxSpeedLimitMpS = tempMaxSpeedMps;
                             }
                             else
                             {
@@ -2926,17 +2926,17 @@ namespace Orts.Simulation.Physics
                         {
                             if (firstObject.SignalDetails.IsSignal)
                             {
-                                allowedMaxSpeedSignalMpS = tempMaxSpeedMps;
+                                AllowedMaxSpeedSignalMpS = tempMaxSpeedMps;
                             }
                             else
                             {
-                                if (firstObject.SpeedInfo.LimitedSpeedReduction == 0) allowedMaxSpeedLimitMpS = tempMaxSpeedMps;
+                                if (firstObject.SpeedInfo.LimitedSpeedReduction == 0) AllowedMaxSpeedLimitMpS = tempMaxSpeedMps;
                                 else allowedMaxTempSpeedLimitMpS = tempMaxSpeedMps;
                             }
                         }
                         else if (firstObject.SignalDetails.IsSignal)
                         {
-                            allowedMaxSpeedSignalMpS = allowedAbsoluteMaxSpeedSignalMpS;
+                            AllowedMaxSpeedSignalMpS = allowedAbsoluteMaxSpeedSignalMpS;
                         }
                     }
 
@@ -2973,7 +2973,7 @@ namespace Orts.Simulation.Physics
                         {
                             int newSignalIndex = newObjectItem.SignalDetails.Index;
 
-                            noMoreNewSignals = NextSignalObject[0] == null || (NextSignalObject[0] != null && newSignalIndex == NextSignalObject[0].Index);
+                            noMoreNewSignals = NextSignalObject[0] == null || (newSignalIndex == NextSignalObject[0].Index);
 
                             if (!noMoreNewSignals)
                             {
@@ -3230,8 +3230,8 @@ namespace Orts.Simulation.Physics
         private void UpdateSpeedInfo()
         {
             float validSpeedMpS = AllowedMaxSpeedMpS;
-            float validSpeedSignalMpS = allowedMaxSpeedSignalMpS;
-            float validSpeedLimitMpS = allowedMaxSpeedLimitMpS;
+            float validSpeedSignalMpS = AllowedMaxSpeedSignalMpS;
+            float validSpeedLimitMpS = AllowedMaxSpeedLimitMpS;
             float validTempSpeedLimitMpS = allowedMaxTempSpeedLimitMpS;
 
             // update valid speed with pending actions
@@ -3768,7 +3768,7 @@ namespace Orts.Simulation.Physics
                     // Cycle down the train consist until the first stationary car is found that has its leading couplers starting to pull it. The next car is then started by allowing its speed to increase above 0.
                     f += car.TotalForceN - (car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN);
                     m += car.MassKG;
-                    if (car.IsPlayerTrain && simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
+                    if (car.IsPlayerTrain && !simulator.Settings.SimpleControlPhysics && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
                     {
                         if (j == Cars.Count - 1 || car.CouplerSlackM < car.AdvancedCouplerDynamicTensionSlackLimitM)
                             break;
@@ -3822,7 +3822,7 @@ namespace Orts.Simulation.Physics
                     // Cycle up the train consist until the first stationary car is found that has its leading couplers starting to pull it. The next car is then started by allowing its speed to increase above 0.
                     f += car.TotalForceN + car.FrictionForceN + car.BrakeForceN + car.CurveForceN + car.WindForceN + car.TunnelForceN;
                     m += car.MassKG;
-                    if (car.IsPlayerTrain && simulator.UseAdvancedAdhesion && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
+                    if (car.IsPlayerTrain && !simulator.Settings.SimpleControlPhysics && car.IsAdvancedCoupler) // "Advanced coupler" - operates in three extension zones
                     {
                         if (j == 0 || car.CouplerSlackM > car.AdvancedCouplerDynamicCompressionSlackLimitM)
                             break;
@@ -6433,20 +6433,20 @@ namespace Orts.Simulation.Physics
                 if (speedMpS > 0)
                 {
                     if (speedInfo.LimitedSpeedReduction == 0)
-                        allowedMaxSpeedLimitMpS = speedMpS;
+                        AllowedMaxSpeedLimitMpS = speedMpS;
                     else
                         allowedMaxTempSpeedLimitMpS = speedMpS;
                     if (simulator.TimetableMode)
                         AllowedMaxSpeedMpS = speedMpS;
                     else
-                        AllowedMaxSpeedMpS = Math.Min(allowedMaxSpeedLimitMpS, Math.Min(allowedMaxTempSpeedLimitMpS,
-                                       allowedMaxSpeedSignalMpS == -1 ? 999 : allowedMaxSpeedSignalMpS));
+                        AllowedMaxSpeedMpS = Math.Min(AllowedMaxSpeedLimitMpS, Math.Min(allowedMaxTempSpeedLimitMpS,
+                                       AllowedMaxSpeedSignalMpS == -1 ? 999 : AllowedMaxSpeedSignalMpS));
                 }
             }
             // No speed limits behind us, initialize allowedMaxSpeedLimitMpS.
             else if (!simulator.TimetableMode)
             {
-                AllowedMaxSpeedMpS = allowedMaxSpeedLimitMpS;
+                AllowedMaxSpeedMpS = AllowedMaxSpeedLimitMpS;
             }
 
             // check backward for last signal in direction of train - check with list of pending signal speeds
@@ -6464,20 +6464,20 @@ namespace Orts.Simulation.Physics
                     // if signal is now just behind train - set speed as signal speed limit, do not reenter in list
                     if (PassedSignalSpeeds.ContainsKey(signal.Index))
                     {
-                        allowedMaxSpeedSignalMpS = PassedSignalSpeeds[signal.Index];
-                        AllowedMaxSpeedMpS = Math.Min(allowedMaxSpeedSignalMpS, AllowedMaxSpeedMpS);
+                        AllowedMaxSpeedSignalMpS = PassedSignalSpeeds[signal.Index];
+                        AllowedMaxSpeedMpS = Math.Min(AllowedMaxSpeedSignalMpS, AllowedMaxSpeedMpS);
                         LastPassedSignal[routeDirection] = signal.Index;
                     }
                     // if signal is not last passed signal - reset signal speed limit
                     else if (signal.Index != LastPassedSignal[routeDirection])
                     {
-                        allowedMaxSpeedSignalMpS = TrainMaxSpeedMpS;
+                        AllowedMaxSpeedSignalMpS = TrainMaxSpeedMpS;
                         LastPassedSignal[routeDirection] = -1;
                     }
                     // set signal limit as speed limit
                     else
                     {
-                        AllowedMaxSpeedMpS = Math.Min(allowedMaxSpeedSignalMpS, AllowedMaxSpeedMpS);
+                        AllowedMaxSpeedMpS = Math.Min(AllowedMaxSpeedSignalMpS, AllowedMaxSpeedMpS);
                     }
                 }
                 else if (signal.SignalHeads[0].SignalFunction == SignalFunction.Speed)
@@ -6485,11 +6485,11 @@ namespace Orts.Simulation.Physics
                     SpeedInfo speedInfo = signal.SignalSpeed(SignalFunction.Speed);
                     if (speedInfo != null && speedInfo.Reset)
                     {
-                        allowedMaxSpeedSignalMpS = TrainMaxSpeedMpS;
+                        AllowedMaxSpeedSignalMpS = TrainMaxSpeedMpS;
                         if (simulator.TimetableMode)
-                            AllowedMaxSpeedMpS = allowedMaxSpeedLimitMpS;
+                            AllowedMaxSpeedMpS = AllowedMaxSpeedLimitMpS;
                         else
-                            AllowedMaxSpeedMpS = Math.Min(allowedMaxTempSpeedLimitMpS, allowedMaxSpeedLimitMpS);
+                            AllowedMaxSpeedMpS = Math.Min(allowedMaxTempSpeedLimitMpS, AllowedMaxSpeedLimitMpS);
                     }
                 }
             }
@@ -6531,14 +6531,14 @@ namespace Orts.Simulation.Physics
 
                         if (PassedSignalSpeeds.ContainsKey(signal.Index))
                         {
-                            allowedMaxSpeedSignalMpS = PassedSignalSpeeds[signal.Index];
+                            AllowedMaxSpeedSignalMpS = PassedSignalSpeeds[signal.Index];
                             if (simulator.TimetableMode)
-                                AllowedMaxSpeedMpS = Math.Min(AllowedMaxSpeedMpS, allowedMaxSpeedSignalMpS);
+                                AllowedMaxSpeedMpS = Math.Min(AllowedMaxSpeedMpS, AllowedMaxSpeedSignalMpS);
                             else
-                                AllowedMaxSpeedMpS = Math.Min(allowedMaxSpeedLimitMpS, Math.Min(allowedMaxTempSpeedLimitMpS, allowedMaxSpeedSignalMpS));
+                                AllowedMaxSpeedMpS = Math.Min(AllowedMaxSpeedLimitMpS, Math.Min(allowedMaxTempSpeedLimitMpS, AllowedMaxSpeedSignalMpS));
 
                             if (!remainingSignals.ContainsKey(signal.Index))
-                                remainingSignals.Add(signal.Index, allowedMaxSpeedSignalMpS);
+                                remainingSignals.Add(signal.Index, AllowedMaxSpeedSignalMpS);
                         }
                     }
                     else
@@ -6551,21 +6551,21 @@ namespace Orts.Simulation.Physics
                             {
                                 if (simulator.TimetableMode)
                                 {
-                                    allowedMaxSpeedLimitMpS = Math.Min(allowedMaxSpeedLimitMpS, speedMpS);
-                                    AllowedMaxSpeedMpS = allowedMaxSpeedLimitMpS;
+                                    AllowedMaxSpeedLimitMpS = Math.Min(AllowedMaxSpeedLimitMpS, speedMpS);
+                                    AllowedMaxSpeedMpS = AllowedMaxSpeedLimitMpS;
                                 }
                                 else
                                 {
-                                    allowedMaxSpeedLimitMpS = Math.Min(allowedMaxSpeedLimitMpS, speedMpS);
-                                    AllowedMaxSpeedMpS = Math.Min(allowedMaxSpeedLimitMpS, Math.Min(allowedMaxTempSpeedLimitMpS,
-                                       allowedMaxSpeedSignalMpS == -1 ? 999 : allowedMaxSpeedSignalMpS));
+                                    AllowedMaxSpeedLimitMpS = Math.Min(AllowedMaxSpeedLimitMpS, speedMpS);
+                                    AllowedMaxSpeedMpS = Math.Min(AllowedMaxSpeedLimitMpS, Math.Min(allowedMaxTempSpeedLimitMpS,
+                                       AllowedMaxSpeedSignalMpS == -1 ? 999 : AllowedMaxSpeedSignalMpS));
                                 }
                             }
                             else
                             {
                                 allowedMaxTempSpeedLimitMpS = Math.Min(allowedMaxTempSpeedLimitMpS, speedMpS);
-                                AllowedMaxSpeedMpS = Math.Min(allowedMaxSpeedLimitMpS, Math.Min(allowedMaxTempSpeedLimitMpS,
-                                    allowedMaxSpeedSignalMpS == -1 ? 999 : allowedMaxSpeedSignalMpS));
+                                AllowedMaxSpeedMpS = Math.Min(AllowedMaxSpeedLimitMpS, Math.Min(allowedMaxTempSpeedLimitMpS,
+                                    AllowedMaxSpeedSignalMpS == -1 ? 999 : AllowedMaxSpeedSignalMpS));
                             }
                         }
                     }
@@ -6596,8 +6596,8 @@ namespace Orts.Simulation.Physics
                     float speedMpS = IsFreight ? speedInfo.FreightSpeed : speedInfo.PassengerSpeed;
                     if (speedMpS > 0 && !PassedSignalSpeeds.ContainsKey(passedSignal.Index))
                     {
-                        allowedMaxSpeedSignalMpS = allowedMaxSpeedSignalMpS > 0 ? Math.Min(allowedMaxSpeedSignalMpS, speedMpS) : speedMpS;
-                        AllowedMaxSpeedMpS = Math.Min(AllowedMaxSpeedMpS, allowedMaxSpeedSignalMpS);
+                        AllowedMaxSpeedSignalMpS = AllowedMaxSpeedSignalMpS > 0 ? Math.Min(AllowedMaxSpeedSignalMpS, speedMpS) : speedMpS;
+                        AllowedMaxSpeedMpS = Math.Min(AllowedMaxSpeedMpS, AllowedMaxSpeedSignalMpS);
 
                         PassedSignalSpeeds.Add(passedSignal.Index, speedMpS);
                     }
@@ -8355,21 +8355,21 @@ namespace Orts.Simulation.Physics
 
             if (speedInfo.MaxSpeedMpSSignal > 0)
             {
-                allowedMaxSpeedSignalMpS = simulator.TimetableMode ? speedInfo.MaxSpeedMpSSignal : allowedAbsoluteMaxSpeedSignalMpS;
-                AllowedMaxSpeedMpS = Math.Min(speedInfo.MaxSpeedMpSSignal, Math.Min(allowedMaxSpeedLimitMpS, allowedMaxTempSpeedLimitMpS));
+                AllowedMaxSpeedSignalMpS = simulator.TimetableMode ? speedInfo.MaxSpeedMpSSignal : allowedAbsoluteMaxSpeedSignalMpS;
+                AllowedMaxSpeedMpS = Math.Min(speedInfo.MaxSpeedMpSSignal, Math.Min(AllowedMaxSpeedLimitMpS, allowedMaxTempSpeedLimitMpS));
             }
             if (speedInfo.MaxSpeedMpSLimit > 0)
             {
-                allowedMaxSpeedLimitMpS = simulator.TimetableMode ? speedInfo.MaxSpeedMpSLimit : allowedAbsoluteMaxSpeedLimitMpS;
+                AllowedMaxSpeedLimitMpS = simulator.TimetableMode ? speedInfo.MaxSpeedMpSLimit : allowedAbsoluteMaxSpeedLimitMpS;
                 if (simulator.TimetableMode)
                     AllowedMaxSpeedMpS = speedInfo.MaxSpeedMpSLimit;
                 else
-                    AllowedMaxSpeedMpS = Math.Min(speedInfo.MaxSpeedMpSLimit, Math.Min(allowedMaxSpeedSignalMpS, allowedMaxTempSpeedLimitMpS));
+                    AllowedMaxSpeedMpS = Math.Min(speedInfo.MaxSpeedMpSLimit, Math.Min(AllowedMaxSpeedSignalMpS, allowedMaxTempSpeedLimitMpS));
             }
             if (speedInfo.MaxTempSpeedMpSLimit > 0 && !simulator.TimetableMode)
             {
                 allowedMaxTempSpeedLimitMpS = allowedAbsoluteMaxTempSpeedLimitMpS;
-                AllowedMaxSpeedMpS = Math.Min(speedInfo.MaxTempSpeedMpSLimit, Math.Min(allowedMaxSpeedSignalMpS, allowedMaxSpeedLimitMpS));
+                AllowedMaxSpeedMpS = Math.Min(speedInfo.MaxTempSpeedMpSLimit, Math.Min(AllowedMaxSpeedSignalMpS, AllowedMaxSpeedLimitMpS));
             }
             if (IsActualPlayerTrain && AllowedMaxSpeedMpS > prevMaxSpeedMpS)
             {
@@ -9301,7 +9301,7 @@ namespace Orts.Simulation.Physics
                                 {
                                     int otherSectionIndex = routeElement.Direction == 0 ?
                                         otherPlatform.TCSectionIndex[0] :
-                                        otherPlatform.TCSectionIndex[platform.TCSectionIndex.Count - 1];
+                                        otherPlatform.TCSectionIndex[otherPlatform.TCSectionIndex.Count - 1];
                                     if (otherSectionIndex == beginSectionIndex)
                                     {
                                         if (otherPlatform.TrackCircuitOffset[Location.NearEnd, routeElement.Direction] < actualBegin)
@@ -9829,8 +9829,8 @@ namespace Orts.Simulation.Physics
         ///
         private void InitializeSpeeds()
         {
-            allowedMaxSpeedSignalMpS = allowedAbsoluteMaxSpeedSignalMpS;
-            allowedMaxSpeedLimitMpS = allowedAbsoluteMaxSpeedLimitMpS;
+            AllowedMaxSpeedSignalMpS = allowedAbsoluteMaxSpeedSignalMpS;
+            AllowedMaxSpeedLimitMpS = allowedAbsoluteMaxSpeedLimitMpS;
             allowedMaxTempSpeedLimitMpS = allowedAbsoluteMaxTempSpeedLimitMpS;
             TrainMaxSpeedMpS = Math.Min((float)simulator.TRK.Route.SpeedLimit, ((MSTSLocomotive)simulator.PlayerLocomotive).MaxSpeedMpS);
         }
@@ -10350,7 +10350,7 @@ namespace Orts.Simulation.Physics
 
                     circuitString.Append("...");
                 }
-                circuitString.Append(backstring.ToString());
+                circuitString.Append(backstring);
 
                 // train indication and direction
                 circuitString.Append("={");
@@ -10371,7 +10371,7 @@ namespace Orts.Simulation.Physics
                 {
                     BuildSectionString(forwardstring, ValidRoute[0][i].TrackCircuitSection, 0);
                 }
-                circuitString.Append(forwardstring.ToString());
+                circuitString.Append(forwardstring);
             }
 
             statusString[12] = circuitString.ToString();
@@ -10585,7 +10585,7 @@ namespace Orts.Simulation.Physics
                 if (startIndex < 0)
                     continue;
                 int index = startIndex;
-                float progressiveMaxSpeedLimitMpS = allowedMaxSpeedLimitMpS;
+                float progressiveMaxSpeedLimitMpS = AllowedMaxSpeedLimitMpS;
                 // NORMAL signals get data from a different place when in Auto mode
                 if (dir == Direction.Forward && (ControlMode == TrainControlMode.AutoNode || ControlMode == TrainControlMode.AutoSignal))
                 {
@@ -11088,7 +11088,7 @@ namespace Orts.Simulation.Physics
         /// </summary>
         internal void SetRoutePath(AIPath aiPath, bool usePosition)
         {
-            TrackDirection direction = (TrackDirection)(usePosition ? (int)FrontTDBTraveller.Direction : (RearTDBTraveller != null) ? (int)RearTDBTraveller?.Direction : -2);
+            TrackDirection direction = (TrackDirection)(usePosition ? (int)FrontTDBTraveller.Direction : (RearTDBTraveller != null) ? (int)RearTDBTraveller.Direction : -2);
             TCRoute = new TrackCircuitRoutePath(aiPath, direction, Length, Number);
             ValidRoute[0] = TCRoute.TCRouteSubpaths[TCRoute.ActiveSubPath];
         }

@@ -127,7 +127,7 @@ namespace ORTS.TrackViewer.Drawing
                 }
                 catch
                 {
-                    wfiles = new string[0];
+                    wfiles = Array.Empty<string>();
                 }
                 foreach (var fileName in wfiles)
                 {
@@ -500,11 +500,11 @@ namespace ORTS.TrackViewer.Drawing
             }
 
             // First force TrItemTable to exist in case it was not defined in the .tdb file
-            trackDB.AddTrackItems(new TrackItem[0]);
+            trackDB.AddTrackItems(Array.Empty<TrackItem>());
 
             // find rail track items
-            railTrackItemTable = new DrawableTrackItem[trackDB.TrackItems.Count()];
-            for (int i = 0; i < trackDB.TrackItems.Count(); i++)
+            railTrackItemTable = new DrawableTrackItem[trackDB.TrackItems.Length];
+            for (int i = 0; i < trackDB.TrackItems.Length; i++)
             {
                 TrackItem trackItem = trackDB.TrackItems[i];
                 DrawableTrackItem drawableTrackItem = DrawableTrackItem.CreateDrawableTrItem(trackItem);
@@ -515,8 +515,8 @@ namespace ORTS.TrackViewer.Drawing
             // find road track items
             if (roadTrackDB != null && roadTrackDB.TrItemTable != null)
             {
-                roadTrackItemTable = new DrawableTrackItem[roadTrackDB.TrItemTable.Count()];
-                for (int i = 0; i < roadTrackDB.TrItemTable.Count(); i++)
+                roadTrackItemTable = new DrawableTrackItem[roadTrackDB.TrItemTable.Length];
+                for (int i = 0; i < roadTrackDB.TrItemTable.Length; i++)
                 {
                     TrackItem trackItem = roadTrackDB.TrItemTable[i];
                     DrawableTrackItem drawableTrackItem = DrawableTrackItem.CreateDrawableTrItem(trackItem);

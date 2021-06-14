@@ -747,7 +747,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
         public float ExhaustDecelReduction = 0.75f; //Represents the percentage that exhaust will be reduced while engine is decreasing RPMs.
         public float ExhaustAccelIncrease = 2.0f; //Represents the percentage that exhaust will be increased while engine is increasing RPMs.
 
-        public bool DieselEngineConfigured = false; // flag to indicate that the user has configured a diesel engine prime mover code block in the ENG file
+        public bool DieselEngineConfigured; // flag to indicate that the user has configured a diesel engine prime mover code block in the ENG file
         /// <summary>
         /// Current Engine oil pressure in PSI
         /// </summary>
@@ -774,7 +774,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
         /// <summary>
         /// Oil failure/leakage is substracted from the DieselOilPressurePSI
         /// </summary>
-        public float dieseloilfailurePSI = 0f;              //Intended to be implemented later
+        public float dieseloilfailurePSI;              //Intended to be implemented later
         /// <summary>
         /// Actual Engine temperature
         /// </summary>
@@ -802,7 +802,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
         /// <summary>
         /// Cooling system indicator
         /// </summary>
-        public bool DieselTempCoolingRunning = false;
+        public bool DieselTempCoolingRunning;
 
         /// <summary>
         /// Load of the engine

@@ -365,7 +365,7 @@ namespace ORTS.TrackViewer.Editing
         {
             int bestIndex = -1;
             double bestDistance2 = 1e10f;
-            for (int j = 0; j < TrackDB.TrackNodes.Count(); j++)
+            for (int j = 0; j < TrackDB.TrackNodes.Length; j++)
             {
                 TrackNode tn = TrackDB.TrackNodes[j];
                 if (tn == null) continue;

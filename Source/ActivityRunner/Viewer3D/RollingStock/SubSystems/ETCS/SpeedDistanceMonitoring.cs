@@ -244,7 +244,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
                 }
             }
 
-            if (Unit != "")
+            if (!string.IsNullOrEmpty(Unit))
             {
                 var unitPosition = new Point((int)(UnitCenterPosition[0] - FontDialSpeeds.MeasureString(Unit) / Scale / 2f), (int)(UnitCenterPosition[1] - textHeight / 2f));
                 DialSpeeds.Add(new TextPrimitive(unitPosition, Color.White, Unit, FontDialSpeeds));
@@ -425,14 +425,14 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
 
             foreach (var text in CurrentSpeed)
             {
-                if (text.Text == String.Empty)
+                if (string.IsNullOrEmpty(text.Text))
                     continue;
                 x = position.X + (int)(text.Position.X * Scale);
                 y = position.Y + (int)(text.Position.Y * Scale);
                 text.Draw(spriteBatch, new Point(x, y));
             }
 
-            if (ReleaseSpeed.Text != String.Empty)
+            if (!string.IsNullOrEmpty(ReleaseSpeed.Text))
             {
                 x = position.X + (int)(ReleaseSpeed.Position.X * Scale);
                 y = position.Y + (int)(ReleaseSpeed.Position.Y * Scale);
@@ -487,13 +487,13 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
                 }
             }
         }
-        public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
+        public override void Draw(SpriteBatch spriteBatch, Point position)
         {
-            base.Draw(spriteBatch, drawPosition);
+            base.Draw(spriteBatch, position);
             if (TTIWidth > 0)
             {
-                if (TTIColor == Color.White) DrawRectangle(spriteBatch, drawPosition, 0, 0, 54, 54, ColorDarkGrey);
-                DrawRectangle(spriteBatch, drawPosition, (54 - TTIWidth) / 2, (54 - TTIWidth) / 2, TTIWidth, TTIWidth, TTIColor);
+                if (TTIColor == Color.White) DrawRectangle(spriteBatch, position, 0, 0, 54, 54, ColorDarkGrey);
+                DrawRectangle(spriteBatch, position, (54 - TTIWidth) / 2, (54 - TTIWidth) / 2, TTIWidth, TTIWidth, TTIColor);
             }
         }
     }

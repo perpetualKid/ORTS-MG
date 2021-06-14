@@ -342,7 +342,7 @@ namespace Orts.MultiPlayer
                 if (areas.Length >= 10)
                 {
                     MD5 = areas[9];
-                    if (MPManager.Instance().MD5Check == "")
+                    if (string.IsNullOrEmpty(MPManager.Instance().MD5Check))
                     {
                         MPManager.Instance().GetMD5HashFromTDBFile();
                     }
@@ -430,7 +430,7 @@ namespace Orts.MultiPlayer
 
             version = MPManager.Instance().version;
 
-            if (MPManager.Instance().MD5Check == "") MPManager.Instance().GetMD5HashFromTDBFile();
+            if (string.IsNullOrEmpty(MPManager.Instance().MD5Check)) MPManager.Instance().GetMD5HashFromTDBFile();
             MD5 = MPManager.Instance().MD5Check;
         }
         public override string ToString()
@@ -739,8 +739,8 @@ namespace Orts.MultiPlayer
     {
         public string user = "";
         public int num; //train number
-        public bool oldTrainReverseFormation = false;
-        public bool newTrainReverseFormation = false;
+        public bool oldTrainReverseFormation;
+        public bool newTrainReverseFormation;
         public string leadingID;
         public MSGPlayerTrainSw() { }
         public MSGPlayerTrainSw(string m)
@@ -748,7 +748,7 @@ namespace Orts.MultiPlayer
             string[] areas = m.Split('\r');
             if (areas.Length <= 1)
             {
-                throw new Exception("Parsing error in MSGPlayerTrainSw" + m);
+                throw new InvalidDataException($"Parsing error in MSGPlayerTrainSw {m}");
             }
             try
             {
@@ -1051,7 +1051,7 @@ namespace Orts.MultiPlayer
     {
         private static byte[] preState;
         private static SortedList<uint, TrackJunctionNode> SwitchState;
-        public bool OKtoSend = false;
+        public bool OKtoSend;
         private static byte[] switchStatesArray;
         public MSGSwitchStatus()
         {
@@ -1068,11 +1068,11 @@ namespace Orts.MultiPlayer
                         SwitchState.Add(key, trackJunctionNode);
                     }
                 }
-                switchStatesArray = new byte[SwitchState.Count() + 2];
+                switchStatesArray = new byte[SwitchState.Count + 2];
             }
             if (preState == null)
             {
-                preState = new byte[SwitchState.Count() + 2];
+                preState = new byte[SwitchState.Count + 2];
                 for (i = 0; i < preState.Length; i++) preState[i] = 0;
             }
             i = 0;
@@ -2522,7 +2522,7 @@ namespace Orts.MultiPlayer
         }
         public override string ToString()
         {
-            if (user == "") return "5: ALIVE"; //wrong, so just return an ALIVE string
+            if (string.IsNullOrEmpty(user)) return "5: ALIVE"; //wrong, so just return an ALIVE string
             string tmp = "UNCOUPLE " + user + "\t" + whichIsPlayer + "\t" + firstCarIDOld + "\t" + firstCarIDNew
                 + "\t" + location1.TileX + " " + location1.TileZ + " " + location1.Location.X.ToString(CultureInfo.InvariantCulture) + " " + location1.Location.Z.ToString(CultureInfo.InvariantCulture) + " " + Travelled1.ToString(CultureInfo.InvariantCulture) + " " + Speed1.ToString(CultureInfo.InvariantCulture) + " " + trainDirection + " " + oldTrainNumber + " " + mDirection1 + "\t"
                 + FillInString(1)
@@ -3008,7 +3008,7 @@ namespace Orts.MultiPlayer
     {
         private static byte[] preState;
         private static SortedList<long, SignalHead> signals;
-        public bool OKtoSend = false;
+        public bool OKtoSend;
         private bool SendEverything;
         private static byte[] signalsStates;
         private static List<int> changedAspectIndex = new List<int>();
@@ -3394,10 +3394,10 @@ namespace Orts.MultiPlayer
             if (MPManager.IsServer())//server check if need to tell others.
             {
                 //Trace.WriteLine(users);
-                if (users.Count() == 1 && users[0].Trim() == MPManager.GetUserName()) return;
-                if (users.Count() == 1 && users[0].Trim() == "0Server") return;
+                if (users.Length == 1 && users[0].Trim() == MPManager.GetUserName()) return;
+                if (users.Length == 1 && users[0].Trim() == "0Server") return;
                 //Trace.WriteLine(this.ToString());
-                MultiPlayer.MPManager.BroadCast(this.ToString());
+                MPManager.BroadCast(ToString());
             }
         }
 

@@ -350,7 +350,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <param name="isReleasedWithJump">True if sound possibly be released with jump</param>
         public static void Sweep(string name, bool isExternal, bool isReleasedWithJump)
         {
-            if (name == null || name == string.Empty)
+            if (string.IsNullOrEmpty(name))
                 return;
 
             string key = GetKey(name, isExternal, isReleasedWithJump);

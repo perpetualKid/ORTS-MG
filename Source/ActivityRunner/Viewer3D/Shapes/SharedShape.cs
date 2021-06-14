@@ -20,12 +20,12 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
         private static readonly List<string> shapeWarnings = new List<string>();
 
         // This data is common to all instances of the shape
-        public List<string> MatrixNames = new List<string>();
-        public Matrix[] Matrices = new Matrix[0];  // the original natural pose for this shape - shared by all instances
+        public IList<string> MatrixNames { get; private set; } = new List<string>();
+        public Matrix[] Matrices = Array.Empty<Matrix>();  // the original natural pose for this shape - shared by all instances
         public Animations Animations;
         public LodControl[] LodControls;
         public bool HasNightSubObj;
-        public int RootSubObjectIndex = 0;
+        public int RootSubObjectIndex;
         public string SoundFileName = "";
         public float BellAnimationFPS = 8;
 
@@ -41,7 +41,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
         private SharedShape()
         {
             FilePath = "Empty";
-            LodControls = new LodControl[0];
+            LodControls = Array.Empty<LodControl>();
         }
 
         internal static void Initialize(Viewer viewer)
@@ -99,15 +99,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
             }
 
             Matrices = sFile.Shape.Matrices.ToArray();
-            MatrixNames = sFile.Shape.Matrices.MatrixNames;
-            //var matrixCount = sFile.shape.matrices.Count;
-            //MatrixNames.Capacity = matrixCount;
-            //Matrices = new Matrix[matrixCount];
-            //for (var i = 0; i < matrixCount; ++i)
-            //{
-            //    MatrixNames.Add(sFile.shape.matrices[i].Name.ToUpper());
-            //    Matrices[i] = XNAMatrixFromMSTS(sFile.shape.matrices[i]);
-            //}
+            MatrixNames = new List<string>(sFile.Shape.Matrices.MatrixNames);
             Animations = sFile.Shape.Animations;
 
 #if DEBUG_SHAPE_HIERARCHY

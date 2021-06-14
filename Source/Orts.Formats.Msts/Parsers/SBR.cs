@@ -32,34 +32,34 @@ namespace Orts.Formats.Msts.Parsers
     /// </summary>
     public abstract class SBR : IDisposable
     {
-        public TokenID ID;
-        public string Label;  // First data item may be a label ( usually a 0 byte )
+        public TokenID ID { get; protected set; }
+        public string Label { get; protected set; }  // First data item may be a label ( usually a 0 byte )
         public string FileName { get; protected set; }
 
         public static SBR Open(string fileName)
         {
-            Stream fb = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+            Stream fileStream = new FileStream(fileName, FileMode.Open, FileAccess.Read);
 
             byte[] buffer = new byte[34];
-            fb.Read(buffer, 0, 2);
+            fileStream.Read(buffer, 0, 2);
 
             bool unicode = (buffer[0] == 0xFF && buffer[1] == 0xFE);  // unicode header
 
             string headerString;
             if (unicode)
             {
-                fb.Read(buffer, 0, 32);
-                headerString = System.Text.Encoding.Unicode.GetString(buffer, 0, 16);
+                fileStream.Read(buffer, 0, 32);
+                headerString = Encoding.Unicode.GetString(buffer, 0, 16);
             }
             else
             {
-                fb.Read(buffer, 2, 14);
-                headerString = System.Text.Encoding.ASCII.GetString(buffer, 0, 8);
+                fileStream.Read(buffer, 2, 14);
+                headerString = Encoding.ASCII.GetString(buffer, 0, 8);
             }
 
             // SIMISA@F  means compressed
             // SIMISA@@  means uncompressed
-            if (headerString.StartsWith("SIMISA@F"))
+            if (headerString.StartsWith("SIMISA@F", StringComparison.Ordinal))
             {
 
                 /* Skipping past the first two bytes. Those bytes are part of zlib specification (RFC 1950), not the deflate specification (RFC 1951) and 
@@ -69,51 +69,51 @@ namespace Orts.Formats.Msts.Parsers
                  * System.IO.Compression.DeflateStream, represents the deflate specification (RFC 1951) but not RFC 1950. So a workaround of skipping 
                  * past the first 2 bytes to get to the deflate data will work.
                 */
-                fb.Seek(2, SeekOrigin.Current);
-                fb = new DeflateStream(fb, CompressionMode.Decompress);
+                fileStream.Seek(2, SeekOrigin.Current);
+                fileStream = new DeflateStream(fileStream, CompressionMode.Decompress);
             }
-            else if (headerString.StartsWith("\r\nSIMISA"))
+            else if (headerString.StartsWith("\r\nSIMISA", StringComparison.Ordinal))
             {
                 // ie us1rd2l1000r10d.s, we are going to allow this but warn
                 Trace.TraceError("Improper header in " + fileName);
-                fb.Read(buffer, 0, 4);
+                fileStream.Read(buffer, 0, 4);
             }
-            else if (!headerString.StartsWith("SIMISA@@"))
+            else if (!headerString.StartsWith("SIMISA@@", StringComparison.Ordinal))
             {
-                throw new System.Exception("Unrecognized header \"" + headerString + "\" in " + fileName);
+                throw new InvalidDataException($"Unrecognized header \"{headerString}\" in {fileName}");
             }
 
             // Read SubHeader
             string subHeader;
             if (unicode)
             {
-                fb.Read(buffer, 0, 32);
-                subHeader = System.Text.Encoding.Unicode.GetString(buffer, 0, 16);
+                fileStream.Read(buffer, 0, 32);
+                subHeader = Encoding.Unicode.GetString(buffer, 0, 16);
             }
             else
             {
-                fb.Read(buffer, 0, 16);
-                subHeader = System.Text.Encoding.ASCII.GetString(buffer, 0, 8);
+                fileStream.Read(buffer, 0, 16);
+                subHeader = Encoding.ASCII.GetString(buffer, 0, 8);
             }
 
             // Select for binary vs text content
             if (subHeader[7] == 't')
             {
-                return new UnicodeFileReader(fb, fileName, unicode ? Encoding.Unicode : Encoding.ASCII);
+                return new UnicodeFileReader(fileStream, fileName, unicode ? Encoding.Unicode : Encoding.ASCII);
             }
             else if (subHeader[7] != 'b')
             {
-                throw new System.Exception("Unrecognized subHeader \"" + subHeader + "\" in " + fileName);
+                throw new InvalidDataException($"Unrecognized subHeader \"{subHeader}\" in {fileName}");
             }
 
             // And for binary types, select where their tokens will appear in our TokenID enum
             if (subHeader[5] == 'w')  // and [7] must be 'b'
             {
-                return new BinaryFileReader(fb, fileName, 300);
+                return new BinaryFileReader(fileStream, fileName, 300);
             }
             else
             {
-                return new BinaryFileReader(fb, fileName, 0);
+                return new BinaryFileReader(fileStream, fileName, 0);
             }
         }
 
@@ -134,7 +134,7 @@ namespace Orts.Formats.Msts.Parsers
         public void VerifyID(TokenID desiredID)
         {
            if (ID != desiredID)
-               TraceInformation("Expected block " + desiredID + "; got " + ID);
+               TraceInformation($"Expected block {desiredID}; got {ID}");
         }
 
         /// <summary>
@@ -149,7 +149,7 @@ namespace Orts.Formats.Msts.Parsers
             }
             else
             {
-                TraceInformation("Expected block comment; got " + ID);
+                TraceInformation($"Expected block comment; got {ID}");
                 Skip();
             }
         }
@@ -159,23 +159,25 @@ namespace Orts.Formats.Msts.Parsers
         public abstract void ThrowException(string message);
 
         #region IDisposable Support
-        private bool disposedValue = false; // To detect redundant calls
+        private bool disposed; // To detect redundant calls
 
         protected virtual void Dispose(bool disposing)
         {
             VerifyEndOfBlock();
-            if (!disposedValue)
+            if (!disposed)
             {
                 if (disposing)
                 {
                     // TODO: dispose managed state (managed objects).
                 }
-                disposedValue = true;
+                disposed = true;
             }
         }
+
         public void Dispose()
         {
             Dispose(true);
+            GC.SuppressFinalize(this);
         }
         #endregion
     }
@@ -207,21 +209,20 @@ namespace Orts.Formats.Msts.Parsers
         {
             if (closed) return;
 
-            string s = stf.ReadItem();
-            string extraData = s;
-            if (s != "")
+            string token = stf.ReadItem();
+            if (!string.IsNullOrEmpty(token))
             {
                 // we have extra data at the end of the file
-                while (s != "")
+                while (!string.IsNullOrEmpty(token))
                 {
-                    if (s != ")")  // we'll ignore extra )'s since the files are full of misformed brackets
+                    if (token != ")")  // we'll ignore extra )'s since the files are full of misformed brackets
                     {
-                        TraceWarning("Expected end of file; got '" + s + "'");
+                        TraceWarning($"Expected end of file; got '{token}'");
                         stf.Dispose();
                         closed = true;
                         return;
                     }
-                    s = stf.ReadItem();
+                    token = stf.ReadItem();
                 }
             }
             stf.Dispose();
@@ -235,7 +236,7 @@ namespace Orts.Formats.Msts.Parsers
         /// <returns></returns>
         public override bool EndOfBlock()
         {
-            return closed || endOfBlock || stf.PeekPastWhitespace() == -1;
+            return closed || endOfBlockReached || stf.PeekPastWhitespace() == -1;
         }
     }
 
@@ -244,8 +245,8 @@ namespace Orts.Formats.Msts.Parsers
     /// </summary>
     public class UnicodeBlockReader : SBR
     {
-        protected STFReader stf;
-        protected bool endOfBlock;
+        private protected STFReader stf;
+        private protected bool endOfBlockReached;
 
         public override SBR ReadSubBlock()
         {
@@ -289,8 +290,7 @@ namespace Orts.Formats.Msts.Parsers
 
             if (EnumExtension.GetValue(token, out TokenID tokenID))
                 return tokenID;
-            else if (string.Compare(token, "SKIP", true) == 0 || string.Compare(token, "COMMENT", true) == 0 
-                || token.StartsWith("#"))
+            else if ("SKIP".Equals(token, StringComparison.OrdinalIgnoreCase) || "COMMENT".Equals(token, StringComparison.OrdinalIgnoreCase) || token.StartsWith('#'))
                 return TokenID.Comment;
             else
             {
@@ -305,17 +305,17 @@ namespace Orts.Formats.Msts.Parsers
         /// <returns></returns>
         public override void Skip()
         {
-            if (endOfBlock) return;  // already there
+            if (endOfBlockReached) return;  // already there
 
             // We are inside a pair of brackets, skip the entire hierarchy to past the end bracket
             int depth = 1;
             while (depth > 0)
             {
                 string token = stf.ReadItem();
-                if (token == "")
+                if (string.IsNullOrEmpty(token))
                 {
                     TraceWarning("Unexpected end of file");
-                    endOfBlock = true;
+                    endOfBlockReached = true;
                     return;
                 }
                 if (token == "(")
@@ -323,7 +323,7 @@ namespace Orts.Formats.Msts.Parsers
                 if (token == ")")
                     --depth;
             }
-            endOfBlock = true;
+            endOfBlockReached = true;
         }
 
         /// <summary>
@@ -333,25 +333,25 @@ namespace Orts.Formats.Msts.Parsers
         /// <returns></returns>
         public override bool EndOfBlock()
         {
-            return endOfBlock || stf.PeekPastWhitespace() == ')' || stf.EOF();
+            return endOfBlockReached || stf.PeekPastWhitespace() == ')' || stf.EOF();
         }
 
         public override void VerifyEndOfBlock()
         {
-            if (!endOfBlock)
+            if (!endOfBlockReached)
             {
-                string s = stf.ReadItem();
-                if (s.StartsWith("#") || 0 == string.Compare(s, "comment", true))
+                string token = stf.ReadItem();
+                if (token.StartsWith('#') || "comment".Equals(token, StringComparison.OrdinalIgnoreCase))
                 {
                     // allow comments at end of block ie
                     // MaxReleaseRate( 1.4074  #For train position 31-45  use (1.86 - ( 0.0146 * 31 ))	)
                     Skip();
                     return;
                 }
-                if (s != ")")
-                    TraceWarning("Expected end of block; got '" + s + "'");
+                if (token != ")")
+                    TraceWarning($"Expected end of block; got '{token}'");
 
-                endOfBlock = true;
+                endOfBlockReached = true;
             }
         }
 
@@ -389,12 +389,11 @@ namespace Orts.Formats.Msts.Parsers
         /// the TokenID enum.  For some file types, ie .W files, the token value's 
         /// will be offset into the TokenID table by the specified tokenOffset.
         /// </summary>
-        /// <param name="fb"></param>
         public BinaryFileReader(Stream inputStream, string fileName, int tokenOffset)
         {
             FileName = fileName;
-            InputStream = new BinaryReader(inputStream);
-            TokenOffset = tokenOffset;
+            base.InputStream = new BinaryReader(inputStream);
+            base.tokenOffset = tokenOffset;
         }
 
         public override void Skip()
@@ -421,10 +420,10 @@ namespace Orts.Formats.Msts.Parsers
     /// </summary>
     public class BinaryBlockReader : SBR
     {
-        public BinaryReader InputStream;
-        public uint RemainingBytes;  // number of bytes in this block not yet read from the stream
-        public uint Flags;
-        protected int TokenOffset;     // the binaryTokens are offset by this amount, ie for binary world files 
+        internal BinaryReader InputStream { get; private protected set; }
+        public uint RemainingBytes { get; private set; } // number of bytes in this block not yet read from the stream
+        public uint Flags { get; private set; }
+        private protected int tokenOffset;     // the binaryTokens are offset by this amount, ie for binary world files 
 
         public override SBR ReadSubBlock()
         {
@@ -432,11 +431,11 @@ namespace Orts.Formats.Msts.Parsers
             {
                 FileName = FileName,
                 InputStream = InputStream,
-                TokenOffset = TokenOffset
+                tokenOffset = tokenOffset
             };
 
             int MSTSToken = InputStream.ReadUInt16();
-            block.ID = (TokenID)(MSTSToken + TokenOffset);
+            block.ID = (TokenID)(MSTSToken + tokenOffset);
             block.Flags = InputStream.ReadUInt16();
             block.RemainingBytes = InputStream.ReadUInt32(); // record length
 
@@ -448,7 +447,7 @@ namespace Orts.Formats.Msts.Parsers
             if (labelLength > 0)
             {
                 byte[] buffer = InputStream.ReadBytes(labelLength * 2);
-                block.Label = System.Text.Encoding.Unicode.GetString(buffer, 0, labelLength * 2);
+                block.Label = Encoding.Unicode.GetString(buffer, 0, labelLength * 2);
                 block.RemainingBytes -= (uint)labelLength * 2;
             }
             return block;
@@ -458,7 +457,7 @@ namespace Orts.Formats.Msts.Parsers
         {
             if (RemainingBytes > 0)
             {
-                if (RemainingBytes > Int32.MaxValue)
+                if (RemainingBytes > int.MaxValue)
                 {
                     TraceWarning("Remaining Bytes overflow");
                     RemainingBytes = 1000;
@@ -477,7 +476,7 @@ namespace Orts.Formats.Msts.Parsers
         {
             if (!EndOfBlock())
             {
-                TraceWarning("Expected end of block " + ID + "; got more data");
+                TraceWarning($"Expected end of block {ID}; got more data");
                 Skip();
             }
         }
@@ -492,9 +491,9 @@ namespace Orts.Formats.Msts.Parsers
             if (count > 0)
             {
                 byte[] b = InputStream.ReadBytes(count * 2);
-                string s = System.Text.Encoding.Unicode.GetString(b);
+                string token = Encoding.Unicode.GetString(b);
                 RemainingBytes -= (uint)(count * 2 + 2);
-                return s;
+                return token;
             }
             else
             {
@@ -519,22 +518,26 @@ namespace Orts.Formats.Msts.Parsers
     }
 
     [Serializable]
+#pragma warning disable CA1032 // Implement standard exception constructors
+#pragma warning disable CA2229 // Implement serialization constructors
     public class SBRException : Exception
+#pragma warning restore CA2229 // Implement serialization constructors
+#pragma warning restore CA1032 // Implement standard exception constructors
     {
         public static void TraceWarning(BinaryBlockReader sbr, string message)
         {
-            long position = (sbr.InputStream.BaseStream is DeflateStream deflateStream) ? deflateStream.BaseStream.Position : sbr.InputStream.BaseStream.Position;
-            Trace.TraceWarning("{2} in {0}:byte {1}", sbr.FileName, position, message);
+            long position = (sbr?.InputStream.BaseStream is DeflateStream deflateStream) ? deflateStream.BaseStream.Position : sbr.InputStream.BaseStream.Position;
+            Trace.TraceWarning($"{message} in {sbr.FileName}:byte {position}");
         }
 
         public static void TraceInformation(BinaryBlockReader sbr, string message)
         {
-            long position = (sbr.InputStream.BaseStream is DeflateStream deflateStream) ? deflateStream.BaseStream.Position : sbr.InputStream.BaseStream.Position;
-            Trace.TraceInformation("{2} in {0}:byte {1}", sbr.FileName, position, message);
+            long position = (sbr?.InputStream.BaseStream is DeflateStream deflateStream) ? deflateStream.BaseStream.Position : sbr.InputStream.BaseStream.Position;
+            Trace.TraceInformation($"{message} in {sbr.FileName}:byte {position}");
         }
 
         public SBRException(BinaryBlockReader sbr, string message)
-            : base($"{message} in {sbr.FileName}:byte {((sbr.InputStream.BaseStream is DeflateStream deflateStream) ? deflateStream.BaseStream.Position : sbr.InputStream.BaseStream.Position)}\n")
+            : base($"{message} in {sbr?.FileName}:byte {((sbr?.InputStream.BaseStream is DeflateStream deflateStream) ? deflateStream.BaseStream.Position : sbr.InputStream.BaseStream.Position)}\n")
         {
         }
     }

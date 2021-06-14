@@ -15,6 +15,7 @@
 // You should have received a copy of the GNU General Public License
 // along with Open Rails.  If not, see <http://www.gnu.org/licenses/>.
 
+using Orts.Common;
 using Orts.Formats.Msts.Parsers;
 
 using System.IO;
@@ -23,34 +24,40 @@ using System.IO;
 // </Comment>
 namespace Orts.Formats.Msts.Files
 {
+    public enum SpeedPostShapeNames
+    { 
+        Warning,
+        StartRestriction,
+        EndRestriction
+    }
 
     public class SpeedpostDatFile
 	{
         /// <summary>
         /// contains only shape names for temporary speed restrictions (warning, begin, end)
         /// </summary>
-		public string[] ShapeNames { get; private set; } = new string[3];
+        public EnumArray<string, SpeedPostShapeNames> ShapeNames { get; } = new EnumArray<string, SpeedPostShapeNames>();
 
 		public SpeedpostDatFile(string fileName, string shapePath)
 		{
 			using (STFReader stf = new STFReader(fileName, false))
 			{
                 stf.ParseBlock(new STFReader.TokenProcessor[] {
-                    new STFReader.TokenProcessor("speed_warning_sign_shape", () => ReadShapeInfo(stf, 0, shapePath)),
-                    new STFReader.TokenProcessor("restricted_shape", () => ReadShapeInfo(stf, 1, shapePath)),
-                    new STFReader.TokenProcessor("end_restricted_shape", () => ReadShapeInfo(stf, 2, shapePath)),
+                    new STFReader.TokenProcessor("speed_warning_sign_shape", () => ReadShapeInfo(stf, SpeedPostShapeNames.Warning, shapePath)),
+                    new STFReader.TokenProcessor("restricted_shape", () => ReadShapeInfo(stf, SpeedPostShapeNames.StartRestriction, shapePath)),
+                    new STFReader.TokenProcessor("end_restricted_shape", () => ReadShapeInfo(stf, SpeedPostShapeNames.EndRestriction, shapePath)),
                 });
 			}
 		}
 
-        private void ReadShapeInfo(STFReader stf, int index, string path)
+        private void ReadShapeInfo(STFReader stf, SpeedPostShapeNames shapeName, string path)
         {
             string dataItem = stf.ReadStringBlock(null);
             if (dataItem != null)
             {
                 dataItem = Path.Combine(path, dataItem);
                 if (File.Exists(dataItem))
-                    ShapeNames[index] = dataItem;
+                    ShapeNames[shapeName] = dataItem;
                 else
                     STFException.TraceWarning(stf, $"Non-existent shape file {dataItem} referenced");
             }

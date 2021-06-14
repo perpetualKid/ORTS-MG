@@ -64,7 +64,7 @@ namespace Orts.ContentManager
         {
             InitializeComponent();
 
-            settings = new UserSettings(new string[0]);
+            settings = new UserSettings(Array.Empty<string>());
             contentManager = new ContentManager(settings.FolderSettings);
 
             // Start off the tree with the Content Manager itself at the root and expand to show packages.
@@ -100,7 +100,7 @@ namespace Orts.ContentManager
         private async void TreeViewContent_BeforeExpand(object sender, TreeViewCancelEventArgs e)
         {
             // Are we about to expand a not-yet-loaded node? This is identified by a single child with no text or tag.
-            if (e.Node.Tag != null && e.Node.Tag is Content && e.Node.Nodes.Count == 1 && e.Node.Nodes[0].Text == "" && e.Node.Nodes[0].Tag == null)
+            if (e.Node.Tag != null && e.Node.Tag is Content && e.Node.Nodes.Count == 1 && string.IsNullOrEmpty(e.Node.Nodes[0].Text) && e.Node.Nodes[0].Tag == null)
             {
                 // Make use of the single child to show a loading message.
                 e.Node.Nodes[0].Text = "Loading...";
@@ -114,10 +114,10 @@ namespace Orts.ContentManager
                 {
 
                     Content content = e.Node.Tag as Content;
-                    var nodes = await Task.Run(() => ExpandTreeView(content, ctsExpanding.Token));
+                    var nodes = await Task.Run(() => ExpandTreeView(content, ctsExpanding.Token)).ConfigureAwait(false);
 
                     //// Collapse node if we're going to end up with no child nodes.
-                    if (nodes.Count() == 0)
+                    if (!nodes.Any())
                     {
                         e.Node.Collapse();
                     }

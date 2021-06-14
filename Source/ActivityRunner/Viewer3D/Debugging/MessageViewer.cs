@@ -42,9 +42,9 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
         private void ReplySelectedClick(object sender, EventArgs e)
         {
             string msg = MSG.Text
-                .Replace("\r", "")
-                .Replace("\t", "");
-            if (msg == "")
+                .Replace("\r", "", StringComparison.Ordinal)
+                .Replace("\t", "", StringComparison.Ordinal);
+            if (msg.Length == 0)
                 return;
             if (messages.SelectedItems.Count > 0)
             {

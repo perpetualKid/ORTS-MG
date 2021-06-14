@@ -62,7 +62,7 @@ namespace Orts.Formats.Msts.Files
         {
         }
 
-        public ORTrackData(STFReader stf)
+        internal ORTrackData(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {

@@ -5,6 +5,8 @@ using System.Windows.Forms;
 using Orts.Common.Info;
 using Orts.Common.Logging;
 
+[assembly: CLSCompliant(false)]
+
 namespace Orts.TrackViewer
 {
     public static class Program

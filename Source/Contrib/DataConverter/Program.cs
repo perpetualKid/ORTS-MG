@@ -21,6 +21,8 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 
+[assembly: CLSCompliant(false)]
+
 namespace Orts.DataConverter
 {
     internal class Program

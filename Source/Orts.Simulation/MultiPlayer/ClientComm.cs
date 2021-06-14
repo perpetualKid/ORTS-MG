@@ -37,7 +37,7 @@ namespace Orts.MultiPlayer
 		public string UserName;
 		public string Code;
 		public Decoder decoder;
-		public bool Connected = false;
+		public bool Connected;
 
 		public void Stop()
 		{

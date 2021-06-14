@@ -28,6 +28,8 @@ using Orts.Common.Info;
 using Orts.Common.Native;
 using Orts.Settings;
 
+[assembly: CLSCompliant(false)]
+
 namespace Orts.ActivityRunner
 {
     internal static class Program

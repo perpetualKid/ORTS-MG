@@ -508,8 +508,8 @@ namespace Orts.ActivityRunner.Viewer3D
             else ObjectRadius = DTrackData.Radius * (float)Math.Sin(0.5 * Math.Abs(DTrackData.Length)); // half chord length
         }
 
-        private int offSet = 0;
-        private int whichCase = 0;
+        private int offSet;
+        private int whichCase;
         private float elevated;
         /// <summary>
         /// Builds a SuperElevation LOD to SuperElevationProfile specifications as one vertex buffer and one index buffer.

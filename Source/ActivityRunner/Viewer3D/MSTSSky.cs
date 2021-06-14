@@ -42,7 +42,7 @@ namespace Orts.ActivityRunner.Viewer3D
         public const int skySides = 24;
         public static int skyHeight;
         public const short skyLevels = 4;
-        public static bool IsNight = false;
+        public static bool IsNight;
         public static float mstsskyTileu;
         public static float mstsskyTilev;
         public static float mstscloudTileu;
@@ -84,7 +84,7 @@ namespace Orts.ActivityRunner.Viewer3D
         public float mstsskyovercastFactor;
         // Fog distance
         public float mstsskyfogDistance;
-        public bool isNight = false;
+        public bool isNight;
 
         public List<string> SkyLayers = new List<string>();
 
@@ -553,7 +553,7 @@ namespace Orts.ActivityRunner.Viewer3D
             // TODO: This should happen on the loader thread. 
             if (viewer.ENVFile.SkyLayers != null)
             {
-                var mstsskytexture = Viewer.ENVFile.SkyLayers.ToArray();
+                var mstsskytexture = Viewer.ENVFile.SkyLayers;
                 int count = Viewer.ENVFile.SkyLayers.Count;
 
                 string[] mstsSkyTextureNames = new string[Viewer.ENVFile.SkyLayers.Count];
@@ -568,7 +568,7 @@ namespace Orts.ActivityRunner.Viewer3D
                         mstsskytexturex = mstsskytexture[i].TileX;
                         mstsskytexturey = mstsskytexture[i].TileY;
                     }
-                    else if (mstsskytexture[i].Fadein_Begin_Time != null)
+                    else if (mstsskytexture[i].FadeinStartTime != null)
                     {
                         mstsSkyStarTexture = mstsSkyTextures[i];
                         mstsskytexturex = mstsskytexture[i].TileX;

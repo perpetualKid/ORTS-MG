@@ -33,11 +33,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
         private readonly MSTSElectricLocomotive Locomotive;
         private readonly Simulator Simulator;
 
-        public bool Activated = false;
+        public bool Activated;
         private string ScriptName = "Automatic";
         private CircuitBreaker Script;
 
-        private float DelayS = 0f;
+        private float DelayS;
 
         public CircuitBreakerState State { get; private set; }
         public bool DriverClosingOrder { get; private set; }

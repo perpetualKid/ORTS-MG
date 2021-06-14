@@ -506,7 +506,8 @@ namespace Orts.ActivityRunner.Viewer3D
                         else
                         {
                             sceneryObjects.Add(new StaticShape(
-                                tempSpeedItem.IsWarning ? Viewer.SpeedpostDatFile.ShapeNames[0] : (tempSpeedItem.IsResume ? Viewer.SpeedpostDatFile.ShapeNames[2] : Viewer.SpeedpostDatFile.ShapeNames[1]),
+                                tempSpeedItem.IsWarning ? Viewer.SpeedpostDatFile.ShapeNames[SpeedPostShapeNames.Warning] : 
+                                (tempSpeedItem.IsResume ? Viewer.SpeedpostDatFile.ShapeNames[SpeedPostShapeNames.EndRestriction] : Viewer.SpeedpostDatFile.ShapeNames[SpeedPostShapeNames.StartRestriction]),
                                 tempSpeedItem.WorldPosition, ShapeFlags.None));
                         }
                     }

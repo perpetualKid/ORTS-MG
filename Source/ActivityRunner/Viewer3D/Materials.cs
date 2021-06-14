@@ -142,7 +142,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public static Texture2D Get(GraphicsDevice graphicsDevice, string path)
         {
-            if (path == null || path == "")
+            if (string.IsNullOrEmpty(path))
                 return SharedMaterialManager.MissingTexture;
 
             path = path.ToLowerInvariant();
@@ -779,10 +779,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 missingTexture = dayTexture;
             else if (nightTexture != null && nightTexture != SharedMaterialManager.MissingTexture)
                 missingTexture = nightTexture;
-            if (missingTexture.Tag is AceInfo aceInfo)
-                aceAlphaBits = aceInfo.AlphaBits;
-            else
-                aceAlphaBits = 0;
+            aceAlphaBits = missingTexture.Tag is byte alphaBits ? alphaBits : byte.MinValue; 
 
             // map shader techniques from Name to their index to avoid costly name-based lookups at runtime
             //this can be static as the techniques are constant for all scenery

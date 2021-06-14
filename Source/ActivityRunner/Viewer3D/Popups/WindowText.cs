@@ -414,11 +414,11 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             {
                 Font = font;
                 OutlineSize = outlineSize;
-                Characters = new char[0];
-                Boxes = new Rectangle[0];
+                Characters = Array.Empty<char>();
+                Boxes = Array.Empty<Rectangle>();
                 BoxesMaxRight = 0;
                 BoxesMaxBottom = 0;
-                AbcWidths = new Vector3[0];
+                AbcWidths = Array.Empty<Vector3>();
             }
 
             public CharacterGroup(char[] characters, CharacterGroup mergeGroup)

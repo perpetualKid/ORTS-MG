@@ -33,7 +33,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.PowerSupplies
         private readonly Pantographs Pantographs;
         public ScriptedCircuitBreaker CircuitBreaker;
 
-        public bool Activated = false;
+        public bool Activated;
         private string ScriptName = "Default";
         private ElectricPowerSupply Script;
 

@@ -519,10 +519,10 @@ namespace Orts.Simulation.AIs
         public int RouteIndex;
         public int TCSectionIndex;
         public int Direction;
-        protected int TriggerDistance = 0;
-        public bool LinkedAuxAction = false;
+        protected int TriggerDistance;
+        public bool LinkedAuxAction;
         protected List<KeyValuePair<int, WorldLocation>> AskingTrain;
-        public Signal SignalReferenced = null;
+        public Signal SignalReferenced;
         public float RequiredSpeedMpS;
         public float RequiredDistance;
         public int Delay;
@@ -698,7 +698,7 @@ namespace Orts.Simulation.AIs
 
     internal class AIActionWPRef : AIAuxActionsRef
     {
-        public AuxActionWPItem keepIt = null;
+        public AuxActionWPItem keepIt;
 
         public AIActionWPRef(Train thisTrain, float distance, float requiredSpeedMpS, int subrouteIdx, int routeIdx, int sectionIdx, int dir)
             : base(thisTrain, distance, requiredSpeedMpS, subrouteIdx, routeIdx, sectionIdx, dir, AuxActionRef.AuxiliaryAction.WaitingPoint)
@@ -1040,10 +1040,10 @@ namespace Orts.Simulation.AIs
 
     internal class AIActSigDelegateRef : AIAuxActionsRef
     {
-        public bool IsAbsolute = false;
+        public bool IsAbsolute;
         public AIActionWPRef AssociatedWPAction;
         public float brakeSection;
-        protected AuxActSigDelegate AssociatedItem = null;  //  In order to Unlock the signal when removing Action Reference
+        protected AuxActSigDelegate AssociatedItem;  //  In order to Unlock the signal when removing Action Reference
 
         public AIActSigDelegateRef(Train thisTrain, float distance, float requiredSpeedMpS, int subrouteIdx, int routeIdx, int sectionIdx, int dir, AIActionWPRef associatedWPAction = null)
             : base(thisTrain, distance, requiredSpeedMpS, subrouteIdx, routeIdx, sectionIdx, dir, AuxiliaryAction.SignalDelegate)
@@ -1178,8 +1178,8 @@ namespace Orts.Simulation.AIs
     internal class AuxActionItem : AIActionItem
     {
         public AuxActionRef ActionRef;
-        public bool Triggered = false;
-        public bool Processing = false;
+        public bool Triggered;
+        public bool Processing;
         public AiMovementState currentMvmtState = AiMovementState.InitAction;
         public Signal SignalReferenced { get { return ((AIAuxActionsRef)ActionRef).SignalReferenced; } set { } }
 

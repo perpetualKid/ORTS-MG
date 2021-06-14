@@ -20,7 +20,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
         protected double animationKey;  // advances with time
         protected Turntable Turntable; // linked turntable data
         private readonly SoundSource Sound;
-        private bool Rotating = false;
+        private bool Rotating;
         protected int IAnimationMatrix = -1; // index of animation matrix
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace Orts.ActivityRunner.Viewer3D.Shapes
         protected double animationKey;  // advances with time
         protected Transfertable Transfertable; // linked turntable data
         private readonly SoundSource Sound;
-        private bool Translating = false;
+        private bool Translating;
         protected int IAnimationMatrix = -1; // index of animation matrix
 
         /// <summary>

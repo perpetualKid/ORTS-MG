@@ -63,9 +63,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
             NotchController.CurrentNotch = 0;
         }
 
-        public override float Update(double elapsedClockSeconds)
+        public override float Update(double elapsedSeconds)
         {
-            float value = NotchController.Update(elapsedClockSeconds);
+            float value = NotchController.Update(elapsedSeconds);
             SetCurrentValue(value);
             SetUpdateValue(NotchController.UpdateValue);
             return value;

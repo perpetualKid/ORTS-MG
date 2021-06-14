@@ -87,7 +87,7 @@ namespace ORTS.TrackViewer.Drawing
                 worldTileRanges[TileX] = new List<int>();
                 int currentTileZ = worldTiles[TileX][0];
                 worldTileRanges[TileX].Add(currentTileZ);
-                for (int i = 1; i < worldTiles[TileX].Count(); i++)
+                for (int i = 1; i < worldTiles[TileX].Count; i++)
                 {
                     int nextTileZ = worldTiles[TileX][i];
                     if (nextTileZ != currentTileZ + 1)

@@ -70,7 +70,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
         public static readonly Color ColorShadow = new Color(8, 24, 57);
 
         // Some DMIs use black for the background and white for borders, instead of blue scale
-        public readonly bool BlackWhiteTheme = false;
+        public readonly bool BlackWhiteTheme;
 
         public Texture2D ColorTexture { get; private set; }
 
@@ -424,60 +424,60 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
             Width = width;
             Height = height;
         }
-        public virtual void Draw(SpriteBatch spriteBatch, Point drawPosition)
+        public virtual void Draw(SpriteBatch spriteBatch, Point position)
         {
-            if (BackgroundColor != Color.Transparent) DrawRectangle(spriteBatch, drawPosition, 0, 0, Width, Height, BackgroundColor);
+            if (BackgroundColor != Color.Transparent) DrawRectangle(spriteBatch, position, 0, 0, Width, Height, BackgroundColor);
 
             foreach (var r in Rectangles)
             {
-                if (r.DrawAsInteger) DrawIntRectangle(spriteBatch, drawPosition, r.X, r.Y, r.Width, r.Height, r.Color);
-                else DrawRectangle(spriteBatch, drawPosition, r.X, r.Y, r.Width, r.Height, r.Color);
+                if (r.DrawAsInteger) DrawIntRectangle(spriteBatch, position, r.X, r.Y, r.Width, r.Height, r.Color);
+                else DrawRectangle(spriteBatch, position, r.X, r.Y, r.Width, r.Height, r.Color);
             }
             foreach(var text in Texts)
             {
-                int x = drawPosition.X + (int)Math.Round(text.Position.X * Scale);
-                int y = drawPosition.Y + (int)Math.Round(text.Position.Y * Scale);
+                int x = position.X + (int)Math.Round(text.Position.X * Scale);
+                int y = position.Y + (int)Math.Round(text.Position.Y * Scale);
                 text.Draw(spriteBatch, new Point(x, y));
             }
             foreach(var tex in Textures)
             {
-                DrawSymbol(spriteBatch, tex.Texture, drawPosition, tex.Position.Y, tex.Position.Y);
+                DrawSymbol(spriteBatch, tex.Texture, position, tex.Position.Y, tex.Position.Y);
             }
             if (FlashingFrame && DMI.Blinker4Hz)
             {
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, 2, Height, ColorYellow);
-                DrawIntRectangle(spriteBatch, drawPosition, Width - 2, 0, 2, Height, ColorYellow);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, Width, 2, ColorYellow);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, Height - 2, Width, 2, ColorYellow);
+                DrawIntRectangle(spriteBatch, position, 0, 0, 2, Height, ColorYellow);
+                DrawIntRectangle(spriteBatch, position, Width - 2, 0, 2, Height, ColorYellow);
+                DrawIntRectangle(spriteBatch, position, 0, 0, Width, 2, ColorYellow);
+                DrawIntRectangle(spriteBatch, position, 0, Height - 2, Width, 2, ColorYellow);
             }
             else if (DMI.BlackWhiteTheme)
             {
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, 1, Height, Color.White);
-                DrawIntRectangle(spriteBatch, drawPosition, Width - 1, 0, 1, Height, Color.White);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, Width, 1, Color.White);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, Height - 1, Width, 1, Color.White);
+                DrawIntRectangle(spriteBatch, position, 0, 0, 1, Height, Color.White);
+                DrawIntRectangle(spriteBatch, position, Width - 1, 0, 1, Height, Color.White);
+                DrawIntRectangle(spriteBatch, position, 0, 0, Width, 1, Color.White);
+                DrawIntRectangle(spriteBatch, position, 0, Height - 1, Width, 1, Color.White);
             }
             else if (this is DMIButton && (this as DMIButton).ShowButtonBorder)
             {
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, 1, Height, Color.Black);
-                DrawIntRectangle(spriteBatch, drawPosition, Width - 1, 0, 1, Height, ColorShadow);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, Width, 1, Color.Black);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, Height - 1, Width, 1, ColorShadow);
+                DrawIntRectangle(spriteBatch, position, 0, 0, 1, Height, Color.Black);
+                DrawIntRectangle(spriteBatch, position, Width - 1, 0, 1, Height, ColorShadow);
+                DrawIntRectangle(spriteBatch, position, 0, 0, Width, 1, Color.Black);
+                DrawIntRectangle(spriteBatch, position, 0, Height - 1, Width, 1, ColorShadow);
 
                 if (!Pressed)
                 {
-                    DrawIntRectangle(spriteBatch, drawPosition, 1, 1, 1, Height - 2, ColorShadow);
-                    DrawIntRectangle(spriteBatch, drawPosition, Width - 2, 1, 1, Height - 2, Color.Black);
-                    DrawIntRectangle(spriteBatch, drawPosition, 1, 1, Width - 2, 1, ColorShadow);
-                    DrawIntRectangle(spriteBatch, drawPosition, 1, Height - 2, Width - 2, 1, Color.Black);
+                    DrawIntRectangle(spriteBatch, position, 1, 1, 1, Height - 2, ColorShadow);
+                    DrawIntRectangle(spriteBatch, position, Width - 2, 1, 1, Height - 2, Color.Black);
+                    DrawIntRectangle(spriteBatch, position, 1, 1, Width - 2, 1, ColorShadow);
+                    DrawIntRectangle(spriteBatch, position, 1, Height - 2, Width - 2, 1, Color.Black);
                 }
             }
             else if (Layer < 0)
             {
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, 1, Height, Color.Black);
-                DrawIntRectangle(spriteBatch, drawPosition, Width - 1, 0, 1, Height, ColorShadow);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, 0, Width, 1, Color.Black);
-                DrawIntRectangle(spriteBatch, drawPosition, 0, Height - 1, Width, 1, ColorShadow);
+                DrawIntRectangle(spriteBatch, position, 0, 0, 1, Height, Color.Black);
+                DrawIntRectangle(spriteBatch, position, Width - 1, 0, 1, Height, ColorShadow);
+                DrawIntRectangle(spriteBatch, position, 0, 0, Width, 1, Color.Black);
+                DrawIntRectangle(spriteBatch, position, 0, Height - 1, Width, 1, ColorShadow);
             }
         }
         public virtual void PrepareFrame(ETCSStatus status) { }
@@ -528,13 +528,13 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
                 area.PrepareFrame(status);
             }
         }
-        public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
+        public override void Draw(SpriteBatch spriteBatch, Point position)
         {
             if (!Visible) return;
-            base.Draw(spriteBatch, drawPosition);
+            base.Draw(spriteBatch, position);
             foreach(var area in SubAreas)
             {
-                if (area.Visible) area.Draw(spriteBatch, new Point((int)Math.Round(drawPosition.X + area.Position.X * Scale), (int)Math.Round(drawPosition.Y + area.Position.Y * Scale)));
+                if (area.Visible) area.Draw(spriteBatch, new Point((int)Math.Round(position.X + area.Position.X * Scale), (int)Math.Round(position.Y + area.Position.Y * Scale)));
             }
         }
         public void AddToLayout(DMIArea area, Point position)
@@ -581,13 +581,13 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
             WindowTitleFont = GetFont(FontHeightWindowTitle);
             SetTitle(WindowTitle);
         }
-        public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
+        public override void Draw(SpriteBatch spriteBatch, Point position)
         {
             if (!Visible) return;
-            base.Draw(spriteBatch, drawPosition);
-            DrawRectangle(spriteBatch, drawPosition, 0, 0, FullScreen ? 334 : 306, 24, Color.Black);
-            int x = drawPosition.X + (int)Math.Round(WindowTitleText.Position.X * Scale);
-            int y = drawPosition.Y + (int)Math.Round(WindowTitleText.Position.Y * Scale);
+            base.Draw(spriteBatch, position);
+            DrawRectangle(spriteBatch, position, 0, 0, FullScreen ? 334 : 306, 24, Color.Black);
+            int x = position.X + (int)Math.Round(WindowTitleText.Position.X * Scale);
+            int y = position.Y + (int)Math.Round(WindowTitleText.Position.Y * Scale);
             WindowTitleText.Draw(spriteBatch, new Point(x, y));
         }
         public void SetTitle(string s)
@@ -602,7 +602,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
     {
         public Rectangle SensitiveArea(Point WindowPosition) => new Rectangle(WindowPosition.X + Position.X - ExtendedSensitiveArea.X, WindowPosition.Y + Position.Y - ExtendedSensitiveArea.Y, Width + ExtendedSensitiveArea.Width + ExtendedSensitiveArea.X, Height + ExtendedSensitiveArea.Height + ExtendedSensitiveArea.Y);
         public Rectangle ExtendedSensitiveArea;
-        public Action PressedAction = null;
+        public Action PressedAction;
         public string ConfirmerCaption;
         public readonly string DisplayName;
         public bool Enabled;
@@ -670,13 +670,13 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
             foreach (var text in CaptionText)
                 text.Color = Enabled ? ColorGrey : ColorDarkGrey;
         }
-        public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
+        public override void Draw(SpriteBatch spriteBatch, Point position)
         {
-            base.Draw(spriteBatch, drawPosition);
+            base.Draw(spriteBatch, position);
             foreach (var text in CaptionText)
             {
-                int x = drawPosition.X + (int)Math.Round(text.Position.X * Scale);
-                int y = drawPosition.Y + (int)Math.Round(text.Position.Y * Scale);
+                int x = position.X + (int)Math.Round(text.Position.X * Scale);
+                int y = position.Y + (int)Math.Round(text.Position.Y * Scale);
                 text.Draw(spriteBatch, new Point(x, y));
             }
         }
@@ -707,11 +707,11 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
             base.ScaleChanged();
             SetIcon();
         }
-        public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
+        public override void Draw(SpriteBatch spriteBatch, Point position)
         {
-            base.Draw(spriteBatch, drawPosition);
+            base.Draw(spriteBatch, position);
             var tex = Enabled ? EnabledTexture : DisabledTexture;
-            DrawSymbol(spriteBatch, tex.Texture, drawPosition, tex.Position.X, tex.Position.Y);
+            DrawSymbol(spriteBatch, tex.Texture, position, tex.Position.X, tex.Position.Y);
         }
     }
     public class DMITextLabel : DMIArea
@@ -748,13 +748,13 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
         {
             CaptionFont = GetFont(FontHeightButton);
         }
-        public override void Draw(SpriteBatch spriteBatch, Point drawPosition)
+        public override void Draw(SpriteBatch spriteBatch, Point position)
         {
-            base.Draw(spriteBatch, drawPosition);
+            base.Draw(spriteBatch, position);
             foreach (var text in CaptionText)
             {
-                int x = drawPosition.X + (int)Math.Round(text.Position.X * Scale);
-                int y = drawPosition.Y + (int)Math.Round(text.Position.Y * Scale);
+                int x = position.X + (int)Math.Round(text.Position.X * Scale);
+                int y = position.Y + (int)Math.Round(text.Position.Y * Scale);
                 text.Draw(spriteBatch, new Point(x, y));
             }
         }

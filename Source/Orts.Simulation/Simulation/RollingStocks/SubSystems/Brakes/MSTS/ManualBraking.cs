@@ -46,9 +46,9 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
         private float ManualBrakingCurrentFraction;
         private float EngineBrakingCurrentFraction;
         private float SteamBrakeCompensation;
-        private bool LocomotiveSteamBrakeFitted = false;
-        private float SteamBrakePressurePSI = 0;
-        private float SteamBrakeCylinderPressurePSI = 0;
+        private bool LocomotiveSteamBrakeFitted;
+        private float SteamBrakePressurePSI;
+        private float SteamBrakeCylinderPressurePSI;
         private float BrakeForceFraction;
 
         public override bool GetHandbrakeStatus()

@@ -607,7 +607,7 @@ namespace ORTS.TrackViewer.Editing
                 //Main path has siding path. Now there is the risk of putting the track over the passing/siding path
                 List<int> sidingJunctionIndexes = IntermediateSidingJunctionIndexes(ActiveNode);
                 // we can only allow intersection if there are no common indexes:
-                return (newMainJunctionIndexes.Intersect(sidingJunctionIndexes).Count() == 0);
+                return !(newMainJunctionIndexes.Intersect(sidingJunctionIndexes).Any());
             }
         }
 
@@ -1999,7 +1999,7 @@ namespace ORTS.TrackViewer.Editing
             var brokenNodeNumbersAfterActive = (from i in brokenNodeNumbers where i > NumberOfActiveNode select i);
 
             int newNumberToDraw;
-            if (brokenNodeNumbersAfterActive.Count() > 0)
+            if (brokenNodeNumbersAfterActive.Any())
             {   // take the first node after this node
                 newNumberToDraw = brokenNodeNumbersAfterActive.Min();
             }

@@ -218,8 +218,8 @@ namespace Orts.ActivityRunner.Viewer3D
         public bool NightTexturesNotLoaded; // At least one night texture hasn't been loaded
         public bool DayTexturesNotLoaded; // At least one day texture hasn't been loaded
         public long LoadMemoryThreshold; // Above this threshold loader doesn't bulk load day or night textures
-        public bool tryLoadingNightTextures = false;
-        public bool tryLoadingDayTextures = false;
+        public bool tryLoadingNightTextures;
+        public bool tryLoadingDayTextures;
 
         public int poscounter = 1; // counter for print position info
 
@@ -227,9 +227,9 @@ namespace Orts.ActivityRunner.Viewer3D
 
         //        UserInputRailDriver RailDriver;
 
-        public static double DbfEvalAutoPilotTimeS = 0;//Debrief eval
-        public static double DbfEvalIniAutoPilotTimeS = 0;//Debrief eval  
-        public bool DbfEvalAutoPilot = false;//DebriefEval
+        public static double DbfEvalAutoPilotTimeS;//Debrief eval
+        public static double DbfEvalIniAutoPilotTimeS;//Debrief eval  
+        public bool DbfEvalAutoPilot;//DebriefEval
 
         private bool lockShadows;
         private bool logRenderFrame;

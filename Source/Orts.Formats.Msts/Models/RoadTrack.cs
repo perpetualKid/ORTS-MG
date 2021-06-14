@@ -22,7 +22,7 @@ namespace Orts.Formats.Msts.Models
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        public RoadTrackDB(STFReader stf)
+        internal RoadTrackDB(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -65,7 +65,7 @@ namespace Orts.Formats.Msts.Models
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="idx">The index of this TrItem in the list of TrItems</param>
-        public RoadLevelCrossingItem(STFReader stf, int idx)
+        internal RoadLevelCrossingItem(STFReader stf, int idx)
         {
             SignalObject = -1;
             stf.MustMatchBlockStart();
@@ -87,7 +87,7 @@ namespace Orts.Formats.Msts.Models
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="idx">The index of this TrItem in the list of TrItems</param>
-		public RoadCarSpawner(STFReader stf, int idx)
+		internal RoadCarSpawner(STFReader stf, int idx)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {

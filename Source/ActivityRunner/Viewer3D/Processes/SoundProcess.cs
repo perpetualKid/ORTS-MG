@@ -52,8 +52,8 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
 #endif
         private int UpdateCounter = -1;
         private int SleepTime = 50;
-        private double StartUpdateTime = 0;
-        private int ASyncUpdatePending = 0;
+        private double StartUpdateTime;
+        private int ASyncUpdatePending;
         private const int FULLUPDATECYCLE = 4; // Number of frequent updates needed till a full update
 
         private ORTSActSoundSources ORTSActSoundSourceList; // Dictionary of activity sound sources

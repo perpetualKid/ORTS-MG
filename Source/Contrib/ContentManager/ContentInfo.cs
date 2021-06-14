@@ -114,30 +114,30 @@ namespace Orts.ContentManager
                         {
                             var node = tracks[activeTrack];
                             var line = new StringBuilder();
-                            line.Append(" ");
+                            line.Append(' ');
                             for (var i = 0; i < tracks.Count; i++)
                                 line.Append(i == activeTrack ? " |" : " .");
                             if ((node.Flags & PathFlags.WaitPoint) != 0)
                                 line.AppendLine($"\t{node.Location}\t{node.Flags} (wait for {node.WaitTime} seconds)");
                             else
                                 line.AppendLine($"\t{node.Location}\t{node.Flags}");
-                            if (node.Next.Count() == 0)
+                            if (!node.Next.Any())
                             {
-                                line.Append(" ");
+                                line.Append(' ');
                                 for (var i = 0; i < tracks.Count; i++)
                                     line.Append(i == activeTrack ? @"  " : @" .");
                                 line.AppendLine();
                             }
                             else if (node.Next.Count() == 2)
                             {
-                                line.Append(" ");
+                                line.Append(' ');
                                 for (var i = 0; i < tracks.Count; i++)
                                     line.Append(i == activeTrack ? @" |\" : @" .");
                                 line.AppendLine();
                             }
                             tracks.RemoveAt(activeTrack);
                             tracks.InsertRange(activeTrack, node.Next);
-                            if (node.Next.Count() >= 1 && rejoinNodes.Contains(tracks[activeTrack]))
+                            if (node.Next.Any() && rejoinNodes.Contains(tracks[activeTrack]))
                             {
                                 activeTrack++;
                                 activeTrack %= tracks.Count;
@@ -145,7 +145,7 @@ namespace Orts.ContentManager
                                 {
                                     activeTrack = tracks.IndexOf(tracks[activeTrack]);
                                     tracks.RemoveAt(tracks.LastIndexOf(tracks[activeTrack]));
-                                    line.Append(" ");
+                                    line.Append(' ');
                                     for (var i = 0; i < tracks.Count; i++)
                                         line.Append(i == activeTrack ? @" |/" : @" .");
                                     line.AppendLine();

@@ -11,10 +11,10 @@ namespace Orts.Formats.Msts.Models
 {
     public class TrackItemSound
     {
-        public List<WorldSoundSource> SoundSources { get; private set; } = new List<WorldSoundSource>();
-        public List<WorldSoundRegion> SoundRegions { get; private set; } = new List<WorldSoundRegion>();
+        public IList<WorldSoundSource> SoundSources { get; private set; } = new List<WorldSoundSource>();
+        public IList<WorldSoundRegion> SoundRegions { get; private set; } = new List<WorldSoundRegion>();
 
-        public TrackItemSound(STFReader stf, TrackItem[] trItems)
+        internal TrackItemSound(STFReader stf, TrackItem[] trItems)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -28,13 +28,10 @@ namespace Orts.Formats.Msts.Models
     {
         private Vector3 position;
 
-        public float X => position.X;
-        public float Y => position.Y;
-        public float Z => position.Z;
         public ref readonly Vector3 Position => ref position;
         public string FileName { get; private set; }
 
-        public WorldSoundSource(STFReader stf)
+        internal WorldSoundSource(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -52,9 +49,9 @@ namespace Orts.Formats.Msts.Models
     {
         public int TrackType { get; private set; } = -1;
         public float RotY { get; private set; }
-        public List<int> TrackNodes { get; private set; }
+        public IList<int> TrackNodes { get; private set; }
 
-        public WorldSoundRegion(STFReader stf, TrackItem[] trItems)
+        internal WorldSoundRegion(STFReader stf, TrackItem[] trItems)
         {
             TrackNodes = new List<int>();
             stf.MustMatchBlockStart();
@@ -64,7 +61,7 @@ namespace Orts.Formats.Msts.Models
                 new STFReader.TokenProcessor("tritemid", ()=>{
                     stf.MustMatchBlockStart();
                     stf.ReadInt(0);//dummy read
-                    var trItemId = stf.ReadInt(-1);
+                    int trItemId = stf.ReadInt(-1);
                     if (trItemId != -1) {
                         if (trItemId >= trItems.Length) {
                             STFException.TraceWarning(stf, $"Ignored invalid TrItemId {trItemId}");
@@ -85,7 +82,8 @@ namespace Orts.Formats.Msts.Models
         public string SoundFile { get; private set; }
         public OrtsActivitySoundFileType SoundFileType { get; private set; }
         public ref readonly WorldLocation Location => ref location;
-        public ActivitySound(STFReader stf)
+        
+        internal ActivitySound(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -123,7 +121,7 @@ namespace Orts.Formats.Msts.Models
         public int TrackType { get; private set; } = -1;
         public ActivationType ActivationType { get; private set; }
 
-        public SoundActivationCondition(STFReader stf)
+        internal SoundActivationCondition(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -170,7 +168,7 @@ namespace Orts.Formats.Msts.Models
         }
     }
 
-    public class ScalabiltyGroup
+    public class ScalabilityGroup
     {
         public int DetailLevel { get; private set; }
         public SmsStreams Streams { get; private set; }
@@ -180,7 +178,7 @@ namespace Orts.Formats.Msts.Models
         public SoundActivationCondition Activation { get; private set; }
         public SoundActivationCondition Deactivation { get; private set; }
 
-        public ScalabiltyGroup(STFReader stf)
+        internal ScalabilityGroup(STFReader stf)
         {
             stf.MustMatchBlockStart();
             DetailLevel = stf.ReadInt(null);
@@ -197,10 +195,10 @@ namespace Orts.Formats.Msts.Models
 
     public class SmsStreams : List<SmsStream>
     {
-        public SmsStreams(STFReader stf)
+        internal SmsStreams(STFReader stf)
         {
             stf.MustMatchBlockStart();
-            var count = stf.ReadInt(null);
+            int count = stf.ReadInt(null);
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("stream", ()=>{
                     if (--count < 0)
@@ -219,10 +217,10 @@ namespace Orts.Formats.Msts.Models
         public int Priority { get; private set; }
         public Triggers Triggers { get; private set; }
         public float Volume { get; private set; } = 1.0f;
-        public List<Curve> VolumeCurves { get; } = new List<Curve>();
+        public IList<Curve> VolumeCurves { get; } = new List<Curve>();
         public Curve FrequencyCurve { get; private set; }
 
-        public SmsStream(STFReader stf)
+        internal SmsStream(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -236,9 +234,13 @@ namespace Orts.Formats.Msts.Models
         }
     }
 
+#pragma warning disable CA1815 // Override equals and operator equals on value types
     public readonly struct CurvePoint
+#pragma warning restore CA1815 // Override equals and operator equals on value types
     {
+#pragma warning disable CA1051 // Do not declare visible instance fields
         public readonly float X, Y;
+#pragma warning restore CA1051 // Do not declare visible instance fields
 
         public CurvePoint(float x, float y)
         {
@@ -267,19 +269,19 @@ namespace Orts.Formats.Msts.Models
 
         public CurvePoint[] CurvePoints { get; private set; }
 
-        public Curve(STFReader stf)
+        internal Curve(STFReader stf)
         {
             stf.MustMatchBlockStart();
-            var type = stf.ReadString();
-            switch (type.ToLower())
+            string type = stf.ReadString();
+            switch (type.ToUpperInvariant())
             {
-                case "distancecontrolled": Mode = ControlMode.Distance; break;
-                case "speedcontrolled": Mode = ControlMode.Speed; break;
-                case "variable1controlled": Mode = ControlMode.Variable1; break;
-                case "variable2controlled": Mode = ControlMode.Variable2; break;
-                case "variable3controlled": Mode = ControlMode.Variable3; break;
-                case "brakecylcontrolled": Mode = ControlMode.BrakeCylinder; break;
-                case "curveforcecontrolled": Mode = ControlMode.CurveForce; break;
+                case "DISTANCECONTROLLED": Mode = ControlMode.Distance; break;
+                case "SPEEDCONTROLLED": Mode = ControlMode.Speed; break;
+                case "VARIABLE1CONTROLLED": Mode = ControlMode.Variable1; break;
+                case "VARIABLE2CONTROLLED": Mode = ControlMode.Variable2; break;
+                case "VARIABLE3CONTROLLED": Mode = ControlMode.Variable3; break;
+                case "BRAKECYLCONTROLLED": Mode = ControlMode.BrakeCylinder; break;
+                case "CURVEFORCECONTROLLED": Mode = ControlMode.CurveForce; break;
                 default: STFException.TraceWarning(stf, "Crash expected: Skipped unknown VolumeCurve/Frequencycurve type " + type); stf.SkipRestOfBlock(); return;
             }
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -309,7 +311,7 @@ namespace Orts.Formats.Msts.Models
 
     public class Triggers : List<Trigger>
     {
-        public Triggers(STFReader stf)
+        internal Triggers(STFReader stf)
         {
             stf.MustMatchBlockStart();
             int count = stf.ReadInt(null);
@@ -332,18 +334,18 @@ namespace Orts.Formats.Msts.Models
 
         private int playcommandCount;
 
-        protected void ParsePlayCommand(STFReader stf, string token)
+        private protected void ParsePlayCommand(STFReader stf, string token)
         {
-            switch (token)
+            switch (token = token.ToUpperInvariant())
             {
-                case "playoneshot":
-                case "startloop":
-                case "releaselooprelease":
-                case "startlooprelease":
-                case "releaseloopreleasewithjump":
-                case "disabletrigger":
-                case "enabletrigger":
-                case "setstreamvolume":
+                case "PLAYONESHOT":
+                case "STARTLOOP":
+                case "RELEASELOOPRELEASE":
+                case "STARTLOOPRELEASE":
+                case "RELEASELOOPRELEASEWITHJUMP":
+                case "DISABLETRIGGER":
+                case "ENABLETRIGGER":
+                case "SETSTREAMVOLUME":
                     ++playcommandCount;
                     if (playcommandCount > 1)
                         STFException.TraceWarning(stf, "Replaced play command");
@@ -354,14 +356,14 @@ namespace Orts.Formats.Msts.Models
 
             switch (token)
             {
-                case "playoneshot": SoundCommand = new SoundPlayCommand(stf, SoundPlayCommand.SoundCommandType.PlayOneShot); break;
-                case "startloop": SoundCommand = new SoundPlayCommand(stf, SoundPlayCommand.SoundCommandType.StartLoop); break;
-                case "releaselooprelease": SoundCommand = new LoopRelease(stf, LoopRelease.ReleaseType.Release); break;
-                case "startlooprelease": SoundCommand = new SoundPlayCommand(stf, SoundPlayCommand.SoundCommandType.StartLoopRelease); break;
-                case "releaseloopreleasewithjump": SoundCommand = new LoopRelease(stf, LoopRelease.ReleaseType.ReleaseWithJump); break;
-                case "disabletrigger": SoundCommand = new TriggerCommand(stf, TriggerCommand.TriggerType.Disable); break;
-                case "enabletrigger": SoundCommand = new TriggerCommand(stf, TriggerCommand.TriggerType.Enable); break;
-                case "setstreamvolume": SoundCommand = new StreamVolumeCommand(stf); break;
+                case "PLAYONESHOT": SoundCommand = new SoundPlayCommand(stf, SoundPlayCommand.SoundCommandType.PlayOneShot); break;
+                case "STARTLOOP": SoundCommand = new SoundPlayCommand(stf, SoundPlayCommand.SoundCommandType.StartLoop); break;
+                case "RELEASELOOPRELEASE": SoundCommand = new LoopRelease(stf, LoopRelease.ReleaseType.Release); break;
+                case "STARTLOOPRELEASE": SoundCommand = new SoundPlayCommand(stf, SoundPlayCommand.SoundCommandType.StartLoopRelease); break;
+                case "RELEASELOOPRELEASEWITHJUMP": SoundCommand = new LoopRelease(stf, LoopRelease.ReleaseType.ReleaseWithJump); break;
+                case "DISABLETRIGGER": SoundCommand = new TriggerCommand(stf, TriggerCommand.TriggerType.Disable); break;
+                case "ENABLETRIGGER": SoundCommand = new TriggerCommand(stf, TriggerCommand.TriggerType.Enable); break;
+                case "SETSTREAMVOLUME": SoundCommand = new StreamVolumeCommand(stf); break;
                 case "(": stf.SkipRestOfBlock(); break;
             }
         }
@@ -370,11 +372,11 @@ namespace Orts.Formats.Msts.Models
     public class InitialTrigger : Trigger
     {
 
-        public InitialTrigger(STFReader stf)
+        internal InitialTrigger(STFReader stf)
         {
             stf.MustMatchBlockStart();
             while (!stf.EndOfBlock())
-                ParsePlayCommand(stf, stf.ReadString().ToLower());
+                ParsePlayCommand(stf, stf.ReadString());
         }
     }
 
@@ -383,12 +385,12 @@ namespace Orts.Formats.Msts.Models
 
         public int TriggerId { get; private set; }
 
-        public DiscreteTrigger(STFReader stf)
+        internal DiscreteTrigger(STFReader stf)
         {
             stf.MustMatchBlockStart();
             TriggerId = stf.ReadInt(null);
             while (!stf.EndOfBlock())
-                ParsePlayCommand(stf, stf.ReadString().ToLower());
+                ParsePlayCommand(stf, stf.ReadString());
         }
     }
 
@@ -415,43 +417,43 @@ namespace Orts.Formats.Msts.Models
         public TriggerEvent Event { get; private set; }
         public float Threshold { get; private set; }
 
-        public VariableTrigger(STFReader stf)
+        internal VariableTrigger(STFReader stf)
         {
             stf.MustMatchBlockStart();
 
             string eventString = stf.ReadString();
             Threshold = stf.ReadFloat(STFReader.Units.None, null);
 
-            switch (eventString.ToLower())
+            switch (eventString.ToUpperInvariant())
             {
-                case "speed_inc_past": Event = TriggerEvent.SpeedIncrease; break;
-                case "speed_dec_past": Event = TriggerEvent.SpeedDecrease; break;
-                case "distance_inc_past":
+                case "SPEED_INC_PAST": Event = TriggerEvent.SpeedIncrease; break;
+                case "SPEED_DEC_PAST": Event = TriggerEvent.SpeedDecrease; break;
+                case "DISTANCE_INC_PAST":
                     {
                         Event = TriggerEvent.DistanceIncrease;
                         Threshold *= Threshold;
                         break;
                     }
-                case "distance_dec_past":
+                case "DISTANCE_DEC_PAST":
                     {
                         Event = TriggerEvent.DistanceDecrease;
                         Threshold *= Threshold;
                         break;
                     }
-                case "variable1_inc_past": Event = TriggerEvent.Variable1Increase; break;
-                case "variable1_dec_past": Event = TriggerEvent.Variable1Decrease; break;
-                case "variable2_inc_past": Event = TriggerEvent.Variable2Increase; break;
-                case "variable2_dec_past": Event = TriggerEvent.Variable2Decrease; break;
-                case "variable3_inc_past": Event = TriggerEvent.Variable3Increase; break;
-                case "variable3_dec_past": Event = TriggerEvent.Variable3Decrease; break;
-                case "brakecyl_inc_past": Event = TriggerEvent.BrakeCylinderIncrease; break;
-                case "brakecyl_dec_past": Event = TriggerEvent.BrakeCylinderDecrease; break;
-                case "curveforce_inc_past": Event = TriggerEvent.CurveForceIncrease; break;
-                case "curveforce_dec_past": Event = TriggerEvent.CurveForceDecrease; break;
+                case "VARIABLE1_INC_PAST": Event = TriggerEvent.Variable1Increase; break;
+                case "VARIABLE1_DEC_PAST": Event = TriggerEvent.Variable1Decrease; break;
+                case "VARIABLE2_INC_PAST": Event = TriggerEvent.Variable2Increase; break;
+                case "VARIABLE2_DEC_PAST": Event = TriggerEvent.Variable2Decrease; break;
+                case "VARIABLE3_INC_PAST": Event = TriggerEvent.Variable3Increase; break;
+                case "VARIABLE3_DEC_PAST": Event = TriggerEvent.Variable3Decrease; break;
+                case "BRAKECYL_INC_PAST": Event = TriggerEvent.BrakeCylinderIncrease; break;
+                case "BRAKECYL_DEC_PAST": Event = TriggerEvent.BrakeCylinderDecrease; break;
+                case "CURVEFORCE_INC_PAST": Event = TriggerEvent.CurveForceIncrease; break;
+                case "CURVEFORCE_DEC_PAST": Event = TriggerEvent.CurveForceDecrease; break;
             }
 
             while (!stf.EndOfBlock())
-                ParsePlayCommand(stf, stf.ReadString().ToLower());
+                ParsePlayCommand(stf, stf.ReadString());
         }
     }
 
@@ -462,16 +464,16 @@ namespace Orts.Formats.Msts.Models
         public float MinimumVolume { get; private set; } = 0.9f;
         public float MaximumVolume { get; private set; } = 1.0f;
 
-        public DistanceTravelledTrigger(STFReader stf)
+        internal DistanceTravelledTrigger(STFReader stf)
         {
             stf.MustMatchBlockStart();
             while (!stf.EndOfBlock())
             {
-                string token = stf.ReadString().ToLower();
+                string token = stf.ReadString().ToUpperInvariant();
                 switch (token)
                 {
-                    case "dist_min_max": stf.MustMatchBlockStart(); MinimumDistance = stf.ReadFloat(STFReader.Units.Distance, null); MaximumDistance = stf.ReadFloat(STFReader.Units.Distance, null); stf.SkipRestOfBlock(); break;
-                    case "volume_min_max": stf.MustMatchBlockStart(); MinimumVolume = stf.ReadFloat(STFReader.Units.None, null); MaximumVolume = stf.ReadFloat(STFReader.Units.None, null); stf.SkipRestOfBlock(); break;
+                    case "DIST_MIN_MAX": stf.MustMatchBlockStart(); MinimumDistance = stf.ReadFloat(STFReader.Units.Distance, null); MaximumDistance = stf.ReadFloat(STFReader.Units.Distance, null); stf.SkipRestOfBlock(); break;
+                    case "VOLUME_MIN_MAX": stf.MustMatchBlockStart(); MinimumVolume = stf.ReadFloat(STFReader.Units.None, null); MaximumVolume = stf.ReadFloat(STFReader.Units.None, null); stf.SkipRestOfBlock(); break;
                     default: ParsePlayCommand(stf, token); break;
                 }
             }
@@ -485,17 +487,17 @@ namespace Orts.Formats.Msts.Models
         public float MinimumVolume { get; private set; } = 0.9f;
         public float MaximumVolume { get; private set; } = 1.0f;
 
-        public RandomTrigger(STFReader f)
+        internal RandomTrigger(STFReader stf)
         {
-            f.MustMatchBlockStart();
-            while (!f.EndOfBlock())
+            stf.MustMatchBlockStart();
+            while (!stf.EndOfBlock())
             {
-                string token = f.ReadString().ToLower();
+                string token = stf.ReadString().ToUpperInvariant();
                 switch (token)
                 {
-                    case "delay_min_max": f.MustMatchBlockStart(); MinimumDelay = f.ReadFloat(STFReader.Units.None, null); MaximumDelay = f.ReadFloat(STFReader.Units.None, null); f.SkipRestOfBlock(); break;
-                    case "volume_min_max": f.MustMatchBlockStart(); MinimumVolume = f.ReadFloat(STFReader.Units.None, null); MaximumVolume = f.ReadFloat(STFReader.Units.None, null); f.SkipRestOfBlock(); break;
-                    default: ParsePlayCommand(f, token); break;
+                    case "DELAY_MIN_MAX": stf.MustMatchBlockStart(); MinimumDelay = stf.ReadFloat(STFReader.Units.None, null); MaximumDelay = stf.ReadFloat(STFReader.Units.None, null); stf.SkipRestOfBlock(); break;
+                    case "VOLUME_MIN_MAX": stf.MustMatchBlockStart(); MinimumVolume = stf.ReadFloat(STFReader.Units.None, null); MaximumVolume = stf.ReadFloat(STFReader.Units.None, null); stf.SkipRestOfBlock(); break;
+                    default: ParsePlayCommand(stf, token); break;
                 }
             }
         }
@@ -509,7 +511,7 @@ namespace Orts.Formats.Msts.Models
     {
         public float Volume { get; private set; }
 
-        public StreamVolumeCommand(STFReader stf)
+        internal StreamVolumeCommand(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Volume = stf.ReadFloat(STFReader.Units.None, null);
@@ -529,7 +531,7 @@ namespace Orts.Formats.Msts.Models
 
         public TriggerType Trigger { get; private set; }
 
-        public TriggerCommand(STFReader stf, TriggerType trigger)
+        internal TriggerCommand(STFReader stf, TriggerType trigger)
         {
             Trigger = trigger;
             stf.MustMatchBlockStart();
@@ -548,7 +550,7 @@ namespace Orts.Formats.Msts.Models
             ReleaseWithJump,
         }
 
-        public LoopRelease(STFReader stf, ReleaseType mode)
+        internal LoopRelease(STFReader stf, ReleaseType mode)
         {
             ReleaseMode = mode;
             stf.MustMatchBlockStart();
@@ -571,12 +573,12 @@ namespace Orts.Formats.Msts.Models
             StartLoopRelease,
         }
 
-        public string[] Files { get; protected set; }
+        public IList<string> Files { get; protected set; }
         public Selection SelectionMethod { get; protected set; } = Selection.Sequential;
 
         public SoundCommandType CommandType { get; private set; }
 
-        public SoundPlayCommand(STFReader stf, SoundCommandType commandType)
+        internal SoundPlayCommand(STFReader stf, SoundCommandType commandType)
         {
             CommandType = commandType;
             stf.MustMatchBlockStart();
@@ -584,9 +586,9 @@ namespace Orts.Formats.Msts.Models
             Files = new string[count];
             int fileIndex = 0;
             while (!stf.EndOfBlock())
-                switch (stf.ReadString().ToLower())
+                switch (stf.ReadString().ToUpperInvariant())
                 {
-                    case "file":
+                    case "FILE":
                         if (fileIndex < count)
                         {
                             stf.MustMatchBlockStart();
@@ -600,13 +602,13 @@ namespace Orts.Formats.Msts.Models
                             stf.SkipBlock();
                         }
                         break;
-                    case "selectionmethod":
+                    case "SELECTIONMETHOD":
                         stf.MustMatchBlockStart();
                         string s = stf.ReadString();
-                        switch (s.ToLower())
+                        switch (s.ToUpperInvariant())
                         {
-                            case "randomselection": SelectionMethod = Selection.Random; break;
-                            case "sequentialselection": SelectionMethod = Selection.Sequential; break;
+                            case "RANDOMSELECTION": SelectionMethod = Selection.Random; break;
+                            case "SEQUENTIALSELECTION": SelectionMethod = Selection.Sequential; break;
                             default: STFException.TraceWarning(stf, "Skipped unknown selection method " + s); break;
                         }
                         stf.SkipRestOfBlock();

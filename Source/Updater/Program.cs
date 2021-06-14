@@ -18,6 +18,8 @@
 using System;
 using System.Windows.Forms;
 
+[assembly: CLSCompliant(false)]
+
 namespace Orts.Updater
 {
     internal static class Program

@@ -234,7 +234,7 @@ namespace ORTS.TrackViewer.Editing
                 node.Location.Location.Y.ToString("F3", System.Globalization.CultureInfo.CreateSpecificCulture("en-US")),
                 node.Location.Location.Z.ToString("F3", System.Globalization.CultureInfo.CreateSpecificCulture("en-US")));
 
-            pdpIndex = trackPDPs.Count(); // default PDP index
+            pdpIndex = trackPDPs.Count; // default PDP index
             TrainpathJunctionNode nodeAsJunction = node as TrainpathJunctionNode;
             if (nodeAsJunction != null)
             {
@@ -300,7 +300,7 @@ namespace ORTS.TrackViewer.Editing
             file.WriteLine("\tTrPathStart ( \""  + trainpath.PathStart + "\" )");
             file.WriteLine("\tTrPathEnd ( \"" + trainpath.PathEnd + "\" )");
             file.Write    ("\tTrPathNodes ( ");
-            file.WriteLine(trpathnodes.Count());
+            file.WriteLine(trpathnodes.Count);
             foreach (string line in trpathnodes) {
                 file.WriteLine(line);
             }

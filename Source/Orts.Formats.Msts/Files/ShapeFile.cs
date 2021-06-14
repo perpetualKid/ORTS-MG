@@ -31,39 +31,39 @@ namespace Orts.Formats.Msts.Files
             if (Shape.LodControls.Count < 1)
                 Trace.TraceWarning("Missing at least one LOD Control element in shape {0}", fileName);
 
-            for (var distanceLevelIndex = 0; distanceLevelIndex < Shape.LodControls[0].DistanceLevels.Count; distanceLevelIndex++)
+            for (int distanceLevelIndex = 0; distanceLevelIndex < Shape.LodControls[0].DistanceLevels.Count; distanceLevelIndex++)
             {
-                var distanceLevel = Shape.LodControls[0].DistanceLevels[distanceLevelIndex];
+                DistanceLevel distanceLevel = Shape.LodControls[0].DistanceLevels[distanceLevelIndex];
 
                 if (distanceLevel.DistanceLevelHeader.Hierarchy.Length != Shape.Matrices.Count)
                     Trace.TraceWarning("Expected {2} hierarchy elements; got {3} in distance level {1} in shape {0}", fileName, distanceLevelIndex, Shape.Matrices.Count, distanceLevel.DistanceLevelHeader.Hierarchy.Length);
 
-                for (var hierarchyIndex = 0; hierarchyIndex < distanceLevel.DistanceLevelHeader.Hierarchy.Length; hierarchyIndex++)
+                for (int hierarchyIndex = 0; hierarchyIndex < distanceLevel.DistanceLevelHeader.Hierarchy.Length; hierarchyIndex++)
                 {
-                    var matrixIndex = distanceLevel.DistanceLevelHeader.Hierarchy[hierarchyIndex];
+                    int matrixIndex = distanceLevel.DistanceLevelHeader.Hierarchy[hierarchyIndex];
                     if (matrixIndex < -1 || matrixIndex >= Shape.Matrices.Count)
                         Trace.TraceWarning("Hierarchy element {2} out of range (expected {3} to {4}; got {5}) in distance level {1} in shape {0}", fileName, distanceLevelIndex, hierarchyIndex, -1, Shape.Matrices.Count - 1, matrixIndex);
                 }
 
-                for (var subObjectIndex = 0; subObjectIndex < distanceLevel.SubObjects.Count; subObjectIndex++)
+                for (int subObjectIndex = 0; subObjectIndex < distanceLevel.SubObjects.Count; subObjectIndex++)
                 {
-                    var subObject = distanceLevel.SubObjects[subObjectIndex];
+                    SubObject subObject = distanceLevel.SubObjects[subObjectIndex];
 
                     if (subObject.SubObjectHeader.GeometryInfo.GeometryNodeMap.Length != Shape.Matrices.Count)
                         Trace.TraceWarning("Expected {3} geometry node map elements; got {4} in sub-object {2} in distance level {1} in shape {0}", fileName, distanceLevelIndex, subObjectIndex, Shape.Matrices.Count, subObject.SubObjectHeader.GeometryInfo.GeometryNodeMap.Length);
 
-                    var geometryNodeMap = subObject.SubObjectHeader.GeometryInfo.GeometryNodeMap;
-                    for (var geometryNodeMapIndex = 0; geometryNodeMapIndex < geometryNodeMap.Length; geometryNodeMapIndex++)
+                    int[] geometryNodeMap = subObject.SubObjectHeader.GeometryInfo.GeometryNodeMap;
+                    for (int geometryNodeMapIndex = 0; geometryNodeMapIndex < geometryNodeMap.Length; geometryNodeMapIndex++)
                     {
-                        var geometryNode = geometryNodeMap[geometryNodeMapIndex];
+                        int geometryNode = geometryNodeMap[geometryNodeMapIndex];
                         if (geometryNode < -1 || geometryNode >= subObject.SubObjectHeader.GeometryInfo.GeometryNodes.Count)
                             Trace.TraceWarning("Geometry node map element {3} out of range (expected {4} to {5}; got {6}) in sub-object {2} in distance level {1} in shape {0}", fileName, distanceLevelIndex, subObjectIndex, geometryNodeMapIndex, -1, subObject.SubObjectHeader.GeometryInfo.GeometryNodes.Count - 1, geometryNode);
                     }
 
-                    var vertices = subObject.Vertices;
-                    for (var vertexIndex = 0; vertexIndex < vertices.Count; vertexIndex++)
+                    Vertices vertices = subObject.Vertices;
+                    for (int vertexIndex = 0; vertexIndex < vertices.Count; vertexIndex++)
                     {
-                        var vertex = vertices[vertexIndex];
+                        Vertex vertex = vertices[vertexIndex];
 
                         if (vertex.PointIndex < 0 || vertex.PointIndex >= Shape.Points.Count)
                             Trace.TraceWarning("Point index out of range (expected {4} to {5}; got {6}) in vertex {3} in sub-object {2} in distance level {1} in shape {0}", fileName, distanceLevelIndex, subObjectIndex, vertexIndex, 0, Shape.Points.Count - 1, vertex.PointIndex);
@@ -77,10 +77,10 @@ namespace Orts.Formats.Msts.Files
                             Trace.TraceWarning("UV index out of range (expected {4} to {5}; got {6}) in vertex {3} in sub-object {2} in distance level {1} in shape {0}", fileName, distanceLevelIndex, subObjectIndex, vertexIndex, 0, Shape.UVPoints.Count - 1, vertex.VertexUVs[0]);
                     }
 
-                    for (var primitiveIndex = 0; primitiveIndex < subObject.Primitives.Count; primitiveIndex++)
+                    for (int primitiveIndex = 0; primitiveIndex < subObject.Primitives.Count; primitiveIndex++)
                     {
-                        var triangleList = subObject.Primitives[primitiveIndex].IndexedTriList;
-                        for (var triangleListIndex = 0; triangleListIndex < triangleList.VertexIndices.Count; triangleListIndex++)
+                        IndexedTriList triangleList = subObject.Primitives[primitiveIndex].IndexedTriList;
+                        for (int triangleListIndex = 0; triangleListIndex < triangleList.VertexIndices.Count; triangleListIndex++)
                         {
                             if (triangleList.VertexIndices[triangleListIndex].A < 0 || triangleList.VertexIndices[triangleListIndex].A >= vertices.Count)
                                 Trace.TraceWarning("Vertex out of range (expected {4} to {5}; got {6}) in primitive {3} in sub-object {2} in distance level {1} in shape {0}", fileName, distanceLevelIndex, subObjectIndex, primitiveIndex, 0, vertices.Count - 1, triangleList.VertexIndices[triangleListIndex].A);
@@ -92,11 +92,13 @@ namespace Orts.Formats.Msts.Files
 
         public ShapeFile(string fileName, bool suppressShapeWarnings)
         {
-            var file = SBR.Open(fileName);
-            Shape = new Shape(file.ReadSubBlock());
-            file.VerifyEndOfBlock();
-            if (!suppressShapeWarnings)
-                Validate(fileName);
+            using (SBR file = SBR.Open(fileName))
+            {
+                Shape = new Shape(file.ReadSubBlock());
+                //                file.VerifyEndOfBlock();//covered through "using" Dispose-implementation
+                if (!suppressShapeWarnings)
+                    Validate(fileName);
+            }
         }
     }
 }

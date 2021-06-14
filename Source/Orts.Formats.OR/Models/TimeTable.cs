@@ -23,9 +23,9 @@ namespace Orts.Formats.OR.Models
             Path = string.Empty;
         }
 
-        public int CompareTo(TrainInformation otherInfo)
+        public int CompareTo(TrainInformation other)
         {
-            return string.Compare(Train, otherInfo?.Train, StringComparison.OrdinalIgnoreCase);
+            return string.Compare(Train, other?.Train, StringComparison.OrdinalIgnoreCase);
         }
 
         public string StartTimeCleaned

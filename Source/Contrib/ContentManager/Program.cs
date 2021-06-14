@@ -18,6 +18,8 @@
 using System;
 using System.Windows.Forms;
 
+[assembly: CLSCompliant(false)]
+
 // TODO 20210531
 // https://github.com/perpetualKid/ORTS-MG/issues/89
 //< configuration >

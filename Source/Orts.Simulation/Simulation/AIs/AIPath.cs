@@ -443,7 +443,7 @@ namespace Orts.Simulation.AIs
 
             //both this node and the next node are junctions: find the vector node connecting them.
             var iCand = -1;
-            for (int i = 0; i < TDB.TrackDB.TrackNodes.Count(); i++)
+            for (int i = 0; i < TDB.TrackDB.TrackNodes.Length; i++)
             {
                 if (!(TDB.TrackDB.TrackNodes[i] is TrackVectorNode tn))
                     continue;
@@ -488,7 +488,7 @@ namespace Orts.Simulation.AIs
         {
             int bestIndex = -1;
             float bestDistance2 = 1e10f;
-            for (int j = 0; j < trackDB.TrackNodes.Count(); j++)
+            for (int j = 0; j < trackDB.TrackNodes.Length; j++)
             {
                 TrackNode tn = trackDB.TrackNodes[j];
                 if (tn == null) continue;

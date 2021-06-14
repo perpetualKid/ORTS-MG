@@ -77,13 +77,13 @@ namespace Orts.Simulation
         // station stop logging flags - these are saved to resume correct logging after save
         private string StationStopLogFile;   // logfile name
         private bool StationStopLogActive;   // logging is active
-        public EventWrapper triggeredEventWrapper = null;        // used for exchange with Sound.cs to trigger activity sounds;
-        public bool NewMsgFromNewPlayer = false; // flag to indicate to ActivityWindow that there is a new message to be shown;
+        public EventWrapper triggeredEventWrapper;        // used for exchange with Sound.cs to trigger activity sounds;
+        public bool NewMsgFromNewPlayer; // flag to indicate to ActivityWindow that there is a new message to be shown;
         public string MsgFromNewPlayer; // string to be displayed in ActivityWindow
 
         public List<TempSpeedPostItem> TempSpeedPostItems;
 
-        public int RandomizabilityPerCent = 0; // 0 -> hardly randomizable ; 100 -> well randomizable
+        public int RandomizabilityPerCent; // 0 -> hardly randomizable ; 100 -> well randomizable
         public bool WeatherChangesPresent; // tested in case of randomized activities to state wheter weather should be randomized
 
         private Activity(BinaryReader inf, Simulator simulator, List<EventWrapper> oldEventList, List<TempSpeedPostItem> tempSpeedPostItems)
@@ -624,8 +624,8 @@ namespace Orts.Simulation
         {
             foreach (var eventWrapper in EventList)
             {
-                if (eventWrapper is EventCategoryLocationWrapper && eventWrapper.ParsedObject.TrainService != "" &&
-                    train.Name.ToLower() == eventWrapper.ParsedObject.TrainService.ToLower())
+                if (eventWrapper is EventCategoryLocationWrapper && !string.IsNullOrEmpty(eventWrapper.ParsedObject.TrainService) &&
+                    eventWrapper.ParsedObject.TrainService.Equals(train.Name, StringComparison.OrdinalIgnoreCase))
                 {
                     if (eventWrapper.ParsedObject.TrainStartingTime == -1 || (train as AITrain).ServiceDefinition.Time == eventWrapper.ParsedObject.TrainStartingTime)
                     {
@@ -744,7 +744,7 @@ namespace Orts.Simulation
         public float distanceToNextSignal = -1;
         public Train MyPlayerTrain; // Shortcut to player train
 
-        public bool ldbfevaldepartbeforeboarding = false;//Debrief Eval
+        public bool ldbfevaldepartbeforeboarding;//Debrief Eval
         public static List<string> DbfEvalDepartBeforeBoarding = new List<string>();//Debrief Eval
 
         public ActivityTaskPassengerStopAt(Simulator simulator, ActivityTask prev, DateTime Arrive, DateTime Depart,
@@ -912,7 +912,7 @@ namespace Orts.Simulation
                         stringBuild.AppendFormat("{0}:{1}:{2}", delay.Hours.ToString("00"), delay.Minutes.ToString("00"), delay.Seconds.ToString("00"));
                         stringBuild.Append(separator);
                         stringBuild.Append(maydepart ? "Completed" : "NotCompleted");
-                        stringBuild.Append("\n");
+                        stringBuild.Append('\n');
                         File.AppendAllText(LogStationLogFile, stringBuild.ToString());
                     }
                 }
@@ -979,11 +979,11 @@ namespace Orts.Simulation
                                 stringBuild.Append(separator);
                                 stringBuild.Append(SchArrive.ToString("HH:mm:ss"));
                                 stringBuild.Append(separator);
-                                stringBuild.Append("-");
+                                stringBuild.Append('-');
                                 stringBuild.Append(separator);
                                 stringBuild.Append(ActArrive.HasValue ? ActArrive.Value.ToString("HH:mm:ss") : "-");
                                 stringBuild.Append(separator);
-                                stringBuild.Append("-");
+                                stringBuild.Append('-');
                                 stringBuild.Append(separator);
 
                                 TimeSpan delay = ActArrive.HasValue ? (ActArrive - SchArrive).Value : TimeSpan.Zero;
@@ -999,7 +999,7 @@ namespace Orts.Simulation
 
                                 stringBuild.Append(separator);
                                 stringBuild.Append("Final stop");
-                                stringBuild.Append("\n");
+                                stringBuild.Append('\n');
                                 File.AppendAllText(LogStationLogFile, stringBuild.ToString());
                             }
 
@@ -1028,14 +1028,14 @@ namespace Orts.Simulation
                                 stringBuild.Append(separator);
                                 stringBuild.Append(SchDepart.ToString("HH:mm:ss"));
                                 stringBuild.Append(separator);
-                                stringBuild.Append("-");
+                                stringBuild.Append('-');
                                 stringBuild.Append(separator);
-                                stringBuild.Append("-");
+                                stringBuild.Append('-');
                                 stringBuild.Append(separator);
-                                stringBuild.Append("-");
+                                stringBuild.Append('-');
                                 stringBuild.Append(separator);
                                 stringBuild.Append("Missed");
-                                stringBuild.Append("\n");
+                                stringBuild.Append('\n');
                                 File.AppendAllText(LogStationLogFile, stringBuild.ToString());
                             }
                         }
@@ -1203,9 +1203,9 @@ namespace Orts.Simulation
                 activity.IsSuccessful = true;
                 return true;
             }
-            if (this.ParsedObject.Outcomes.RestartWaitingTrain != null && this.ParsedObject.Outcomes.RestartWaitingTrain.WaitingTrainToRestart != "")
+            if (!string.IsNullOrEmpty(ParsedObject.Outcomes.RestartWaitingTrain?.WaitingTrainToRestart))
             {
-                var restartWaitingTrain = this.ParsedObject.Outcomes.RestartWaitingTrain;
+                var restartWaitingTrain = ParsedObject.Outcomes.RestartWaitingTrain;
                 Simulator.RestartWaitingTrain(restartWaitingTrain);
             }
             return false;
@@ -1474,7 +1474,7 @@ namespace Orts.Simulation
             var triggered = false;
             var e = this.ParsedObject as Orts.Formats.Msts.Models.LocationActivityEvent;
             var train = Simulator.PlayerLocomotive.Train;
-            if (ParsedObject.TrainService != "" && Train != null)
+            if (!string.IsNullOrEmpty(ParsedObject.TrainService) && Train != null)
             {
                 if (Train.FrontTDBTraveller == null) return triggered;
                 train = Train;

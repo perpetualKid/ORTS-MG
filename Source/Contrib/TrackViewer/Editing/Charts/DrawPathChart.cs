@@ -284,11 +284,11 @@ namespace ORTS.TrackViewer.Editing.Charts
         /// Draw the current chart on the given canvas. 
         /// This will do some general things, but the actual drawing for the specific chart is handed over to DrawSubChart.
         /// </summary>
-        /// <param name="zoomRatioStart">Describing the start (left-side) of the zooming region (as a part of the total x-range)</param>
-        /// <param name="zoomRatioStop">Describing the stop (right-side) of the zooming region (as a part of the total x-range)</param>
+        /// <param name="zoomPercentageStart">Describing the start (left-side) of the zooming region (as a part of the total x-range)</param>
+        /// <param name="zoomPercentageStop">Describing the stop (right-side) of the zooming region (as a part of the total x-range)</param>
         /// <param name="drawingCanvas">The WPF canvas to draw upon</param>
         /// <param name="legendCanvas">The WPF canvas on which to draw the legend</param>
-        public void Draw(double zoomRatioStart, double zoomRatioStop, Canvas drawingCanvas, Canvas legendCanvas)
+        public void Draw(double zoomPercentageStart, double zoomPercentageStop, Canvas drawingCanvas, Canvas legendCanvas)
         {
             drawingCanvas.Children.Clear();
             legendCanvas.Children.Clear();
@@ -301,8 +301,8 @@ namespace ORTS.TrackViewer.Editing.Charts
             canvasWidth = drawingCanvas.ActualWidth;
             canvasHeight = drawingCanvas.ActualHeight;
 
-            this.zoomRatioLeft = zoomRatioStart;
-            this.zoomRatioRight = zoomRatioStop;
+            this.zoomRatioLeft = zoomPercentageStart;
+            this.zoomRatioRight = zoomPercentageStop;
 
             DrawSubChart(drawingCanvas, legendCanvas);
         }
@@ -1018,12 +1018,12 @@ namespace ORTS.TrackViewer.Editing.Charts
                 }
             }
 
-            if (0 == pointsWithMarkers.Count())
+            if (0 == pointsWithMarkers.Count)
             {
                 return;
             }
 
-            double pixelsPerMarker = this.canvasWidth / pointsWithMarkers.Count();
+            double pixelsPerMarker = this.canvasWidth / pointsWithMarkers.Count;
             bool onlyShowMultiplesOf5 = (pixelsPerMarker < 25);
             foreach (PathChartPoint sourcePoint in pointsWithMarkers)
             {

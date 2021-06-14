@@ -39,6 +39,7 @@ namespace Orts.Formats.Msts.Files
 			{
 			}
 		}
-		public Hazard Hazard;
+
+		public Hazard Hazard { get; private set; }
 	}
 }

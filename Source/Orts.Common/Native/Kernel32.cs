@@ -9,6 +9,7 @@ namespace Orts.Common.Native
     /// </summary>
     public static partial class NativeMethods
     {
+#pragma warning disable CA1711 // Identifiers should not have incorrect suffix
         /// <summary>
         /// Retrieves all the keys and values for the specified section of an initialization file.
         /// </summary>
@@ -20,6 +21,7 @@ namespace Orts.Common.Native
         public static int GetPrivateProfileSection(string sectionName, string value, int size, string fileName)
         { return GetPrivateProfileSectionNative(sectionName, value, size, fileName); }
         [DllImport("kernel32.dll", EntryPoint = "GetPrivateProfileSection", CharSet = CharSet.Unicode, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern int GetPrivateProfileSectionNative(string sectionName, string value, int size, string fileName);
 
         /// <summary>
@@ -39,6 +41,7 @@ namespace Orts.Common.Native
         public static int GetPrivateProfileString(string sectionName, string keyName, string defaultValue, string value, int size, string fileName)
         { return GetPrivateProfileStringNative(sectionName, keyName, defaultValue, value, size, fileName); }
         [DllImport("kernel32.dll", EntryPoint = "GetPrivateProfileString", CharSet = CharSet.Unicode, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern int GetPrivateProfileStringNative(string sectionName, string keyName, string defaultValue, string value, int size, string fileName);
 
         /// <summary>
@@ -58,7 +61,10 @@ namespace Orts.Common.Native
         public static int GetPrivateProfileString(string sectionName, string keyName, string defaultValue, StringBuilder value, int size, string fileName)
         { return GetPrivateProfileStringNative(sectionName, keyName, defaultValue, value, size, fileName); }
         [DllImport("kernel32.dll", EntryPoint = "GetPrivateProfileString", CharSet = CharSet.Unicode, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
+#pragma warning disable CA1838 // Avoid 'StringBuilder' parameters for P/Invokes
         private static extern int GetPrivateProfileStringNative(string sectionName, string keyName, string defaultValue, StringBuilder value, int size, string fileName);
+#pragma warning restore CA1838 // Avoid 'StringBuilder' parameters for P/Invokes
 
         /// <summary>
         /// Copies a string into the specified section of an initialization file.
@@ -73,39 +79,43 @@ namespace Orts.Common.Native
         public static int WritePrivateProfileString(string sectionName, string keyName, string value, string fileName)
         { return WritePrivateProfileStringNative(sectionName, keyName, value, fileName); }
         [DllImport("kernel32.dll", EntryPoint = "WritePrivateProfileString", CharSet = CharSet.Unicode, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern int WritePrivateProfileStringNative(string sectionName, string keyName, string value, string fileName);
 
         public static bool GlobalMemoryStatusEx([In, Out] NativeStructs.MemoryStatusExtended buffer)
         { return GlobalMemoryStatusExNative(buffer); }
         [DllImport("kernel32.dll", EntryPoint = "GlobalMemoryStatusEx", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool GlobalMemoryStatusExNative([In, Out] NativeStructs.MemoryStatusExtended buffer);
 
         public static bool SetDllDirectory(string pathName)
         { return SetDllDirectoryNative(pathName); }
         [DllImport("kernel32.dll", EntryPoint = "SetDllDirectory", CharSet = CharSet.Unicode)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool SetDllDirectoryNative(string pathName);
 
         public static bool GlobalMemoryStatusEx([In, Out] NativeStructs.MEMORYSTATUSEX buffer)
         { return GlobalMemoryStatusExNative(buffer); }
         [DllImport("kernel32.dll", EntryPoint = "GlobalMemoryStatusEx", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool GlobalMemoryStatusExNative([In, Out] NativeStructs.MEMORYSTATUSEX buffer);
 
         public static bool GetProcessIoCounters(IntPtr hProcess, out NativeStructs.IO_COUNTERS ioCounters)
         { return GetProcessIoCountersNative(hProcess, out ioCounters); }
         [DllImport("kernel32.dll", EntryPoint = "GetProcessIoCounters", SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern bool GetProcessIoCountersNative(IntPtr hProcess, out NativeStructs.IO_COUNTERS ioCounters);
 
         public static IntPtr GetModuleHandle(string lpModuleName)
         { return GetModuleHandleNative(lpModuleName); }
         [DllImport("kernel32.dll", EntryPoint = "GetModuleHandle", CharSet = CharSet.Unicode, SetLastError = true)]
+        [DefaultDllImportSearchPaths(DllImportSearchPath.System32)]
         private static extern IntPtr GetModuleHandleNative(string lpModuleName);
-
-
+#pragma warning restore CA1711 // Identifiers should not have incorrect suffix
     }
 
 #pragma warning disable CA1034 // Nested types should not be visible
 #pragma warning disable CA1707 // Identifiers should not contain underscores
-#pragma warning disable CA1051 // Do not declare visible instance fields
 #pragma warning disable CA1815 // Override equals and operator equals on value types
     public static partial class NativeStructs
     {
@@ -151,5 +161,4 @@ namespace Orts.Common.Native
 #pragma warning restore CA1815 // Override equals and operator equals on value types
 #pragma warning restore CA1707 // Identifiers should not contain underscores
 #pragma warning restore CA1034 // Nested types should not be visible
-#pragma warning restore CA1051 // Do not declare visible instance fields
 }

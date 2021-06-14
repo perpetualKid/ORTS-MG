@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 
 using Microsoft.Xna.Framework;
@@ -17,7 +18,7 @@ namespace Orts.Formats.Msts.Models
     /// </summary>
     public abstract class TrackItem
     {
-        protected WorldLocation location;
+        private protected WorldLocation location;
         /// <summary>
         /// The name of the item (used for the label shown by F6)
         /// </summary>
@@ -44,7 +45,7 @@ namespace Orts.Formats.Msts.Models
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="index">The index of this TrItem in the list of TrItems</param>
-        protected void ParseTrackItemId(STFReader stf, int index)
+        private protected void ParseTrackItemId(STFReader stf, int index)
         {
             stf.MustMatchBlockStart();
             TrackItemId = stf.ReadUInt(null);
@@ -56,7 +57,7 @@ namespace Orts.Formats.Msts.Models
         /// Reads the Rdata from filestream
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        protected void ParseTrackItemRData(STFReader stf)
+        private protected void ParseTrackItemRData(STFReader stf)
         {
             stf.MustMatchBlockStart();
             float x = stf.ReadFloat(null);
@@ -70,7 +71,7 @@ namespace Orts.Formats.Msts.Models
         /// Reads the SData from filestream
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
-        protected void ParseTrackItemSData(STFReader stf)
+        private protected void ParseTrackItemSData(STFReader stf)
         {
             stf.MustMatchBlockStart();
             SData1 = stf.ReadFloat(STFReader.Units.None, null);
@@ -94,7 +95,7 @@ namespace Orts.Formats.Msts.Models
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="index">The index of this TrItem in the list of TrItems</param>
-        public CrossoverItem(STFReader stf, int index)
+        internal CrossoverItem(STFReader stf, int index)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -117,33 +118,6 @@ namespace Orts.Formats.Msts.Models
     /// </summary>
     public class SignalItem : TrackItem
     {
-        /// <summary>
-        /// Struct to describe details of the signal for junctions
-        /// </summary>
-        public class TrackItemSignalDirection
-        {
-            /// <summary>Index to the junction track node</summary>
-            public uint TrackNode { get; private set; }
-            ///// <summary>Used with junction signals, appears to be either 1 or 0</summary>
-            //public uint SData1 { get; private set; }
-            /// <summary>Used with junction signals, appears to be either 1 or 0</summary>
-            public uint LinkLRPath { get; private set; }
-            ///// <summary>Used with junction signals, appears to be either 1 or 0</summary>
-            //public uint SData3 { get; private set; }
-
-            public TrackItemSignalDirection(STFReader stf)
-            {
-                stf.MustMatchBlockStart();
-                TrackNode = stf.ReadUInt(null);
-                //SData1 = stf.ReadUInt(null);
-                stf.ReadUInt(null);
-                LinkLRPath = stf.ReadUInt(null);
-                //SData3 = stf.ReadUInt(null);
-                stf.ReadUInt(null);
-                stf.SkipRestOfBlock();
-            }
-        }
-
         /// <summary>Set to  00000001 if junction link set</summary>
         public uint Flags1 { get; private set; }
         /// <summary>0 or 1 depending on which way signal is facing</summary>
@@ -155,14 +129,14 @@ namespace Orts.Formats.Msts.Models
         /// <summary>Type of signal</summary>
         public string SignalType { get; private set; }
         /// <summary></summary>
-        public TrackItemSignalDirection[] SignalDirections { get; private set; }
+        public IList<TrackItemSignalDirection> SignalDirections { get; private set; }
 
         /// <summary>
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="index">The index of this TrItem in the list of TrItems</param>
-        public SignalItem(STFReader stf, int index)
+        internal SignalItem(STFReader stf, int index)
         {
             SignalObject = -1;
             stf.MustMatchBlockStart();
@@ -177,25 +151,21 @@ namespace Orts.Formats.Msts.Models
                     Direction = (TrackDirection)stf.ReadUInt(null);
                     SignalData = stf.ReadFloat(STFReader.Units.None, null);
                     SignalType = stf.ReadString();
-                    // To do get index to Sigtypes table corresponding to this sigmal
+                    // To do get index to Sigtypes table corresponding to this signal
                     stf.SkipRestOfBlock();
                 }),
                 new STFReader.TokenProcessor("trsignaldirs", ()=>{
                     stf.MustMatchBlockStart();
                     uint signalDirs = stf.ReadUInt(null);
-                    SignalDirections = new TrackItemSignalDirection[signalDirs];
+                    SignalDirections = new List<TrackItemSignalDirection>((int)signalDirs);
                     int i = 0;
                     stf.ParseBlock(new STFReader.TokenProcessor[] {
                         new STFReader.TokenProcessor("trsignaldir", ()=>{
-                            if (i >= signalDirs)
+                            if (SignalDirections.Count >= signalDirs)
                             {
                                 STFException.TraceWarning(stf, $"Adding extra TrSignalDirs in SignalItem {TrackItemId}");
-                                var temp = new TrackItemSignalDirection[signalDirs+1];
-                                Array.Copy(SignalDirections, temp, SignalDirections.Length);
-                                SignalDirections = temp;
                             }
-                            SignalDirections[i] = new TrackItemSignalDirection(stf);
-                            i++;
+                            SignalDirections.Add(new TrackItemSignalDirection(stf));
                         }),
                     });
                     if (i < signalDirs)
@@ -206,12 +176,39 @@ namespace Orts.Formats.Msts.Models
     }
 
     /// <summary>
+    /// Struct to describe details of the signal for junctions
+    /// </summary>
+    public class TrackItemSignalDirection
+    {
+        /// <summary>Index to the junction track node</summary>
+        public uint TrackNode { get; private set; }
+        ///// <summary>Used with junction signals, appears to be either 1 or 0</summary>
+        //public uint SData1 { get; private set; }
+        /// <summary>Used with junction signals, appears to be either 1 or 0</summary>
+        public uint LinkLRPath { get; private set; }
+        ///// <summary>Used with junction signals, appears to be either 1 or 0</summary>
+        //public uint SData3 { get; private set; }
+
+        internal TrackItemSignalDirection(STFReader stf)
+        {
+            stf.MustMatchBlockStart();
+            TrackNode = stf.ReadUInt(null);
+            //SData1 = stf.ReadUInt(null);
+            stf.ReadUInt(null);
+            LinkLRPath = stf.ReadUInt(null);
+            //SData3 = stf.ReadUInt(null);
+            stf.ReadUInt(null);
+            stf.SkipRestOfBlock();
+        }
+    }
+
+    /// <summary>
     /// Describes SpeedPost of MilePost (could be Kilometer post as well)
     /// </summary>
     public class SpeedPostItem : TrackItem
     {
         /// <summary>Flags from raw file describing exactly what this is.</summary>
-        protected uint flags;
+        private protected uint flags;
 
         /// <summary>true to be milepost</summary>
         public bool IsMilePost { get; protected set; }
@@ -244,17 +241,14 @@ namespace Orts.Formats.Msts.Models
         public int NumberShown { get; protected set; }
 
         /// <summary>Get the direction the signal is NOT facing</summary>
-        public int ReverseDirection
-        {
-            get { return Direction == 0 ? 1 : 0; }
-        }
+        public int ReverseDirection => Direction == 0 ? 1 : 0;
 
         /// <summary>
         /// Default constructor used during file parsing.
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="idx">The index of this TrItem in the list of TrItems</param>
-        public SpeedPostItem(STFReader stf, int idx)
+        internal SpeedPostItem(STFReader stf, int idx)
         {
             SignalObject = -1;
             stf.MustMatchBlockStart();
@@ -318,6 +312,9 @@ namespace Orts.Formats.Msts.Models
 
         public TempSpeedPostItem(Route routeFile, in WorldLocation location, bool isStart, in WorldPosition worldPosition, bool isWarning)
         {
+            if (null == routeFile)
+                throw new ArgumentNullException(nameof(routeFile));
+
             // TrItemId needs to be set later
             position = worldPosition;
             this.location = location;
@@ -393,7 +390,7 @@ namespace Orts.Formats.Msts.Models
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="index">The index of this TrItem in the list of TrItems</param>
-        public SoundRegionItem(STFReader stf, int index)
+        internal SoundRegionItem(STFReader stf, int index)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -422,7 +419,7 @@ namespace Orts.Formats.Msts.Models
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="idx">The index of this TrItem in the list of TrItems</param>
-        public EmptyItem(STFReader stf, int idx)
+        internal EmptyItem(STFReader stf, int idx)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -441,7 +438,7 @@ namespace Orts.Formats.Msts.Models
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="index">The index of this TrItem in the list of TrItems</param>
-        public LevelCrossingItem(STFReader stf, int index)
+        internal LevelCrossingItem(STFReader stf, int index)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -467,7 +464,7 @@ namespace Orts.Formats.Msts.Models
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="index">The index of this TrItem in the list of TrItems</param>
-        public SidingItem(STFReader stf, int index)
+        internal SidingItem(STFReader stf, int index)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -508,7 +505,7 @@ namespace Orts.Formats.Msts.Models
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="idx">The index of this TrItem in the list of TrItems</param>
-        public PlatformItem(STFReader stf, int idx)
+        internal PlatformItem(STFReader stf, int idx)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -532,15 +529,15 @@ namespace Orts.Formats.Msts.Models
         /// <summary>
         /// Constructor to create Platform Item out of Siding Item
         /// </summary>
-        /// <param name="thisSiding">The siding to use for a platform creation</param>
-        public PlatformItem(SidingItem thisSiding)
+        /// <param name="sidingItem">The siding to use for a platform creation</param>
+        public PlatformItem(SidingItem sidingItem)
         {
-            TrackItemId = thisSiding.TrackItemId;
-            SData1 = thisSiding.SData1;
-            SData2 = thisSiding.SData2;
-            ItemName = thisSiding.ItemName;
-            Flags1 = thisSiding.Flags1;
-            LinkedPlatformItemId = thisSiding.LinkedSidingId;
+            TrackItemId = sidingItem?.TrackItemId ?? throw new ArgumentNullException(nameof(sidingItem));
+            SData1 = sidingItem.SData1;
+            SData2 = sidingItem.SData2;
+            ItemName = sidingItem.ItemName;
+            Flags1 = sidingItem.Flags1;
+            LinkedPlatformItemId = sidingItem.LinkedSidingId;
             Station = ItemName;
         }
     }
@@ -555,7 +552,7 @@ namespace Orts.Formats.Msts.Models
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="index">The index of this TrItem in the list of TrItems</param>
-        public HazardItem(STFReader stf, int index)
+        internal HazardItem(STFReader stf, int index)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -576,7 +573,7 @@ namespace Orts.Formats.Msts.Models
         /// </summary>
         /// <param name="stf">The STFreader containing the file stream</param>
         /// <param name="index">The index of this TrItem in the list of TrItems</param>
-        public PickupItem(STFReader stf, int index)
+        internal PickupItem(STFReader stf, int index)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {

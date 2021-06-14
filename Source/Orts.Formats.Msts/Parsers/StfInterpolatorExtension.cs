@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Orts.Common.Calc;
 
@@ -6,17 +7,20 @@ namespace Orts.Formats.Msts.Parsers
 {
     public static class StfInterpolatorExtension
     {
-        public static Interpolator CreateInterpolator(this STFReader reader)
+        public static Interpolator CreateInterpolator(this STFReader stf)
         {
+            if (null == stf)
+                throw new ArgumentNullException(nameof(stf));
+
             List<double> list = new List<double>();
-            reader.MustMatchBlockStart();
-            while (!reader.EndOfBlock())
-                list.Add(reader.ReadFloat(STFReader.Units.Any, null));
+            stf.MustMatchBlockStart();
+            while (!stf.EndOfBlock())
+                list.Add(stf.ReadFloat(STFReader.Units.Any, null));
             if (list.Count % 2 == 1)
-                STFException.TraceWarning(reader, "Ignoring extra odd value in Interpolator list.");
+                STFException.TraceWarning(stf, "Ignoring extra odd value in Interpolator list.");
             int n = list.Count / 2;
             if (n < 2)
-                STFException.TraceWarning(reader, "Interpolator must have at least two value pairs.");
+                STFException.TraceWarning(stf, "Interpolator must have at least two value pairs.");
             double[] xArray = new double[n];
             double[] yArray = new double[n];
             for (int i = 0; i < n; i++)
@@ -24,13 +28,16 @@ namespace Orts.Formats.Msts.Parsers
                 xArray[i] = list[2 * i];
                 yArray[i] = list[2 * i + 1];
                 if (i > 0 && xArray[i - 1] >= xArray[i])
-                    STFException.TraceWarning(reader, "Interpolator x values must be increasing.");
+                    STFException.TraceWarning(stf, "Interpolator x values must be increasing.");
             }
             return new Interpolator(xArray, yArray);
         }
 
         public static Interpolator2D CreateInterpolator2D(this STFReader stf)
         {
+            if (null == stf)
+                throw new ArgumentNullException(nameof(stf));
+
             List<double> xlist = new List<double>();
             List<Interpolator> ilist = new List<Interpolator>();
             stf.MustMatchBlockStart();
@@ -57,6 +64,9 @@ namespace Orts.Formats.Msts.Parsers
 
         public static Interpolator2D CreateInterpolator2D(this STFReader stf, bool tab)
         {
+            if (null == stf)
+                throw new ArgumentNullException(nameof(stf));
+
             List<double> xlist = new List<double>();
             List<Interpolator> ilist = new List<Interpolator>();
 
@@ -71,8 +81,8 @@ namespace Orts.Formats.Msts.Parsers
                     errorFound = true;
                 }
                 int numOfColumns = stf.ReadInt(0);
-                string header = stf.ReadString().ToLower();
-                if (header == "throttle")
+                string header = stf.ReadString();
+                if ("throttle".Equals(header, System.StringComparison.OrdinalIgnoreCase))
                 {
                     stf.MustMatchBlockStart();
                     int numOfThrottleValues = 0;
@@ -95,8 +105,8 @@ namespace Orts.Formats.Msts.Parsers
                     }
 
                     int numofData = 0;
-                    string tableLabel = stf.ReadString().ToLower();
-                    if (tableLabel == "table")
+                    string tableLabel = stf.ReadString();
+                    if ("table".Equals(tableLabel, System.StringComparison.OrdinalIgnoreCase))
                     {
                         stf.MustMatchBlockStart();
                         for (int i = 0; i < numOfRows; i++)

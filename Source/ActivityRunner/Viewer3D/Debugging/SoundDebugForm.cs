@@ -32,13 +32,13 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
         private Viewer Viewer;
 
         private Timer UITimer;
-        private double lastUpdateTime = 0;
+        private double lastUpdateTime;
 
         private SoundSource selectedSoundSource;
         private TreeNode node;
-        private TreeNode selectedNode = null;
-        private TreeNode lastActSelectedNode = null;
-        private TreeNode lastInActSelectedNode = null;
+        private TreeNode selectedNode;
+        private TreeNode lastActSelectedNode;
+        private TreeNode lastInActSelectedNode;
 
         public SoundDebugForm(Viewer viewer)
         {

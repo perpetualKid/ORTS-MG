@@ -2861,11 +2861,11 @@ namespace Orts.Simulation.Signalling
                     platformDetails.Length = Math.Abs(platformDetails.NodeOffset[Location.FarEnd] - platformDetails.NodeOffset[Location.NearEnd]);
                 }
 
-                if (platformSidesList.TryGetValue(index, out uint thisPlatformData))
+                if (platformSidesList.TryGetValue(index, out uint platformData))
                 {
-                    if (((uint)PlatformDataFlag.PlatformLeft & thisPlatformData) != 0)
+                    if (((uint)Formats.Msts.PlatformData.PlatformLeft & platformData) == (uint)Formats.Msts.PlatformData.PlatformLeft)
                         platformDetails.PlatformSide |= PlatformDetails.PlatformSides.Left;
-                    if (((uint)PlatformDataFlag.PlatformRight & thisPlatformData) != 0)
+                    if (((uint)Formats.Msts.PlatformData.PlatformRight & platformData) == (uint)Formats.Msts.PlatformData.PlatformRight)
                         platformDetails.PlatformSide |= PlatformDetails.PlatformSides.Right;
                 }
 
@@ -3005,7 +3005,7 @@ namespace Orts.Simulation.Signalling
 
             // Override .tdb NumPassengersWaiting info with .act NumPassengersWaiting info if any available
             int overriddenPlatformDetailsIndex;
-            foreach (PlatformData platformData in Simulator.Instance.Activity?.Activity.PlatformWaitingPassengers ?? Enumerable.Empty<PlatformData>())
+            foreach (Formats.Msts.Models.PlatformData platformData in Simulator.Instance.Activity?.Activity.PlatformWaitingPassengers ?? Enumerable.Empty<Formats.Msts.Models.PlatformData>())
             {
                 overriddenPlatformDetailsIndex = PlatformDetailsList.FindIndex(platformDetails => (platformDetails.PlatformReference[Location.NearEnd] == platformData.ID) || (platformDetails.PlatformReference[Location.FarEnd] == platformData.ID));
                 if (overriddenPlatformDetailsIndex >= 0)

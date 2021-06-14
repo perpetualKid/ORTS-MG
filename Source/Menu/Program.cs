@@ -21,8 +21,9 @@ using System.Diagnostics;
 using System.Windows.Forms;
 
 using Orts.Common.Info;
-using Orts.Common.Native;
 using Orts.Models.Simplified;
+
+[assembly: CLSCompliant(false)]
 
 namespace Orts.Menu
 {

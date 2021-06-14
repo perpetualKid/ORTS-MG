@@ -20,18 +20,20 @@ using Microsoft.Xna.Framework;
 using Orts.Formats.Msts.Models;
 using Orts.Formats.Msts.Parsers;
 
+using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.IO;
 
 namespace Orts.Formats.Msts.Files
 {
     public class CabViewFile
 	{
-        public List<Vector3> Locations { get; } = new List<Vector3>();   // Head locations for front, left and right views
-        public List<Vector3> Directions { get; } = new List<Vector3>();  // Head directions for each view
-        public List<string> Views2D { get; } = new List<string>();     // 2D CAB Views - by GeorgeS
-        public List<string> ViewsNight { get; } = new List<string>();    // Night CAB Views - by GeorgeS
-        public List<string> ViewsLight { get; } = new List<string>();    // Light CAB Views - by GeorgeS
+        public IList<Vector3> Locations { get; } = new List<Vector3>();   // Head locations for front, left and right views
+        public IList<Vector3> Directions { get; } = new List<Vector3>();  // Head directions for each view
+        public StringCollection Views2D { get; } = new StringCollection();     // 2D CAB Views - by GeorgeS
+        public StringCollection ViewsNight { get; } = new StringCollection();    // Night CAB Views - by GeorgeS
+        public StringCollection ViewsLight { get; } = new StringCollection();    // Light CAB Views - by GeorgeS
         public CabViewControls CabViewControls { get; private set; }                 // Controls in CAB - by GeorgeS
 
         public CabViewFile(string fileName) : 
@@ -49,11 +51,11 @@ namespace Orts.Formats.Msts.Files
                         new STFReader.TokenProcessor("direction", ()=>{ Directions.Add(stf.ReadVector3Block(STFReader.Units.None, new Vector3())); }),
                         new STFReader.TokenProcessor("cabviewfile", ()=>{
                             string cvfileName = stf.ReadStringBlock(null);
-                            var path = Path.Combine(basePath, Path.GetDirectoryName(cvfileName));
+                            string path = Path.Combine(basePath, Path.GetDirectoryName(cvfileName));
                             string name = Path.GetFileName(cvfileName);
 
                             // Use *Frnt1024.ace if available
-                            if (!Path.GetFileNameWithoutExtension(cvfileName).EndsWith("1024"))
+                            if (!Path.GetFileNameWithoutExtension(cvfileName).EndsWith("1024", StringComparison.OrdinalIgnoreCase))
                             {
                                 string name1024 = Path.GetFileNameWithoutExtension(cvfileName) + "1024" + Path.GetExtension(cvfileName);
                                 if (File.Exists(Path.Combine(path, name1024)))

@@ -50,7 +50,7 @@ namespace ORTS.TrackViewer.Editing.Charts
         public IDictionary<TrainpathNode, double> DistanceAlongPath;
         /// <summary>Is there actually a path loaded with one or more points</summary>
         [JsonIgnore]
-        public bool HasPath { get { return PathChartPoints != null && PathChartPoints.Count() > 0;} }
+        public bool HasPath { get { return PathChartPoints != null && PathChartPoints.Any();} }
 
         [JsonProperty("PathName")]
         private string PathName { get; set; }

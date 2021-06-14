@@ -65,6 +65,7 @@ namespace Orts.ActivityRunner.Viewer3D
     public static class DDSLib
     {
 #pragma warning disable CA1823 // Avoid unused private fields
+#pragma warning disable IDE0051 // Remove unused private members
         private const int DDSD_CAPS = 0x1; //Required in every .dds file.	
         private const int DDSD_HEIGHT = 0x2; //Required in every .dds file.
         private const int DDSD_WIDTH = 0x4; //Required in every .dds file.
@@ -96,6 +97,7 @@ namespace Orts.ActivityRunner.Viewer3D
         private const int DDSCAPS2_VOLUME = 0x200000; //Required for a volume texture.
 
         private const uint DDS_MAGIC = 0x20534444; // "DDS "
+#pragma warning restore IDE0051 // Remove unused private members
 #pragma warning restore CA1823 // Avoid unused private fields
 
         //Compression formats.
@@ -109,7 +111,7 @@ namespace Orts.ActivityRunner.Viewer3D
             D3DFMT_DXT5 = 0x35545844,
             DX10 = 0x30315844,
             DXGI_FORMAT_BC4_UNORM = 0x55344342,
-            DXGI_FORMAT_BC4_SNORM = 0x53344342,
+            DXGI_FORMAT_BC4_SNORM = DXGI_FORMAT_BC4_UNORM, //0x53344342,
             DXGI_FORMAT_BC5_UNORM = 0x32495441,
             DXGI_FORMAT_BC5_SNORM = 0x53354342,
 
@@ -605,7 +607,7 @@ namespace Orts.ActivityRunner.Viewer3D
             SurfaceFormat expectedFormat = SurfaceFormatFromLoadFormat(loadSurfaceFormat, compressionFormat, pixelFlags, rgbBitCount);
 
             Texture2D texture = new Texture2D(device, width, height, hasMipMaps, expectedFormat);
-            texture.Tag = new Formats.Msts.Models.AceInfo() { AlphaBits = XNATextureNumAlphaBits(texture) };
+            texture.Tag = XNATextureNumAlphaBits(texture);
 
             if (texture.Format != expectedFormat)
             {
@@ -643,7 +645,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
                 if (streamOffset > reader.BaseStream.Length)
                 {
-                    throw new Exception("The stream you offered is smaller then the offset you are proposing for it.");
+                    throw new InvalidDataException("The stream you offered is smaller then the offset you are proposing for it.");
                 }
 
                 reader.BaseStream.Seek(streamOffset, SeekOrigin.Begin);

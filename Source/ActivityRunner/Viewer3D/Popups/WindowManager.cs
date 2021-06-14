@@ -65,7 +65,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         private readonly Material WindowManagerMaterial;
         private readonly PopupWindowMaterial PopupWindowMaterial;
         private readonly List<Window> Windows = new List<Window>();
-        private Window[] WindowsZOrder = new Window[0];
+        private Window[] WindowsZOrder = Array.Empty<Window>();
         private SpriteBatch SpriteBatch;
         private Matrix Identity = Matrix.Identity;
         private Matrix XNAView = Matrix.Identity;

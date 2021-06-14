@@ -107,50 +107,50 @@ namespace Orts.Simulation.RollingStocks
         public MSTSNotchController LargeEjectorController = new MSTSNotchController(0, 1, 0.1f);
 
         public bool Injector1IsOn;
-        private bool Injector1SoundIsOn = false;
+        private bool Injector1SoundIsOn;
         public bool Injector2IsOn;
-        private bool Injector2SoundIsOn = false;
+        private bool Injector2SoundIsOn;
         public bool CylinderCocksAreOpen;
         public bool BlowdownValveOpen;
         public bool CylinderCompoundOn;  // Flag to indicate whether compound locomotive is in compound or simple mode of operation - simple = true (ie bypass valve is open)
         private bool FiringIsManual;
-        private bool BlowerIsOn = false;
-        private bool BoilerIsPriming = false;
-        private bool WaterIsExhausted = false;
-        private bool CoalIsExhausted = false;
-        private bool FireIsExhausted = false;
-        private bool FuelBoost = false;
-        private bool FuelBoostReset = false;
-        private bool StokerIsMechanical = false;
+        private bool BlowerIsOn;
+        private bool BoilerIsPriming;
+        private bool WaterIsExhausted;
+        private bool CoalIsExhausted;
+        private bool FireIsExhausted;
+        private bool FuelBoost;
+        private bool FuelBoostReset;
+        private bool StokerIsMechanical;
         private bool HotStart; // Determine whether locomotive is started in hot or cold state - selectable option in Options TAB
-        private bool FullBoilerHeat = false;    // Boiler heat has exceeded max possible heat in boiler (max operating steam pressure)
-        private bool FullMaxPressBoilerHeat = false; // Boiler heat has exceed the max total possible heat in boiler (max safety valve pressure)
-        private bool ShovelAnyway = false; // Predicts when the AI fireman should be increasing the fire burn rate despite the heat in the boiler
+        private bool FullBoilerHeat;    // Boiler heat has exceeded max possible heat in boiler (max operating steam pressure)
+        private bool FullMaxPressBoilerHeat; // Boiler heat has exceed the max total possible heat in boiler (max safety valve pressure)
+        private bool ShovelAnyway; // Predicts when the AI fireman should be increasing the fire burn rate despite the heat in the boiler
         /// <summary>
         /// Grate limit of locomotive exceedeed?
         /// </summary>
-        public bool IsGrateLimit { get; protected set; } = false;
+        public bool IsGrateLimit { get; protected set; }
 
-        private bool HasSuperheater = false;  // Flag to indicate whether locomotive is superheated steam type
-        private bool IsSuperSet = false;    // Flag to indicate whether superheating is reducing cylinder condenstation
-        private bool IsSaturated = false;     // Flag to indicate locomotive is saturated steam type
-        private bool safety2IsOn = false; // Safety valve #2 is on and opertaing
-        private bool safety3IsOn = false; // Safety valve #3 is on and opertaing
-        private bool safety4IsOn = false; // Safety valve #4 is on and opertaing
-        private bool IsFixGeared = false;
-        private bool IsSelectGeared = false;
-        private bool IsLocoSlip = false;        // locomotive is slipping
-        private bool IsCritTELimit = false; // Flag to advise if critical TE is exceeded
-        private bool ISBoilerLimited = false;  // Flag to indicate that Boiler is limiting factor with the locomotive power
-        private bool SetFireOn = false; // Flag to set the AI fire to on for starting of locomotive
-        private bool SetFireOff = false; // Flag to set the AI fire to off for locomotive when approaching a stop 
-        private bool SetFireReset = false; // Flag if AI fire has been reset, ie no overrides in place
-        private bool AIFireOverride = false; // Flag to show ai fire has has been overriden
-        private bool InjectorLockedOut = false; // Flag to lock injectors from changing within a fixed period of time
+        private bool HasSuperheater;  // Flag to indicate whether locomotive is superheated steam type
+        private bool IsSuperSet;    // Flag to indicate whether superheating is reducing cylinder condenstation
+        private bool IsSaturated;     // Flag to indicate locomotive is saturated steam type
+        private bool safety2IsOn; // Safety valve #2 is on and opertaing
+        private bool safety3IsOn; // Safety valve #3 is on and opertaing
+        private bool safety4IsOn; // Safety valve #4 is on and opertaing
+        private bool IsFixGeared;
+        private bool IsSelectGeared;
+        private bool IsLocoSlip;        // locomotive is slipping
+        private bool IsCritTELimit; // Flag to advise if critical TE is exceeded
+        private bool ISBoilerLimited;  // Flag to indicate that Boiler is limiting factor with the locomotive power
+        private bool SetFireOn; // Flag to set the AI fire to on for starting of locomotive
+        private bool SetFireOff; // Flag to set the AI fire to off for locomotive when approaching a stop 
+        private bool SetFireReset; // Flag if AI fire has been reset, ie no overrides in place
+        private bool AIFireOverride; // Flag to show ai fire has has been overriden
+        private bool InjectorLockedOut; // Flag to lock injectors from changing within a fixed period of time
 
         // Aux Tender Parameters
-        public bool AuxTenderMoveFlag = false; // Flag to indicate whether train has moved
-        private bool SteamIsAuxTenderCoupled = false;
+        public bool AuxTenderMoveFlag; // Flag to indicate whether train has moved
+        private bool SteamIsAuxTenderCoupled;
         private float TenderWaterPercent;       // Percentage of water in tender
         public float WaterConsumptionLbpS;
         public float CurrentAuxTenderWaterMassKG;
@@ -185,7 +185,7 @@ namespace Orts.Simulation.RollingStocks
         private float baseStartTempK;     // Starting water temp
         private float StartBoilerHeatBTU;
         public float BoilerMassLB;         // current total mass of water and steam in boiler (changes as boiler usage changes)
-        private bool RestoredGame = false; // Flag to indicate that game is being restored. This will stop some values from being "initialised", as this will overwrite restored values.
+        private bool RestoredGame; // Flag to indicate that game is being restored. This will stop some values from being "initialised", as this will overwrite restored values.
 
         private float BoilerKW;                 // power of boiler
         private float MaxBoilerKW;              // power of boiler at full performance
@@ -244,7 +244,7 @@ namespace Orts.Simulation.RollingStocks
         private float BoilerHeatOutSVAIBTUpS;
         private float SafetyValveDropPSI = 4.0f;      // Pressure drop before Safety valve turns off, normally around 4 psi - First safety valve normally operates between MaxBoilerPressure, and MaxBoilerPressure - 4, ie Max Boiler = 200, cutoff = 196.
         private float EvaporationAreaM2;
-        private float SuperheatAreaM2 = 0.0f;      // Heating area of superheater
+        private float SuperheatAreaM2;      // Heating area of superheater
         private float SuperheatKFactor = 15000.0f;     // Factor used to calculate superheat temperature - guesstimate
         private float MaxSuperheatRefTempF;            // Maximum Superheat temperature in deg Fahrenheit, based upon the heating area.
         private float SuperheatTempRatio;          // A ratio used to calculate the superheat temp - based on the ratio of superheat (using heat area) to "known" curve. 
@@ -266,13 +266,13 @@ namespace Orts.Simulation.RollingStocks
         private SmoothedData FuelRateStoker = new SmoothedData(15); // Stoker is more responsive and only takes x seconds to fully react to changing needs.
         private SmoothedData FuelRate = new SmoothedData(45); // Automatic fireman takes x seconds to fully react to changing needs.
         private SmoothedData BurnRateSmoothKGpS = new SmoothedData(150); // Changes in BurnRate take x seconds to fully react to changing needs - models increase and decrease in heat.
-        private float FuelRateSmoothed = 0.0f;     // Smoothed Fuel Rate
+        private float FuelRateSmoothed;     // Smoothed Fuel Rate
 
         // steam performance reporting
-        public float SteamPerformanceTimeS = 0.0f; // Records the time since starting movement
-        public float CumulativeWaterConsumptionLbs = 0.0f;
-        public float CumulativeCylinderSteamConsumptionLbs = 0.0f;
-        private float CummulativeTotalSteamConsumptionLbs = 0.0f;
+        public float SteamPerformanceTimeS; // Records the time since starting movement
+        public float CumulativeWaterConsumptionLbs;
+        public float CumulativeCylinderSteamConsumptionLbs;
+        private float CummulativeTotalSteamConsumptionLbs;
         public static float DbfEvalCumulativeWaterConsumptionLbs;//DebriefEval
 
         private int LocoIndex;
@@ -288,9 +288,9 @@ namespace Orts.Simulation.RollingStocks
         private float CylinderCondensationFactor;  // Cylinder compensation factor for condensation in cylinder due to cutoff
         private float BlowerSteamUsageFactor;
         private float InjectorLockOutResetTimeS = 15.0f; // Time to reset the injector lock out time - time to prevent change of injectors
-        private float InjectorLockOutTimeS = 0.0f; // Current lock out time - reset after Reset Time exceeded 
+        private float InjectorLockOutTimeS; // Current lock out time - reset after Reset Time exceeded 
         private float InjectorFlowRateLBpS;    // Current injector flow rate - based upon current boiler pressure
-        private float MaxInjectorFlowRateLBpS = 0.0f;      // Maximum possible injector flow rate - based upon maximum boiler pressure
+        private float MaxInjectorFlowRateLBpS;      // Maximum possible injector flow rate - based upon maximum boiler pressure
         private Interpolator BackPressureIHPtoPSI;             // back pressure in cylinders given usage
         private Interpolator CylinderSteamDensityPSItoLBpFT3;   // steam density in cylinders given pressure (could be super heated)
         private Interpolator WaterDensityPSItoLBpFT3;   // water density given pressure
@@ -340,8 +340,8 @@ namespace Orts.Simulation.RollingStocks
         private const float SpecificHeatCoalKJpKGpK = 1.26f; // specific heat of coal - kJ/kg/K
         private const float SteamVaporSpecVolumeAt100DegC1BarM3pKG = 1.696f;
         private float WaterHeatBTUpFT3;             // Water heat in btu/ft3
-        private bool FusiblePlugIsBlown = false;    // Fusible plug blown, due to lack of water in the boiler
-        private bool LocoIsOilBurner = false;       // Used to identify if loco is oil burner
+        private bool FusiblePlugIsBlown;    // Fusible plug blown, due to lack of water in the boiler
+        private bool LocoIsOilBurner;       // Used to identify if loco is oil burner
         private float GrateAreaM2;                  // Grate Area in SqM
         private float IdealFireDepthIN = 7.0f;      // Assume standard coal coverage of grate = 7 inches.
         private float FuelDensityKGpM3 = 864.5f;    // Anthracite Coal : 50 - 58 (lb/ft3), 800 - 929 (kg/m3)
@@ -355,10 +355,10 @@ namespace Orts.Simulation.RollingStocks
         }
 
         private float DamperBurnEffect;             // Effect of the Damper control Used in manual firing)
-        private float Injector1Fraction = 0.0f;     // Fraction (0-1) of injector 1 flow from Fireman controller or AI
-        private float Injector2Fraction = 0.0f;     // Fraction (0-1) of injector  of injector 2 flow from Fireman controller or AI
+        private float Injector1Fraction;     // Fraction (0-1) of injector 1 flow from Fireman controller or AI
+        private float Injector2Fraction;     // Fraction (0-1) of injector  of injector 2 flow from Fireman controller or AI
         private float SafetyValveStartPSI = 0.1f;   // Set safety valve to just over max pressure - allows for safety valve not to operate in AI firing
-        private float InjectorBoilerInputLB = 0.0f; // Input into boiler from injectors
+        private float InjectorBoilerInputLB; // Input into boiler from injectors
         private const float WaterDensityAt100DegC1BarKGpM3 = 954.8f;
 
 
@@ -372,7 +372,7 @@ namespace Orts.Simulation.RollingStocks
         private float CompCylDiaIN = 9.5f;
         private float CompCylStrokeIN = 10.0f;
         private float CompStrokespM = 120.0f;
-        private float CompSteamUsageLBpS = 0.0f;
+        private float CompSteamUsageLBpS;
         private const float BTUpHtoKJpS = 0.000293071f;     // Convert BTU/s to Kj/s
         private float BoilerHeatTransferCoeffWpM2K = 45.0f; // Heat Transfer of locomotive boiler 45 Wm2K
         private float TotalSteamUsageLBpS;                  // Running total for complete current steam usage
@@ -406,18 +406,18 @@ namespace Orts.Simulation.RollingStocks
         private float WaterTempNewK;            // Boiler Water Temp (Kelvin) - for testing purposes
         private float BkW_Diff;                 // Net Energy into boiler after steam loads taken.
         private float WaterVolL;                // Actual volume of water in bolier (litres)
-        private float BoilerHeatOutBTUpS = 0.0f;// heat out of boiler in BTU
+        private float BoilerHeatOutBTUpS;// heat out of boiler in BTU
         /// <summary>
         /// Heat into boiler in BTU
         /// </summary>
-        public float BoilerHeatInBTUpS { get; protected set; } = 0.0f;
+        public float BoilerHeatInBTUpS { get; protected set; }
 
         private float BoilerHeatExcess;         // Vlaue of excess boiler heat
         private float InjCylEquivSizeIN;        // Calculate the equivalent cylinder size for purpose of sizing the injector.
         private float InjectorSize;             // size of injector installed on boiler
 
         // Values from previous iteration to use in UpdateFiring() and show in HUD
-        public float PreviousBoilerHeatOutBTUpS { get; protected set; } = 0.0f;
+        public float PreviousBoilerHeatOutBTUpS { get; protected set; }
         public float PreviousTotalSteamUsageLBpS { get; protected set; }
 
         private float Injector1WaterDelTempF = 65f;   // Injector 1 water delivery temperature - F
@@ -441,7 +441,7 @@ namespace Orts.Simulation.RollingStocks
 
         private float SuperheaterFactor = 1.0f;               // Currently 2 values respected: 0.0 for no superheat (default), > 1.0 for typical superheat
         public float SuperheaterSteamUsageFactor = 1.0f;       // Below 1.0, reduces steam usage due to superheater
-        private float Stoker = 0.0f;                // Currently 2 values respected: 0.0 for no mechanical stoker (default), = 1.0 for typical mechanical stoker
+        private float Stoker;                // Currently 2 values respected: 0.0 for no mechanical stoker (default), = 1.0 for typical mechanical stoker
         private float StokerMaxUsage = 0.01f;       // Max steam usage of stoker - 1% of max boiler output
         private float StokerMinUsage = 0.005f;      // Min Steam usage - just to keep motor ticking over - 0.5% of max boiler output
         private float StokerSteamUsageLBpS;         // Current steam usage of stoker
@@ -495,7 +495,7 @@ namespace Orts.Simulation.RollingStocks
         public float LogLPReleasePressurePSI;
         public float LogLPSteamChestPressurePSI;
 
-        public bool LogIsCompoundLoco = false;
+        public bool LogIsCompoundLoco;
         private float LogPreCompressionPressurePSI;
         private float LogPreAdmissionPressurePSI;
 
@@ -549,9 +549,9 @@ namespace Orts.Simulation.RollingStocks
 
         private const int CylStrokesPerCycle = 2;  // each cylinder does 2 strokes for every wheel rotation, within each stroke
         private float CylinderEfficiencyRate = 1.0f; // Factor to vary the output power of the cylinder without changing steam usage - used as a player customisation factor.
-        public float CylCockSteamUsageLBpS = 0.0f; // Cylinder Cock Steam Usage if locomotive moving
-        public float CylCockSteamUsageStatLBpS = 0.0f; // Cylinder Cock Steam Usage if locomotive stationary
-        public float CylCockSteamUsageDisplayLBpS = 0.0f; // Cylinder Cock Steam Usage for display and effects
+        public float CylCockSteamUsageLBpS; // Cylinder Cock Steam Usage if locomotive moving
+        public float CylCockSteamUsageStatLBpS; // Cylinder Cock Steam Usage if locomotive stationary
+        public float CylCockSteamUsageDisplayLBpS; // Cylinder Cock Steam Usage for display and effects
         private float CylCockDiaIN = 0.5f;          // Steam Cylinder Cock orifice size
         private float CylCockPressReduceFactor;     // Factor to reduce cylinder pressure by if cocks open
         private float CylCockBoilerHeatOutBTUpS;  // Amount of heat taken out by use of cylinder cocks
@@ -573,7 +573,7 @@ namespace Orts.Simulation.RollingStocks
         private float DisplayTractiveEffortLbsF; // Value of Tractive effort to display in HUD
         private float MaxCriticalSpeedTractiveEffortLbf;  // Maximum power value @ critical speed of piston
         private float DisplayCriticalSpeedTractiveEffortLbf;  // Display power value @ speed of piston
-        private float absStartTractiveEffortN = 0.0f;      // Record starting tractive effort
+        private float absStartTractiveEffortN;      // Record starting tractive effort
         private float TractiveEffortLbsF;           // Current sim calculated tractive effort
         private const float TractiveEffortFactor = 0.85f;  // factor for calculating Theoretical Tractive Effort for non-geared locomotives
         private float GearedTractiveEffortFactor = 0.7f;  // factor for calculating Theoretical Tractive Effort for geared locomotives
@@ -610,7 +610,7 @@ namespace Orts.Simulation.RollingStocks
         private float LowMaxGearedSpeedMpS;  // Max speed of the geared locomotive - Low Gear
         private float HighMaxGearedSpeedMpS; // Max speed of the geared locomotive - High Gear
         private float MotiveForceGearRatio; // mulitplication factor to be used in calculating motive force etc, when a geared locomotive.
-        private float SteamGearPosition = 0.0f; // Position of Gears if set
+        private float SteamGearPosition; // Position of Gears if set
 
         // Rotative Force and adhesion
 
@@ -639,7 +639,7 @@ namespace Orts.Simulation.RollingStocks
         private float StartCrankAngleRight;
         private float StartCrankAngleMiddle;
         private float StartTangentialCrankForceFactorLeft;
-        private float StartTangentialCrankForceFactorMiddle = 0.0f;
+        private float StartTangentialCrankForceFactorMiddle;
         private float StartTangentialCrankForceFactorRight;
         private float SpeedTangentialCrankForceFactorLeft;
         private float SpeedTangentialCrankForceFactorMiddle;
@@ -712,12 +712,12 @@ namespace Orts.Simulation.RollingStocks
         public float GeneratorSteamVelocityMpS;
         public float WhistleSteamVolumeM3pS;
         public float WhistleSteamVelocityMpS;
-        private float CylinderCockTimerS = 0.0f;
-        private float CylinderCockOpenTimeS = 0.0f;
+        private float CylinderCockTimerS;
+        private float CylinderCockOpenTimeS;
         private bool CylinderCock1On = true;
-        private bool CylinderCock2On = false;
-        public bool Cylinder2SteamEffects = false;
-        public bool GeneratorSteamEffects = false;
+        private bool CylinderCock2On;
+        public bool Cylinder2SteamEffects;
+        public bool GeneratorSteamEffects;
         public float CompressorParticleDurationS = 3.0f;
         public float Cylinder1ParticleDurationS = 3.0f;
         public float Cylinder2ParticleDurationS = 3.0f;
@@ -4650,7 +4650,9 @@ namespace Orts.Simulation.RollingStocks
             // Typically tangential force will be greater at starting then when the locomotive is at speed, as interia and reduce steam pressure will decrease the value. 
             // By default this model uses information based upon a "NYC 4-4-2 locomotive", for smaller locomotives this data is changed in the OR initialisation phase.
 
-            if (Simulator.UseAdvancedAdhesion && this == Simulator.PlayerLocomotive && this.Train.TrainType != TrainType.AiPlayerHosting) // only set advanced wheel slip when advanced adhesion and is the player locomotive, AI locomotive will not work to this model. Don't use slip model when train is in auto pilot
+            if (Simulator.UseAdvancedAdhesion && !Simulator.Settings.SimpleControlPhysics && this == Simulator.PlayerLocomotive && this.Train.TrainType != TrainType.AiPlayerHosting)
+                // only set advanced wheel slip when advanced adhesion, and simplecontrols/physics is not set and is the player locomotive, AI locomotive will not work to this model. 
+                // Don't use slip model when train is in auto pilot
             {
                 float SlipCutoffPressureAtmPSI;
                 float SlipCylinderReleasePressureAtmPSI;
@@ -6471,7 +6473,8 @@ namespace Orts.Simulation.RollingStocks
                     );
             }
 
-            if (Simulator.UseAdvancedAdhesion && SteamEngineType != SteamEngineTypes.Geared) // Only display slip monitor if advanced adhesion used
+            if (Simulator.UseAdvancedAdhesion && !Simulator.Settings.SimpleControlPhysics && SteamEngineType != SteamEngineTypes.Geared) 
+                // Only display slip monitor if advanced adhesion is set and simplecontrols/physics not set
             {
                 status.AppendFormat("\n\t\t === {0} === \n", Simulator.Catalog.GetString("Slip Monitor"));
                 status.AppendFormat("{0}\t{1}\t{2:N0}\t{3}\t{4}\t{5}\t{6}\t{7}\t{8}\t{9}\t{10}\t{11}\t{12:N2}\t{13}\t{14}\t{15:N2}\t{16}\t{17}\t{18:N1}\n",

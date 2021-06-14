@@ -22,7 +22,7 @@ using System.IO;
 using System.Linq;
 using Orts.Common.Logging;
 
-[assembly: CLSCompliant(true)]
+[assembly: CLSCompliant(false)]
 
 namespace Orts.ContentChecker
 {

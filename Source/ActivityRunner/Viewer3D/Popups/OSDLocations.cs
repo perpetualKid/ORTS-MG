@@ -51,7 +51,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         private ActivityTask ActivityCurrentTask;
         private Dictionary<string, bool> Platforms;
         private Dictionary<string, bool> Sidings;
-        private int PlatformUpdate = 0;
+        private int PlatformUpdate;
 
         public OSDLocations(WindowManager owner)
             : base(owner, 0, 0, "OSD Locations")

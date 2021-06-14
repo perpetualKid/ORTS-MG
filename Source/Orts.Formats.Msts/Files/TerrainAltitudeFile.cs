@@ -23,16 +23,18 @@ namespace Orts.Formats.Msts.Files
 {
     public class TerrainAltitudeFile
     {
+#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
         private readonly ushort[,] elevation;
 
         public TerrainAltitudeFile(string fileName, int sampleCount)
         {
             elevation = new ushort[sampleCount, sampleCount];
+#pragma warning restore CA1814 // Prefer jagged arrays over multidimensional
             try
             {
-                using (var reader = new BinaryReader(File.OpenRead(fileName)))
-                    for (var z = 0; z < sampleCount; z++)
-                        for (var x = 0; x < sampleCount; x++)
+                using (BinaryReader reader = new BinaryReader(File.OpenRead(fileName)))
+                    for (int z = 0; z < sampleCount; z++)
+                        for (int x = 0; x < sampleCount; x++)
                             elevation[x, z] = reader.ReadUInt16();
             }
             catch (Exception error)

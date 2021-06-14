@@ -22,6 +22,8 @@ using System.IO;
 using System.Linq;
 using Orts.Common.Logging;
 
+[assembly: CLSCompliant(false)]
+
 namespace Orts.DataValidator
 {
     internal class Program

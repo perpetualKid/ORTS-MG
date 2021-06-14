@@ -55,7 +55,7 @@ namespace Orts.ActivityRunner.Viewer3D
         public readonly List<SoundSourceBase> SnowSound;
         public readonly List<SoundSourceBase> WeatherSounds = new List<SoundSourceBase>();
 
-        public bool weatherChangeOn = false;
+        public bool weatherChangeOn;
         public DynamicWeather dynamicWeather;
         public bool RandomizedWeather;
         public bool DesertZone; // we are in a desert zone, so no randomized weather change...
@@ -67,7 +67,7 @@ namespace Orts.ActivityRunner.Viewer3D
         public float Time;
         private readonly double[] windChangeMpSS = { 40, 5 }; // Flurry, steady
         private const double windSpeedMaxMpS = 4.5f;
-        private double windUpdateTimer = 0.0;
+        private double windUpdateTimer;
         private float WindGustUpdateTimeS = 1.0f;
         private bool InitialWind = true;
         private float BaseWindDirectionRad;
@@ -532,8 +532,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 {
                     dynamicWeather = new DynamicWeather();
                 }
-                var weatherChange = Simulator.Instance.ActivityRun.triggeredEventWrapper.ParsedObject.Outcomes.WeatherChange != null ?
-                    Simulator.Instance.ActivityRun.triggeredEventWrapper.ParsedObject.Outcomes.WeatherChange : Simulator.Instance.ActivityRun.triggeredEventWrapper.ParsedObject.WeatherChange;
+                OrtsWeatherChange weatherChange = Simulator.Instance.ActivityRun.triggeredEventWrapper.ParsedObject.WeatherChange ?? Simulator.Instance.ActivityRun.triggeredEventWrapper.ParsedObject.Outcomes.WeatherChange;
                 dynamicWeather.WeatherChange_Init(weatherChange, this);
                 Simulator.Instance.ActivityRun.triggeredEventWrapper = null;
             }
@@ -559,16 +558,16 @@ namespace Orts.ActivityRunner.Viewer3D
         public class DynamicWeather
         {
             public const float RainSnowLiquidityThreshold = 0.3f;
-            public float overcastChangeRate = 0;
-            public float overcastTimer = 0;
-            public float fogChangeRate = 0;
-            public float fogTimer = 0;
-            public float stableWeatherTimer = 0;
-            public float precipitationIntensityChangeRate = 0;
-            public float precipitationIntensityTimer = 0;
+            public float overcastChangeRate;
+            public float overcastTimer;
+            public float fogChangeRate;
+            public float fogTimer;
+            public float stableWeatherTimer;
+            public float precipitationIntensityChangeRate;
+            public float precipitationIntensityTimer;
             public float precipitationIntensityDelayTimer = -1;
-            public float precipitationLiquidityChangeRate = 0;
-            public float precipitationLiquidityTimer = 0;
+            public float precipitationLiquidityChangeRate;
+            public float precipitationLiquidityTimer;
             public float ORTSOvercast = -1;
             public int ORTSOvercastTransitionTimeS = -1;
             public float ORTSFog = -1;
@@ -577,7 +576,7 @@ namespace Orts.ActivityRunner.Viewer3D
             public int ORTSPrecipitationIntensityTransitionTimeS = -1;
             public float ORTSPrecipitationLiquidity = -1;
             public int ORTSPrecipitationLiquidityTransitionTimeS = -1;
-            public bool fogDistanceIncreasing = false;
+            public bool fogDistanceIncreasing;
             public DynamicWeather()
             {
             }
@@ -655,7 +654,7 @@ namespace Orts.ActivityRunner.Viewer3D
                     {
                         fogDistanceIncreasing = true;
                         fogChangeRate = -fogChangeRate;
-                        ORTSFog = weatherControl.weather.FogDistance;
+                        if (fogTimer > 0) ORTSFog = weatherControl.weather.FogDistance;
                     }
                     wChangeOn = true;
                 }

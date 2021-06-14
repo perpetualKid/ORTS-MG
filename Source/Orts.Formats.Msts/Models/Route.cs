@@ -10,7 +10,7 @@ namespace Orts.Formats.Msts.Models
 {
     public class Route
     {
-        public Route(STFReader stf)
+        internal Route(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -123,11 +123,11 @@ namespace Orts.Formats.Msts.Models
 
     public class RouteStart
     {
-        private WorldLocation location;
+        private readonly WorldLocation location;
 
         public ref readonly WorldLocation Location => ref location;
 
-        public RouteStart(STFReader stf)
+        internal RouteStart(STFReader stf)
         {
             stf.MustMatchBlockStart();
             location = new WorldLocation(stf.ReadInt(null), stf.ReadInt(null), stf.ReadFloat(null), 0f, stf.ReadFloat(null));
@@ -140,15 +140,15 @@ namespace Orts.Formats.Msts.Models
     /// </summary>
     public class Environment
     {
-        private Dictionary<string, string> fileNames = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> fileNames = new Dictionary<string, string>();
 
-        public Environment(STFReader stf)
+        internal Environment(STFReader stf)
         {
             stf.MustMatchBlockStart();
             for (int i = 0; i < 12; ++i)
             {
-                var envfilekey = stf.ReadString();
-                var envfile = stf.ReadStringBlock(null);
+                string envfilekey = stf.ReadString();
+                string envfile = stf.ReadStringBlock(null);
                 fileNames.Add(envfilekey, envfile);
             }
             stf.SkipRestOfBlock();

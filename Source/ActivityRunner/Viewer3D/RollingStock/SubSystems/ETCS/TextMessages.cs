@@ -36,7 +36,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock.SubSystems.Etcs
         private WindowTextFont FontMessageBold;
         private readonly Texture2D[] ScrollUpTexture = new Texture2D[2];
         private readonly Texture2D[] ScrollDownTexture = new Texture2D[2];
-        private int CurrentPage = 0;
+        private int CurrentPage;
         private int NumPages = 1;
 
         public readonly DMIButton ButtonScrollUp;

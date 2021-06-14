@@ -14,7 +14,7 @@ namespace Orts.Formats.Msts.Models
     /// </summary>
     public class ActivityEvents: List<ActivityEvent>
     {
-        public ActivityEvents(STFReader stf)
+        internal ActivityEvents(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -26,6 +26,9 @@ namespace Orts.Formats.Msts.Models
 
         public void UpdateORActivtyData(STFReader stf)
         {
+            if (null == stf)
+                throw new ArgumentNullException(nameof(stf));
+
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("eventcategorylocation", ()=>{ TryModify(0, stf); }),
@@ -73,7 +76,7 @@ namespace Orts.Formats.Msts.Models
             }
         }
 
-        private bool TestMatch(int category, ActivityEvent origEvent)
+        private static bool TestMatch(int category, ActivityEvent origEvent)
         {
             return 
                 ((category == 0 && origEvent is LocationActivityEvent) ||
@@ -101,10 +104,10 @@ namespace Orts.Formats.Msts.Models
         public string TrainService { get; protected set; } = "";
         public int TrainStartingTime { get; protected set; } = -1;
 
-        public virtual void Update(STFReader stf)
+        internal virtual void Update(STFReader stf)
         { }
 
-        protected void OrtsActivitySoundProcessor(STFReader stf)
+        private protected void OrtsActivitySoundProcessor(STFReader stf)
         {
             stf.MustMatchBlockStart();
             string soundFile = stf.ReadString();
@@ -128,13 +131,13 @@ namespace Orts.Formats.Msts.Models
         public ref readonly WorldLocation Location => ref location;
         public float RadiusM { get; private set; }
 
-        public LocationActivityEvent(STFReader stf)
+        internal LocationActivityEvent(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Update(stf);
         }
 
-        public override void Update(STFReader stf)
+        internal override void Update(STFReader stf)
         {
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("eventtypelocation", ()=>{ stf.MustMatchBlockStart(); stf.MustMatchBlockEnd(); }),
@@ -184,13 +187,13 @@ namespace Orts.Formats.Msts.Models
         public uint? SidingId { get; private set; }  // May be specified inside the Wagon_List instead. Nullable as can't use -1 to indicate not set.
         public float SpeedMpS { get; private set; }
 
-        public ActionActivityEvent(STFReader stf)
+        internal ActionActivityEvent(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Update(stf);
         }
 
-        public override void Update(STFReader stf)
+        internal override void Update(STFReader stf)
         {
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("eventtypeallstops", ()=>{ stf.MustMatchBlockStart(); stf.MustMatchBlockEnd(); Type = EventType.AllStops; }),
@@ -211,7 +214,7 @@ namespace Orts.Formats.Msts.Models
                 new STFReader.TokenProcessor("texttodisplayoncompletioniftriggered", ()=>{ TextToDisplayOnCompletionIfTriggered = stf.ReadStringBlock(""); }),
                 new STFReader.TokenProcessor("texttodisplayoncompletionifnotriggered", ()=>{ TextToDisplayOnCompletionIfNotTriggered = stf.ReadStringBlock(""); }),
                 new STFReader.TokenProcessor("name", ()=>{ Name = stf.ReadStringBlock(""); }),
-                new STFReader.TokenProcessor("wagon_list", ()=>{ WorkOrderWagons = new WorkOrderWagons(stf, Type); }),
+                new STFReader.TokenProcessor("wagon_list", ()=>{ WorkOrderWagons = new WorkOrderWagons(stf); }),
                 new STFReader.TokenProcessor("sidingitem", ()=>{ SidingId = (uint)stf.ReadIntBlock(null); }),
                 new STFReader.TokenProcessor("speed", ()=>{ SpeedMpS = stf.ReadFloatBlock(STFReader.Units.Speed, null); }),
                 new STFReader.TokenProcessor("reversable_event", ()=>{ stf.MustMatchBlockStart(); stf.MustMatchBlockEnd(); Reversible = true; }),
@@ -227,13 +230,13 @@ namespace Orts.Formats.Msts.Models
     {  // E.g. Hisatsu route and Short Passenger Run shrtpass.act
         public int Time { get; private set; }
 
-        public TimeActivityEvent(STFReader stf)
+        internal TimeActivityEvent(STFReader stf)
         {
             stf.MustMatchBlockStart();
             Update(stf);
         }
 
-        public override void Update(STFReader stf)
+        internal override void Update(STFReader stf)
         {
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("id", ()=>{ ID = stf.ReadIntBlock(null); }),
@@ -266,7 +269,7 @@ namespace Orts.Formats.Msts.Models
         public float PrecipitationLiquidity { get; private set; }
         public int PrecipitationLiquidityTransitionTime { get; private set; }
 
-        public OrtsWeatherChange(STFReader stf)
+        internal OrtsWeatherChange(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -307,22 +310,22 @@ namespace Orts.Formats.Msts.Models
         public bool ActivitySuccess { get; private set; }
         public string ActivityFail { get; private set; }
         // MSTS Activity Editor limits model to 4 outcomes of any type. We use lists so there is no restriction.
-        public List<int> ActivateList { get; } = new List<int>();
-        public List<int> RestoreActivityLevels { get; } = new List<int>();
-        public List<int> DecrementActivityLevels { get; } = new List<int>();
-        public List<int> IncrementActivityLevels { get; } = new List<int>();
+        public IList<int> ActivateList { get; } = new List<int>();
+        public IList<int> RestoreActivityLevels { get; } = new List<int>();
+        public IList<int> DecrementActivityLevels { get; } = new List<int>();
+        public IList<int> IncrementActivityLevels { get; } = new List<int>();
         public string DisplayMessage { get; private set; }
         //       public string WaitingTrainToRestart;
         public RestartWaitingTrain RestartWaitingTrain { get; private set; }
         public OrtsWeatherChange WeatherChange { get; private set; }
         public ActivitySound ActivitySound { get; private set; }
 
-        public Outcomes(STFReader stf)
+        internal Outcomes(STFReader stf)
         {
             Update(stf);
         }
 
-        public void Update(STFReader stf)
+        internal void Update(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {

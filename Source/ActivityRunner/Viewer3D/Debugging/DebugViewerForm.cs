@@ -99,7 +99,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 	  /// <summary>
 	  /// contains the last position of the mouse
 	  /// </summary>
-	  private System.Drawing.Point LastCursorPosition = new System.Drawing.Point();
+	  private System.Drawing.Point LastCursorPosition;
 		public Pen redPen = new Pen(Color.Red);
 		public Pen greenPen = new Pen(Color.Green);
 		public Pen orangePen = new Pen(Color.Orange);
@@ -433,7 +433,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 		  }*/
 	  }
 
-        private int LostCount = 0;//how many players in the lost list (quit)
+        private int LostCount;//how many players in the lost list (quit)
 	  public void CheckAvatar()
 	  {
 		  if (!MultiPlayer.MPManager.IsMultiPlayer() || MultiPlayer.MPManager.OnlineTrains == null || MultiPlayer.MPManager.OnlineTrains.Players == null) return;
@@ -811,7 +811,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 				//trains selected in the avatar view list will be drawn in blue, others will be drawn in red
 				pathPen.Color = Color.Red;
 				var drawRed = 0;
-				int ValidTrain = selectedTrainList.Count();
+				int ValidTrain = selectedTrainList.Count;
 				//add trains quit into the end, will draw them in gray
 				var quitTrains = MultiPlayer.MPManager.Instance().lostPlayer.Values
 					.Select((MultiPlayer.OnlinePlayer lost) => lost?.Train)
@@ -1789,12 +1789,12 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 		  msgSelected.Enabled = false;
 		  reply2Selected.Enabled = false;
 		  if (!MultiPlayer.MPManager.IsMultiPlayer()) return;
-		  var msg = MSG.Text;
-		  msg = msg.Replace("\r", "");
-		  msg = msg.Replace("\t", "");
+            string msg = MSG.Text;
+		  msg = msg.Replace("\r", "", StringComparison.Ordinal);
+		  msg = msg.Replace("\t", "", StringComparison.Ordinal);
 		  MultiPlayer.MPManager.Instance().ComposingText = false;
 		  MSG.Enabled = false;
-		  if (msg != "")
+		  if (msg.Length > 0)
 		  {
 			  if (MultiPlayer.MPManager.IsServer())
 			  {
@@ -1828,12 +1828,12 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 
 		  if (!MultiPlayer.MPManager.IsMultiPlayer()) return;
 		  var msg = MSG.Text;
-		  msg = msg.Replace("\r", "");
-		  msg = msg.Replace("\t", "");
+		  msg = msg.Replace("\r", "", StringComparison.Ordinal);
+		  msg = msg.Replace("\t", "", StringComparison.Ordinal);
 		  MultiPlayer.MPManager.Instance().ComposingText = false;
 		  MSG.Text = "";
 		  MSG.Enabled = false;
-		  if (msg == "") return;
+		  if (msg.Length == 0) return;
 		  var user = "";
 		  if (messages.SelectedItems.Count > 0)
 		  {
@@ -1841,10 +1841,10 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 			  for (var i = 0; i < chosen.Count; i++)
 			  {
 				  var tmp = (string)(chosen[i]);
-				  var index = tmp.IndexOf(':');
+				  var index = tmp.IndexOf(':', StringComparison.Ordinal);
 				  if (index < 0) continue;
 				  tmp = tmp.Substring(0, index) + "\r";
-				  if (user.Contains(tmp)) continue;
+				  if (user.Contains(tmp, StringComparison.OrdinalIgnoreCase)) continue;
 				  user += tmp;
 			  }
 			  user += "0END";
@@ -1877,13 +1877,13 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 			  if (e.KeyValue == 13)
 			  {
 				  var msg = MSG.Text;
-				  msg = msg.Replace("\r", "");
-				  msg = msg.Replace("\t", "");
-				  msg = msg.Replace("\n", "");
+				  msg = msg.Replace("\r", "", StringComparison.Ordinal);
+				  msg = msg.Replace("\t", "", StringComparison.Ordinal);
+				  msg = msg.Replace("\n", "", StringComparison.Ordinal);
 				  MultiPlayer.MPManager.Instance().ComposingText = false;
 				  MSG.Enabled = false;
 				  MSG.Text = "";
-				  if (msg == "") return;
+				  if (msg.Length == 0) return;
 				  var user = "";
 
 				  if (MultiPlayer.MPManager.IsServer())
@@ -1923,9 +1923,9 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 		  if (!MultiPlayer.MPManager.IsMultiPlayer()) return;
 		  var msg = MSG.Text;
 		  MSG.Text = "";
-		  msg = msg.Replace("\r", "");
-		  msg = msg.Replace("\t", "");
-		  if (msg == "") return;
+		  msg = msg.Replace("\r", "", StringComparison.Ordinal);
+		  msg = msg.Replace("\t", "", StringComparison.Ordinal);
+		  if (msg.Length == 0) return;
 		  var user = "";
 		  if (AvatarView.SelectedItems.Count > 0)
 		  {

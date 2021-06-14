@@ -276,7 +276,7 @@ namespace Orts.ActivityRunner.Viewer3D
         /// <param name="filespec">Complete filepath string to track profile file.</param>
         public TRPFile(Viewer viewer, string filespec)
         {
-            if (filespec == "")
+            if (string.IsNullOrEmpty(filespec))
             {
                 // No track profile provided, use default
                 TrackProfile = new TrProfile(viewer);

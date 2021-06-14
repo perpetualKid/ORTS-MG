@@ -46,11 +46,11 @@ namespace Orts.Simulation
         // Dynamic data
         public bool Forward; // forward motion on
         public bool Reverse; // reverse motion on
-        public float XPos = 0; // X Position of animated part, to be compared with X positions of endpoints
+        public float XPos; // X Position of animated part, to be compared with X positions of endpoints
         public bool Connected = true; // Transfertable is connected to a track
         public bool SaveConnected = true; // Transfertable is connected to a track
         public int ConnectedTarget = -1; // index of trackend connected
-        public float TargetX = 0; //final target for Viewer;
+        public float TargetX; //final target for Viewer;
 
         public SignalEnvironment signalRef { get; protected set; }
 
@@ -158,13 +158,13 @@ namespace Orts.Simulation
         /// Computes the nearest transfertable exit in the actual direction
         /// Returns the Y angle to be compared.
         /// </summary>
-        public override void ComputeTarget(bool isForward)
+        public override void ComputeTarget(bool clockwise)
         {
             if (!Continuous) return;
             Continuous = false;
             GoToTarget = false;
-            Forward = isForward;
-            Reverse = !isForward;
+            Forward = clockwise;
+            Reverse = !clockwise;
             if (Forward)
             {
                 var offsetDiff = 1.4f;
@@ -236,7 +236,7 @@ namespace Orts.Simulation
         /// 
         /// </summary>
         /// 
-        public override void StartContinuous(bool isForward)
+        public override void StartContinuous(bool clockwise)
         {
             if (TrainsOnMovingTable.Count > 1 || (TrainsOnMovingTable.Count == 1 && TrainsOnMovingTable[0].FrontOnBoard ^ TrainsOnMovingTable[0].BackOnBoard))
             {
@@ -285,8 +285,8 @@ namespace Orts.Simulation
                 // Computing position of cars relative to center of transfertable
 
              }
-             Forward = isForward;
-             Reverse = !isForward;
+             Forward = clockwise;
+             Reverse = !clockwise;
              Continuous = true;
         }
 

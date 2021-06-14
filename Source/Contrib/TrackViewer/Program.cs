@@ -19,6 +19,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
+[assembly: CLSCompliant(false)]
+
 namespace ORTS.TrackViewer
 {
     internal static class Program

@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.IO;
 
 using Microsoft.Xna.Framework;
 
@@ -24,7 +24,7 @@ namespace Orts.Formats.Msts.Models
             EsdBoundingBox = new EsdBoundingBox();
         }
 
-        public ShapeDescriptor(STFReader stf)
+        internal ShapeDescriptor(STFReader stf)
         {
             Name = stf.ReadString(); // Ignore the filename string. TODO: Check if it agrees with the SD file name? Is this important?
             stf.ParseBlock(new STFReader.TokenProcessor[] {
@@ -35,7 +35,7 @@ namespace Orts.Formats.Msts.Models
                     new STFReader.TokenProcessor("esd_subobj", ()=>{ EsdSubObject = true; stf.SkipBlock(); }),
                     new STFReader.TokenProcessor("esd_bounding_box", ()=>{
                         EsdBoundingBox = new EsdBoundingBox(stf);
-                        if (EsdBoundingBox.Min == null || EsdBoundingBox.Max == null)  // ie quietly handle ESD_Bounding_Box()
+                        if (EsdBoundingBox.Min == Vector3.Zero || EsdBoundingBox.Max == Vector3.Zero)  // ie quietly handle ESD_Bounding_Box()
                             EsdBoundingBox = null;
                     }),
                     new STFReader.TokenProcessor("esd_ortssoundfilename", ()=>{ EsdSoundFileName = stf.ReadStringBlock(null); }),
@@ -60,18 +60,18 @@ namespace Orts.Formats.Msts.Models
             max = new Vector3();
         }
 
-        public EsdBoundingBox(STFReader stf)
+        internal EsdBoundingBox(STFReader stf)
         {
             stf.MustMatchBlockStart();
             string item = stf.ReadString();
-            if (item == ")") return;    // quietly return on ESD_Bounding_Box()
+            if (item == ")") 
+                return;    // quietly return on ESD_Bounding_Box()
             stf.StepBackOneItem();
             min = new Vector3(stf.ReadFloat(null), stf.ReadFloat(null), stf.ReadFloat(null));
             max = new Vector3(stf.ReadFloat(null), stf.ReadFloat(null), stf.ReadFloat(null));
             // JP2indirt.sd has extra parameters
             stf.SkipRestOfBlock();
         }
-
     }
 
     public class Shape
@@ -95,7 +95,7 @@ namespace Orts.Formats.Msts.Models
         public LodControls LodControls { get; private set; }
         public Animations Animations { get; private set; }
 
-        public Shape(SBR block)
+        internal Shape(SBR block)
         {
             block.VerifyID(TokenID.Shape);
             ShapeHeader = new ShapeHeader(block.ReadSubBlock());
@@ -126,7 +126,7 @@ namespace Orts.Formats.Msts.Models
         public uint Flags1 { get; private set; }
         public uint Flags2 { get; private set; }
 
-        public ShapeHeader(SBR block)
+        internal ShapeHeader(SBR block)
         {
             block.VerifyID(TokenID.Shape_Header);
             Flags1 = block.ReadFlags();
@@ -138,11 +138,12 @@ namespace Orts.Formats.Msts.Models
 
     public class Volumes : List<VolumeSphere>
     {
-        public Volumes(SBR block)
+        internal Volumes(SBR block)
         {
             block.VerifyID(TokenID.Volumes);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new VolumeSphere(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new VolumeSphere(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -152,10 +153,10 @@ namespace Orts.Formats.Msts.Models
         public Vector3 Vector { get; private set; }
         public float Radius { get; private set; }
 
-        public VolumeSphere(SBR block)
+        internal VolumeSphere(SBR block)
         {
             block.VerifyID(TokenID.Vol_Sphere);
-            var vectorBlock = block.ReadSubBlock();
+            SBR vectorBlock = block.ReadSubBlock();
             Vector = new Vector3(vectorBlock.ReadFloat(), vectorBlock.ReadFloat(), vectorBlock.ReadFloat());
             vectorBlock.VerifyEndOfBlock();
             Radius = block.ReadFloat();
@@ -165,13 +166,13 @@ namespace Orts.Formats.Msts.Models
 
     public class ShaderNames : List<string>
     {
-        public ShaderNames(SBR block)
+        internal ShaderNames(SBR block)
         {
             block.VerifyID(TokenID.Shader_Names);
-            var count = Capacity = block.ReadInt();
+            int count = Capacity = block.ReadInt();
             while (count-- > 0)
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Named_Shader);
                 Add(subBlock.ReadString());
                 subBlock.VerifyEndOfBlock();
@@ -182,13 +183,13 @@ namespace Orts.Formats.Msts.Models
 
     public class TextureFilterNames : List<string>
     {
-        public TextureFilterNames(SBR block)
+        internal TextureFilterNames(SBR block)
         {
             block.VerifyID(TokenID.Texture_Filter_Names);
-            var count = Capacity = block.ReadInt();
+            int count = Capacity = block.ReadInt();
             while (count-- > 0)
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Named_Filter_Mode);
                 Add(subBlock.ReadString());
                 subBlock.VerifyEndOfBlock();
@@ -199,13 +200,13 @@ namespace Orts.Formats.Msts.Models
 
     public class Points : List<Vector3>
     {
-        public Points(SBR block)
+        internal Points(SBR block)
         {
             block.VerifyID(TokenID.Points);
-            var count = Capacity = block.ReadInt();
+            int count = Capacity = block.ReadInt();
             while (count-- > 0)
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Point);
                 Add(new Vector3(subBlock.ReadFloat(), subBlock.ReadFloat(), subBlock.ReadFloat()));
                 subBlock.VerifyEndOfBlock();
@@ -216,13 +217,13 @@ namespace Orts.Formats.Msts.Models
 
     public class UVPoints : List<Vector2>
     {
-        public UVPoints(SBR block)
+        internal UVPoints(SBR block)
         {
             block.VerifyID(TokenID.UV_Points);
-            var count = Capacity = block.ReadInt();
+            int count = Capacity = block.ReadInt();
             while (count-- > 0)
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.UV_Point);
                 Add(new Vector2(subBlock.ReadFloat(), subBlock.ReadFloat()));
                 subBlock.VerifyEndOfBlock();
@@ -233,13 +234,13 @@ namespace Orts.Formats.Msts.Models
 
     public class Normals : List<Vector3>
     {
-        public Normals(SBR block)
+        internal Normals(SBR block)
         {
             block.VerifyID(TokenID.Normals);
-            var count = Capacity = block.ReadInt();
+            int count = Capacity = block.ReadInt();
             while (count-- > 0)
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Vector);
                 Add(new Vector3(subBlock.ReadFloat(), subBlock.ReadFloat(), subBlock.ReadFloat()));
                 subBlock.VerifyEndOfBlock();
@@ -248,15 +249,15 @@ namespace Orts.Formats.Msts.Models
         }
     }
 
-    public class SortVectors: List<Vector3>
+    public class SortVectors : List<Vector3>
     {
-        public SortVectors(SBR block)
+        internal SortVectors(SBR block)
         {
             block.VerifyID(TokenID.Sort_Vectors);
-            var count = Capacity = block.ReadInt();
+            int count = Capacity = block.ReadInt();
             while (count-- > 0)
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Vector);
                 Add(new Vector3(subBlock.ReadFloat(), subBlock.ReadFloat(), subBlock.ReadFloat()));
                 subBlock.VerifyEndOfBlock();
@@ -267,13 +268,13 @@ namespace Orts.Formats.Msts.Models
 
     public class Colors : List<Color>
     {
-        public Colors(SBR block)
+        internal Colors(SBR block)
         {
             block.VerifyID(TokenID.Colours);
-            var count = Capacity = block.ReadInt();
+            int count = Capacity = block.ReadInt();
             while (count-- > 0)
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Colour);
 
                 float alpha = subBlock.ReadFloat();
@@ -286,40 +287,41 @@ namespace Orts.Formats.Msts.Models
 
     public class Matrices : List<Matrix>
     {
-        public List<string> MatrixNames { get; } = new List<string>();
+        public IList<string> MatrixNames { get; } = new List<string>();
 
-        public Matrices(SBR block)
+        internal Matrices(SBR block)
         {
             block.VerifyID(TokenID.Matrices);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(ReadMatrix(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(ReadMatrix(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
 
-        private Matrix ReadMatrix(SBR block)
+        internal Matrix ReadMatrix(SBR block)
         {
             block.VerifyID(TokenID.Matrix);
             MatrixNames.Add(string.IsNullOrEmpty(block.Label) ? string.Empty : block.Label.ToUpperInvariant());
 
             Matrix result = new Matrix(
-                block.ReadFloat(), block.ReadFloat(), - block.ReadFloat(), 0.0f,
-                block.ReadFloat(), block.ReadFloat(), - block.ReadFloat(), 0.0f,
-                - block.ReadFloat(), - block.ReadFloat(), block.ReadFloat(), 0.0f,
-                block.ReadFloat(), block.ReadFloat(), - block.ReadFloat(), 1.0f);
+                block.ReadFloat(), block.ReadFloat(), -block.ReadFloat(), 0.0f,
+                block.ReadFloat(), block.ReadFloat(), -block.ReadFloat(), 0.0f,
+                -block.ReadFloat(), -block.ReadFloat(), block.ReadFloat(), 0.0f,
+                block.ReadFloat(), block.ReadFloat(), -block.ReadFloat(), 1.0f);
             block.VerifyEndOfBlock();
             return result;
-        }    
+        }
     }
 
     public class ImageNames : List<string>
     {
-        public ImageNames(SBR block)
+        internal ImageNames(SBR block)
         {
             block.VerifyID(TokenID.Images);
-            var count = Capacity = block.ReadInt();
+            int count = Capacity = block.ReadInt();
             while (count-- > 0)
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Image);
                 Add(subBlock.ReadString());
                 subBlock.VerifyEndOfBlock();
@@ -330,11 +332,12 @@ namespace Orts.Formats.Msts.Models
 
     public class Textures : List<Texture>
     {
-        public Textures(SBR block)
+        internal Textures(SBR block)
         {
             block.VerifyID(TokenID.Textures);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new Texture(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new Texture(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -352,7 +355,7 @@ namespace Orts.Formats.Msts.Models
         public float MipMapLODBias { get; private set; }
         public uint BorderColor { get; private set; }
 
-        public Texture(SBR block)
+        internal Texture(SBR block)
         {
             block.VerifyID(TokenID.Texture);
             ImageIndex = block.ReadInt();
@@ -363,7 +366,7 @@ namespace Orts.Formats.Msts.Models
             block.VerifyEndOfBlock();
         }
 
-        public Texture(int imageIndex)
+        internal Texture(int imageIndex)
         {
             ImageIndex = imageIndex;
             FilterMode = 0;
@@ -374,11 +377,12 @@ namespace Orts.Formats.Msts.Models
 
     public class LightMaterials : List<LightMaterial>
     {
-        public LightMaterials(SBR block)
+        internal LightMaterials(SBR block)
         {
             block.VerifyID(TokenID.Light_Materials);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new LightMaterial(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new LightMaterial(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -396,7 +400,7 @@ namespace Orts.Formats.Msts.Models
         public int EmissiveColorIndex { get; private set; }
         public float SpecPower { get; private set; }
 
-        public LightMaterial(SBR block)
+        internal LightMaterial(SBR block)
         {
             block.VerifyID(TokenID.Light_Material);
             Flags = block.ReadFlags();
@@ -411,11 +415,12 @@ namespace Orts.Formats.Msts.Models
 
     public class LightModelConfigs : List<LightModelConfig>
     {
-        public LightModelConfigs(SBR block)
+        internal LightModelConfigs(SBR block)
         {
             block.VerifyID(TokenID.Light_Model_Cfgs);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new LightModelConfig(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new LightModelConfig(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -425,7 +430,7 @@ namespace Orts.Formats.Msts.Models
         public uint Flags { get; private set; }
         public UVOperations UVOperations { get; private set; }
 
-        public LightModelConfig(SBR block)
+        internal LightModelConfig(SBR block)
         {
             block.VerifyID(TokenID.Light_Model_Cfg);
             Flags = block.ReadFlags();
@@ -436,21 +441,21 @@ namespace Orts.Formats.Msts.Models
 
     public class UVOperations : List<UVOperation>
     {
-        public UVOperations(SBR block)
+        internal UVOperations(SBR block)
         {
             block.VerifyID(TokenID.UV_Ops);
-            var count = Capacity = block.ReadInt();
+            int count = Capacity = block.ReadInt();
             while (count-- > 0)
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 switch (subBlock.ID)
                 {
                     case TokenID.UV_OP_Copy: Add(new UVOperationCopy(subBlock)); break;
                     case TokenID.UV_Op_ReflectMapFull: Add(new UVOperationReflectMapFull(subBlock)); break;
                     case TokenID.UV_Op_Reflectmap: Add(new UVOperationReflectMap(subBlock)); break;
-                    case TokenID.UV_Op_UniformScale: this.Add(new UVOperationUniformScale(subBlock)); break;
-                    case TokenID.UV_Op_NonUniformScale: this.Add(new UVOperationNonUniformScale(subBlock)); break;
-                    default: throw new System.Exception("Unexpected uv_op: " + subBlock.ID.ToString());
+                    case TokenID.UV_Op_UniformScale: Add(new UVOperationUniformScale(subBlock)); break;
+                    case TokenID.UV_Op_NonUniformScale: Add(new UVOperationNonUniformScale(subBlock)); break;
+                    default: throw new InvalidDataException($"Unexpected uv_op: {subBlock.ID}");
                 }
             }
             block.VerifyEndOfBlock();
@@ -468,7 +473,7 @@ namespace Orts.Formats.Msts.Models
     {
         public int SourceUVIndex { get; private set; }
 
-        public UVOperationCopy(SBR block)
+        internal UVOperationCopy(SBR block)
         {
             block.VerifyID(TokenID.UV_OP_Copy);
             TextureAddressMode = block.ReadInt();
@@ -479,7 +484,7 @@ namespace Orts.Formats.Msts.Models
 
     public class UVOperationReflectMapFull : UVOperation
     {
-        public UVOperationReflectMapFull(SBR block)
+        internal UVOperationReflectMapFull(SBR block)
         {
             block.VerifyID(TokenID.UV_Op_ReflectMapFull);
             TextureAddressMode = block.ReadInt();
@@ -489,7 +494,7 @@ namespace Orts.Formats.Msts.Models
 
     public class UVOperationReflectMap : UVOperation
     {
-        public UVOperationReflectMap(SBR block)
+        internal UVOperationReflectMap(SBR block)
         {
             block.VerifyID(TokenID.UV_Op_Reflectmap);
             TextureAddressMode = block.ReadInt();
@@ -503,7 +508,7 @@ namespace Orts.Formats.Msts.Models
         public float UnknownParameter3 { get; private set; }
         public float UnknownParameter4 { get; private set; }
 
-        public UVOperationUniformScale(SBR block)
+        internal UVOperationUniformScale(SBR block)
         {
             block.VerifyID(TokenID.UV_Op_UniformScale);
             TextureAddressMode = block.ReadInt();
@@ -521,7 +526,7 @@ namespace Orts.Formats.Msts.Models
         public float UnknownParameter4 { get; private set; }
 
 
-        public UVOperationNonUniformScale(SBR block)
+        internal UVOperationNonUniformScale(SBR block)
         {
             block.VerifyID(TokenID.UV_Op_NonUniformScale);
             TextureAddressMode = block.ReadInt();
@@ -535,11 +540,12 @@ namespace Orts.Formats.Msts.Models
 
     public class VertexStates : List<VertexState>
     {
-        public VertexStates(SBR block)
+        internal VertexStates(SBR block)
         {
             block.VerifyID(TokenID.Vtx_States);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new VertexState(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new VertexState(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -555,12 +561,12 @@ namespace Orts.Formats.Msts.Models
         public uint LightFlags { get; private set; } = 2;
         public int Matrix2 { get; private set; } = -1;
 
-        public VertexState(int matrixIndex)
+        internal VertexState(int matrixIndex)
         {
             MatrixIndex = matrixIndex;
         }
 
-        public VertexState(SBR block)
+        internal VertexState(SBR block)
         {
             block.VerifyID(TokenID.Vtx_State);
             Flags = block.ReadFlags();
@@ -576,11 +582,12 @@ namespace Orts.Formats.Msts.Models
 
     public class PrimaryStates : List<PrimaryState>
     {
-        public PrimaryStates(SBR block)
+        internal PrimaryStates(SBR block)
         {
             block.VerifyID(TokenID.Prim_States);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new PrimaryState(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new PrimaryState(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -601,9 +608,9 @@ namespace Orts.Formats.Msts.Models
         public int AlphaTestMode { get; private set; }
         public int LightConfigIndex { get; private set; }
         public int ZBufferMode { get; private set; }
-        public int TextureIndex { get { return TextureIndices[0]; } }
+        public int TextureIndex => TextureIndices[0];
 
-        public PrimaryState(int textureIndex, int shaderIndex, int vertexStateIndex)
+        internal PrimaryState(int textureIndex, int shaderIndex, int vertexStateIndex)
         {
             Flags = 0;
             ShaderIndex = shaderIndex;
@@ -616,7 +623,7 @@ namespace Orts.Formats.Msts.Models
             ZBufferMode = 1;
         }
 
-        public PrimaryState(SBR block)
+        internal PrimaryState(SBR block)
         {
             block.VerifyID(TokenID.Prim_State);
 
@@ -625,10 +632,11 @@ namespace Orts.Formats.Msts.Models
             Flags = block.ReadFlags();
             ShaderIndex = block.ReadInt();
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Tex_Idxs);
                 TextureIndices = new int[subBlock.ReadInt()];
-                for (var i = 0; i < TextureIndices.Length; ++i) TextureIndices[i] = subBlock.ReadInt();
+                for (int i = 0; i < TextureIndices.Length; ++i) 
+                    TextureIndices[i] = subBlock.ReadInt();
                 subBlock.VerifyEndOfBlock();
             }
             ZBias = block.ReadFloat();
@@ -642,11 +650,12 @@ namespace Orts.Formats.Msts.Models
 
     public class LodControls : List<LodControl>
     {
-        public LodControls(SBR block)
+        internal LodControls(SBR block)
         {
             block.VerifyID(TokenID.Lod_Controls);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new LodControl(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new LodControl(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -656,7 +665,7 @@ namespace Orts.Formats.Msts.Models
         public DistanceLevelsHeader DistanceLevelsHeader { get; private set; }
         public DistanceLevels DistanceLevels { get; private set; }
 
-        public LodControl(SBR block)
+        internal LodControl(SBR block)
         {
             block.VerifyID(TokenID.Lod_Control);
             DistanceLevelsHeader = new DistanceLevelsHeader(block.ReadSubBlock());
@@ -669,7 +678,7 @@ namespace Orts.Formats.Msts.Models
     {
         public int DistanceLevelBias { get; private set; }
 
-        public DistanceLevelsHeader(SBR block)
+        internal DistanceLevelsHeader(SBR block)
         {
             block.VerifyID(TokenID.Distance_Levels_Header);
             DistanceLevelBias = block.ReadInt();
@@ -679,11 +688,12 @@ namespace Orts.Formats.Msts.Models
 
     public class DistanceLevels : List<DistanceLevel>
     {
-        public DistanceLevels(SBR block)
+        internal DistanceLevels(SBR block)
         {
             block.VerifyID(TokenID.Distance_Levels);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new DistanceLevel(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new DistanceLevel(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -693,7 +703,7 @@ namespace Orts.Formats.Msts.Models
         public DistanceLevelHeader DistanceLevelHeader { get; private set; }
         public SubObjects SubObjects { get; private set; }
 
-        public DistanceLevel(SBR block)
+        internal DistanceLevel(SBR block)
         {
             block.VerifyID(TokenID.Distance_Level);
             DistanceLevelHeader = new DistanceLevelHeader(block.ReadSubBlock());
@@ -707,20 +717,20 @@ namespace Orts.Formats.Msts.Models
         public float DistanceLevelSelection { get; private set; }
         public int[] Hierarchy { get; private set; }
 
-        public DistanceLevelHeader(SBR block)
+        internal DistanceLevelHeader(SBR block)
         {
             block.VerifyID(TokenID.Distance_Level_Header);
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.DLevel_Selection);
                 DistanceLevelSelection = subBlock.ReadFloat();
                 subBlock.VerifyEndOfBlock();
             }
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Hierarchy);
                 Hierarchy = new int[subBlock.ReadInt()];
-                for (var i = 0; i < Hierarchy.Length; ++i)
+                for (int i = 0; i < Hierarchy.Length; ++i)
                     Hierarchy[i] = subBlock.ReadInt();
                 subBlock.VerifyEndOfBlock();
             }
@@ -730,11 +740,12 @@ namespace Orts.Formats.Msts.Models
 
     public class SubObjects : List<SubObject>
     {
-        public SubObjects(SBR block)
+        internal SubObjects(SBR block)
         {
             block.VerifyID(TokenID.Sub_Objects);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new SubObject(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new SubObject(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -746,7 +757,7 @@ namespace Orts.Formats.Msts.Models
         public VertexSets VertexSets { get; private set; }
         public Primitives Primitives { get; private set; }
 
-        public SubObject(SBR block)
+        internal SubObject(SBR block)
         {
             block.VerifyID(TokenID.Sub_Object);
             SubObjectHeader = new SubObjectHeader(block.ReadSubBlock());
@@ -771,7 +782,7 @@ namespace Orts.Formats.Msts.Models
         public int[] SubObjectLightConfigs { get; private set; }
         public int SubObjectID { get; private set; }
 
-        public SubObjectHeader(SBR block)
+        internal SubObjectHeader(SBR block)
         {
             block.VerifyID(TokenID.Sub_Object_Header);
 
@@ -784,20 +795,20 @@ namespace Orts.Formats.Msts.Models
 
             if (!block.EndOfBlock())
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.SubObject_Shaders);
                 SubObjectShaders = new int[subBlock.ReadInt()];
-                for (var i = 0; i < SubObjectShaders.Length; ++i)
+                for (int i = 0; i < SubObjectShaders.Length; ++i)
                     SubObjectShaders[i] = subBlock.ReadInt();
                 subBlock.VerifyEndOfBlock();
             }
 
             if (!block.EndOfBlock())
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.SubObject_Light_Cfgs);
                 SubObjectLightConfigs = new int[subBlock.ReadInt()];
-                for (var i = 0; i < SubObjectLightConfigs.Length; ++i)
+                for (int i = 0; i < SubObjectLightConfigs.Length; ++i)
                     SubObjectLightConfigs[i] = subBlock.ReadInt();
                 subBlock.VerifyEndOfBlock();
             }
@@ -824,7 +835,7 @@ namespace Orts.Formats.Msts.Models
         public GeometryNodes GeometryNodes { get; private set; }
         public int[] GeometryNodeMap { get; private set; }
 
-        public GeometryInfo(SBR block)
+        internal GeometryInfo(SBR block)
         {
             block.VerifyID(TokenID.Geometry_Info);
             FaceNormals = block.ReadInt();
@@ -839,10 +850,10 @@ namespace Orts.Formats.Msts.Models
             NodeXTriLists = block.ReadInt();
             GeometryNodes = new GeometryNodes(block.ReadSubBlock());
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Geometry_Node_Map);
                 GeometryNodeMap = new int[subBlock.ReadInt()];
-                for (var i = 0; i < GeometryNodeMap.Length; ++i)
+                for (int i = 0; i < GeometryNodeMap.Length; ++i)
                     GeometryNodeMap[i] = subBlock.ReadInt();
                 subBlock.VerifyEndOfBlock();
             }
@@ -852,11 +863,12 @@ namespace Orts.Formats.Msts.Models
 
     public class GeometryNodes : List<GeometryNode>
     {
-        public GeometryNodes(SBR block)
+        internal GeometryNodes(SBR block)
         {
             block.VerifyID(TokenID.Geometry_Nodes);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new GeometryNode(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new GeometryNode(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -870,7 +882,7 @@ namespace Orts.Formats.Msts.Models
         public int PointLists { get; private set; }
         public CullablePrims CullablePrims { get; private set; }
 
-        public GeometryNode(SBR block)
+        internal GeometryNode(SBR block)
         {
             block.VerifyID(TokenID.Geometry_Node);
             TextureLightCmds = block.ReadInt();
@@ -889,7 +901,7 @@ namespace Orts.Formats.Msts.Models
         public int NumFlatSections { get; private set; }
         public int NumPrimIndices { get; private set; }
 
-        public CullablePrims(SBR block)
+        internal CullablePrims(SBR block)
         {
             block.VerifyID(TokenID.Cullable_Prims);
             NumPrims = block.ReadInt();
@@ -901,11 +913,12 @@ namespace Orts.Formats.Msts.Models
 
     public class Vertices : List<Vertex>
     {
-        public Vertices(SBR block)
+        internal Vertices(SBR block)
         {
             block.VerifyID(TokenID.Vertices);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new Vertex(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new Vertex(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -919,7 +932,7 @@ namespace Orts.Formats.Msts.Models
         public uint Color2 { get; private set; }
         public int[] VertexUVs { get; private set; }
 
-        public Vertex(SBR block)
+        internal Vertex(SBR block)
         {
             block.VerifyID(TokenID.Vertex);
             Flags = block.ReadFlags();
@@ -928,10 +941,11 @@ namespace Orts.Formats.Msts.Models
             Color1 = block.ReadFlags();
             Color2 = block.ReadFlags();
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Vertex_UVs);
                 VertexUVs = new int[subBlock.ReadInt()];
-                for (var i = 0; i < VertexUVs.Length; ++i) VertexUVs[i] = subBlock.ReadInt();
+                for (int i = 0; i < VertexUVs.Length; ++i) 
+                    VertexUVs[i] = subBlock.ReadInt();
                 subBlock.VerifyEndOfBlock();
             }
             block.VerifyEndOfBlock();
@@ -950,11 +964,12 @@ namespace Orts.Formats.Msts.Models
 
     public class VertexSets : List<VertexSet>
     {
-        public VertexSets(SBR block)
+        internal VertexSets(SBR block)
         {
             block.VerifyID(TokenID.Vertex_Sets);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new VertexSet(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new VertexSet(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -965,7 +980,7 @@ namespace Orts.Formats.Msts.Models
         public int StartVertexIndex { get; private set; }
         public int VertexCount { get; private set; }
 
-        public VertexSet(SBR block)
+        internal VertexSet(SBR block)
         {
             block.VerifyID(TokenID.Vertex_Set);
             VertexStateIndex = block.ReadInt();
@@ -977,19 +992,19 @@ namespace Orts.Formats.Msts.Models
 
     public class Primitives : List<Primitive>
     {
-        public Primitives(SBR block)
+        internal Primitives(SBR block)
         {
             block.VerifyID(TokenID.Primitives);
-            var last_prim_state_idx = 0;
-            var count = Capacity = block.ReadInt();
+            int last_prim_state_idx = 0;
+            int count = Capacity = block.ReadInt();
             while (count-- > 0)
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 switch (subBlock.ID)
                 {
                     case TokenID.Prim_State_Idx: last_prim_state_idx = subBlock.ReadInt(); subBlock.VerifyEndOfBlock(); break;
                     case TokenID.Indexed_TriList: Add(new Primitive(subBlock, last_prim_state_idx)); break;
-                    default: throw new System.Exception("Unexpected primitive type " + subBlock.ID.ToString());
+                    default: throw new InvalidDataException("Unexpected primitive type " + subBlock.ID.ToString());
                 }
             }
             block.VerifyEndOfBlock();
@@ -1001,9 +1016,9 @@ namespace Orts.Formats.Msts.Models
         public int PrimitiveStateIndex { get; private set; }
         public IndexedTriList IndexedTriList { get; private set; }
 
-        public Primitive(SBR block, int last_prim_state_idx)
+        internal Primitive(SBR block, int lastPrimitiveStateIndex)
         {
-            PrimitiveStateIndex = last_prim_state_idx;
+            PrimitiveStateIndex = lastPrimitiveStateIndex;
             IndexedTriList = new IndexedTriList(block);
         }
     }
@@ -1014,15 +1029,15 @@ namespace Orts.Formats.Msts.Models
         public int[] NormalIndices { get; private set; }
         public uint[] Flags { get; private set; }
 
-        public IndexedTriList(SBR block)
+        internal IndexedTriList(SBR block)
         {
             block.VerifyID(TokenID.Indexed_TriList);
             VertexIndices = new VertexIndices(block.ReadSubBlock());
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Normal_Idxs);
                 NormalIndices = new int[subBlock.ReadInt()];
-                for (var i = 0; i < NormalIndices.Length; ++i)
+                for (int i = 0; i < NormalIndices.Length; ++i)
                 {
                     NormalIndices[i] = subBlock.ReadInt();
                     subBlock.ReadInt(); // skip the '3' value - its purpose unknown
@@ -1030,10 +1045,11 @@ namespace Orts.Formats.Msts.Models
                 subBlock.VerifyEndOfBlock();
             }
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 subBlock.VerifyID(TokenID.Flags);
                 Flags = new uint[subBlock.ReadInt()];
-                for (var i = 0; i < Flags.Length; ++i) Flags[i] = subBlock.ReadFlags();
+                for (int i = 0; i < Flags.Length; ++i) 
+                    Flags[i] = subBlock.ReadFlags();
                 subBlock.VerifyEndOfBlock();
             }
             block.VerifyEndOfBlock();
@@ -1042,11 +1058,12 @@ namespace Orts.Formats.Msts.Models
 
     public class VertexIndices : List<VertexIndex>
     {
-        public VertexIndices(SBR block)
+        internal VertexIndices(SBR block)
         {
             block.VerifyID(TokenID.Vertex_Idxs);
-            var count = Capacity = block.ReadInt() / 3;
-            while (count-- > 0) Add(new VertexIndex(block));
+            int count = Capacity = block.ReadInt() / 3;
+            while (count-- > 0) 
+                Add(new VertexIndex(block));
             block.VerifyEndOfBlock();
         }
     }
@@ -1057,14 +1074,14 @@ namespace Orts.Formats.Msts.Models
         public int B { get; private set; }
         public int C { get; private set; }
 
-        public VertexIndex(SBR block)
+        internal VertexIndex(SBR block)
         {
             A = block.ReadInt();
             B = block.ReadInt();
             C = block.ReadInt();
         }
 
-        public VertexIndex(int a, int b, int c)
+        internal VertexIndex(int a, int b, int c)
         {
             A = a;
             B = b;
@@ -1074,11 +1091,12 @@ namespace Orts.Formats.Msts.Models
 
     public class Animations : List<Animation>
     {
-        public Animations(SBR block)
+        internal Animations(SBR block)
         {
             block.VerifyID(TokenID.Animations);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new Animation(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new Animation(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -1089,7 +1107,7 @@ namespace Orts.Formats.Msts.Models
         public int FrameRate { get; private set; }          // :uint,frame_rate 
         public AnimationNodes AnimationNodes { get; private set; }    // :anim_nodes,AnimNodes .
 
-        public Animation(SBR block)
+        internal Animation(SBR block)
         {
             block.VerifyID(TokenID.Animation);
             FrameCount = block.ReadInt();
@@ -1101,11 +1119,12 @@ namespace Orts.Formats.Msts.Models
 
     public class AnimationNodes : List<AnimationNode>
     {
-        public AnimationNodes(SBR block)
+        internal AnimationNodes(SBR block)
         {
             block.VerifyID(TokenID.Anim_nodes);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new AnimationNode(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new AnimationNode(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -1115,7 +1134,7 @@ namespace Orts.Formats.Msts.Models
         public string Name { get; private set; }
         public Controllers Controllers { get; private set; }
 
-        public AnimationNode(SBR block)
+        internal AnimationNode(SBR block)
         {
             block.VerifyID(TokenID.Anim_node);
             Name = block.Label;
@@ -1126,18 +1145,18 @@ namespace Orts.Formats.Msts.Models
 
     public class Controllers : List<Controller>
     {
-        public Controllers(SBR block)
+        internal Controllers(SBR block)
         {
             block.VerifyID(TokenID.Controllers);
-            var count = Capacity = block.ReadInt();
+            int count = Capacity = block.ReadInt();
             while (count-- > 0)
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 switch (subBlock.ID)
                 {
                     case TokenID.Linear_Pos: Add(new LinearPosition(subBlock)); break;
                     case TokenID.Tcb_Rot: Add(new TcbRotation(subBlock)); break;
-                    default: throw new System.Exception("Unexpected animation controller " + subBlock.ID.ToString());
+                    default: throw new InvalidDataException($"Unexpected animation controller {subBlock.ID}");
                 }
             }
             block.VerifyEndOfBlock();
@@ -1155,18 +1174,18 @@ namespace Orts.Formats.Msts.Models
 
     public class TcbRotation : Controller
     {
-        public TcbRotation(SBR block)
+        internal TcbRotation(SBR block)
         {
             block.VerifyID(TokenID.Tcb_Rot);
-            var count = Capacity = block.ReadInt();
+            int count = Capacity = block.ReadInt();
             while (count-- > 0)
             {
-                var subBlock = block.ReadSubBlock();
+                SBR subBlock = block.ReadSubBlock();
                 switch (subBlock.ID)
                 {
                     case TokenID.Slerp_Rot: Add(new SlerpRotation(subBlock)); break;
                     case TokenID.Tcb_Key: Add(new TcbKey(subBlock)); break;
-                    default: throw new System.Exception("Unexpected block " + subBlock.ID.ToString());
+                    default: throw new InvalidDataException($"Unexpected block {subBlock.ID}");
                 }
             }
             block.VerifyEndOfBlock();
@@ -1176,9 +1195,9 @@ namespace Orts.Formats.Msts.Models
     public class SlerpRotation : KeyPosition
     {
         private Quaternion quaternion;
-        public ref readonly Quaternion Quaternion => ref quaternion; 
+        public ref readonly Quaternion Quaternion => ref quaternion;
 
-        public SlerpRotation(SBR block)
+        internal SlerpRotation(SBR block)
         {
             block.VerifyID(TokenID.Slerp_Rot);
             Frame = block.ReadInt();
@@ -1189,11 +1208,12 @@ namespace Orts.Formats.Msts.Models
 
     public class LinearPosition : Controller
     {
-        public LinearPosition(SBR block)
+        internal LinearPosition(SBR block)
         {
             block.VerifyID(TokenID.Linear_Pos);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new LinearKey(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new LinearKey(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -1203,22 +1223,23 @@ namespace Orts.Formats.Msts.Models
         private Vector3 position;
         public ref readonly Vector3 Position => ref position;
 
-        public LinearKey(SBR block)
+        internal LinearKey(SBR block)
         {
             block.VerifyID(TokenID.Linear_Key);
             Frame = block.ReadInt();
-            position = new Vector3(block.ReadFloat(), block.ReadFloat(), - block.ReadFloat());
+            position = new Vector3(block.ReadFloat(), block.ReadFloat(), -block.ReadFloat());
             block.VerifyEndOfBlock();
         }
     }
 
     public class TcbPosition : Controller
     {
-        public TcbPosition(SBR block)
+        internal TcbPosition(SBR block)
         {
             block.VerifyID(TokenID.Tcb_Pos);
-            var count = Capacity = block.ReadInt();
-            while (count-- > 0) Add(new TcbKey(block.ReadSubBlock()));
+            int count = Capacity = block.ReadInt();
+            while (count-- > 0) 
+                Add(new TcbKey(block.ReadSubBlock()));
             block.VerifyEndOfBlock();
         }
     }
@@ -1233,7 +1254,7 @@ namespace Orts.Formats.Msts.Models
         public float In { get; private set; }
         public float Out { get; private set; }
 
-        public TcbKey(SBR block)
+        internal TcbKey(SBR block)
         {
             block.VerifyID(TokenID.Tcb_Key);
             Frame = block.ReadInt();

@@ -94,7 +94,7 @@ namespace Orts.Simulation.RollingStocks
         public SmoothedData ExhaustColorG = new SmoothedData(1);
         public SmoothedData ExhaustColorB = new SmoothedData(1);
 
-        public float DieselOilPressurePSI = 0f;
+        public float DieselOilPressurePSI;
         public float DieselMinOilPressurePSI;
         public float DieselMaxOilPressurePSI;
         public float DieselTemperatureDeg = 40f;
@@ -108,7 +108,7 @@ namespace Orts.Simulation.RollingStocks
         /// <summary>
         /// Used to accumulate a quantity that is not lost because of lack of precision when added to the Fuel level
         /// </summary>        
-        private float partialFuelConsumption = 0;
+        private float partialFuelConsumption;
 
         private const float GearBoxControllerBoost = 1; // Slow boost to enable easy single gear up/down commands
 

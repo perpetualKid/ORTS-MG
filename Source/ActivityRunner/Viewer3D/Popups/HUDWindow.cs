@@ -63,24 +63,24 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         //Set lines rows HUDScroll.
         public int nLinesShow;
         public int charFitPerLine;
-        public int columnsCount = 0;
-        public int headerToRestore = 0;
-        public int PathHeaderColumn = 0;
-        public static int columnsChars = 0;
+        public int columnsCount;
+        public int headerToRestore;
+        public int PathHeaderColumn;
+        public static int columnsChars;
         public int[] lineOffsetLocoInfo = { 0, 0, 0, 0, 0, 0 };
         public static int hudWindowLinesActualPage = 1;
         public static int hudWindowLinesPagesCount = 1;
-        public static int hudWindowColumnsActualPage = 0;
-        public static int hudWindowColumnsPagesCount = 0;
-        public static int hudWindowLocoActualPage = 0;
+        public static int hudWindowColumnsActualPage;
+        public static int hudWindowColumnsPagesCount;
+        public static int hudWindowLocoActualPage;
         public static int hudWindowLocoPagesCount = 1;
-        public static bool hudWindowFullScreen = false;
-        public static bool hudWindowHorizontalScroll = false;
-        public static bool hudWindowSteamLocoLead = false;
+        public static bool hudWindowFullScreen;
+        public static bool hudWindowHorizontalScroll;
+        public static bool hudWindowSteamLocoLead;
         private List<string> stringStatus = new List<string>();
-        public static bool BrakeInfoVisible = false;
+        public static bool BrakeInfoVisible;
 
-        public int WebServerPageNo = 0;
+        public int WebServerPageNo;
         private int TextPage;
         private int LocomotivePage = 2;
         private int LastTextPage;
@@ -1873,10 +1873,10 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 foreach (var cell in statusSplit)
                 {
                     cellIndex++;
-                    if (cell == "")
+                    if (cell.Length == 0)
                     {
                         var cellStringLength = cellString.Length > columnsChars ? 0 : columnsChars;
-                        cumulativeLenght = cumulativeLenght + cellStringLength;
+                        cumulativeLenght += cellStringLength;
                         CumulativeTextStatus.Add(cumulativeLenght, cumulativeTextStatus + (cellString.Length > columnsChars ? "" : space));
                         CumulativeTabStatus.Add(cumulativeLenght, cumulativeTabStatus + "\t");
                         lText = false;
@@ -1886,7 +1886,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                         cumulativeTabStatus = "";
                         continue;
                     }
-                    else if (cell.Length > 0 && lText && !CumulativeTextStatus.ContainsKey(cumulativeLenght))
+                    else if (lText && !CumulativeTextStatus.ContainsKey(cumulativeLenght))
                     {
                         CumulativeTextStatus.Add(cumulativeLenght, cumulativeTextStatus);
                         CumulativeTabStatus.Add(cumulativeLenght, cumulativeTabStatus);
@@ -2078,7 +2078,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             return (int)x;
         }
 
-        private bool lResetHudScroll = false;
+        private bool lResetHudScroll;
         /// <summary>
         /// Reset Scroll Control window
         /// </summary>

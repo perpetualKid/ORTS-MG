@@ -49,7 +49,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
         protected float MaxReleaseRatePSIpS = 1.86f;
         protected float MaxApplicationRatePSIpS = .9f;
         protected float MaxAuxilaryChargingRatePSIpS = 1.684f;
-        protected float BrakeInsensitivityPSIpS = 0;
+        protected float BrakeInsensitivityPSIpS;
         protected float EmergResChargingRatePSIpS = 1.684f;
         protected float EmergAuxVolumeRatio = 1.4f;
         protected string DebugType = string.Empty;
@@ -58,11 +58,11 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS
         protected float CylVolumeM3;
 
 
-        protected bool TrainBrakePressureChanging = false;
-        protected bool BrakePipePressureChanging = false;
-        protected float SoundTriggerCounter = 0;
-        protected float prevCylPressurePSI = 0f;
-        protected float prevBrakePipePressurePSI = 0f;
+        protected bool TrainBrakePressureChanging;
+        protected bool BrakePipePressureChanging;
+        protected float SoundTriggerCounter;
+        protected float prevCylPressurePSI;
+        protected float prevBrakePipePressurePSI;
         protected bool BailOffOn;
 
 

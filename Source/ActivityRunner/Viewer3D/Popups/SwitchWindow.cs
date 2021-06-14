@@ -129,7 +129,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             Debug.Assert(SwitchPreviousNode != null);
             Debug.Assert(SwitchNode.InPins == 1);
             Debug.Assert(SwitchNode.OutPins == 2 || SwitchNode.OutPins == 3);  // allow for 3-way switch
-            Debug.Assert(SwitchNode.TrackPins.Count() == 3 || SwitchNode.TrackPins.Count() == 4);  // allow for 3-way switch
+            Debug.Assert(SwitchNode.TrackPins.Length == 3 || SwitchNode.TrackPins.Length == 4);  // allow for 3-way switch
 
             var switchPreviousNodeID = SwitchPreviousNode.Index;
             var switchBranchesAwayFromUs = SwitchNode.TrackPins[0].Link == switchPreviousNodeID;

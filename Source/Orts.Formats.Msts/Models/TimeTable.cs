@@ -6,7 +6,7 @@ namespace Orts.Formats.Msts.Models
     {
         public float InitialSpeed { get; private set; }
 
-        public TimeTable(STFReader stf)
+        internal TimeTable(STFReader stf)
         {
             stf.MustMatchBlockStart();
             stf.ParseBlock(new STFReader.TokenProcessor[] {

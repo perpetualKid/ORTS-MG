@@ -590,7 +590,7 @@ namespace ORTS.TrackViewer.Editing
             TrainpathNode currentNode = this.FirstNode;
             if (currentNode == null)
             {   // No route, so return no names
-                return new string[0];
+                return Array.Empty<string>();
             }
 
             while (currentNode.NextMainNode != null)
@@ -686,7 +686,7 @@ namespace ORTS.TrackViewer.Editing
                 currentMainNode = currentMainNode.NextMainNode;
             }
             mainNodes.Reverse();
-            int lastIndex = mainNodes.Count() - 1; // we now this is at least 1
+            int lastIndex = mainNodes.Count - 1; // we now this is at least 1
 
             //new start
             this.FirstNode = mainNodes[0];
@@ -736,7 +736,7 @@ namespace ORTS.TrackViewer.Editing
             }
             sidingNodes.Reverse();
 
-            int lastIndex = sidingNodes.Count() - 1; // we now this is at least 1
+            int lastIndex = sidingNodes.Count - 1; // we now this is at least 1
 
             // new start of siding
             sidingNodes[0].NextSidingNode = sidingNodes[1];

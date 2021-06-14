@@ -53,15 +53,15 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 
         private ControlLayout scrollbox;
         private ControlLayoutHorizontal line;
-        private bool lDebriefEvalFile = false;//Debrief eval
-        private bool ldbfevalupdateautopilottime = false;//Debrief eval
-        private bool actualStatusVisible = false; //Debrief eval
-        private bool dbfevalActivityEnded = false; //Debrief eval
+        private bool lDebriefEvalFile;//Debrief eval
+        private bool ldbfevalupdateautopilottime;//Debrief eval
+        private bool actualStatusVisible; //Debrief eval
+        private bool dbfevalActivityEnded; //Debrief eval
         private Label indicator;//Debrief eval
         private Label statusLabel;//Debrief eval
         public string Star;//Debrief eval
         private StreamWriter wDbfEval;//Debrief eval
-        public static float DbfEvalDistanceTravelled = 0;//Debrief eval
+        public static float DbfEvalDistanceTravelled;//Debrief eval
 
         private List<TabData> Tabs = new List<TabData>();
         private int ActiveTab;
@@ -273,7 +273,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                             {
                                                 line.Add(new Label(colWidth * 7, line.RemainingHeight, location));
                                             }
-                                            else if (location == "" | (eventAction.Type == Orts.Formats.Msts.EventType.PickUpPassengers) || (eventAction.Type == Orts.Formats.Msts.EventType.PickUpWagons))
+                                            else if (location.Length == 0 | (eventAction.Type == Orts.Formats.Msts.EventType.PickUpPassengers) || (eventAction.Type == Orts.Formats.Msts.EventType.PickUpWagons))
                                                 line.AddSpace(colWidth * 7, 0);
                                             locationFirst = location;
                                             locationShown = true;
@@ -383,7 +383,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                             //Station stops remaining
                             foreach (var item in DbfEvalActArrive)
                             {
-                                if (item.Value == "")
+                                if (string.IsNullOrEmpty(item.Value))
                                     dbfstationstopsremaining++;
                             }
                             if (!actualStatusVisible)
@@ -495,13 +495,13 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                     }
                                     if (dbfevalexist)
                                     {
-                                        if (!DbfEvalTaskName.ContainsKey(dbfeval) && !(dbfevaltaskname == "" && dbfevaltasklocation == "" && dbfevaltaskstatus == ""))
+                                        if (!DbfEvalTaskName.ContainsKey(dbfeval) && !(dbfevaltaskname.Length == 0 && dbfevaltasklocation.Length == 0 && dbfevaltaskstatus.Length == 0))
                                         {
                                             DbfEvalTaskName.Add(dbfeval, dbfevaltaskname);
                                             DbfEvalTaskLocation.Add(dbfeval, dbfevaltasklocation);
                                             DbfEvalTaskStatus.Add(dbfeval, dbfevaltaskstatus);
                                         }
-                                        else if (dbfevaltaskstatus != "" && DbfEvalTaskStatus[dbfeval] != dbfevaltaskstatus)
+                                        else if (dbfevaltaskstatus.Length > 0 && DbfEvalTaskStatus[dbfeval] != dbfevaltaskstatus)
                                         {
                                             DbfEvalTaskStatus[dbfeval] = dbfevaltaskstatus;
                                         }
@@ -857,15 +857,15 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                     line = scrollbox.AddLayoutHorizontalLineOfText();
                                     labeltext = "  " + item.Value;
                                     outmesssage(labeltext, colWidth * 7, false, widthValue);
-                                    labeltext = DbfEvalTaskLocation.ContainsKey(item.Key) && DbfEvalTaskLocation[item.Key] != "" ? DbfEvalTaskLocation[item.Key].ToString() : "-";
+                                    labeltext = DbfEvalTaskLocation.ContainsKey(item.Key) && DbfEvalTaskLocation[item.Key].Length > 0 ? DbfEvalTaskLocation[item.Key].ToString() : "-";
                                     outmesssage(labeltext, colWidth * 8, false, 2);
-                                    labeltext = DbfEvalTaskStatus.ContainsKey(item.Key) && DbfEvalTaskStatus[item.Key] != "" ? DbfEvalTaskStatus[item.Key].ToString() : "-";
+                                    labeltext = DbfEvalTaskStatus.ContainsKey(item.Key) && DbfEvalTaskStatus[item.Key].Length > 0 ? DbfEvalTaskStatus[item.Key].ToString() : "-";
                                     outmesssage(labeltext, colWidth, false, 2);
                                     writeline();
                                 }
                                 //Coupling Over Speed > 1.5 MpS (5.4Kmh 3.3Mph)
                                 colWidth = (cl.RemainingWidth - cl.TextHeight) / 14;
-                                labeltext = "  Coupling speed limits=" + noverspeedcoupling.ToString();
+                                labeltext = $"  Coupling speed limits={noverspeedcoupling}";
                                 outmesssage(labeltext, colWidth * 4, true, 2);
                             }
                             else

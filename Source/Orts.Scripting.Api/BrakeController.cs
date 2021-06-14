@@ -124,7 +124,7 @@ namespace Orts.Scripting.Api
         /// Called when starting speed > 0
         /// </summary>
         /// 
-        public abstract float Update(double elapsedClockSeconds);
+        public abstract float Update(double elapsedSeconds);
         /// <summary>
         /// Called regularly at every simulator update cycle.
         /// </summary>

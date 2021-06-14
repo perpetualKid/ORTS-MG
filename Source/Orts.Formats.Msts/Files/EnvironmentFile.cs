@@ -27,9 +27,9 @@ namespace Orts.Formats.Msts.Files
         public float WaterWaveHeight { get; private set; }
         public float WaterWaveSpeed { get; private set; }
         public float WorldSkynLayers { get; private set; }
-        public List<WaterLayer> WaterLayers { get; private set; }
-        public List<SkyLayer> SkyLayers { get; private set; }
-        public List<SkySatellite> SkySatellites { get; private set; }
+        public IList<WaterLayer> WaterLayers { get; private set; }
+        public IList<SkyLayer> SkyLayers { get; private set; }
+        public IList<SkySatellite> SkySatellites { get; private set; }
 
         public EnvironmentFile(string fileName)
         {
@@ -60,7 +60,10 @@ namespace Orts.Formats.Msts.Files
         {
             stf.MustMatchBlockStart();
             int texturelayers = stf.ReadInt(null);
-            WaterLayers = new List<WaterLayer>(texturelayers);
+            WaterLayers = new List<WaterLayer>()
+            {
+                Capacity = texturelayers
+            };
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("world_water_layer", ()=>{ if(texturelayers-- > 0) WaterLayers.Add(new WaterLayer(stf)); })
             });
@@ -70,7 +73,10 @@ namespace Orts.Formats.Msts.Files
         {
             stf.MustMatchBlockStart();
             int skylayers = stf.ReadInt(null);
-            SkyLayers = new List<SkyLayer>(skylayers);
+            SkyLayers = new List<SkyLayer>()
+            {
+                Capacity = skylayers
+            };
 
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("world_sky_layer", ()=>{ if(skylayers-- > 0) SkyLayers.Add(new SkyLayer(stf)); })});
@@ -81,7 +87,10 @@ namespace Orts.Formats.Msts.Files
         {
             stf.MustMatchBlockStart();
             int skysatellite = stf.ReadInt(null);
-            SkySatellites = new List<SkySatellite>(skysatellite);
+            SkySatellites = new List<SkySatellite>()
+            { 
+                Capacity = skysatellite 
+            };
 
             stf.ParseBlock(new STFReader.TokenProcessor[] {
                 new STFReader.TokenProcessor("world_sky_satellite", () => { if (skysatellite-- > 0) SkySatellites.Add(new SkySatellite(stf)); })});

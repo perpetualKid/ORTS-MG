@@ -62,7 +62,7 @@ namespace Orts.ContentChecker
             }
 
             // Try to also load all sound files. This is tricky, because quite deep into the structure of a sms
-            foreach (ScalabiltyGroup group in sms.ScalabiltyGroups)
+            foreach (ScalabilityGroup group in sms.ScalabiltyGroups)
             {
                 if (group.Streams == null)
                 { 

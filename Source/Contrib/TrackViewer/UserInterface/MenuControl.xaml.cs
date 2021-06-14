@@ -559,7 +559,7 @@ namespace ORTS.TrackViewer.UserInterface
             StringBuilder shortcuts = new StringBuilder();
             shortcuts.Append(TrackViewer.catalog.GetString("ctrl-R\tReload the route\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("Q\tQuit\n"));
-            shortcuts.Append("\n");
+            shortcuts.Append('\n');
             shortcuts.Append(TrackViewer.catalog.GetString("=\tZoom-in (and keep zooming)\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("shift-=\tZoom-in\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("-\tZoom-out (and keep zooming)\n"));
@@ -568,13 +568,13 @@ namespace ORTS.TrackViewer.UserInterface
             shortcuts.Append(TrackViewer.catalog.GetString("M\tToggle zoom center\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("R\tZoom reset\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("L\tAdd label\n"));
-            shortcuts.Append("\n");
+            shortcuts.Append('\n');
             shortcuts.Append(TrackViewer.catalog.GetString("shift-C\t\tShift center to current mouse location\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("left arrow\tShift left\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("down arrow\tShift down\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("right arrow\tShift right\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("up arrow\t\tShift up\n"));
-            shortcuts.Append("\n");
+            shortcuts.Append('\n');
             shortcuts.Append(TrackViewer.catalog.GetString("F5\tShow speed-limits\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("shift-F5\tShow mileposts\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("F6\tShow terrain\n"));
@@ -589,7 +589,7 @@ namespace ORTS.TrackViewer.UserInterface
             shortcuts.Append(TrackViewer.catalog.GetString("shift-F10\tHighlight items\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("F11\tShow path\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("shift-F11\tShow raw path\n"));
-            shortcuts.Append("\n");
+            shortcuts.Append('\n');
             shortcuts.Append(TrackViewer.catalog.GetString("C\t\tShift to center of current path node\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("PgUp\t\tShow more of the path\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("PgDn\t\tShow less of the path\n"));
@@ -599,7 +599,7 @@ namespace ORTS.TrackViewer.UserInterface
             shortcuts.Append(TrackViewer.catalog.GetString("W\t\tPlace a wait-point\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("ctrl-Z\t\tUndo in path editor\n"));
             shortcuts.Append(TrackViewer.catalog.GetString("ctrl-Y\t\tRedo in path editor\n"));
-            shortcuts.Append("\n");
+            shortcuts.Append('\n');
             shortcuts.Append(TrackViewer.catalog.GetString("alt-?\t\tVarious keys to open submenus\n"));
             MessageBox.Show(shortcuts.ToString(), TrackViewer.catalog.GetString("Keyboard shortcuts"));
         }
@@ -609,7 +609,7 @@ namespace ORTS.TrackViewer.UserInterface
             StringBuilder about = new StringBuilder();
             about.Append(TrackViewer.catalog.GetString("This is ORTS TrackViewer, version "));
             about.Append(TrackViewer.TrackViewerVersion);
-            about.Append("\n");
+            about.Append('\n');
             about.Append(TrackViewer.catalog.GetString("It is a 'Contribution' to ORTS, and as such\n"));
             about.Append(TrackViewer.catalog.GetString("not an integral part of ORTS."));
             MessageBox.Show(about.ToString(), "TrackViewer");

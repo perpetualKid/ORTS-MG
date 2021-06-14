@@ -843,14 +843,14 @@ namespace ORTS.TrackViewer.Drawing
         {
             double previousValue = ScaleValue;
             stepIndex += stepsToAdd;
-            while (stepIndex >= discreteSteps.Count())
+            while (stepIndex >= discreteSteps.Length)
             {
-                stepIndex -= discreteSteps.Count();
+                stepIndex -= discreteSteps.Length;
                 powerOfTen ++;
             }
             while (stepIndex < 0)
             {
-                stepIndex += discreteSteps.Count();
+                stepIndex += discreteSteps.Length;
                 powerOfTen --;
                 if (powerOfTen < minPowerOfTen)
                 {
@@ -868,9 +868,9 @@ namespace ORTS.TrackViewer.Drawing
         public void ApproximateTo(double requestedValue)
         {
             powerOfTen = Convert.ToInt32(Math.Floor(Math.Log10(requestedValue))) - 1;
-            double restValue = requestedValue *  Math.Pow(10 , -(double)powerOfTen);
-            for (stepIndex = 0; stepIndex < discreteSteps.Count() && discreteSteps[stepIndex] < restValue; stepIndex++) { };
-            if (stepIndex == discreteSteps.Count())
+            double restValue = requestedValue *  Math.Pow(10 , -powerOfTen);
+            for (stepIndex = 0; stepIndex < discreteSteps.Length && discreteSteps[stepIndex] < restValue; stepIndex++) { };
+            if (stepIndex == discreteSteps.Length)
             {   // the value requested is larger than 90. 10^n, which means we get 100.10^n.
                 // This needs to be 10.10^(n+1)
                 powerOfTen += 1;
@@ -888,7 +888,7 @@ namespace ORTS.TrackViewer.Drawing
             DiscreteScale newScale = new DiscreteScale();
             newScale.ApproximateTo(ratio * ScaleValue);
             int neededSteps = newScale.stepIndex - this.stepIndex;
-            neededSteps += discreteSteps.Count() * (newScale.powerOfTen - this.powerOfTen);
+            neededSteps += discreteSteps.Length * (newScale.powerOfTen - this.powerOfTen);
             return neededSteps;
         }
     }

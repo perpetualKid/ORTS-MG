@@ -134,7 +134,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems.Controllers
         public float StepSize;
         private List<INotchController> Notches = new List<INotchController>();
         public int CurrentNotch { get; set; }
-        public bool ToZero = false; // true if controller zero command;
+        public bool ToZero; // true if controller zero command;
 
         private float OldValue;
 
