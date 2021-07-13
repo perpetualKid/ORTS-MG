@@ -152,14 +152,14 @@ namespace Orts.Simulation.Timetables
             // set references (required to process commands)
             foreach (Physics.Train thisTrain in trainList)
             {
-                if (simulator.NameDictionary.ContainsKey(thisTrain.Name.ToLower()))
+                if (simulator.NameDictionary.ContainsKey(thisTrain.Name))
                 {
                     Trace.TraceWarning("Train : " + thisTrain.Name + " : duplicate name");
                 }
                 else
                 {
                     simulator.TrainDictionary.Add(thisTrain.Number, thisTrain);
-                    simulator.NameDictionary.Add(thisTrain.Name.ToLower(), thisTrain);
+                    simulator.NameDictionary.Add(thisTrain.Name, thisTrain);
                 }
             }
 
@@ -175,7 +175,7 @@ namespace Orts.Simulation.Timetables
 
                 reqPlayerTrain = InitializePlayerTrain(playerTrain, ref Paths, ref trainList);
                 simulator.TrainDictionary.Add(reqPlayerTrain.Number, reqPlayerTrain);
-                simulator.NameDictionary.Add(reqPlayerTrain.Name.ToLower(), reqPlayerTrain);
+                simulator.NameDictionary.Add(reqPlayerTrain.Name, reqPlayerTrain);
             }
 
             // process additional commands for all extracted trains
@@ -760,7 +760,7 @@ namespace Orts.Simulation.Timetables
                 if (TrainRouteXRef.ContainsKey(reqTrain.Index) && Paths.ContainsKey(TrainRouteXRef[reqTrain.Index]))
                 {
                     AIPath usedPath = new AIPath(Paths[TrainRouteXRef[reqTrain.Index]]);
-                    reqTrain.TTTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TDB.TrackDB.TrackNodes, usedPath);
+                    reqTrain.TTTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TrackDatabase.TrackDB.TrackNodes, usedPath);
                     reqTrain.TTTrain.Path = usedPath;
                     reqTrain.TTTrain.CreateRoute(false);  // create route without use of FrontTDBtraveller
                     reqTrain.TTTrain.EndRouteAtLastSignal();
@@ -844,7 +844,7 @@ namespace Orts.Simulation.Timetables
 
             // create traveller
             AIPath usedPath = Paths[TrainRouteXRef[reqTrain.Index]];
-            playerTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TDB.TrackDB.TrackNodes, usedPath);
+            playerTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TrackDatabase.TrackDB.TrackNodes, usedPath);
 
             // extract train path
             playerTrain.SetRoutePath(usedPath, true);
@@ -1176,8 +1176,7 @@ namespace Orts.Simulation.Timetables
         {
             validPath = true;
 
-            string pathDirectory = Path.Combine(simulator.RoutePath, "Paths");
-            string formedpathFilefull = Path.Combine(pathDirectory, pathstring);
+            string formedpathFilefull = Path.Combine(simulator.RouteFolder.PathsFolder, pathstring);
             string pathExtension = Path.GetExtension(formedpathFilefull);
 
             if (String.IsNullOrEmpty(pathExtension))
@@ -1204,7 +1203,7 @@ namespace Orts.Simulation.Timetables
                         try
                         {
                             var infpath = new BinaryReader(new FileStream(formedpathFilefullBinary, FileMode.Open, FileAccess.Read));
-                            outPath = new AIPath(simulator.TDB, simulator.TSectionDat, infpath);
+                            outPath = new AIPath(simulator.TrackDatabase, simulator.TSectionDat, infpath);
                             infpath.Close();
 
                             if (outPath.Nodes != null)
@@ -1224,7 +1223,7 @@ namespace Orts.Simulation.Timetables
                 {
                     try
                     {
-                        outPath = new AIPath(simulator.TDB, simulator.TSectionDat, formedpathFilefull, true);
+                        outPath = new AIPath(simulator.TrackDatabase, simulator.TSectionDat, formedpathFilefull, true);
                         validPath = outPath.Nodes != null;
 
                         if (validPath)
@@ -1370,9 +1369,6 @@ namespace Orts.Simulation.Timetables
 
                 TTTrain.MovementState = AiMovementState.Static;
 
-                // derive various directory paths
-                string pathDirectory = Path.Combine(ttInfo.simulator.RoutePath, "Paths");
-
                 // no path defined : exit
                 if (String.IsNullOrEmpty(fileStrings[pathRow][columnIndex]))
                 {
@@ -1380,10 +1376,9 @@ namespace Orts.Simulation.Timetables
                     return (false);
                 }
 
-                string pathFilefull = ExtractPathString(pathDirectory, fileStrings[pathRow][columnIndex], ref TTTrain);
+                string pathFilefull = ExtractPathString(ttInfo.simulator.RouteFolder.PathsFolder, fileStrings[pathRow][columnIndex], ref TTTrain);
 
-                string trainsDirectory = Path.Combine(ttInfo.simulator.BasePath, "Trains");
-                string consistDirectory = Path.Combine(trainsDirectory, "Consists");
+                string consistDirectory = ttInfo.simulator.RouteFolder.ContentFolder.ConsistsFolder;
 
                 string consistdef = fileStrings[consistRow][columnIndex];
 
@@ -1395,7 +1390,7 @@ namespace Orts.Simulation.Timetables
                 }
 
                 List<ConsistInfo> consistdetails = ProcessConsistInfo(consistdef);
-                string trainsetDirectory = Path.Combine(trainsDirectory, "trainset");
+                string trainsetDirectory = ttInfo.simulator.RouteFolder.ContentFolder.TrainSetsFolder;
 
                 // extract path
                 string pathExtension = Path.GetExtension(pathFilefull);
@@ -2387,7 +2382,7 @@ namespace Orts.Simulation.Timetables
                         }
                         else
                         {
-                            confMaxSpeed = Math.Min((float)simulator.TRK.Route.SpeedLimit, conFile.Train.MaxVelocity.A);
+                            confMaxSpeed = Math.Min((float)simulator.Route.SpeedLimit, conFile.Train.MaxVelocity.A);
                         }
                     }
                 }
@@ -2400,7 +2395,7 @@ namespace Orts.Simulation.Timetables
 
                 // set train details
                 TTTrain.CheckFreight();
-                TTTrain.SpeedSettings.routeSpeedMpS = (float)simulator.TRK.Route.SpeedLimit;
+                TTTrain.SpeedSettings.routeSpeedMpS = (float)simulator.Route.SpeedLimit;
 
                 if (!confMaxSpeed.HasValue || confMaxSpeed.Value <= 0f)
                 {
@@ -2827,7 +2822,7 @@ namespace Orts.Simulation.Timetables
                     }
                     else
                     {
-                        outTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TDB.TrackDB.TrackNodes, outPath);
+                        outTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TrackDatabase.TrackDB.TrackNodes, outPath);
                         outTrain.Path = outPath;
                         outTrain.CreateRoute(false);
                         outTrain.ValidRoute[0] = new TrackCircuitPartialPathRoute(outTrain.TCRoute.TCRouteSubpaths[0]);
@@ -2880,7 +2875,7 @@ namespace Orts.Simulation.Timetables
                         }
                         else
                         {
-                            inTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TDB.TrackDB.TrackNodes, inPath);
+                            inTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TrackDatabase.TrackDB.TrackNodes, inPath);
                             inTrain.Path = inPath;
                             inTrain.CreateRoute(false);
                             inTrain.ValidRoute[0] = new TrackCircuitPartialPathRoute(inTrain.TCRoute.TCRouteSubpaths[0]);
@@ -3011,8 +3006,7 @@ namespace Orts.Simulation.Timetables
                 bool loadPathNoFailure = true;
                 TTTrain formedTrain = new TTTrain(TTTrain);
 
-                string pathDirectory = Path.Combine(simulator.RoutePath, "Paths");
-                string formedpathFilefull = Path.Combine(pathDirectory, DisposeDetails.RunRoundPath);
+                string formedpathFilefull = Path.Combine(simulator.RouteFolder.PathsFolder, DisposeDetails.RunRoundPath);
                 string pathExtension = Path.GetExtension(formedpathFilefull);
                 if (String.IsNullOrEmpty(pathExtension))
                     formedpathFilefull = Path.ChangeExtension(formedpathFilefull, "pat");
@@ -3025,7 +3019,7 @@ namespace Orts.Simulation.Timetables
                 }
                 else
                 {
-                    formedTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TDB.TrackDB.TrackNodes, formedPath);
+                    formedTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TrackDatabase.TrackDB.TrackNodes, formedPath);
                     formedTrain.Path = formedPath;
                     formedTrain.CreateRoute(false);
                     formedTrain.ValidRoute[0] = new TrackCircuitPartialPathRoute(formedTrain.TCRoute.TCRouteSubpaths[0]);

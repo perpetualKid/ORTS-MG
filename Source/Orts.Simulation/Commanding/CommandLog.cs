@@ -84,7 +84,7 @@ namespace Orts.Simulation.Commanding
                 var c = replayCommandList[0];
                 // Without a small margin, an activity event can pause simulator just before the ResumeActicityCommand is due, 
                 // so resume never happens.
-                double margin = (Simulator.Paused) ? 0.5 : 0;   // margin of 0.5 seconds
+                double margin = (Simulator.GamePaused) ? 0.5 : 0;   // margin of 0.5 seconds
                 if( elapsedTime >= c.Time - margin ) {
                     if( c is PausedCommand ) {
                         // Wait for the right duration and then action the command.

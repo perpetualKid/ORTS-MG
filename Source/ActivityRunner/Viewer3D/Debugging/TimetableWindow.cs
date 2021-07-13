@@ -185,7 +185,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
 
         public void PopulateItemLists()
         {
-            foreach (var item in F.simulator.TDB.TrackDB.TrackItems)
+            foreach (var item in F.simulator.TrackDatabase.TrackDB.TrackItems)
             {
                 switch (item)
                 {

@@ -13,8 +13,8 @@
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1641" />
     <PackageReference Include="System.Net.Primitives" Version="4.3.1" />
     <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
-    <PackageReference Include="GetText.NET" Version="0.12.7-rc" />
-    <PackageReference Include="GetText.NET.WindowsForms" Version="0.12.7-rc" />
+    <PackageReference Include="GetText.NET" Version="0.12.11" />
+    <PackageReference Include="GetText.NET.WindowsForms" Version="0.12.11" />
     <PackageReference Include="System.Resources.Extensions" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>

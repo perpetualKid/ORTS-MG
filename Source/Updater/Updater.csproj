@@ -10,8 +10,8 @@
     <ApplicationIcon>..\Orts.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="GetText.NET" Version="0.12.7-rc" />
-    <PackageReference Include="GetText.NET.WindowsForms" Version="0.12.7-rc" />
+    <PackageReference Include="GetText.NET" Version="0.12.11" />
+    <PackageReference Include="GetText.NET.WindowsForms" Version="0.12.11" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="System.Resources.Extensions" Version="5.0.0" />
   </ItemGroup>

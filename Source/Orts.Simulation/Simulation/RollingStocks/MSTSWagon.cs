@@ -53,6 +53,7 @@ using Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS;
 using Orts.Simulation.RollingStocks.SubSystems.Controllers;
 using Orts.Simulation.RollingStocks.SubSystems.PowerSupplies;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace Orts.Simulation.RollingStocks
 {
@@ -849,7 +850,7 @@ namespace Orts.Simulation.RollingStocks
         public void GetMeasurementUnits()
         {
             IsMetric = Simulator.Settings.MeasurementUnit == MeasurementUnit.Metric || (Simulator.Settings.MeasurementUnit == MeasurementUnit.System && System.Globalization.RegionInfo.CurrentRegion.IsMetric) ||
-                (Simulator.Settings.MeasurementUnit == MeasurementUnit.Route && Simulator.TRK.Route.MilepostUnitsMetric);
+                (Simulator.Settings.MeasurementUnit == MeasurementUnit.Route && Simulator.Route.MilepostUnitsMetric);
             IsUK = Simulator.Settings.MeasurementUnit == MeasurementUnit.UK;
         }
 
@@ -2448,9 +2449,9 @@ namespace Orts.Simulation.RollingStocks
                     // Activity randomizatrion needs to be active in Options menu, and HotBox will not be applied to a locomotive or tender.
                     if (Simulator.Settings.ActRandomizationLevel > 0 && WagonType != WagonTypes.Engine && WagonType != WagonTypes.Tender)
                      {
-                         var HotboxRandom = Simulator.Random.Next(100) / Simulator.Settings.ActRandomizationLevel;
+                         var HotboxRandom = RandomNumberGenerator.GetInt32(100) / Simulator.Settings.ActRandomizationLevel;
                          float PerCentRandom = 0.66f; // Set so that random time is always in first 66% of activity duration
-                         var RawHotBoxTimeRandomS = Simulator.Random.Next((int)Simulator.Activity.Activity.Header.Duration.TotalSeconds);
+                         var RawHotBoxTimeRandomS = RandomNumberGenerator.GetInt32((int)Simulator.ActivityFile.Activity.Header.Duration.TotalSeconds);
                          if (!Train.HotBoxSetOnTrain) // only allow one hot box to be set per train 
                          {
                               if (HotboxRandom < 10)

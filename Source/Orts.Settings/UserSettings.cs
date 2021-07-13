@@ -116,7 +116,9 @@ namespace Orts.Settings
         [Default(MeasurementUnit.Route)]
         public MeasurementUnit MeasurementUnit { get; set; }
         [Default(false)]
-        public bool DisableTCSScripts { get; set; }
+        public bool DisableTCSScripts { get; set; }        
+        [Default(true)]
+        public bool StartGamePaused { get; set; }
 
         // Audio settings:
         [Default(100)]

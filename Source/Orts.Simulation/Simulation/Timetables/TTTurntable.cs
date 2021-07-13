@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 
 using Microsoft.Xna.Framework;
 
@@ -39,6 +40,7 @@ using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
 using Orts.Simulation.Signalling;
 using Orts.Simulation.Track;
+using Orts.Simulation.World;
 
 namespace Orts.Simulation.Timetables
 {
@@ -95,7 +97,7 @@ namespace Orts.Simulation.Timetables
             bool validpool = true;
             bool newName = false;
             bool firstName = false;
-            Turntable thisTurntable = null;
+            TurnTable thisTurntable = null;
 
             string Worldfile = string.Empty;
             int UiD = -1;
@@ -202,7 +204,7 @@ namespace Orts.Simulation.Timetables
 
                                 AccessPathDetails thisAccess = new AccessPathDetails();
                                 thisAccess.AccessPath = new TrackCircuitPartialPathRoute(usedRoute);
-                                thisAccess.AccessTraveller = new Traveller(Simulatorref.TSectionDat, Simulatorref.TDB.TrackDB.TrackNodes, newPath);
+                                thisAccess.AccessTraveller = new Traveller(Simulatorref.TSectionDat, Simulatorref.TrackDatabase.TrackDB.TrackNodes, newPath);
                                 thisAccess.AccessPathName = accessPath;
                                 AdditionalTurntableDetails.AccessPaths.Add(thisAccess);
                             }
@@ -322,7 +324,7 @@ namespace Orts.Simulation.Timetables
             // paths must start at turntable
             if (validpool)
             {
-                thisTurntable = Simulatorref.MovingTables[AdditionalTurntableDetails.TurntableIndex] as Turntable;
+                thisTurntable = Simulator.Instance.MovingTables[AdditionalTurntableDetails.TurntableIndex] as TurnTable;
 
                 // check validity for all access paths
                 for (int iPath = 0; iPath < AdditionalTurntableDetails.AccessPaths.Count; iPath++)
@@ -405,7 +407,7 @@ namespace Orts.Simulation.Timetables
             {
                 AccessPathDetails thisAccess = new AccessPathDetails();
                 thisAccess.AccessPath = new TrackCircuitPartialPathRoute(inf);
-                thisAccess.AccessTraveller = new Traveller(Simulatorref.TSectionDat, Simulatorref.TDB.TrackDB.TrackNodes, inf);
+                thisAccess.AccessTraveller = new Traveller(Simulatorref.TSectionDat, Simulatorref.TrackDatabase.TrackDB.TrackNodes, inf);
                 thisAccess.AccessPathName = inf.ReadString();
                 thisAccess.TableExitIndex = inf.ReadInt32();
                 thisAccess.TableVectorIndex = inf.ReadInt32();
@@ -437,7 +439,7 @@ namespace Orts.Simulation.Timetables
 
                 PoolDetails newPool = new PoolDetails();
                 newPool.StoragePath = new TrackCircuitPartialPathRoute(inf);
-                newPool.StoragePathTraveller = new Traveller(Simulatorref.TSectionDat, Simulatorref.TDB.TrackDB.TrackNodes, inf);
+                newPool.StoragePathTraveller = new Traveller(Simulatorref.TSectionDat, Simulatorref.TrackDatabase.TrackDB.TrackNodes, inf);
                 newPool.StorageName = inf.ReadString();
 
                 newPool.AccessPaths = null;
@@ -572,7 +574,7 @@ namespace Orts.Simulation.Timetables
             // check if turntable track section is in path - must be in first element (path must start at turntable end)
             int vectorIndex = -1;
             TrackCircuitSection thisSection = thisPath[0].TrackCircuitSection;
-            TrackVectorNode thisTDBsection = Simulatorref.TDB.TrackDB.TrackNodes[thisSection.OriginalIndex] as TrackVectorNode;
+            TrackVectorNode thisTDBsection = Simulatorref.TrackDatabase.TrackDB.TrackNodes[thisSection.OriginalIndex] as TrackVectorNode;
 
             for (int iVector = 0; iVector < thisTDBsection.TrackVectorSections.Length; iVector++)
             {
@@ -591,22 +593,19 @@ namespace Orts.Simulation.Timetables
         /// <summary>
         /// FindTurntable : find reference to turntable as defined in turntable.dat using worldfile and uid references
         /// </summary>
-
         private int FindTurntable(string worldfile, int uid)
         {
-            int foundIndex = -1;
-
+            if (string.IsNullOrEmpty(worldfile))
+                return -1;
             // search through all moving tables
-            for (int iMT = 0; iMT < Simulatorref.MovingTables.Count && foundIndex == -1; iMT++)
+            for (int i = 0; i < Simulator.Instance.MovingTables.Count; i++)
             {
-                MovingTable thisMT = Simulatorref.MovingTables[iMT];
-
-                if (thisMT.WFile == worldfile && thisMT.UID == uid)
+                if (worldfile.Equals(Simulator.Instance.MovingTables[i].WFile, StringComparison.OrdinalIgnoreCase) && Simulator.Instance.MovingTables[i].UID == uid)
                 {
-                    foundIndex = iMT;
+                    return i;
                 }
             }
-            return (foundIndex);
+            return -1;
         }
 
         //================================================================================================//
@@ -614,7 +613,7 @@ namespace Orts.Simulation.Timetables
         /// Calculate offset of timetable position in access path
         /// </summary>
 
-        private void CalculateAccessOffsets(int ipath, Turntable thisTurntable)
+        private void CalculateAccessOffsets(int ipath, TurnTable thisTurntable)
         {
             AccessPathDetails thisPath = AdditionalTurntableDetails.AccessPaths[ipath];
 
@@ -630,7 +629,7 @@ namespace Orts.Simulation.Timetables
             TrackCircuitSection thisSection = thisPath.AccessPath[0].TrackCircuitSection;
             int trackNodeIndex = thisSection.OriginalIndex;
 
-            TrackVectorSection[] trackVectors = (Simulatorref.TDB.TrackDB.TrackNodes[trackNodeIndex] as TrackVectorNode).TrackVectorSections;
+            TrackVectorSection[] trackVectors = (Simulatorref.TrackDatabase.TrackDB.TrackNodes[trackNodeIndex] as TrackVectorNode).TrackVectorSections;
 
             // check if path is in front or behind turntable
 
@@ -675,15 +674,7 @@ namespace Orts.Simulation.Timetables
 #endif
 
             // get turntable exit index
-            int exitIndex = -1;
-            for (int iExit = 0; iExit < thisTurntable.MyTrackNodesIndex.Length && exitIndex < 0; iExit++)
-            {
-                if (thisTurntable.MyTrackNodesIndex[iExit] == trackNodeIndex)
-                {
-                    exitIndex = iExit;
-                }
-            }
-            thisPath.TableExitIndex = exitIndex;
+            thisPath.TableExitIndex = thisTurntable.FindExitNode(trackNodeIndex);
 
             // store updated path
             AdditionalTurntableDetails.AccessPaths[ipath] = thisPath;
@@ -694,7 +685,7 @@ namespace Orts.Simulation.Timetables
         /// Calculate length and turntable offset for storage paths
         /// </summary>
 
-        private void CalculateStorageOffsets(int ipath, Turntable thisTurntable)
+        private void CalculateStorageOffsets(int ipath, TurnTable thisTurntable)
         {
             PoolDetails thisPath = StoragePool[ipath];
 
@@ -710,7 +701,7 @@ namespace Orts.Simulation.Timetables
             TrackCircuitSection thisSection = thisPath.StoragePath[0].TrackCircuitSection;
             int trackNodeIndex = thisSection.OriginalIndex;
 
-            TrackVectorSection[] trackVectors = (Simulatorref.TDB.TrackDB.TrackNodes[trackNodeIndex] as TrackVectorNode).TrackVectorSections;
+            TrackVectorSection[] trackVectors = (Simulatorref.TrackDatabase.TrackDB.TrackNodes[trackNodeIndex] as TrackVectorNode).TrackVectorSections;
 
             // check if path is in front or behind turntable
 
@@ -753,15 +744,7 @@ namespace Orts.Simulation.Timetables
 #endif
 
             // get turntable exit index
-            int exitIndex = -1;
-            for (int iExit = 0; iExit < thisTurntable.MyTrackNodesIndex.Length && exitIndex < 0; iExit++)
-            {
-                if (thisTurntable.MyTrackNodesIndex[iExit] == trackNodeIndex)
-                {
-                    exitIndex = iExit;
-                }
-            }
-            thisPath.TableExitIndex = exitIndex;
+            thisPath.TableExitIndex = thisTurntable.FindExitNode(trackNodeIndex);
 
             // store updated path
             StoragePool[ipath] = thisPath;
@@ -813,12 +796,11 @@ namespace Orts.Simulation.Timetables
             int storageIndex = -1;
 
             // check if train fits on turntable - if not, reject
-            Turntable thisTurntable = Simulatorref.MovingTables[AdditionalTurntableDetails.TurntableIndex] as Turntable;
+            TurnTable thisTurntable = Simulator.Instance.MovingTables[AdditionalTurntableDetails.TurntableIndex] as TurnTable;
 
             if (train.Length > thisTurntable.Length)
             {
-                Trace.TraceWarning("Train : {0} too long ({1}) for turntable (length {2}) in pool {3}\n",
-                    train.Name, train.Length.ToString(), thisTurntable.Length.ToString(), PoolName);
+                Trace.TraceWarning($"Train : {train.Name} too long ({train.Length}) for turntable (length {thisTurntable.Length}) in pool {PoolName}\n");
             }
             else
             {
@@ -1138,7 +1120,7 @@ namespace Orts.Simulation.Timetables
                 else
                 {
                     // set delay
-                    float randDelay = (float)Simulator.Random.Next((train.DelayedStartSettings.newStart.randomPartS * 10));
+                    float randDelay = RandomNumberGenerator.GetInt32(train.DelayedStartSettings.newStart.randomPartS * 10);
                     train.RestdelayS = train.DelayedStartSettings.newStart.fixedPartS + (randDelay / 10f);
                     train.DelayedStart = true;
                     train.DelayedStartState = AiStartMovement.NewTrain;
@@ -1340,7 +1322,7 @@ namespace Orts.Simulation.Timetables
 
     public class TimetableTurntableControl
     {
-        private Turntable parentTurntable;                          // parent turntable
+        private TurnTable parentTurntable;                          // parent turntable
         private int parentIndex;                                    // index of parent turntable in moving table list
 
         private TimetableTurntablePool parentPool;                  // parent pool
@@ -1393,7 +1375,7 @@ namespace Orts.Simulation.Timetables
             poolName = thisPoolName;
             parentIndex = turntableIndex;
             parentTrain = train;
-            parentTurntable = simulatorref.MovingTables[parentIndex] as Turntable;
+            parentTurntable = simulatorref.MovingTables[parentIndex] as TurnTable;
 
             // set defined framerate if defined and not yet set for turntable
             if (parentPool.AdditionalTurntableDetails.FrameRate.HasValue && !parentTurntable.TurntableFrameRate.HasValue)
@@ -1430,9 +1412,8 @@ namespace Orts.Simulation.Timetables
             trainOnTable = null;
             if (inf.ReadBoolean())
             {
-                trainOnTable = new TrainOnMovingTable(simulatorref);
-                trainOnTable.Restore(inf);
-                trainOnTable.Train = parentTrain;  // must be explicitly restored as train is not yet available in train dictionary
+                trainOnTable = new TrainOnMovingTable(parentTrain);
+                trainOnTable.Restore(inf, parentTrain); // must be explicitly restored as train is not yet available in train dictionary
             }
         }
 
@@ -1476,27 +1457,28 @@ namespace Orts.Simulation.Timetables
 
         public bool CheckTurntableAvailable()
         {
-            if (parentTurntable == null) parentTurntable = parentPool.Simulatorref.MovingTables[parentIndex] as Turntable;
+            if (parentTurntable == null) 
+                parentTurntable = Simulator.Instance.MovingTables[parentIndex] as TurnTable;
 
             bool available = true;
             // check if waiting for turntable availability
-            if (MovingTableState == TimetableTurntableControl.MovingTableStateEnum.WaitingMovingTableAvailability)
+            if (MovingTableState == MovingTableStateEnum.WaitingMovingTableAvailability)
             {
                 available = false;
 
                 // turntable is not available
                 if (parentTurntable.InUse)
                 {
-                    if (!parentTurntable.Q.Contains(parentTrain.Number))
+                    if (!parentTurntable.WaitingTrains.Contains(parentTrain.Number))
                     {
-                        parentTurntable.Q.Enqueue(parentTrain.Number);
+                        parentTurntable.WaitingTrains.Enqueue(parentTrain.Number);
                     }
                 }
                 else
                 {
-                    if (parentTurntable.Q.Count < 1 || parentTurntable.Q.Peek() == parentTrain.Number)
+                    if (parentTurntable.WaitingTrains.Count < 1 || parentTurntable.WaitingTrains.Peek() == parentTrain.Number)
                     {
-                        if (parentTurntable.Q.Count >= 1) parentTurntable.Q.Dequeue();
+                        if (parentTurntable.WaitingTrains.Count >= 1) parentTurntable.WaitingTrains.Dequeue();
                         available = true;
                         parentTurntable.InUse = true;
                         switch (MovingTableAction)
@@ -1530,7 +1512,8 @@ namespace Orts.Simulation.Timetables
 
         public void UpdateTurntableStateAI(double elapsedClockSeconds, int presentTime)
         {
-            if (parentTurntable == null) parentTurntable = parentPool.Simulatorref.MovingTables[parentIndex] as Turntable;
+            if (parentTurntable == null) 
+                parentTurntable = Simulator.Instance.MovingTables[parentIndex] as TurnTable;
 
             int reqTurntableExit = -1;
             int reqTurntableEntry = -1;
@@ -1669,7 +1652,8 @@ namespace Orts.Simulation.Timetables
 
         public bool UpdateTurntableStatePlayer(double elapsedClockSeconds)
         {
-            if (parentTurntable == null) parentTurntable = parentPool.Simulatorref.MovingTables[parentIndex] as Turntable;
+            if (parentTurntable == null) 
+                parentTurntable = Simulator.Instance.MovingTables[parentIndex] as TurnTable;
 
             bool terminated = false;
             int reqTurntableExit = -1;
@@ -1686,16 +1670,16 @@ namespace Orts.Simulation.Timetables
                 case MovingTableStateEnum.WaitingMovingTableAvailability:
                     if (parentTurntable.InUse)
                     {
-                        if (!parentTurntable.Q.Contains(parentTrain.Number))
+                        if (!parentTurntable.WaitingTrains.Contains(parentTrain.Number))
                         {
-                            parentTurntable.Q.Enqueue(parentTrain.Number);
+                            parentTurntable.WaitingTrains.Enqueue(parentTrain.Number);
                         }
                     }
                     else
                     {
-                        if (parentTurntable.Q.Count < 1 || parentTurntable.Q.Peek() == parentTrain.Number)
+                        if (parentTurntable.WaitingTrains.Count < 1 || parentTurntable.WaitingTrains.Peek() == parentTrain.Number)
                         {
-                            if (parentTurntable.Q.Count >= 1) parentTurntable.Q.Dequeue();
+                            if (parentTurntable.WaitingTrains.Count >= 1) parentTurntable.WaitingTrains.Dequeue();
                             parentTurntable.InUse = true;
 
                             if (MovingTableAction == MovingTableActionEnum.FromAccess)
@@ -1749,8 +1733,7 @@ namespace Orts.Simulation.Timetables
                         Simulator.Instance.Confirmer.Information(message);
 
                         // create train-on-table class
-                        trainOnTable = new TrainOnMovingTable(Simulator.Instance);
-                        trainOnTable.Train = parentTrain;
+                        trainOnTable = new TrainOnMovingTable(parentTrain);
                         trainOnTable.SetFrontState(false);
                         trainOnTable.SetBackState(false);
                     }
@@ -1790,8 +1773,7 @@ namespace Orts.Simulation.Timetables
                         Simulator.Instance.Confirmer.Information(message);
 
                         // create train-on-table class
-                        trainOnTable = new TrainOnMovingTable(Simulator.Instance);
-                        trainOnTable.Train = parentTrain;
+                        trainOnTable = new TrainOnMovingTable(parentTrain);
                         trainOnTable.SetFrontState(false);
                         trainOnTable.SetBackState(false);
                     }
@@ -1981,7 +1963,7 @@ namespace Orts.Simulation.Timetables
                         double elapsedClockSeconds)
         {
             // if turntable is moving, always return false
-            if (parentTurntable.AutoClockwise || parentTurntable.AutoCounterclockwise)
+            if (parentTurntable.AutoRotationDirection != Rotation.None)
             {
                 parentTurntable.AutoRotateTable(elapsedClockSeconds);
 
@@ -2028,12 +2010,11 @@ namespace Orts.Simulation.Timetables
             reqTurntableExit = reqExit;
 
             // find out direction to move
-            float startAngle = parentTurntable.Angles[parentTurntable.ConnectedTrackEnd];
-            float endAngle = parentTurntable.Angles[reqExit];
+            (float startAngle, float endAngle) = parentTurntable.FindConnectingDirections(reqExit);
             float angleToMove = (endAngle - startAngle) % (float)Math.PI;
-            float halfPi = (float)Math.PI / 2.0f;
-            bool exitForward = parentTurntable.MyTrackNodesOrientation[reqExit];
-            bool entryForward = parentTurntable.MyTrackNodesOrientation[parentTurntable.ConnectedTrackEnd];
+            float halfPi = MathHelper.PiOver2;
+            bool exitForward = parentTurntable.TrackNodeOrientation(reqExit);
+            bool entryForward = parentTurntable.TrackNodeOrientation(parentTurntable.ConnectedTrackEnd);
 
             bool reqChangeEnd = false;
 
@@ -2052,7 +2033,7 @@ namespace Orts.Simulation.Timetables
 
                 if (angleToMove <= -halfPi)
                 {
-                    parentTurntable.AutoCounterclockwise = true;
+                    parentTurntable.AutoRotationDirection = Rotation.CounterClockwise;
                     reqChangeEnd = true;
 #if DEBUG_TURNTABLEINFO
                     Trace.TraceInformation("   angle <= - halfPi");
@@ -2060,7 +2041,7 @@ namespace Orts.Simulation.Timetables
                 }
                 else if (angleToMove < 0)
                 {
-                    parentTurntable.AutoCounterclockwise = true;
+                    parentTurntable.AutoRotationDirection = Rotation.CounterClockwise;
 #if DEBUG_TURNTABLEINFO
                     Trace.TraceInformation("   -halfPi < angle < 0");
 #endif
@@ -2068,14 +2049,14 @@ namespace Orts.Simulation.Timetables
 
                 else if (angleToMove < halfPi)
                 {
-                    parentTurntable.AutoClockwise = true;
+                    parentTurntable.AutoRotationDirection = Rotation.Clockwise;
 #if DEBUG_TURNTABLEINFO
                     Trace.TraceInformation("   0 < angle < halfPi");
 #endif
                 }
                 else
                 {
-                    parentTurntable.AutoClockwise = true;
+                    parentTurntable.AutoRotationDirection = Rotation.Clockwise;
                     reqChangeEnd = true;
 #if DEBUG_TURNTABLEINFO
                     Trace.TraceInformation("   halfPi <= angle");
@@ -2095,8 +2076,7 @@ namespace Orts.Simulation.Timetables
                 // reverse rotation if required
                 if (reqChangeEnd)
                 {
-                    parentTurntable.AutoClockwise = !parentTurntable.AutoClockwise;
-                    parentTurntable.AutoCounterclockwise = !parentTurntable.AutoCounterclockwise;
+                    parentTurntable.AutoRotationDirection = parentTurntable.AutoRotationDirection.Reverse();
                 }
 
                 // set required end
@@ -2139,14 +2119,14 @@ namespace Orts.Simulation.Timetables
             // rotate clockwise or counterclockwise depending on angle
             if ( angleToMove < 0)
             {
-                parentTurntable.AutoCounterclockwise = true;
+                parentTurntable.AutoRotationDirection = Rotation.CounterClockwise;
 #if DEBUG_TURNTABLEINFO
                 Trace.TraceInformation("   angle < 0");
 #endif
             }
             else if (angleToMove > 0)
             {
-                parentTurntable.AutoClockwise = true;
+                parentTurntable.AutoRotationDirection = Rotation.Clockwise;
 #if DEBUG_TURNTABLEINFO
                 Trace.TraceInformation("   angle > 0");
 #endif
@@ -2192,8 +2172,7 @@ namespace Orts.Simulation.Timetables
             // reverse rotation if required
             if (reqChangeEnd)
             {
-                parentTurntable.AutoClockwise = !parentTurntable.AutoClockwise;
-                parentTurntable.AutoCounterclockwise = !parentTurntable.AutoCounterclockwise;
+                parentTurntable.AutoRotationDirection = parentTurntable.AutoRotationDirection.Reverse();
             }
 
             // set required end
@@ -2344,7 +2323,7 @@ namespace Orts.Simulation.Timetables
             // set train on table
             parentTrain.ControlMode = TrainControlMode.TurnTable;
 
-            TrainOnMovingTable trainOnTable = new TrainOnMovingTable(parentTrain, parentPool.Simulatorref);
+            TrainOnMovingTable trainOnTable = new TrainOnMovingTable(parentTrain);
             trainOnTable.SetFrontState(true);
             trainOnTable.SetBackState(true);
 
@@ -2380,7 +2359,7 @@ namespace Orts.Simulation.Timetables
 
             // get traveller at start of path tracknode
             TrackCircuitSection thisSection = parentTrain.ValidRoute[0][0].TrackCircuitSection;
-            Traveller middlePosition = new Traveller(parentPool.Simulatorref.TSectionDat, parentPool.Simulatorref.TDB.TrackDB.TrackNodes, parentPool.Simulatorref.TDB.TrackDB.TrackNodes[thisSection.OriginalIndex] as TrackVectorNode);
+            Traveller middlePosition = new Traveller(parentPool.Simulatorref.TSectionDat, parentPool.Simulatorref.TrackDatabase.TrackDB.TrackNodes, parentPool.Simulatorref.TrackDatabase.TrackDB.TrackNodes[thisSection.OriginalIndex] as TrackVectorNode);
 
 #if DEBUG_TURNTABLEINFO
             Trace.TraceInformation("Pool {0} - Train {1} [{2}] : calculating middle position for state : {3} , orientation : {4}",

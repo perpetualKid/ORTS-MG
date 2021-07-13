@@ -381,7 +381,7 @@ namespace Orts.MultiPlayer
         public MSGPlayer(string n, string cd, string c, string p, Train t, int tn, string avatar)
         {
             url = avatar;
-            route = MPManager.Simulator.RoutePathName;
+            route = Simulator.Instance.RouteFolder.RouteName;
             int index = p.LastIndexOf("\\PATHS\\", StringComparison.OrdinalIgnoreCase);
             if (index > 0)
             {
@@ -463,7 +463,7 @@ namespace Orts.MultiPlayer
                 if (MPManager.IsServer())
                 {
                     MPManager.BroadCast((new MSGMessage(this.user, "Error", reason)).ToString());//server will broadcast this error
-                    throw new Exception("Player has wrong version of protocol");//ignore this player message
+                    throw new InvalidDataException("Player has wrong version of protocol");//ignore this player message
                 }
                 else
                 {
@@ -473,10 +473,10 @@ namespace Orts.MultiPlayer
             }
             if (MPManager.IsServer() && MPManager.Instance().MD5Check != "NA")//I am the server and have MD5 check values, client should have matching MD5, if file is accessible
             {
-                if ((MD5 != "NA" && MD5 != MPManager.Instance().MD5Check) || route.ToLower() != MPManager.Simulator.RoutePathName.ToLower())
+                if ((MD5 != "NA" && MD5 != MPManager.Instance().MD5Check) || !Simulator.Instance.RouteFolder.RouteName.Equals(route, StringComparison.OrdinalIgnoreCase))
                 {
                     MPManager.BroadCast((new MSGMessage(this.user, "Error", "Wrong route dir or TDB file, the dispatcher uses a different route")).ToString());//server will broadcast this error
-                    throw new Exception("Player has wrong version of route");//ignore this player message
+                    throw new InvalidDataException("Player has wrong version of route");//ignore this player message
                 }
             }
             //check if other players with the same name is online
@@ -512,7 +512,7 @@ namespace Orts.MultiPlayer
                     if (cars.Length != p1Train.Cars.Count) identical = false;
                     if (identical != false)
                     {
-                        string wagonFilePath = MPManager.Simulator.BasePath + @"\trains\trainset\";
+                        string wagonFilePath = MPManager.Simulator.RouteFolder.ContentFolder.TrainSetsFolder;
                         for (int i = 0; i < cars.Length; i++)
                         {
                             if (wagonFilePath + cars[i] != p1Train.Cars[i].RealWagFilePath) { identical = false; break; }
@@ -559,7 +559,7 @@ namespace Orts.MultiPlayer
                             if (cars.Length != t.Cars.Count) identical = false;
                             if (identical != false)
                             {
-                                string wagonFilePath = MPManager.Simulator.BasePath + @"\trains\trainset\";
+                                string wagonFilePath = MPManager.Simulator.RouteFolder.ContentFolder.TrainSetsFolder;
                                 for (int i = 0; i < cars.Length; i++)
                                 {
                                     if (wagonFilePath + cars[i] != t.Cars[i].RealWagFilePath) { identical = false; break; }
@@ -571,7 +571,7 @@ namespace Orts.MultiPlayer
                             t.Cars.RemoveRange(0, carsCount);
                                 for (int i = 0; i < cars.Length; i++)
                                 {
-                                    string wagonFilePath = MPManager.Simulator.BasePath + @"\trains\trainset\" + cars[i];
+                                    string wagonFilePath = Path.Combine(MPManager.Simulator.RouteFolder.ContentFolder.TrainSetsFolder, cars[i]);
                                     if (!File.Exists(wagonFilePath))
                                     {
                                         Trace.TraceWarning($"Ignored missing rolling stock {wagonFilePath}");
@@ -631,7 +631,7 @@ namespace Orts.MultiPlayer
                 MPManager.BroadCast((new MSGMessage(this.user, "Error", reason)).ToString());
                 throw new Exception("Wrong version of protocol");
             }
-            if ((MPManager.Instance().MD5Check != "NA" && MD5 != "NA" && MD5 != MPManager.Instance().MD5Check) || route.ToLower() != MPManager.Simulator.RoutePathName.ToLower())
+            if ((MPManager.Instance().MD5Check != "NA" && MD5 != "NA" && MD5 != MPManager.Instance().MD5Check) || !Simulator.Instance.RouteFolder.RouteName.Equals(route, StringComparison.OrdinalIgnoreCase))
             {
                 MPManager.BroadCast((new MSGMessage(this.user, "Error", "Wrong route dir or TDB file, the dispatcher uses a different route")).ToString());//server will broadcast this error
                 throw new Exception("Player has wrong version of route");//ignore this player message
@@ -656,7 +656,7 @@ namespace Orts.MultiPlayer
                 if (cars.Length != p1Train.Cars.Count) identical = false;
                 if (identical != false)
                 {
-                    string wagonFilePath = MPManager.Simulator.BasePath + @"\trains\trainset\";
+                    string wagonFilePath = MPManager.Simulator.RouteFolder.ContentFolder.TrainSetsFolder;
                     for (int i = 0; i < cars.Length; i++)
                     {
                         if (wagonFilePath + cars[i] != p1Train.Cars[i].RealWagFilePath) { identical = false; break; }
@@ -691,7 +691,7 @@ namespace Orts.MultiPlayer
 
             MPManager.Instance().lastPlayerAddedTime = MPManager.Simulator.GameTime;
 
-            MSGPlayer host = new MSGPlayer(MPManager.GetUserName(), "1234", MPManager.Simulator.conFileName, MPManager.Simulator.patFileName, MPManager.Simulator.PlayerLocomotive.Train,
+            MSGPlayer host = new MSGPlayer(MPManager.GetUserName(), "1234", MPManager.Simulator.ConsistFileName, MPManager.Simulator.PathFileName, MPManager.Simulator.PlayerLocomotive.Train,
                 MPManager.Simulator.PlayerLocomotive.Train.Number, MPManager.Simulator.Settings.AvatarURL);
             SendToPlayer(p, host.ToString() + MPManager.OnlineTrains.AddAllPlayerTrain());
 
@@ -888,7 +888,7 @@ namespace Orts.MultiPlayer
                     MPManager.BroadCast((new MSGMessage(user, "SwitchWarning", "Server does not allow hand thrown of switch")).ToString());
                     return;
                 }
-                TrackJunctionNode trj = MPManager.Simulator.TDB.TrackDB.GetJunctionNode(TileX, TileZ, WorldID);
+                TrackJunctionNode trj = MPManager.Simulator.TrackDatabase.TrackDB.GetJunctionNode(TileX, TileZ, WorldID);
                 bool state = MPManager.Simulator.SignalEnvironment.RequestSetSwitch(trj, this.Selection);
                 if (state == false)
                     MPManager.BroadCast((new MSGMessage(user, "Warning", "Train on the switch, cannot throw")).ToString());
@@ -896,7 +896,7 @@ namespace Orts.MultiPlayer
             }
             else
             {
-                TrackJunctionNode trj = MPManager.Simulator.TDB.TrackDB.GetJunctionNode(TileX, TileZ, WorldID);
+                TrackJunctionNode trj = MPManager.Simulator.TrackDatabase.TrackDB.GetJunctionNode(TileX, TileZ, WorldID);
                 SetSwitch(trj, Selection);
                 //trj.SelectedRoute = Selection; //although the new signal system request Signals.RequestSetSwitch, client may just change
                 if (user == MPManager.GetUserName() && HandThrown == true)//got the message with my name, will confirm with the player
@@ -911,7 +911,7 @@ namespace Orts.MultiPlayer
         public static void SetSwitch(TrackNode switchNode, int desiredState)
         {
             TrackCircuitSection switchSection = TrackCircuitSection.TrackCircuitList[switchNode.TrackCircuitCrossReferences[0].Index];
-            (MPManager.Simulator.TDB.TrackDB.TrackNodes[switchSection.OriginalIndex] as TrackJunctionNode).SelectedRoute = switchSection.JunctionSetManual = desiredState;
+            (MPManager.Simulator.TrackDatabase.TrackDB.TrackNodes[switchSection.OriginalIndex] as TrackJunctionNode).SelectedRoute = switchSection.JunctionSetManual = desiredState;
             switchSection.JunctionLastRoute = switchSection.JunctionSetManual;
 
             // update linked signals
@@ -999,7 +999,7 @@ namespace Orts.MultiPlayer
             SwitchState = new SortedList<uint, TrackJunctionNode>();
             try
             {
-                foreach (TrackNode t in MPManager.Simulator.TDB.TrackDB.TrackNodes)
+                foreach (TrackNode t in MPManager.Simulator.TrackDatabase.TrackDB.TrackNodes)
                 {
                     if (t is TrackJunctionNode trackJunctionNode)
                     {
@@ -1027,7 +1027,7 @@ namespace Orts.MultiPlayer
         public static void SetSwitch(TrackNode switchNode, int desiredState)
         {
             TrackCircuitSection switchSection = TrackCircuitSection.TrackCircuitList[switchNode.TrackCircuitCrossReferences[0].Index];
-            (MPManager.Simulator.TDB.TrackDB.TrackNodes[switchSection.OriginalIndex] as TrackJunctionNode).SelectedRoute = switchSection.JunctionSetManual = desiredState;
+            (MPManager.Simulator.TrackDatabase.TrackDB.TrackNodes[switchSection.OriginalIndex] as TrackJunctionNode).SelectedRoute = switchSection.JunctionSetManual = desiredState;
             switchSection.JunctionLastRoute = switchSection.JunctionSetManual;
 
             // update linked signals
@@ -1060,7 +1060,7 @@ namespace Orts.MultiPlayer
             {
                 SwitchState = new SortedList<uint, TrackJunctionNode>();
                 uint key = 0;
-                foreach (TrackNode t in MPManager.Simulator.TDB.TrackDB.TrackNodes)
+                foreach (TrackNode t in MPManager.Simulator.TrackDatabase.TrackDB.TrackNodes)
                 {
                     if (t is TrackJunctionNode trackJunctionNode)
                     {
@@ -1102,7 +1102,7 @@ namespace Orts.MultiPlayer
                 SwitchState = new SortedList<uint, TrackJunctionNode>();
                 try
                 {
-                    foreach (TrackNode t in MPManager.Simulator.TDB.TrackDB.TrackNodes)
+                    foreach (TrackNode t in MPManager.Simulator.TrackDatabase.TrackDB.TrackNodes)
                     {
                         if (t is TrackJunctionNode trackJunctionNode)
                         {
@@ -1155,7 +1155,7 @@ namespace Orts.MultiPlayer
         public static void SetSwitch(TrackNode switchNode, int desiredState)
         {
             TrackCircuitSection switchSection = TrackCircuitSection.TrackCircuitList[switchNode.TrackCircuitCrossReferences[0].Index];
-            (MPManager.Simulator.TDB.TrackDB.TrackNodes[switchSection.OriginalIndex] as TrackJunctionNode).SelectedRoute = switchSection.JunctionSetManual = desiredState;
+            (MPManager.Simulator.TrackDatabase.TrackDB.TrackNodes[switchSection.OriginalIndex] as TrackJunctionNode).SelectedRoute = switchSection.JunctionSetManual = desiredState;
             switchSection.JunctionLastRoute = switchSection.JunctionSetManual;
 
             // update linked signals
@@ -1310,12 +1310,12 @@ namespace Orts.MultiPlayer
             train.TrainType = TrainType.Remote;
             train.DistanceTravelled = Travelled;
             train.MUDirection = (MidpointDirection)this.mDirection;
-            train.RearTDBTraveller = new Traveller(MPManager.Simulator.TSectionDat, MPManager.Simulator.TDB.TrackDB.TrackNodes, location, direction == 1 ? Traveller.TravellerDirection.Forward : Traveller.TravellerDirection.Backward);
+            train.RearTDBTraveller = new Traveller(MPManager.Simulator.TSectionDat, MPManager.Simulator.TrackDatabase.TrackDB.TrackNodes, location, direction == 1 ? Traveller.TravellerDirection.Forward : Traveller.TravellerDirection.Backward);
             //if (consistDirection != 1)
             //	train.RearTDBTraveller.ReverseDirection();
             for (var i = 0; i < cars.Length; i++)// cars.Length-1; i >= 0; i--) {
             {
-                string wagonFilePath = MPManager.Simulator.BasePath + @"\trains\trainset\" + cars[i];
+                string wagonFilePath = Path.Combine(MPManager.Simulator.RouteFolder.ContentFolder.TrainSetsFolder, cars[i]);
                 TrainCar car = null;
                 try
                 {
@@ -1517,11 +1517,11 @@ namespace Orts.MultiPlayer
             }
             if (found)
             {
-                Traveller traveller = new Traveller(MPManager.Simulator.TSectionDat, MPManager.Simulator.TDB.TrackDB.TrackNodes, location, direction == 1 ? Traveller.TravellerDirection.Forward : Traveller.TravellerDirection.Backward);
+                Traveller traveller = new Traveller(MPManager.Simulator.TSectionDat, MPManager.Simulator.TrackDatabase.TrackDB.TrackNodes, location, direction == 1 ? Traveller.TravellerDirection.Forward : Traveller.TravellerDirection.Backward);
                 List<TrainCar> tmpCars = new List<TrainCar>();
                 for (var i = 0; i < cars.Length; i++)// cars.Length-1; i >= 0; i--) {
                 {
-                    string wagonFilePath = MPManager.Simulator.BasePath + @"\trains\trainset\" + cars[i];
+                    string wagonFilePath = Path.Combine(MPManager.Simulator.RouteFolder.ContentFolder.TrainSetsFolder, cars[i]);
                     TrainCar car = FindCar(train, ids[i]);
                     try
                     {
@@ -1556,10 +1556,10 @@ namespace Orts.MultiPlayer
             }
             train1.TrainType = TrainType.Remote;
             train1.DistanceTravelled = Travelled;
-            train1.RearTDBTraveller = new Traveller(MPManager.Simulator.TSectionDat, MPManager.Simulator.TDB.TrackDB.TrackNodes, location, direction == 1 ? Traveller.TravellerDirection.Forward : Traveller.TravellerDirection.Backward);
+            train1.RearTDBTraveller = new Traveller(MPManager.Simulator.TSectionDat, MPManager.Simulator.TrackDatabase.TrackDB.TrackNodes, location, direction == 1 ? Traveller.TravellerDirection.Forward : Traveller.TravellerDirection.Backward);
             for (var i = 0; i < cars.Length; i++)// cars.Length-1; i >= 0; i--) {
             {
-                string wagonFilePath = MPManager.Simulator.BasePath + @"\trains\trainset\" + cars[i];
+                string wagonFilePath = Path.Combine(MPManager.Simulator.RouteFolder.ContentFolder.TrainSetsFolder, cars[i]);
                 TrainCar car = null;
                 try
                 {
@@ -2604,7 +2604,7 @@ namespace Orts.MultiPlayer
                         t.Cars.AddRange(tmpcars);
                         Traveller.TravellerDirection d1 = Traveller.TravellerDirection.Forward;
                         if (trainDirection == 1) d1 = Traveller.TravellerDirection.Backward;
-                        t.RearTDBTraveller = new Traveller(MPManager.Simulator.TSectionDat, MPManager.Simulator.TDB.TrackDB.TrackNodes, location1, d1);
+                        t.RearTDBTraveller = new Traveller(MPManager.Simulator.TSectionDat, MPManager.Simulator.TrackDatabase.TrackDB.TrackNodes, location1, d1);
                         t.DistanceTravelled = Travelled1;
                         t.SpeedMpS = Speed1;
                         t.LeadLocomotive = lead;
@@ -2677,7 +2677,7 @@ namespace Orts.MultiPlayer
                 if (train2Direction == 1) d2 = Traveller.TravellerDirection.Backward;
 
                 // and fix up the travellers
-                train2.RearTDBTraveller = new Traveller(MPManager.Simulator.TSectionDat, MPManager.Simulator.TDB.TrackDB.TrackNodes, location2, d2);
+                train2.RearTDBTraveller = new Traveller(MPManager.Simulator.TSectionDat, MPManager.Simulator.TrackDatabase.TrackDB.TrackNodes, location2, d2);
                 train2.DistanceTravelled = Travelled2;
                 train2.SpeedMpS = Speed2;
                 train2.MUDirection = (MidpointDirection)mDirection2;
@@ -2955,7 +2955,7 @@ namespace Orts.MultiPlayer
 
             train.DistanceTravelled = Travelled;
             train.MUDirection = (MidpointDirection)mDirection;
-            train.RearTDBTraveller = new Traveller(MPManager.Simulator.TSectionDat, MPManager.Simulator.TDB.TrackDB.TrackNodes, location, direction == 0 ? Traveller.TravellerDirection.Forward : Traveller.TravellerDirection.Backward);
+            train.RearTDBTraveller = new Traveller(MPManager.Simulator.TSectionDat, MPManager.Simulator.TrackDatabase.TrackDB.TrackNodes, location, direction == 0 ? Traveller.TravellerDirection.Forward : Traveller.TravellerDirection.Backward);
             train.CheckFreight();
             train.CalculatePositionOfCars();
             train.LeadLocomotive = null; train2.LeadLocomotive = null;

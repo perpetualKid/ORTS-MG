@@ -40,7 +40,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         protected override ControlLayout Layout(ControlLayout layout)
         {
             ControlLayoutVertical vbox = base.Layout(layout).AddLayoutVertical();
-            if (Owner.Viewer.Simulator.Activity != null || Owner.Viewer.Simulator.TimetableMode)
+            if (Owner.Viewer.Simulator.ActivityFile != null || Owner.Viewer.Simulator.TimetableMode)
             {
                 int colWidth = (vbox.RemainingWidth - vbox.TextHeight * 2) / 5;
 
@@ -138,7 +138,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         {
             base.PrepareFrame(elapsedTime, updateFull);
 
-            if (updateFull && (Owner.Viewer.Simulator.Activity != null || Owner.Viewer.Simulator.TimetableMode) && Owner.Viewer.Simulator.AI.aiListChanged)
+            if (updateFull && (Owner.Viewer.Simulator.ActivityFile != null || Owner.Viewer.Simulator.TimetableMode) && Owner.Viewer.Simulator.AI.aiListChanged)
             {
                 Owner.Viewer.Simulator.AI.aiListChanged = false;
                 Layout();

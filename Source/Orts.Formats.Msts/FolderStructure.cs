@@ -9,20 +9,21 @@ using System.Linq;
 
 using Microsoft.Win32;
 
-using Orts.Formats.Msts.Files;
-
 namespace Orts.Formats.Msts
 {
     public static class FolderStructure
     {
+        private const string OR = "OpenRails";
+        private const string Global = "Global";
+
 #pragma warning disable CA1034 // Nested types should not be visible
         public class ContentFolder
         {
+            #region RouteFolder
             public class RouteFolder
             {
 #pragma warning restore CA1034 // Nested types should not be visible
 
-                private const string OR = "OpenRails";
                 private const string tsection = "tsection.dat";
 
                 private readonly string routeName;
@@ -38,38 +39,63 @@ namespace Orts.Formats.Msts
 
                 public bool IsValid => !string.IsNullOrEmpty(TrackFileName);
 
+                public string RouteName => routeName;
+
+                #region Folders
+                public string CurrentFolder => routeFolder;
+
+                public ContentFolder ContentFolder => parent;
+
                 public string TrackFileName => Directory.EnumerateFiles(routeFolder, "*.trk").FirstOrDefault();
 
-                public string ActivitiesFolder => Path.Combine(routeFolder, "ACTIVITIES");
+                public string ActivitiesFolder => Path.Combine(routeFolder, "Activities");
 
-                public string OrActivitiesFolder => Path.Combine(routeFolder, "ACTIVITIES", OR);
+                public string OpenRailsActivitiesFolder => Path.Combine(ActivitiesFolder, OR);
+
+                public string OpenRailsRouteFolder => Path.Combine(routeFolder, OR);
+
+                public string EnvironmentTexturesFolder => Path.Combine(routeFolder, "EnvFiles", "Textures");
+
+                public string EnvironmentFolder => Path.Combine(routeFolder, "EnvFiles");
+
+                public string PathsFolder => Path.Combine(routeFolder, "Paths");
+
+                public string ServicesFolder => Path.Combine(routeFolder, "Services");
+
+                public string ShapesFolder => Path.Combine(routeFolder, "Shapes");
+
+                public string SoundFolder => Path.Combine(routeFolder, "Sound");
+
+                public string TexturesFolder => Path.Combine(routeFolder, "Textures");
+
+                public string TerrainTexturesFolder => Path.Combine(routeFolder, "Terrtex");
+
+                public string TilesFolder => Path.Combine(routeFolder, "Tiles");
+
+                public string TilesFolderLow => Path.Combine(routeFolder, "Lo_Tiles");
+
+                public string TrafficFolder => Path.Combine(routeFolder, "Traffic");
 
                 public string WeatherFolder => Path.Combine(routeFolder, "WeatherFiles");
 
-                public string PathsFolder => Path.Combine(routeFolder, "PATHS");
+                public string WorldFolder => Path.Combine(routeFolder, "World");
+                #endregion
 
-                public string ServicesFolder => Path.Combine(routeFolder, "SERVICES");
-
-                public string TrafficFolder => Path.Combine(routeFolder, "TRAFFIC");
-
-                public string SoundsFolder => Path.Combine(routeFolder, "SOUND");
-                
-                public string WorldFolder => Path.Combine(routeFolder, "WORLD");
-
-                public string TrackDatabaseFile(RouteFile route)
+                #region Files
+                public string TrackDatabaseFile(string routeFileName)
                 {
-                    if (route == null)
-                        throw new ArgumentNullException(nameof(route));
+                    if (string.IsNullOrEmpty(routeFileName))
+                        throw new ArgumentNullException(nameof(routeFileName));
 
-                    return Path.Combine(routeFolder, route.Route.FileName + ".tdb");
+                    return Path.Combine(routeFolder, routeFileName + ".tdb");
                 }
 
-                public string RoadTrackDatabaseFile(RouteFile route)
+                public string RoadTrackDatabaseFile(string routeFileName)
                 {
-                    if (route == null)
-                        throw new ArgumentNullException(nameof(route));
+                    if (string.IsNullOrEmpty(routeFileName))
+                        throw new ArgumentNullException(nameof(routeFileName));
 
-                    return Path.Combine(routeFolder, route.Route.FileName + ".rdb");
+                    return Path.Combine(routeFolder, routeFileName + ".rdb");
                 }
 
                 public string ServiceFile(string serviceName)
@@ -87,9 +113,24 @@ namespace Orts.Formats.Msts
                     return Path.Combine(TrafficFolder, trafficName + ".trf");
                 }
 
-                public string SoundFile(string soundName)
+                public string SoundFile(string soundFileName)
                 {
-                    return Path.Combine(SoundsFolder, soundName);
+                    return Path.Combine(SoundFolder, soundFileName);
+                }
+
+                public string HazardFile(string hazardName)
+                {
+                    return Path.Combine(routeFolder, hazardName);
+                }
+
+                public string ShapeFile(string shapeFileName)
+                {
+                    return Path.Combine(ShapesFolder, shapeFileName);
+                }
+
+                public string EnvironmentTextureFile(string textureFileName)
+                {
+                    return Path.Combine(EnvironmentTexturesFolder, textureFileName);
                 }
 
                 public string TrackSectionFile
@@ -99,10 +140,10 @@ namespace Orts.Formats.Msts
                         string tsectionFile;
                         if (File.Exists(tsectionFile = Path.Combine(routeFolder, OR, tsection)))
                             return tsectionFile;
-                        else if (File.Exists(tsectionFile = Path.Combine(routeFolder, "GLOBAL", tsection)))
+                        else if (File.Exists(tsectionFile = Path.Combine(routeFolder, Global, tsection)))   // doesn't seem to be a valid option, but might have been used so keep for now
                             return tsectionFile;
                         else
-                            return Path.Combine(parent.Folder, "GLOBAL", tsection);
+                            return Path.Combine(parent.Folder, Global, tsection);
                     }
                 }
 
@@ -123,7 +164,13 @@ namespace Orts.Formats.Msts
                 }
 
                 public bool ORSignalConfigFile { get; private set; }
+
+                public string CarSpawnerFile => Path.Combine(routeFolder, "carspawn.dat");
+                public string OpenRailsCarSpawnerFile => Path.Combine(routeFolder, OR, "carspawn.dat");
+
+                #endregion
             }
+            #endregion
 
             private readonly ConcurrentDictionary<string, RouteFolder> routeFolders = new ConcurrentDictionary<string, RouteFolder>(StringComparer.OrdinalIgnoreCase);
 
@@ -134,11 +181,17 @@ namespace Orts.Formats.Msts
 
             public string Folder { get; }
 
-            public string RoutesFolder => Path.Combine(Folder, "ROUTES");
+            public string RoutesFolder => Path.Combine(Folder, "Routes");
 
-            public string ConsistsFolder => Path.Combine(Folder, "TRAINS", "Consists");
+            public string SoundFolder => Path.Combine(Folder, "Sound");
 
-            public string TrainSetsFolder => Path.Combine(Folder, "TRAINS", "TrainSet");
+            public string ConsistsFolder => Path.Combine(Folder, "Trains", "Consists");
+
+            public string TrainSetsFolder => Path.Combine(Folder, "Trains", "TrainSet");
+
+            public string TexturesFolder => Path.Combine(Folder, Global, "Textures");
+
+            public string ShapesFolder => Path.Combine(Folder, Global, "Shapes");
 
             public string ConsistFile(string consistName)
             {
@@ -148,6 +201,21 @@ namespace Orts.Formats.Msts
             public string EngineFile(string trainSetName, string engineName)
             {
                 return Path.Combine(TrainSetsFolder, trainSetName, engineName + ".eng");
+            }
+
+            public string SoundFile(string soundName)
+            {
+                return Path.Combine(SoundFolder, soundName);
+            }
+
+            public string ShapeFile(string shapeFile)
+            {
+                return Path.Combine(ShapesFolder, shapeFile);
+            }
+
+            public string TextureFile(string textureFile)
+            {
+                return Path.Combine(ShapesFolder, textureFile);
             }
 
             public string WagonFile(string trainSetName, string wagonName)
@@ -211,15 +279,20 @@ namespace Orts.Formats.Msts
         {
             string routeName = Path.GetFileName(routePath);
             string contentFolder = Path.GetFullPath(Path.Combine(routePath, "..\\.."));
-            return Content(contentFolder).Route(routeName);
+            current = Content(contentFolder);
+            return current.Route(routeName);
         }
 
         public static ContentFolder.RouteFolder RouteFromActivity(string activityPath)
         {
-            string routePath = Path.GetFullPath(Path.Combine(activityPath, "..\\.."));
+            string traversal = "..\\..";
+            if (Path.GetFileName(Path.GetDirectoryName(activityPath)).Equals(OR, StringComparison.OrdinalIgnoreCase))
+                traversal = "..\\..\\..";
+            string routePath = Path.GetFullPath(Path.Combine(activityPath, traversal));
             string routeName = Path.GetFileName(routePath);
             string contentFolder = Path.GetFullPath(Path.Combine(routePath, "..\\.."));
-            return Content(contentFolder).Route(routeName);
+            current = Content(contentFolder);
+            return current.Route(routeName);
         }
 
         //public static string TrackItemTable => Path.Combine(RouteFolder, RouteName + ".TIT");

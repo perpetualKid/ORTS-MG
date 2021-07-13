@@ -49,6 +49,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 
 using Microsoft.Xna.Framework;
 
@@ -442,7 +443,7 @@ namespace Orts.Simulation.RollingStocks
         {
             //  BrakePipeChargingRatePSIpS = Simulator.Settings.BrakePipeChargingRate;
 
-            MilepostUnitsMetric = Simulator.TRK.Route.MilepostUnitsMetric;
+            MilepostUnitsMetric = Simulator.Route.MilepostUnitsMetric;
             BrakeCutsPowerAtBrakeCylinderPressurePSI = 4.0f;
 
             LocomotiveAxle = new Axle();
@@ -2418,8 +2419,8 @@ namespace Orts.Simulation.RollingStocks
             {
                 if (Train.SlipperySpotDistanceM < 0)
                 {
-                    Train.SlipperySpotLengthM = 10 + 40 * (float)Simulator.Random.NextDouble();
-                    Train.SlipperySpotDistanceM = Train.SlipperySpotLengthM + 2000 * (float)Simulator.Random.NextDouble();
+                    Train.SlipperySpotLengthM = 10 + 40 * (float)(RandomNumberGenerator.GetInt32(int.MaxValue) / (double)int.MaxValue);
+                    Train.SlipperySpotDistanceM = Train.SlipperySpotLengthM + 2000 * (float)(RandomNumberGenerator.GetInt32(int.MaxValue) / (double)int.MaxValue);
                 }
                 if (Train.SlipperySpotDistanceM < Train.SlipperySpotLengthM)
                     max0 *= 0.8f;
@@ -2679,8 +2680,8 @@ namespace Orts.Simulation.RollingStocks
             {
                 if (Train.SlipperySpotDistanceM < 0)
                 {
-                    Train.SlipperySpotLengthM = 10 + 40 * (float)Simulator.Random.NextDouble();
-                    Train.SlipperySpotDistanceM = Train.SlipperySpotLengthM + 2000 * (float)Simulator.Random.NextDouble();
+                    Train.SlipperySpotLengthM = 10 + 40 * (float)(RandomNumberGenerator.GetInt32(int.MaxValue) / (double)int.MaxValue);
+                    Train.SlipperySpotDistanceM = Train.SlipperySpotLengthM + 2000 * (float)(RandomNumberGenerator.GetInt32(int.MaxValue) / (double)int.MaxValue);
                 }
                 if (Train.SlipperySpotDistanceM < Train.SlipperySpotLengthM)
                 {
@@ -2688,11 +2689,11 @@ namespace Orts.Simulation.RollingStocks
                 }
                 if (Simulator.WeatherType == WeatherType.Rain) // Wet weather
                 {
-                    if (Simulator.Settings.AdhesionProportionalToWeather && AdvancedAdhesionModel && !Simulator.Paused)  // Adjust clear weather for precipitation presence - base friction value will be approximately between 0.15 and 0.2
+                    if (Simulator.Settings.AdhesionProportionalToWeather && AdvancedAdhesionModel && !Simulator.GamePaused)  // Adjust clear weather for precipitation presence - base friction value will be approximately between 0.15 and 0.2
                     // ie base value between 0.8 and 1.0 (TODO) 
                     // note lowest friction will be for drizzle rain; friction will increase for precipitation both higher and lower than drizzle rail
                     {
-                        float pric = Simulator.Weather.PrecipitationIntensityPPSPM2 * 1000;
+                        float pric = Simulator.Weather.PrecipitationIntensity * 1000;
                         // precipitation will calculate a value between 0.15 (light rain) and 0.2 (heavy rain) - this will be a factor that is used to adjust the base value - assume linear value between upper and lower precipitation values
                         if (pric >= 0.5)
                             BaseFrictionCoefficientFactor = Math.Min((pric * 0.0078f + 0.45f), 0.8f); // should give a minimum value between 0.8 and 1.0
@@ -2734,9 +2735,9 @@ namespace Orts.Simulation.RollingStocks
             else // Default to Dry (Clear) weather
             {
 
-                if (Simulator.Settings.AdhesionProportionalToWeather && AdvancedAdhesionModel && !Simulator.Paused)  // Adjust clear weather for fog presence
+                if (Simulator.Settings.AdhesionProportionalToWeather && AdvancedAdhesionModel && !Simulator.GamePaused)  // Adjust clear weather for fog presence
                 {
-                    float fog = Simulator.Weather.FogDistance;
+                    float fog = Simulator.Weather.FogVisibilityDistance;
                     if (fog > 2000)
                     {
                         BaseFrictionCoefficientFactor = 1.0f; // if fog is not too thick don't change the friction
@@ -2798,7 +2799,7 @@ namespace Orts.Simulation.RollingStocks
             }
 
             var AdhesionMultiplier = Simulator.Settings.AdhesionFactor / 100.0f; // Convert to a factor where 100% = no change to adhesion
-            var AdhesionRandom = (float)((float)(Simulator.Settings.AdhesionFactorChange) * 0.01f * 2f * (Simulator.Random.NextDouble() - 0.5f));
+            var AdhesionRandom = (float)(Simulator.Settings.AdhesionFactorChange * 0.01f * 2f * (RandomNumberGenerator.GetInt32(int.MaxValue) / (double)int.MaxValue - 0.5f));
 
             Train.LocomotiveCoefficientFriction = BaseuMax * BaseFrictionCoefficientFactor * AdhesionMultiplier;  // Find friction coefficient factor for locomotive
             Train.LocomotiveCoefficientFriction = MathHelper.Clamp(Train.LocomotiveCoefficientFriction, 0.05f, 0.8f); // Ensure friction coefficient never exceeds a "reasonable" value

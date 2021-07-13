@@ -102,17 +102,17 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                     line.Add(new Label(width, line.RemainingHeight, Owner.Viewer.Settings.Input.UserCommands[command].ToString()));
                 }
             }));
-            if (owner.Viewer.Simulator.Activity != null)
+            if (owner.Viewer.Simulator.ActivityFile != null)
             {
                 Tabs.Add(new TabData(Tab.ActivityBriefing, Viewer.Catalog.GetString("Briefing"), (cl) =>
                 {
                     var scrollbox = cl.AddLayoutScrollboxVertical(cl.RemainingWidth);
-                    if (owner.Viewer.Simulator.Activity != null &&
-                        owner.Viewer.Simulator.Activity.Activity != null &&
-                        owner.Viewer.Simulator.Activity.Activity.Header != null &&
-                        owner.Viewer.Simulator.Activity.Activity.Header.Briefing.Length > 0)
+                    if (owner.Viewer.Simulator.ActivityFile != null &&
+                        owner.Viewer.Simulator.ActivityFile.Activity != null &&
+                        owner.Viewer.Simulator.ActivityFile.Activity.Header != null &&
+                        owner.Viewer.Simulator.ActivityFile.Activity.Header.Briefing.Length > 0)
                     {
-                        scrollbox.Add(new TextFlow(scrollbox.RemainingWidth, owner.Viewer.Simulator.Activity.Activity.Header.Briefing));
+                        scrollbox.Add(new TextFlow(scrollbox.RemainingWidth, owner.Viewer.Simulator.ActivityFile.Activity.Header.Briefing));
                     }
                 }));
                 Tabs.Add(new TabData(Tab.ActivityTimetable, Viewer.Catalog.GetString("Timetable"), (cl) =>
@@ -212,9 +212,9 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                         var wagonName = trainIndex.ToString() + " - " + wagonIndex.ToString();
                                         var wagonType = "";
                                         var wagonFound = false;
-                                        if (owner.Viewer.Simulator.Activity.Activity.ActivityObjects != null)
+                                        if (owner.Viewer.Simulator.ActivityFile.Activity.ActivityObjects != null)
                                         {
-                                            foreach (ActivityObject activityObject in owner.Viewer.Simulator.Activity.Activity.ActivityObjects)
+                                            foreach (ActivityObject activityObject in owner.Viewer.Simulator.ActivityFile.Activity.ActivityObjects)
                                             {
                                                 if (activityObject.ID == trainIndex)
                                                 {
@@ -260,7 +260,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                             var sidingId = eventAction.Type == Orts.Formats.Msts.EventType.AssembleTrainAtLocation
                                                 || eventAction.Type == Orts.Formats.Msts.EventType.DropOffWagonsAtLocation
                                                 ? (uint)eventAction.SidingId : wagonItem.SidingId;
-                                            foreach (var item in owner.Viewer.Simulator.TDB.TrackDB.TrackItems)
+                                            foreach (var item in owner.Viewer.Simulator.TrackDatabase.TrackDB.TrackItems)
                                             {
                                                 var siding = item as SidingItem;
                                                 if (siding != null && siding.TrackItemId == sidingId)
@@ -297,7 +297,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 
                 Tabs.Add(new TabData(Tab.ActivityEvaluation, Viewer.Catalog.GetString("Evaluation"), (cl) =>
                 {
-                    if (owner.Viewer.Simulator.ActivityRun.EventList != null && owner.Viewer.Simulator.Activity.Activity.Header.Name != null)
+                    if (owner.Viewer.Simulator.ActivityRun.EventList != null && owner.Viewer.Simulator.ActivityFile.Activity.Header.Name != null)
                     {
                         var txtinfo = "";
                         var locomotive = Owner.Viewer.Simulator.PlayerLocomotive;
@@ -317,12 +317,12 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                         if (!actualStatusVisible)
                         {
                             //Activity name
-                            txtinfo = "Activity: " + owner.Viewer.Simulator.Activity.Activity.Header.Name.ToString();
+                            txtinfo = "Activity: " + owner.Viewer.Simulator.ActivityFile.Activity.Header.Name.ToString();
                             line.Add(new Label(colWidth, line.RemainingHeight, txtinfo));
                             line = scrollbox.AddLayoutHorizontalLineOfText();
-                            labeltext = "Startime: " + owner.Viewer.Simulator.Activity.Activity.Header.StartTime.ToString();
+                            labeltext = "Startime: " + owner.Viewer.Simulator.ActivityFile.Activity.Header.StartTime.ToString();
                             line.Add(new Label(colWidth * 2, line.RemainingHeight, labeltext));
-                            labeltext = "Estimated time to complete: " + owner.Viewer.Simulator.Activity.Activity.Header.Duration.ToString();
+                            labeltext = "Estimated time to complete: " + owner.Viewer.Simulator.ActivityFile.Activity.Header.Duration.ToString();
                             line.Add(new Label(colWidth * 2, line.RemainingHeight, labeltext));
                             line = scrollbox.AddLayoutHorizontalLineOfText();
                         }
@@ -474,7 +474,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                             var sidingId = eventAction.Type == Orts.Formats.Msts.EventType.AssembleTrainAtLocation
                                                 || eventAction.Type == Orts.Formats.Msts.EventType.DropOffWagonsAtLocation
                                                 ? (uint)eventAction.SidingId : wagonItem.SidingId;
-                                            foreach (var item in owner.Viewer.Simulator.TDB.TrackDB.TrackItems)
+                                            foreach (var item in owner.Viewer.Simulator.TrackDatabase.TrackDB.TrackItems)
                                             {
                                                 var siding = item as SidingItem;
                                                 if (siding != null && siding.TrackItemId == sidingId)
@@ -625,7 +625,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                 File.Delete(files);//Delete all debrief eval files previously saved, for the same activity.
 
                             //Activity name
-                            var activityname = owner.Viewer.Simulator.Activity.Activity.Header.Name.ToString().Trim();
+                            var activityname = owner.Viewer.Simulator.ActivityFile.Activity.Header.Name.ToString().Trim();
 
                             foreach (var ch in Path.GetInvalidFileNameChars())
                                 activityname = activityname.Replace(ch, ' ');
@@ -689,19 +689,19 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                             outmesssage(labeltext, colWidth * 3, true, 0);
                             labeltext = "  Activity=" + activityname;
                             outmesssage(labeltext, colWidth * 3, true, 0);
-                            labeltext = "  Difficulty=" + owner.Viewer.Simulator.Activity.Activity.Header.Difficulty.ToString();
+                            labeltext = "  Difficulty=" + owner.Viewer.Simulator.ActivityFile.Activity.Header.Difficulty.ToString();
                             outmesssage(labeltext, colWidth * 3, true, 0);
-                            labeltext = "  Startime=" + owner.Viewer.Simulator.Activity.Activity.Header.StartTime.ToString();
+                            labeltext = "  Startime=" + owner.Viewer.Simulator.ActivityFile.Activity.Header.StartTime.ToString();
                             outmesssage(labeltext, colWidth * 3, true, 0);
-                            string sEstimatedTime = owner.Viewer.Simulator.Activity.Activity.Header.Duration.ToString();
+                            string sEstimatedTime = owner.Viewer.Simulator.ActivityFile.Activity.Header.Duration.ToString();
                             double estimatedTime = TimeSpan.Parse(sEstimatedTime).TotalSeconds;
                             labeltext = "  Estimated Time=" + sEstimatedTime;
                             outmesssage(labeltext, colWidth * 3, true, 0);
-                            double elapsedTime = Owner.Viewer.Simulator.ClockTime - owner.Viewer.Simulator.Activity.Activity.Header.StartTime.TotalSeconds;
+                            double elapsedTime = Owner.Viewer.Simulator.ClockTime - owner.Viewer.Simulator.ActivityFile.Activity.Header.StartTime.TotalSeconds;
                             labeltext = "  Elapsed Time=" + FormatStrings.FormatTime(elapsedTime);
                             outmesssage(labeltext, colWidth * 3, true, 0);
                             //estimatedTime
-                            bool bEstimatedTime = elapsedTime > owner.Viewer.Simulator.Activity.Activity.Header.StartTime.TotalSeconds;
+                            bool bEstimatedTime = elapsedTime > owner.Viewer.Simulator.ActivityFile.Activity.Header.StartTime.TotalSeconds;
 
                             //Auto pilot time.
                             double autoPilotTime = Viewer.DbfEvalAutoPilotTimeS;

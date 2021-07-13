@@ -31,6 +31,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 
 using Microsoft.Xna.Framework;
@@ -3581,7 +3582,7 @@ namespace Orts.Simulation.Timetables
                     thisStation.Passed = true;
 
                     MovementState = AiMovementState.Stopped;   // if state is still station_stop and ready and allowed to depart - change to stop to check action
-                    RestdelayS = (float)DelayedStartSettings.stationRestart.fixedPartS + ((float)Simulator.Random.Next(DelayedStartSettings.stationRestart.randomPartS * 10) / 10f);
+                    RestdelayS = (float)DelayedStartSettings.stationRestart.fixedPartS + ((float)RandomNumberGenerator.GetInt32(DelayedStartSettings.stationRestart.randomPartS * 10) / 10f);
                     if (!endOfPath[0])
                     {
                         removeStation = true;  // set next station if not at end of path
@@ -4851,7 +4852,7 @@ namespace Orts.Simulation.Timetables
                     break;
             }
 
-            float randDelay = (float)Simulator.Random.Next(randDelayPart);
+            float randDelay = RandomNumberGenerator.GetInt32(randDelayPart);
             RestdelayS += (baseDelayPart + (randDelay / 10f));
             DelayedStart = true;
             DelayedStartState = reason;
@@ -10742,7 +10743,7 @@ namespace Orts.Simulation.Timetables
             // if normal stop, set restart delay
             if (!AtStation && !attachTrain.AtStation)
             {
-                float randDelay = (float)Simulator.Random.Next((DelayedStartSettings.attachRestart.randomPartS * 10));
+                float randDelay = RandomNumberGenerator.GetInt32(DelayedStartSettings.attachRestart.randomPartS * 10);
                 RestdelayS = DelayedStartSettings.attachRestart.fixedPartS + (randDelay / 10f);
                 DelayedStart = true;
                 DelayedStartState = AiStartMovement.PathAction;
@@ -10886,7 +10887,7 @@ namespace Orts.Simulation.Timetables
             newTrain.StartTime = null; // time will be set later
 
             // set delay
-            float randDelay = (float)Simulator.Random.Next((DelayedStartSettings.detachRestart.randomPartS * 10));
+            float randDelay = RandomNumberGenerator.GetInt32(DelayedStartSettings.detachRestart.randomPartS * 10);
             RestdelayS = DelayedStartSettings.detachRestart.fixedPartS + (randDelay / 10f);
             DelayedStart = true;
             DelayedStartState = AiStartMovement.NewTrain;
@@ -11021,7 +11022,7 @@ namespace Orts.Simulation.Timetables
             // if normal stop, set restart delay
             if (MovementState == AiMovementState.Stopped)
             {
-                randDelay = (float)Simulator.Random.Next((DelayedStartSettings.detachRestart.randomPartS * 10));
+                randDelay = RandomNumberGenerator.GetInt32(DelayedStartSettings.detachRestart.randomPartS * 10);
                 RestdelayS = DelayedStartSettings.detachRestart.fixedPartS + (randDelay / 10f);
                 DelayedStart = true;
                 DelayedStartState = AiStartMovement.PathAction;
@@ -11347,9 +11348,9 @@ namespace Orts.Simulation.Timetables
             {
                 DetachSection = TrackCircuitSection.TrackCircuitList[DetachSection.Pins[TrackDirection.Ahead, Location.NearEnd].Link];
             }
-            TrackVectorNode detachNode = simulator.TDB.TrackDB.TrackNodes[DetachSection.OriginalIndex] as TrackVectorNode;
+            TrackVectorNode detachNode = simulator.TrackDatabase.TrackDB.TrackNodes[DetachSection.OriginalIndex] as TrackVectorNode;
 
-            formedTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TDB.TrackDB.TrackNodes, detachNode);
+            formedTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TrackDatabase.TrackDB.TrackNodes, detachNode);
 
             trainlist.Add(formedTrain);
 
@@ -11369,9 +11370,9 @@ namespace Orts.Simulation.Timetables
         {
             TTTrain formedTrain = new TTTrain(train);
             TrackCircuitSection DetachSection = TrackCircuitSection.TrackCircuitList[sectionInfo];
-            TrackVectorNode DetachNode = simulator.TDB.TrackDB.TrackNodes[DetachSection.OriginalIndex] as TrackVectorNode;
+            TrackVectorNode DetachNode = simulator.TrackDatabase.TrackDB.TrackNodes[DetachSection.OriginalIndex] as TrackVectorNode;
 
-            formedTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TDB.TrackDB.TrackNodes, DetachNode);
+            formedTrain.RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TrackDatabase.TrackDB.TrackNodes, DetachNode);
             formedTrain.PresentPosition[Direction.Forward].UpdateFrom(train.PresentPosition[Direction.Forward]);
             formedTrain.PresentPosition[Direction.Backward].UpdateFrom(train.PresentPosition[Direction.Backward]);
             formedTrain.CreateRoute(true);

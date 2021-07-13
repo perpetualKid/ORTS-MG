@@ -51,6 +51,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 
 using Microsoft.Xna.Framework;
@@ -99,6 +100,8 @@ namespace Orts.Simulation.Physics
         internal const float MaxTimeS = 120;                     // check ahead for distance covered in 2 mins.
         internal const float MinCheckDistanceM = 5000;           // minimum distance to check ahead
         internal const float MinCheckDistanceManualM = 3000;     // minimum distance to check ahead in manual mode
+
+        private const int RandomizationResolution = 1000000; // resolution for calculation of random value with a pseudo-gaussian distribution
 
         internal float MinCheckDistanceExplorerM => Math.Max(AllowedMaxSpeedMpS * MaxTimeS, MinCheckDistanceM);      // minimum distance to check ahead in explorer mode
 
@@ -256,7 +259,7 @@ namespace Orts.Simulation.Physics
         // Variables used for autopilot mode and played train switching
         public bool IsActualPlayerTrain => this == simulator.PlayerLocomotive?.Train;
 
-        internal float MaxDistanceCheckedAhead => Math.Max((IsActualPlayerTrain ? (float)simulator.TRK.Route.SpeedLimit : AllowedMaxSpeedMpS) * MaxTimeS, MinCheckDistanceM);
+        internal float MaxDistanceCheckedAhead => Math.Max((IsActualPlayerTrain ? (float)simulator.Route.SpeedLimit : AllowedMaxSpeedMpS) * MaxTimeS, MinCheckDistanceM);
 
         public bool IsPlayerDriven => TrainType == TrainType.Player || TrainType == TrainType.AiPlayerDriven;
 
@@ -439,7 +442,7 @@ namespace Orts.Simulation.Physics
         #region .ctor
         private void Init()
         {
-            allowedAbsoluteMaxSpeedSignalMpS = (float)simulator.TRK.Route.SpeedLimit;
+            allowedAbsoluteMaxSpeedSignalMpS = (float)simulator.Route.SpeedLimit;
             allowedAbsoluteMaxSpeedLimitMpS = allowedAbsoluteMaxSpeedSignalMpS;
             allowedAbsoluteMaxTempSpeedLimitMpS = allowedAbsoluteMaxSpeedSignalMpS;
         }
@@ -567,7 +570,7 @@ namespace Orts.Simulation.Physics
             LeadLocomotiveIndex = inf.ReadInt32();
             RetainerSetting = (RetainerSetting)inf.ReadInt32();
             RetainerPercent = inf.ReadInt32();
-            RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TDB.TrackDB.TrackNodes, inf);
+            RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TrackDatabase.TrackDB.TrackNodes, inf);
             SlipperySpotDistanceM = inf.ReadSingle();
             SlipperySpotLengthM = inf.ReadSingle();
             TrainMaxSpeedMpS = inf.ReadSingle();
@@ -770,7 +773,7 @@ namespace Orts.Simulation.Physics
                 }
             }
 
-            AuxActionsContainer = new AuxActionsContainer(this, inf, simulator.RoutePath);
+            AuxActionsContainer = new AuxActionsContainer(this, inf);
             RestoreDeadlockInfo(inf);
 
             InitialSpeed = inf.ReadSingle();
@@ -1668,7 +1671,7 @@ namespace Orts.Simulation.Physics
                 // Calculate Wind speed and direction, and train direction
                 // Update the value of the Wind Speed and Direction for the train
                 PhysicsWindDirectionDeg = MathHelper.ToDegrees(simulator.Weather.WindDirection);
-                PhysicsWindSpeedMpS = simulator.Weather.WindSpeed;
+                PhysicsWindSpeedMpS = simulator.Weather.WindSpeed.Length();
                 float TrainSpeedMpS = Math.Abs(SpeedMpS);
 
                 // If a westerly direction (ie -ve) convert to an angle between 0 and 360
@@ -1718,12 +1721,12 @@ namespace Orts.Simulation.Physics
                 {
                     if (Cars[i - 1].AuxWagonType == AuxWagonType.Tender || Cars[i - 1].AuxWagonType == AuxWagonType.Engine)  // Aux tender found in consist
                     {
-                        if (simulator.Activity != null) // If an activity check to see if fuel presets are used.
+                        if (simulator.ActivityFile != null) // If an activity check to see if fuel presets are used.
                         {
                             if (!mstsSteamLocomotive.AuxTenderMoveFlag)  // If locomotive hasn't moved and Auxtender connected use fuel presets on aux tender
                             {
                                 MaxAuxTenderWaterMassKG = Cars[i].AuxTenderWaterMassKG;
-                                mstsSteamLocomotive.CurrentAuxTenderWaterMassKG = Cars[i].AuxTenderWaterMassKG * (simulator.Activity.Activity.Header.FuelWater / 100.0f); // 
+                                mstsSteamLocomotive.CurrentAuxTenderWaterMassKG = Cars[i].AuxTenderWaterMassKG * (simulator.ActivityFile.Activity.Header.FuelWater / 100.0f); // 
                                 IsAuxTenderCoupled = true;      // Flag to advise MSTSSteamLovcomotive that tender is set.
                                 auxTenderFound = true;      // Auxililary tender found in consist.
 
@@ -1857,7 +1860,7 @@ namespace Orts.Simulation.Physics
                         }
 
                         // Calculate a random factor for steam heat leaks in connecting pipes
-                        car.SteamHoseLeakRateRandom = Simulator.Random.Next(100) / 100.0f; // Achieves a two digit random number between 0 and 1
+                        car.SteamHoseLeakRateRandom = RandomNumberGenerator.GetInt32(100) / 100.0f; // Achieves a two digit random number between 0 and 1
                         car.SteamHoseLeakRateRandom = MathHelper.Clamp(car.SteamHoseLeakRateRandom, 0.5f, 1.0f); // Keep Random Factor ratio within bounds
 
                         // Calculate Starting Heat value in Car Q = C * M * Tdiff, where C = Specific heat capacity, M = Mass ( Volume * Density), Tdiff - difference in temperature
@@ -2856,7 +2859,7 @@ namespace Orts.Simulation.Physics
                     float temp1MaxSpeedMpS = IsFreight ? firstObject.SpeedInfo.FreightSpeed : firstObject.SpeedInfo.PassengerSpeed;
                     if (firstObject.SignalDetails.IsSignal)
                     {
-                        allowedAbsoluteMaxSpeedSignalMpS = temp1MaxSpeedMpS == -1 ? (float)simulator.TRK.Route.SpeedLimit : temp1MaxSpeedMpS;
+                        allowedAbsoluteMaxSpeedSignalMpS = temp1MaxSpeedMpS == -1 ? (float)simulator.Route.SpeedLimit : temp1MaxSpeedMpS;
                     }
                     else if (!firstObject.SpeedInfo.Reset)
                     {
@@ -3328,7 +3331,7 @@ namespace Orts.Simulation.Physics
                 {
                     if (actualSpeedMpS > 998f)
                     {
-                        actualSpeedMpS = (float)simulator.TRK.Route.SpeedLimit;
+                        actualSpeedMpS = (float)simulator.Route.SpeedLimit;
                     }
 
                     if (actualSpeedMpS > 0)
@@ -9703,7 +9706,7 @@ namespace Orts.Simulation.Physics
         {
             if (DateTime.UtcNow.Millisecond % 10 < 6 - simulator.Settings.ActRandomizationLevel)
                 return 0;
-            return (int)(Simulator.Random.Next(0, (int)(Simulator.Resolution * Simulator.Random.NextDouble()) + 1) / Simulator.Resolution * maxAddedDelay);
+            return (int)(RandomNumberGenerator.GetInt32(0, (int)(RandomizationResolution * (RandomNumberGenerator.GetInt32(int.MaxValue) / (double)int.MaxValue)) + 1) / (double)RandomizationResolution * maxAddedDelay);
         }
 
         /// <summary>
@@ -9714,7 +9717,7 @@ namespace Orts.Simulation.Physics
         /// </summary>
         internal static int RandomizedDelay(int maxAddedDelay)
         {
-            return (int)(Simulator.Random.Next(0, (int)(Simulator.Resolution * Simulator.Random.NextDouble()) + 1) / Simulator.Resolution * maxAddedDelay);
+            return (int)(RandomNumberGenerator.GetInt32(0, (int)(RandomizationResolution * (RandomNumberGenerator.GetInt32(int.MaxValue) / (double)int.MaxValue)) + 1) / (double)RandomizationResolution * maxAddedDelay);
         }
 
         /// <summary>
@@ -9832,7 +9835,7 @@ namespace Orts.Simulation.Physics
             AllowedMaxSpeedSignalMpS = allowedAbsoluteMaxSpeedSignalMpS;
             AllowedMaxSpeedLimitMpS = allowedAbsoluteMaxSpeedLimitMpS;
             allowedMaxTempSpeedLimitMpS = allowedAbsoluteMaxTempSpeedLimitMpS;
-            TrainMaxSpeedMpS = Math.Min((float)simulator.TRK.Route.SpeedLimit, ((MSTSLocomotive)simulator.PlayerLocomotive).MaxSpeedMpS);
+            TrainMaxSpeedMpS = Math.Min((float)simulator.Route.SpeedLimit, ((MSTSLocomotive)simulator.PlayerLocomotive).MaxSpeedMpS);
         }
 
         /// <summary>
@@ -10573,7 +10576,7 @@ namespace Orts.Simulation.Physics
         public void UpdatePlayerTrainData(float maxDistanceM)
         {
             // variable used to search for NORMAL signals and speedposts when not in AUTO mode
-            float maxDistanceNormalSignal = ControlMode == TrainControlMode.Explorer ? Math.Max(maxDistanceM, (float)simulator.TRK.Route.SpeedLimit * 250.0f) : maxDistanceM;
+            float maxDistanceNormalSignal = ControlMode == TrainControlMode.Explorer ? Math.Max(maxDistanceM, (float)simulator.Route.SpeedLimit * 250.0f) : maxDistanceM;
             InitializePlayerTrainData();
             // fill in the lists
             TrainPathItem trainPathItem;
@@ -10699,7 +10702,7 @@ namespace Orts.Simulation.Physics
                     if (section.CircuitType == TrackCircuitType.Junction && sectionDistanceToTrainM < maxDistanceM)
                     {
                         bool rightSwitch = true;
-                        TrackJunctionNode junctionNode = simulator.TDB.TrackDB.TrackNodes[section.OriginalIndex] as TrackJunctionNode;
+                        TrackJunctionNode junctionNode = simulator.TrackDatabase.TrackDB.TrackNodes[section.OriginalIndex] as TrackJunctionNode;
                         if (section.Pins[sectionDirection, Location.FarEnd].Link != -1)
                         {
                             //facing
@@ -12057,12 +12060,12 @@ namespace Orts.Simulation.Physics
                             ContinuousBrakingTime += elapsedClockSeconds;
                             if (BrakingTime >= 1200.0 / simulator.Settings.ActRandomizationLevel || ContinuousBrakingTime >= 600.0 / simulator.Settings.ActRandomizationLevel)
                             {
-                                int randInt = Simulator.Random.Next(200000);
+                                int randInt = RandomNumberGenerator.GetInt32(200000);
                                 bool brakesStuck = false;
                                 if (randInt > 200000 - (simulator.Settings.ActRandomizationLevel == 1 ? 4 : simulator.Settings.ActRandomizationLevel == 2 ? 8 : 31))
                                 // a car will have brakes stuck. Select which one
                                 {
-                                    int iBrakesStuckCar = Simulator.Random.Next(Cars.Count);
+                                    int iBrakesStuckCar = RandomNumberGenerator.GetInt32(Cars.Count);
                                     int jBrakesStuckCar = iBrakesStuckCar;
                                     while (Cars[iBrakesStuckCar] is MSTSLocomotive && iBrakesStuckCar < Cars.Count)
                                         iBrakesStuckCar++;
@@ -12125,12 +12128,12 @@ namespace Orts.Simulation.Physics
                     }
                     if (nLocos > 0)
                     {
-                        int randInt = Simulator.Random.Next(2000000 / nLocos);
+                        int randInt = RandomNumberGenerator.GetInt32(2000000 / nLocos);
                         bool locoUnpowered;
                         if (randInt > 2000000 / nLocos - (simulator.Settings.ActRandomizationLevel == 1 ? 2 : simulator.Settings.ActRandomizationLevel == 2 ? 8 : 50))
                         // a loco will be partly or totally unpowered. Select which one
                         {
-                            int iLocoUnpoweredCar = Simulator.Random.Next(Cars.Count);
+                            int iLocoUnpoweredCar = RandomNumberGenerator.GetInt32(Cars.Count);
                             int jLocoUnpoweredCar = iLocoUnpoweredCar;
                             if (iLocoUnpoweredCar % 2 == 1)
                             {
@@ -12331,11 +12334,11 @@ namespace Orts.Simulation.Physics
                             Traveller t = null;
                             if (expectedTracIndex <= 0)
                             {
-                                t = new Traveller(simulator.TSectionDat, simulator.TDB.TrackDB.TrackNodes, new WorldLocation(expectedTileX, expectedTileZ, expectedX, 0, expectedZ), (Traveller.TravellerDirection)expectedTDir);
+                                t = new Traveller(simulator.TSectionDat, simulator.TrackDatabase.TrackDB.TrackNodes, new WorldLocation(expectedTileX, expectedTileZ, expectedX, 0, expectedZ), (Traveller.TravellerDirection)expectedTDir);
                             }
                             else
                             {
-                                t = new Traveller(simulator.TSectionDat, simulator.TDB.TrackDB.TrackNodes, simulator.TDB.TrackDB.TrackNodes[expectedTracIndex] as TrackVectorNode, new WorldLocation(expectedTileX, expectedTileZ, expectedX, 0, expectedZ), (Traveller.TravellerDirection)expectedTDir);
+                                t = new Traveller(simulator.TSectionDat, simulator.TrackDatabase.TrackDB.TrackNodes, simulator.TrackDatabase.TrackDB.TrackNodes[expectedTracIndex] as TrackVectorNode, new WorldLocation(expectedTileX, expectedTileZ, expectedX, 0, expectedZ), (Traveller.TravellerDirection)expectedTDir);
                             }
                             //move = SpeedMpS > 0 ? 0.001f : -0.001f;
                             DistanceTravelled = expectedTravelled;
@@ -12471,9 +12474,9 @@ namespace Orts.Simulation.Physics
         /// 
         internal void ReenterTrackSections(int trackNodeIndex, Vector3 finalFrontTravellerXNALocation, Vector3 finalRearTravellerXNALocation, Traveller.TravellerDirection direction)
         {
-            FrontTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TDB.TrackDB.TrackNodes, simulator.TDB.TrackDB.TrackNodes[trackNodeIndex],
+            FrontTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TrackDatabase.TrackDB.TrackNodes, simulator.TrackDatabase.TrackDB.TrackNodes[trackNodeIndex],
                  Cars[0].WorldPosition.TileX, Cars[0].WorldPosition.TileZ, finalFrontTravellerXNALocation.X, -finalFrontTravellerXNALocation.Z, FrontTDBTraveller.Direction);
-            RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TDB.TrackDB.TrackNodes, simulator.TDB.TrackDB.TrackNodes[trackNodeIndex],
+            RearTDBTraveller = new Traveller(simulator.TSectionDat, simulator.TrackDatabase.TrackDB.TrackNodes, simulator.TrackDatabase.TrackDB.TrackNodes[trackNodeIndex],
                 Cars[0].WorldPosition.TileX, Cars[0].WorldPosition.TileZ, finalRearTravellerXNALocation.X, -finalRearTravellerXNALocation.Z, RearTDBTraveller.Direction);
             if (direction == Traveller.TravellerDirection.Backward)
             {
@@ -12508,7 +12511,7 @@ namespace Orts.Simulation.Physics
                 return;
             }
 
-            if (simulator.Activity == null && !simulator.TimetableMode)
+            if (simulator.ActivityFile == null && !simulator.TimetableMode)
                 ToggleToExplorerMode();
             else
                 ToggleToManualMode();

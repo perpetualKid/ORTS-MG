@@ -24,6 +24,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 
+using static Orts.Formats.Msts.FolderStructure.ContentFolder;
+
 namespace Orts.ActivityRunner.Viewer3D.Common
 {
     public static class Helpers
@@ -83,17 +85,17 @@ namespace Orts.ActivityRunner.Viewer3D.Common
 
         public static string GetRouteTextureFile(Simulator simulator, TextureFlags textureFlags, string textureName)
         {
-            return GetTextureFile(simulator, textureFlags, simulator.RoutePath + @"\Textures", textureName);
+            return GetTextureFile(simulator, textureFlags, simulator.RouteFolder.TexturesFolder, textureName);
         }
 
         public static string GetTransferTextureFile(Simulator simulator, string textureName)
         {
-            return GetTextureFile(simulator, Helpers.TextureFlags.Snow, simulator.RoutePath + @"\Textures", textureName);
+            return GetTextureFile(simulator, TextureFlags.Snow, simulator.RouteFolder.TexturesFolder, textureName);
         }
 
         public static string GetTerrainTextureFile(Simulator simulator, string textureName)
         {
-            return GetTextureFile(simulator, Helpers.TextureFlags.Snow, simulator.RoutePath + @"\TerrTex", textureName);
+            return GetTextureFile(simulator, TextureFlags.Snow, simulator.RouteFolder.TerrainTexturesFolder, textureName);
         }
 
         public static string GetTextureFile(Simulator simulator, TextureFlags textureFlags, string texturePath, string textureName)

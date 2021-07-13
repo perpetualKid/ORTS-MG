@@ -477,7 +477,7 @@ namespace Orts.ActivityRunner.Viewer3D
             skyShader.Time = (float)Viewer.Simulator.ClockTime / 100000;
             skyShader.MoonScale = SkyConstants.skyRadius / 20;
             skyShader.Overcast = Viewer.Simulator.Weather.OvercastFactor;
-            skyShader.SetFog(Viewer.Simulator.Weather.FogDistance, ref SharedMaterialManager.FogColor);
+            skyShader.SetFog(Viewer.Simulator.Weather.FogVisibilityDistance, ref SharedMaterialManager.FogColor);
             skyShader.WindSpeed = Viewer.World.Sky.windSpeed;
             skyShader.WindDirection = Viewer.World.Sky.windDirection; // Keep setting this after Time and Windspeed. Calculating displacement here.
             for (var i = 0; i < 5; i++)

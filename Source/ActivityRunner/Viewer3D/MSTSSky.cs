@@ -213,7 +213,7 @@ namespace Orts.ActivityRunner.Viewer3D
                     mstsskymoonPhase = 3; // Moon dog only occurs in winter
                 // Overcast factor: 0.0=almost no clouds; 0.1=wispy clouds; 1.0=total overcast
                 //mstsskyovercastFactor = MSTSSkyViewer.World.WeatherControl.overcastFactor;
-                mstsskyfogDistance = MSTSSkyViewer.Simulator.Weather.FogDistance;
+                mstsskyfogDistance = MSTSSkyViewer.Simulator.Weather.FogVisibilityDistance;
                 initialized = true;
             }
 
@@ -560,7 +560,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
                 for (int i = 0; i < Viewer.ENVFile.SkyLayers.Count; i++)
                 {
-                    mstsSkyTextureNames[i] = Viewer.Simulator.RoutePath + @"\envfiles\textures\" + mstsskytexture[i].TextureName;
+                    mstsSkyTextureNames[i] = Viewer.Simulator.RouteFolder.EnvironmentTextureFile(mstsskytexture[i].TextureName);
                     mstsSkyTextures.Add(AceFile.Texture2DFromFile(graphicsDevice, mstsSkyTextureNames[i]));
                     if (i == 0)
                     {
@@ -594,8 +594,8 @@ namespace Orts.ActivityRunner.Viewer3D
             }
             if (viewer.ENVFile.SkySatellites != null)
             {
-                string mstsSkySunTextureName = Viewer.Simulator.RoutePath + @"\envfiles\textures\" + Viewer.ENVFile.SkySatellites[0].TextureName;
-                string mstsSkyMoonTextureName = Viewer.Simulator.RoutePath + @"\envfiles\textures\" + Viewer.ENVFile.SkySatellites[1].TextureName;
+                string mstsSkySunTextureName = Viewer.Simulator.RouteFolder.EnvironmentTextureFile(Viewer.ENVFile.SkySatellites[0].TextureName);
+                string mstsSkyMoonTextureName = Viewer.Simulator.RouteFolder.EnvironmentTextureFile(Viewer.ENVFile.SkySatellites[1].TextureName);
 
                 mstsSkySunTexture = SharedTextureManager.Get(graphicsDevice, mstsSkySunTextureName);
                 mstsSkyMoonTexture = SharedTextureManager.Get(graphicsDevice, mstsSkyMoonTextureName);

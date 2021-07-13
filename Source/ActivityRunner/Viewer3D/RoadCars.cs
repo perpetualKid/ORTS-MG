@@ -62,16 +62,16 @@ namespace Orts.ActivityRunner.Viewer3D
             Viewer = viewer;
             CarSpawnerObj = carSpawnerObj;
 
-            if (viewer.Simulator.RDB == null || viewer.Simulator.CarSpawnerLists == null)
+            if (viewer.Simulator.RoadDatabase == null || viewer.Simulator.CarSpawnerLists == null)
                 throw new InvalidOperationException("RoadCarSpawner requires a RDB and CARSPAWN.DAT");
 
             var start = CarSpawnerObj.TrackItemIds.RoadDbItems.Count > 0 ? CarSpawnerObj.TrackItemIds.RoadDbItems[0] : -1;
             var end = CarSpawnerObj.TrackItemIds.RoadDbItems.Count > 1 ? CarSpawnerObj.TrackItemIds.RoadDbItems[1] : -1;
-            var trItems = viewer.Simulator.RDB.RoadTrackDB.TrItemTable;
+            var trItems = viewer.Simulator.RoadDatabase.RoadTrackDB.TrItemTable;
             ref readonly WorldLocation startLocation = ref trItems[start].Location;
             ref readonly WorldLocation endLocation = ref trItems[end].Location;
 
-            Traveller = new Traveller(viewer.Simulator.TSectionDat, viewer.Simulator.RDB.RoadTrackDB.TrackNodes, startLocation);
+            Traveller = new Traveller(viewer.Simulator.TSectionDat, viewer.Simulator.RoadDatabase.RoadTrackDB.TrackNodes, startLocation);
             Length = Traveller.DistanceTo(endLocation);
             if (Length < 0)
             {
@@ -81,7 +81,7 @@ namespace Orts.ActivityRunner.Viewer3D
                     Trace.TraceWarning("{0} car spawner {1} doesn't have connected road route between {2} and {3}", position, carSpawnerObj.UiD, startLocation, endLocation);
             }
 
-            var sortedLevelCrossings = new SortedList<float, Simulation.LevelCrossingItem>();
+            var sortedLevelCrossings = new SortedList<float, Simulation.World.LevelCrossingItem>();
             for (var crossingTraveller = new Traveller(Traveller); crossingTraveller.NextSection(); )
                 if (crossingTraveller.IsTrack && (crossingTraveller.TN as TrackVectorNode).TrackItemIndices != null)
                     foreach (var trItemRef in (crossingTraveller.TN as TrackVectorNode).TrackItemIndices)
@@ -160,14 +160,14 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public class Crossing
         {
-            public readonly Simulation.LevelCrossingItem Item;
+            public readonly Simulation.World.LevelCrossingItem Item;
             public readonly float Distance;
             public readonly float DistanceAdjust1;
             public readonly float DistanceAdjust2;
             public readonly float DistanceAdjust3;
             public readonly float DistanceAdjust4;
             public readonly float TrackHeight;
-            internal Crossing(Simulation.LevelCrossingItem item, float distance, float trackHeight)
+            internal Crossing(Simulation.World.LevelCrossingItem item, float distance, float trackHeight)
             {
                 Item = item;
                 Distance = distance;

@@ -168,7 +168,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
             this.Viewer = viewer;
 			TimetableWindow = new TimetableWindow(this);
 
-			nodes = simulator.TDB.TrackDB.TrackNodes;
+			nodes = simulator.TrackDatabase.TrackDB.TrackNodes;
 
             // initialise the timer used to handle user input
             UITimer = new Timer();
@@ -332,7 +332,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
             windowSizeUpDown.Maximum = (decimal)maxsize;
             Inited = true;
 
-            if (simulator.TDB == null || simulator.TDB.TrackDB == null || simulator.TDB.TrackDB.TrackItems == null)
+            if (simulator.TrackDatabase == null || simulator.TrackDatabase.TrackDB == null || simulator.TrackDatabase.TrackDB.TrackItems == null)
                 return;
 
             TimetableWindow.PopulateItemLists();
@@ -2352,7 +2352,7 @@ namespace Orts.ActivityRunner.Viewer3D.Debugging
             Location = VectorFromLocation(item.Location);
             try
             {
-                var node = Simulator.Instance.TDB.TrackDB.TrackNodes[signal.TrackNode];
+                var node = Simulator.Instance.TrackDatabase.TrackDB.TrackNodes[signal.TrackNode];
                 Vector2 v2;
                 if (node is TrackVectorNode trackVectorNode) 
                 { 

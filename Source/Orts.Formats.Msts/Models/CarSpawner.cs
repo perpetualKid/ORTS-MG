@@ -47,7 +47,7 @@ namespace Orts.Formats.Msts.Models
         {
             stf.MustMatchBlockStart();
             //pre fit in the shape path so no need to do it again and again later
-            Name = shapePath + stf.ReadString();
+            Name = Path.Combine(shapePath,stf.ReadString());
             Distance = stf.ReadFloat(STFReader.Units.Distance, null);
             stf.SkipRestOfBlock();
         }

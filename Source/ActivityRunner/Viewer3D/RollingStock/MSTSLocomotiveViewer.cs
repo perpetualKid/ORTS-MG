@@ -68,8 +68,8 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         {
             Locomotive = car;
 
-            string wagonFolderSlash = Path.GetDirectoryName(Locomotive.WagFilePath) + "\\";
-            if (Locomotive.CabSoundFileName != null) LoadCarSound(wagonFolderSlash, Locomotive.CabSoundFileName);
+            if (Locomotive.CabSoundFileName != null) 
+                LoadCarSound(Path.GetDirectoryName(Locomotive.WagFilePath), Locomotive.CabSoundFileName);
 
             //Viewer.SoundProcess.AddSoundSource(this, new TrackSoundSource(MSTSWagon, Viewer));
 
@@ -83,7 +83,7 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
                     }
                     catch (Exception error)
                     {
-                        Trace.TraceInformation("File " + Locomotive.TrainControlSystem.Sounds[script] + " in script of locomotive of train " + Locomotive.Train.Name + " : " + error.Message);
+                        Trace.TraceInformation($"File {Locomotive.TrainControlSystem.Sounds[script]} in script of locomotive of train {Locomotive.Train.Name} : {error.Message}");
                     }
                 }
         }
@@ -3154,16 +3154,19 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 
         private Material FindMaterial(bool Alert)
         {
-            string imageName = "";
-            string globalText = Viewer.Simulator.BasePath + @"\GLOBAL\TEXTURES\";
+            string globalText = Viewer.Simulator.RouteFolder.ContentFolder.TexturesFolder;
             CabViewControlType controltype = CVFR.GetControlType();
             Material material = null;
 
+            string imageName;
             if (!string.IsNullOrEmpty(AceFile))
             {
                 imageName = AceFile;
             }
-            else if (Alert) { imageName = "alert.ace"; }
+            else if (Alert) 
+            { 
+                imageName = "alert.ace"; 
+            }
             else
             {
                 switch (controltype)
@@ -3187,10 +3190,9 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
 
             if (String.IsNullOrEmpty(TrainCarShape.SharedShape.ReferencePath))
             {
-                if (!File.Exists(globalText + imageName))
+                if (!File.Exists(Path.Combine(globalText,imageName)))
                 {
-                    Trace.TraceInformation("Ignored missing " + imageName + " using default. You can copy the " + imageName + " from OR\'s AddOns folder to " + globalText +
-                        ", or place it under " + TrainCarShape.SharedShape.ReferencePath);
+                    Trace.TraceInformation($"Ignored missing {imageName} using default. You can copy the {imageName} from OR\'s AddOns folder to {globalText}, or place it under {TrainCarShape.SharedShape.ReferencePath}");
                 }
                 material = Viewer.MaterialManager.Load("Scenery", Helpers.GetTextureFile(Viewer.Simulator, Helpers.TextureFlags.None, globalText, imageName), (int)(options), 0);
             }

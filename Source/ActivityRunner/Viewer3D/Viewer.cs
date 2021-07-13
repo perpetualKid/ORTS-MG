@@ -52,6 +52,7 @@ using Orts.Simulation.Commanding;
 using Orts.Simulation.Physics;
 using Orts.Simulation.RollingStocks;
 using Orts.Simulation.Signalling;
+using Orts.Simulation.World;
 
 namespace Orts.ActivityRunner.Viewer3D
 {
@@ -113,7 +114,6 @@ namespace Orts.ActivityRunner.Viewer3D
         public TileManager Tiles { get; private set; }
         public TileManager LoTiles { get; private set; }
         public EnvironmentFile ENVFile { get; private set; }
-        public SignalConfigurationFile SIGCFG { get; private set; }
         public TrackTypesFile TrackTypes { get; private set; }
         public SpeedpostDatFile SpeedpostDatFile;
         public bool MilepostUnitsMetric { get; private set; }
@@ -289,29 +289,16 @@ namespace Orts.ActivityRunner.Viewer3D
             WellKnownCameras.Add(new FreeRoamCamera(this, FrontCamera)); // Any existing camera will suffice to satisfy .Save() and .Restore()
             WellKnownCameras.Add(ThreeDimCabCamera = new CabCamera3D(this));
 
-            string ORfilepath = System.IO.Path.Combine(Simulator.RoutePath, "OpenRails");
             ContentPath = Game.ContentPath;
             Trace.Write(" ENV");
-            ENVFile = new EnvironmentFile(Simulator.RoutePath + @"\ENVFILES\" + Simulator.TRK.Route.Environment.GetEnvironmentFileName(Simulator.Season, Simulator.WeatherType));
-
-            Trace.Write(" SIGCFG");
-            if (File.Exists(ORfilepath + @"\sigcfg.dat"))
-            {
-                Trace.Write(" SIGCFG_OR");
-                SIGCFG = new SignalConfigurationFile(ORfilepath + @"\sigcfg.dat", true);
-            }
-            else
-            {
-                Trace.Write(" SIGCFG");
-                SIGCFG = new SignalConfigurationFile(Simulator.RoutePath + @"\sigcfg.dat", false);
-            }
+            ENVFile = new EnvironmentFile(Path.Combine(Simulator.RouteFolder.EnvironmentFolder, Simulator.Route.Environment.GetEnvironmentFileName(Simulator.Season, Simulator.WeatherType)));
 
             Trace.Write(" TTYPE");
-            TrackTypes = new TrackTypesFile(Simulator.RoutePath + @"\TTYPE.DAT");
+            TrackTypes = new TrackTypesFile(Path.Combine(Simulator.RouteFolder.CurrentFolder, "TTYPE.DAT"));
 
-            Tiles = new TileManager(Simulator.RoutePath + @"\TILES\", false);
-            LoTiles = new TileManager(Simulator.RoutePath + @"\LO_TILES\", true);
-            MilepostUnitsMetric = Simulator.TRK.Route.MilepostUnitsMetric;
+            Tiles = new TileManager(Simulator.RouteFolder.TilesFolder, false);
+            LoTiles = new TileManager(Simulator.RouteFolder.TilesFolderLow, true);
+            MilepostUnitsMetric = Simulator.Route.MilepostUnitsMetric;
 
             Simulator.AllowedSpeedRaised += (object sender, EventArgs e) =>
             {
@@ -329,13 +316,13 @@ namespace Orts.ActivityRunner.Viewer3D
 
             // The speedpost.dat file is needed only to derive the shape names for the temporary speed restriction zones,
             // so it is opened only in activity mode
-            if (Simulator.ActivityRun != null && Simulator.Activity.Activity.ActivityRestrictedSpeedZones != null)
+            if (Simulator.ActivityRun != null && Simulator.ActivityFile.Activity.ActivityRestrictedSpeedZones != null)
             {
-                var speedpostDatFile = Simulator.RoutePath + @"\speedpost.dat";
+                string speedpostDatFile = Path.Combine(Simulator.RouteFolder.CurrentFolder, "speedpost.dat");
                 if (File.Exists(speedpostDatFile))
                 {
                     Trace.Write(" SPEEDPOST");
-                    SpeedpostDatFile = new SpeedpostDatFile(Simulator.RoutePath + @"\speedpost.dat", Simulator.RoutePath + @"\shapes\");
+                    SpeedpostDatFile = new SpeedpostDatFile(speedpostDatFile, Simulator.RouteFolder.ShapesFolder);
                 }
             }
 
@@ -431,7 +418,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 Simulator.InitializeAiPlayerHosting();
             }
 
-            SharedSMSFileManager.Initialize(TrackTypes.Count, Simulator.TRK.Route.SwitchSMSNumber, Simulator.TRK.Route.CurveSMSNumber, Simulator.TRK.Route.CurveSwitchSMSNumber);
+            SharedSMSFileManager.Initialize(TrackTypes.Count, Simulator.Route.SwitchSMSNumber, Simulator.Route.CurveSMSNumber, Simulator.Route.CurveSwitchSMSNumber);
 
             TextureManager = new SharedTextureManager(this, Game.GraphicsDevice);
 
@@ -518,8 +505,8 @@ namespace Orts.ActivityRunner.Viewer3D
             }
             else
             {
-                UserCommandController.AddEvent(UserCommand.GamePauseMenu, KeyEventType.KeyPressed, () => QuitWindow.Visible = Simulator.Paused = !QuitWindow.Visible);
-                UserCommandController.AddEvent(UserCommand.GamePause, KeyEventType.KeyPressed, () => Simulator.Paused = !Simulator.Paused);
+                UserCommandController.AddEvent(UserCommand.GamePauseMenu, KeyEventType.KeyPressed, () => QuitWindow.Visible = Simulator.GamePaused = !QuitWindow.Visible);
+                UserCommandController.AddEvent(UserCommand.GamePause, KeyEventType.KeyPressed, () => Simulator.GamePaused = !Simulator.GamePaused);
                 UserCommandController.AddEvent(UserCommand.DebugSpeedUp, KeyEventType.KeyPressed, () =>
                 {
                     Simulator.GameSpeed *= 1.5f;
@@ -840,7 +827,7 @@ namespace Orts.ActivityRunner.Viewer3D
             });
 
             // Turntable commands
-            if (Simulator.MovingTables != null)
+            if (Simulator.MovingTables.Any())
             {
                 UserCommandController.AddEvent(UserCommand.ControlTurntableClockwise, KeyEventType.KeyPressed, () =>
                 {
@@ -929,7 +916,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 Vector3 nearPoint = DefaultViewport.Unproject(nearsource, Camera.XnaProjection, Camera.XnaView, world);
                 Vector3 farPoint = DefaultViewport.Unproject(farsource, Camera.XnaProjection, Camera.XnaView, world);
                 forceMouseVisible = true;
-                if (!Simulator.Paused)
+                if (!Simulator.GamePaused)
                 {
                     if (uncoupleWithMouseActive)
                     {
@@ -1196,7 +1183,7 @@ namespace Orts.ActivityRunner.Viewer3D
                     if (Simulator.Settings.ReplayPauseBeforeEnd)
                     {
                         // Reveal Quit Menu
-                        QuitWindow.Visible = Simulator.Paused = !QuitWindow.Visible;
+                        QuitWindow.Visible = Simulator.GamePaused = !QuitWindow.Visible;
                         Log.PauseState = ReplayPauseState.During;
                     }
                     else
@@ -1279,7 +1266,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         private void LoadDefectCarSound(TrainCar car, string filename)
         {
-            var smsFilePath = Simulator.BasePath + @"\sound\" + filename;
+            var smsFilePath = Simulator.RouteFolder.ContentFolder.SoundFile(filename);
             if (!File.Exists(smsFilePath))
             {
                 Trace.TraceWarning("Cannot find defect car sound file {0}", filename);
@@ -1418,11 +1405,11 @@ namespace Orts.ActivityRunner.Viewer3D
         }
 
         // change reference to player train when switching train in Timetable mode
-        private void PlayerTrainChanged(object sender, Simulator.PlayerTrainChangedEventArgs e)
+        private void PlayerTrainChanged(object sender, PlayerTrainChangedEventArgs e)
         {
-            if (SelectedTrain == e.OldTrain)
+            if (SelectedTrain == e.PreviousTrain)
             {
-                SelectedTrain = e.NewTrain;
+                SelectedTrain = e.CurrentTrain;
             }
         }
 
@@ -1436,20 +1423,16 @@ namespace Orts.ActivityRunner.Viewer3D
         private MovingTable FindActiveMovingTable()
         {
             MovingTable activeMovingTable = null;
-            float minDistanceSquared = 1000000f;
-            if (Simulator.MovingTables != null)
+            float minDistanceSquared = 1000_000f;
+            foreach (MovingTable movingTable in Simulator.MovingTables)
             {
-                foreach (var movingTable in Simulator.MovingTables)
+                if (movingTable.WorldPosition.XNAMatrix.M44 != 100_000_000)
                 {
-
-                    if (movingTable.WorldPosition.XNAMatrix.M44 != 100_000_000)
+                    float distanceSquared = (float)WorldLocation.GetDistanceSquared(movingTable.WorldPosition.WorldLocation, Camera.CameraWorldLocation);
+                    if (distanceSquared <= minDistanceSquared && distanceSquared < 160_000) //must be the nearest one, but must also be near!
                     {
-                        var distanceSquared = (float)WorldLocation.GetDistanceSquared(movingTable.WorldPosition.WorldLocation, Camera.CameraWorldLocation);
-                        if (distanceSquared <= minDistanceSquared && distanceSquared < 160000) //must be the nearest one, but must also be near!
-                        {
-                            minDistanceSquared = distanceSquared;
-                            activeMovingTable = movingTable;
-                        }
+                        minDistanceSquared = distanceSquared;
+                        activeMovingTable = movingTable;
                     }
                 }
             }
@@ -1540,9 +1523,9 @@ namespace Orts.ActivityRunner.Viewer3D
             TrackNode bestTn = null;
             float bestD = 10;
             // check each switch
-            for (int j = 0; j < Simulator.TDB.TrackDB.TrackNodes.Length; j++)
+            for (int j = 0; j < Simulator.TrackDatabase.TrackDB.TrackNodes.Length; j++)
             {
-                TrackNode tn = Simulator.TDB.TrackDB.TrackNodes[j];
+                TrackNode tn = Simulator.TrackDatabase.TrackDB.TrackNodes[j];
                 if (tn is TrackJunctionNode)
                 {
 

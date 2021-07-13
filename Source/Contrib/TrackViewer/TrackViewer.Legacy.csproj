@@ -87,8 +87,8 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1641" />
-    <PackageReference Include="GetText.NET" Version="0.12.7-rc" />
-    <PackageReference Include="GetText.NET.WindowsForms" Version="0.12.7-rc" />
+    <PackageReference Include="GetText.NET" Version="0.12.11" />
+    <PackageReference Include="GetText.NET.WindowsForms" Version="0.12.11" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ActivityRunner\ActivityRunner.csproj" />

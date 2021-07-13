@@ -284,7 +284,7 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
 
             if (Client != null)
             {
-                Client.Send((new MSGPlayer(userName, code, simulator.conFileName, simulator.patFileName, simulator.Trains[0], 0, simulator.Settings.AvatarURL)).ToString());
+                Client.Send((new MSGPlayer(userName, code, simulator.ConsistFileName, simulator.PathFileName, simulator.Trains[0], 0, simulator.Settings.AvatarURL)).ToString());
                 // wait 5 seconds to see if you get a reply from server with updated position/consist data, else go on
 
                 System.Threading.Thread.Sleep(5000);
@@ -316,7 +316,7 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
             // that are likely to match the previously chosen route and activity.
             // Append the current date and time, so that each file is unique.
             // This is the "sortable" date format, ISO 8601, but with "." in place of the ":" which are not valid in filenames.
-            string fileStem = $"{(simulator.Activity != null ? simulator.ActivityFileName : (!string.IsNullOrEmpty(simulator.TimetableFileName) ? $"{simulator.RoutePathName} {simulator.TimetableFileName}" : simulator.RoutePathName))} {(MPManager.IsMultiPlayer() && MPManager.IsServer() ? "$Multipl$ " : " ")}{DateTime.Now:yyyy'-'MM'-'dd HH'.'mm'.'ss}";
+            string fileStem = $"{(simulator.ActivityFile != null ? simulator.ActivityFileName : (!string.IsNullOrEmpty(simulator.TimetableFileName) ? $"{simulator.RouteFolder.RouteName} {simulator.TimetableFileName}" : simulator.RouteFolder.RouteName))} {(MPManager.IsMultiPlayer() && MPManager.IsServer() ? "$Multipl$ " : " ")}{DateTime.Now:yyyy'-'MM'-'dd HH'.'mm'.'ss}";
 
             using (BinaryWriter outf = new BinaryWriter(new FileStream(Path.Combine(UserSettings.UserDataFolder, fileStem + ".save"), FileMode.Create, FileAccess.Write)))
             {
@@ -427,10 +427,10 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
                     simulator.Restore(inf, PathName, InitialTileX, InitialTileZ, Game.LoaderProcess.CancellationToken);
                     Viewer = new Viewer(simulator, Game);
                     if (Client != null || Server != null && ActivityType == ActivityType.Activity)
-                        simulator.GetPathAndConsist();
+                        simulator.SetPathAndConsist();
                     if (Client != null)
                     {
-                        Client.Send((new MSGPlayer(userName, code, simulator.conFileName, simulator.patFileName, simulator.Trains[0], 0, simulator.Settings.AvatarURL)).ToString());
+                        Client.Send((new MSGPlayer(userName, code, simulator.ConsistFileName, simulator.PathFileName, simulator.Trains[0], 0, simulator.Settings.AvatarURL)).ToString());
                     }
                     Viewer.Restore(inf);
 
@@ -898,28 +898,28 @@ namespace Orts.ActivityRunner.Viewer3D.Processes
             switch (activityType)
             {
                 case ActivityType.Activity:
-                    simulator = new Simulator(settings, data[0], false);
+                    simulator = new Simulator(settings, data[0]);
                     if (loadingScreen == null)
                         loadingScreen = new LoadingScreenPrimitive(Game);
                     simulator.SetActivity(data[0]);
                     break;
 
                 case ActivityType.Explorer:
-                    simulator = new Simulator(settings, data[0], false);
+                    simulator = new Simulator(settings, data[0]);
                     if (loadingScreen == null)
                         loadingScreen = new LoadingScreenPrimitive(Game);
                     simulator.SetExplore(data[0], data[1], startTime, season, weather);
                     break;
 
                 case ActivityType.ExploreActivity:
-                    simulator = new Simulator(settings, data[0], false);
+                    simulator = new Simulator(settings, data[0]);
                     if (loadingScreen == null)
                         loadingScreen = new LoadingScreenPrimitive(Game);
                     simulator.SetExploreThroughActivity(data[0], data[1], startTime, season, weather);
                     break;
 
                 case ActivityType.TimeTable:
-                    simulator = new Simulator(settings, data[0], true);
+                    simulator = new Simulator(settings, data[0]);
                     if (loadingScreen == null)
                         loadingScreen = new LoadingScreenPrimitive(Game);
                     if (actionType != ActionType.Start) // no specific action for start, handled in start_timetable

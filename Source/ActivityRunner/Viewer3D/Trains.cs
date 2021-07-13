@@ -47,10 +47,9 @@ namespace Orts.ActivityRunner.Viewer3D
             Viewer.Simulator.QueryCarViewerLoaded += Simulator_QueryCarViewerLoaded;
         }
 
-        private void Simulator_QueryCarViewerLoaded(object sender, Simulator.QueryCarViewerLoadedEventArgs e)
+        private void Simulator_QueryCarViewerLoaded(object sender, QueryCarViewerLoadedEventArgs e)
         {
-            var cars = Cars;
-            if (cars.ContainsKey(e.Car))
+            if (Cars.ContainsKey(e.Car))
                 e.Loaded = true;
         }
 

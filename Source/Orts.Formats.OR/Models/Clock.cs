@@ -42,7 +42,7 @@ namespace Orts.Formats.OR.Models
         public Clock(STFReader stf, string shapePath)
         {
             stf.MustMatch("(");
-            Name = shapePath + stf.ReadString();
+            Name = Path.Combine(shapePath, stf.ReadString());
             if (EnumExtension.GetValue(stf.ReadString(), out ClockType type))
                 ClockType = type;
             stf.SkipRestOfBlock();

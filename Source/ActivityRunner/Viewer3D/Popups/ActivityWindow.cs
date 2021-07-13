@@ -90,7 +90,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         private void ResumeActivity_Click(Control arg1, Point arg2)
         {
             TimeSpan diff = DateTime.UtcNow - PopupTime;
-            if (Owner.Viewer.Simulator.Paused)
+            if (Owner.Viewer.Simulator.GamePaused)
                 new ResumeActivityCommand(Owner.Viewer.Log, EventNameLabel.Text, diff.TotalMilliseconds / 1000);
             //it's a toggle click
             else
@@ -114,8 +114,8 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             this.Visible = false;
             this.Activity.IsActivityWindowOpen = this.Visible;
             this.Activity.TriggeredEvent = null;
-            Owner.Viewer.Simulator.Paused = false;   // Move to Viewer3D?
-            this.Activity.IsActivityResumed = !Owner.Viewer.Simulator.Paused;
+            Owner.Viewer.Simulator.GamePaused = false;   // Move to Viewer3D?
+            this.Activity.IsActivityResumed = !Owner.Viewer.Simulator.GamePaused;
             Activity.IsComplete = true;
             if (Owner.Viewer.Simulator.IsReplaying) Owner.Viewer.Simulator.Confirmer.Confirm(CabControl.Activity, CabSetting.Off);
             Owner.Viewer.Game.PopState();
@@ -127,24 +127,24 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             this.Activity.IsActivityWindowOpen = this.Visible;
             this.Activity.TriggeredEvent = null;
             Activity.NewMsgFromNewPlayer = false;
-            Owner.Viewer.Simulator.Paused = false;   // Move to Viewer3D?
-            this.Activity.IsActivityResumed = !Owner.Viewer.Simulator.Paused;
+            Owner.Viewer.Simulator.GamePaused = false;   // Move to Viewer3D?
+            this.Activity.IsActivityResumed = !Owner.Viewer.Simulator.GamePaused;
             if (Owner.Viewer.Simulator.IsReplaying) Owner.Viewer.Simulator.Confirmer.Confirm(CabControl.Activity, CabSetting.On);
         }
 
         public void ResumeActivity()
         {
             this.Activity.TriggeredEvent = null;
-            Owner.Viewer.Simulator.Paused = false;   // Move to Viewer3D?
-            Activity.IsActivityResumed = !Owner.Viewer.Simulator.Paused;
+            Owner.Viewer.Simulator.GamePaused = false;   // Move to Viewer3D?
+            Activity.IsActivityResumed = !Owner.Viewer.Simulator.GamePaused;
             if (Owner.Viewer.Simulator.IsReplaying) Owner.Viewer.Simulator.Confirmer.Confirm(CabControl.Activity, CabSetting.On);
             ResumeMenu();
         }
 
         public void PauseActivity()
         {
-            Owner.Viewer.Simulator.Paused = true;   // Move to Viewer3D?
-            Activity.IsActivityResumed = !Owner.Viewer.Simulator.Paused;
+            Owner.Viewer.Simulator.GamePaused = true;   // Move to Viewer3D?
+            Activity.IsActivityResumed = !Owner.Viewer.Simulator.GamePaused;
             if (Owner.Viewer.Simulator.IsReplaying) Owner.Viewer.Simulator.Confirmer.Confirm(CabControl.Activity, CabSetting.On);
             ResumeMenu();
         }
@@ -172,7 +172,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                 Owner.Viewer.HelpWindow.TabAction();
                                 Owner.Viewer.HelpWindow.TabAction();
                             }
-                            Visible = Activity.IsActivityWindowOpen = Owner.Viewer.HelpWindow.ActivityUpdated = Owner.Viewer.Simulator.Paused = true;
+                            Visible = Activity.IsActivityWindowOpen = Owner.Viewer.HelpWindow.ActivityUpdated = Owner.Viewer.Simulator.GamePaused = true;
                             ComposeMenu(e.ParsedObject.Name, Viewer.Catalog.GetString("This activity has ended {0}.\nFor a detailed evaluation, see the Help Window (F1).",
                                 Activity.IsSuccessful ? Viewer.Catalog.GetString("") : Viewer.Catalog.GetString("without success")));
                             EndMenu();
@@ -192,7 +192,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                     }
                                     else
                                     {
-                                        Owner.Viewer.Simulator.Paused = true;
+                                        Owner.Viewer.Simulator.GamePaused = true;
                                         ResumeMenu();
                                         PopupTime = DateTime.UtcNow;
                                     }
@@ -201,9 +201,9 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                 else
                                 {
                                     // Only needs updating the first time through
-                                    if (!Owner.Viewer.Simulator.Paused && Visible == false)
+                                    if (!Owner.Viewer.Simulator.GamePaused && Visible == false)
                                     {
-                                        Owner.Viewer.Simulator.Paused = e.ParsedObject.OrtsContinue < 0 ? true : false;
+                                        Owner.Viewer.Simulator.GamePaused = e.ParsedObject.OrtsContinue < 0 ? true : false;
                                         if (e.ParsedObject.OrtsContinue != 0)
                                         {
                                             ComposeMenu(e.ParsedObject.Name, text);
@@ -221,7 +221,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                 Activity.TriggeredEvent = null;
                             }
                             TimeSpan diff1 = DateTime.UtcNow - PopupTime;
-                            if (Visible && e.ParsedObject.OrtsContinue >= 0 && diff1.TotalSeconds >= e.ParsedObject.OrtsContinue && !Owner.Viewer.Simulator.Paused)
+                            if (Visible && e.ParsedObject.OrtsContinue >= 0 && diff1.TotalSeconds >= e.ParsedObject.OrtsContinue && !Owner.Viewer.Simulator.GamePaused)
                             {
                                 CloseBox();
                             }
@@ -243,7 +243,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                                 }
                                 else
                                 {
-                                    Owner.Viewer.Simulator.Paused = true;
+                                    Owner.Viewer.Simulator.GamePaused = true;
                                     ResumeMenu();
                                     PopupTime = DateTime.UtcNow;
                                 }
@@ -251,13 +251,13 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                             else
                             {
                                 // Only needs updating the first time through
-                                if (!Owner.Viewer.Simulator.Paused && Visible == false)
+                                if (!Owner.Viewer.Simulator.GamePaused && Visible == false)
                                 {
                                     ComposeActualPlayerTrainMenu(Owner.Viewer.PlayerTrain.Name, text);
                                     NoPauseMenu();
                                     PopupTime = DateTime.UtcNow;
                                 }
-                                else if (Owner.Viewer.Simulator.Paused)
+                                else if (Owner.Viewer.Simulator.GamePaused)
                                 {
                                     ResumeMenu();
                                 }
@@ -269,7 +269,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                             Activity.NewMsgFromNewPlayer = false;
                         }
                         TimeSpan diff1 = DateTime.UtcNow - PopupTime;
-                        if (Visible && diff1.TotalSeconds >= 10 && !Owner.Viewer.Simulator.Paused)
+                        if (Visible && diff1.TotalSeconds >= 10 && !Owner.Viewer.Simulator.GamePaused)
                         {
                             CloseBox();
                             Activity.NewMsgFromNewPlayer = false;
@@ -277,7 +277,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                     }
 
 
-                    Activity.IsActivityResumed = !Owner.Viewer.Simulator.Paused;
+                    Activity.IsActivityResumed = !Owner.Viewer.Simulator.GamePaused;
                     Activity.IsActivityWindowOpen = Visible;
                     Activity.ReopenActivityWindow = false;
                 }
@@ -290,11 +290,11 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         // </CJComment>
         private void ResumeMenu()
         {
-            ResumeLabel.Text = Owner.Viewer.Simulator.Paused ? Viewer.Catalog.GetString("Resume") : Viewer.Catalog.GetString("Pause");
-            CloseLabel.Text = Owner.Viewer.Simulator.Paused ? Viewer.Catalog.GetString("Resume and close box") : Viewer.Catalog.GetString("Close box");
+            ResumeLabel.Text = Owner.Viewer.Simulator.GamePaused ? Viewer.Catalog.GetString("Resume") : Viewer.Catalog.GetString("Pause");
+            CloseLabel.Text = Owner.Viewer.Simulator.GamePaused ? Viewer.Catalog.GetString("Resume and close box") : Viewer.Catalog.GetString("Close box");
             QuitLabel.Text = Viewer.Catalog.GetString("Quit activity");
-            StatusLabel.Text = Owner.Viewer.Simulator.Paused ? Viewer.Catalog.GetString("Status: Activity paused") : Viewer.Catalog.GetString("Status: Activity resumed");
-            StatusLabel.Color = Owner.Viewer.Simulator.Paused ? Color.LightSalmon : Color.LightGreen;
+            StatusLabel.Text = Owner.Viewer.Simulator.GamePaused ? Viewer.Catalog.GetString("Status: Activity paused") : Viewer.Catalog.GetString("Status: Activity resumed");
+            StatusLabel.Color = Owner.Viewer.Simulator.GamePaused ? Color.LightSalmon : Color.LightGreen;
         }
 
         // <CJComment> At this point, would like to change dialog box background from solid to see-through,

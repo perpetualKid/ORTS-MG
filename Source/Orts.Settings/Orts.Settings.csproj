@@ -8,7 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.0.1641" />
-    <PackageReference Include="GetText.NET" Version="0.12.7-rc" />
+    <PackageReference Include="GetText.NET" Version="0.12.11" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Orts.Common\Orts.Common.csproj" />

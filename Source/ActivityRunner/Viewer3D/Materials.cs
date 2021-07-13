@@ -227,7 +227,7 @@ namespace Orts.ActivityRunner.Viewer3D
             PopupWindowShader = new PopupWindowShader(viewer, viewer.RenderProcess.GraphicsDevice);
             PrecipitationShader = new PrecipitationShader(viewer.RenderProcess.GraphicsDevice);
             SceneryShader = new SceneryShader(viewer.RenderProcess.GraphicsDevice);
-            var microtexPath = Path.Combine(viewer.Simulator.RoutePath, "TERRTEX", "microtex.ace");
+            var microtexPath = Path.Combine(viewer.Simulator.RouteFolder.TerrainTexturesFolder, "microtex.ace");
             if (File.Exists(microtexPath))
             {
                 try
@@ -256,9 +256,9 @@ namespace Orts.ActivityRunner.Viewer3D
             MissingTexture = SharedTextureManager.Get(viewer.RenderProcess.GraphicsDevice, Path.Combine(viewer.ContentPath, "blank.bmp"));
 
             // Managing default snow textures
-            var defaultSnowTexturePath = viewer.Simulator.RoutePath + @"\TERRTEX\SNOW\ORTSDefaultSnow.ace";
+            var defaultSnowTexturePath = Path.Combine(viewer.Simulator.RouteFolder.TerrainTexturesFolder, "Snow", "ORTSDefaultSnow.ace");
             DefaultSnowTexture = Viewer.TextureManager.Get(defaultSnowTexturePath);
-            var defaultDMSnowTexturePath = viewer.Simulator.RoutePath + @"\TERRTEX\SNOW\ORTSDefaultDMSnow.ace";
+            var defaultDMSnowTexturePath = Path.Combine(viewer.Simulator.RouteFolder.TerrainTexturesFolder, "Snow", "ORTSDefaultDMSnow.ace");
             DefaultDMSnowTexture = Viewer.TextureManager.Get(defaultDMSnowTexturePath);
 
         }
@@ -512,15 +512,15 @@ namespace Orts.ActivityRunner.Viewer3D
             if (Viewer.Settings.UseMSTSEnv == false)
             {
                 SceneryShader.Overcast = Viewer.Simulator.Weather.OvercastFactor;
-                SceneryShader.SetFog(Viewer.Simulator.Weather.FogDistance, ref SharedMaterialManager.FogColor);
-                ParticleEmitterShader.SetFog(Viewer.Simulator.Weather.FogDistance, ref SharedMaterialManager.FogColor);
+                SceneryShader.SetFog(Viewer.Simulator.Weather.FogVisibilityDistance, ref SharedMaterialManager.FogColor);
+                ParticleEmitterShader.SetFog(Viewer.Simulator.Weather.FogVisibilityDistance, ref SharedMaterialManager.FogColor);
                 SceneryShader.ViewerPos = Viewer.Camera.XnaLocation(Viewer.Camera.CameraWorldLocation);
             }
             else
             {
                 SceneryShader.Overcast = Viewer.World.MSTSSky.mstsskyovercastFactor;
                 SceneryShader.SetFog(Viewer.World.MSTSSky.mstsskyfogDistance, ref SharedMaterialManager.FogColor);
-                ParticleEmitterShader.SetFog(Viewer.Simulator.Weather.FogDistance, ref SharedMaterialManager.FogColor);
+                ParticleEmitterShader.SetFog(Viewer.Simulator.Weather.FogVisibilityDistance, ref SharedMaterialManager.FogColor);
                 SceneryShader.ViewerPos = Viewer.Camera.XnaLocation(Viewer.Camera.CameraWorldLocation);
             }
         }

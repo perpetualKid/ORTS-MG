@@ -56,12 +56,12 @@ namespace Orts.ActivityRunner.Viewer3D
             UID = mstsSignal.UID;
 #endif
             var signalShape = Path.GetFileName(path).ToUpper();
-            if (!viewer.SIGCFG.SignalShapes.ContainsKey(signalShape))
+            if (!viewer.Simulator.SignalConfig.SignalShapes.ContainsKey(signalShape))
             {
                 Trace.TraceWarning("{0} signal {1} has invalid shape {2}.", WorldPosition.ToString(), mstsSignal.UiD, signalShape);
                 return;
             }
-            var mstsSignalShape = viewer.SIGCFG.SignalShapes[signalShape];
+            var mstsSignalShape = viewer.Simulator.SignalConfig.SignalShapes[signalShape];
 #if DEBUG_SIGNAL_SHAPES
             Trace.WriteLine("  Shape={0} SubObjs={1,-2} {2}", Path.GetFileNameWithoutExtension(path).ToUpper(), mstsSignalShape.SignalSubObjs.Count, mstsSignalShape.Description);
 #endif
@@ -134,7 +134,7 @@ namespace Orts.ActivityRunner.Viewer3D
                     Trace.TraceWarning("Skipped {0} signal {1} unit {2} with invalid SubObj {3}", WorldPosition.ToString(), mstsSignal.UiD, i, mstsSignal.SignalUnits[i].SubObject);
                     continue;
                 }
-                var mstsSignalItem = (SignalItem)(viewer.Simulator.TDB.TrackDB.TrackItems[mstsSignal.SignalUnits[i].TrackItem]);
+                var mstsSignalItem = (SignalItem)(viewer.Simulator.TrackDatabase.TrackDB.TrackItems[mstsSignal.SignalUnits[i].TrackItem]);
                 try
                 {
                     // Go create the shape head.
@@ -216,10 +216,10 @@ namespace Orts.ActivityRunner.Viewer3D
                 }
 
 
-                if (!viewer.SIGCFG.SignalTypes.ContainsKey(mstsSignalSubObj.SignalSubSignalType))
+                if (!viewer.Simulator.SignalConfig.SignalTypes.ContainsKey(mstsSignalSubObj.SignalSubSignalType))
                     return;
 
-                var mstsSignalType = viewer.SIGCFG.SignalTypes[mstsSignalSubObj.SignalSubSignalType];
+                var mstsSignalType = viewer.Simulator.SignalConfig.SignalTypes[mstsSignalSubObj.SignalSubSignalType];
 
                 if (SignalTypes.ContainsKey(mstsSignalType.Name))
                     SignalTypeData = SignalTypes[mstsSignalType.Name];
@@ -281,9 +281,9 @@ namespace Orts.ActivityRunner.Viewer3D
                         SemaphoreParts.Add(SemaphorePart);
                     }
 
-                    if (Viewer.Simulator.TRK.Route.DefaultSignalSMS != null)
+                    if (Viewer.Simulator.Route.DefaultSignalSMS != null)
                     {
-                        var soundPath = Viewer.Simulator.RoutePath + @"\\sound\\" + Viewer.Simulator.TRK.Route.DefaultSignalSMS;
+                        var soundPath = Viewer.Simulator.RouteFolder.SoundFile(Viewer.Simulator.Route.DefaultSignalSMS);
                         try
                         {
                             Sound = new SoundSource(Viewer, SignalShape.WorldPosition.WorldLocation, SoundEventSource.Signal, soundPath);
@@ -365,7 +365,7 @@ namespace Orts.ActivityRunner.Viewer3D
                         isDay = Viewer.World.Sky.solarDirection.Y > 0;
                     else
                         isDay = Viewer.World.MSTSSky.mstsskysolarDirection.Y > 0;
-                    bool isPoorVisibility = Viewer.Simulator.Weather.FogDistance < 200;
+                    bool isPoorVisibility = Viewer.Simulator.Weather.FogVisibilityDistance < 200;
                     if (!SignalTypeData.DayLight && isDay && !isPoorVisibility)
                         continue;
 
@@ -435,7 +435,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
             public SignalTypeData(Viewer viewer, SignalType mstsSignalType)
             {
-                if (!viewer.SIGCFG.LightTextures.ContainsKey(mstsSignalType.LightTextureName))
+                if (!viewer.Simulator.SignalConfig.LightTextures.ContainsKey(mstsSignalType.LightTextureName))
                 {
                     Trace.TraceWarning("Skipped invalid light texture {1} for signal type {0}", mstsSignalType.Name, mstsSignalType.LightTextureName);
                     Material = viewer.MaterialManager.Load("missing-signal-light");
@@ -447,7 +447,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 }
                 else
                 {
-                    var mstsLightTexture = viewer.SIGCFG.LightTextures[mstsSignalType.LightTextureName];
+                    var mstsLightTexture = viewer.Simulator.SignalConfig.LightTextures[mstsSignalType.LightTextureName];
                     Material = viewer.MaterialManager.Load("SignalLight", Helpers.GetRouteTextureFile(viewer.Simulator, Helpers.TextureFlags.None, mstsLightTexture.TextureFile));
                     GlowMaterial = viewer.MaterialManager.Load("SignalLightGlow");
 #if DEBUG_SIGNAL_SHAPES
@@ -479,12 +479,12 @@ namespace Orts.ActivityRunner.Viewer3D
 
                         foreach (var mstsSignalLight in mstsSignalType.Lights)
                         {
-                            if (!viewer.SIGCFG.LightsTable.ContainsKey(mstsSignalLight.Name))
+                            if (!viewer.Simulator.SignalConfig.LightsTable.ContainsKey(mstsSignalLight.Name))
                             {
                                 Trace.TraceWarning("Skipped invalid light {1} for signal type {0}", mstsSignalType.Name, mstsSignalLight.Name);
                                 continue;
                             }
-                            var mstsLight = viewer.SIGCFG.LightsTable[mstsSignalLight.Name];
+                            var mstsLight = viewer.Simulator.SignalConfig.LightsTable[mstsSignalLight.Name];
                             Lights.Add(new SignalLightPrimitive(viewer, mstsSignalLight.Position, mstsSignalLight.Radius, mstsLight.Color, glowDay, glowNight, mstsLightTexture.TextureCoordinates));
                             LightsSemaphoreChange.Add(mstsSignalLight.SemaphoreChange);
                         }

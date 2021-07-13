@@ -87,7 +87,7 @@ namespace Orts.Models.Simplified
             using (SemaphoreSlim addItem = new SemaphoreSlim(1))
             {
                 List<TimetableInfo> result = new List<TimetableInfo>();
-                string orActivitiesDirectory = route.RouteFolder.OrActivitiesFolder;
+                string orActivitiesDirectory = route.RouteFolder.OpenRailsActivitiesFolder;
 
                 if (Directory.Exists(orActivitiesDirectory))
                 {

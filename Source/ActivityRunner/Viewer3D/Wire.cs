@@ -370,18 +370,19 @@ namespace Orts.ActivityRunner.Viewer3D
 
             lod = new LODWire(800.0f); // Create LOD for railsides with specified CutoffRadius
             lodItem = new LODItemWire("Wire");
-            if (File.Exists(viewer.Simulator.RoutePath + "\\Textures\\overheadwire.ace"))
+            string overheadWire = Path.Combine(viewer.Simulator.RouteFolder.TexturesFolder, "overheadwire.ace");
+            if (File.Exists(overheadWire))
             {
                 lodItem.TexName = "overheadwire.ace";
             }
-            else if (File.Exists(viewer.Simulator.BasePath + "\\global\\textures\\overheadwire.ace"))
+            else if (File.Exists(overheadWire = Path.Combine(viewer.Simulator.RouteFolder.ContentFolder.TexturesFolder, "overheadwire.ace")))
             {
-                lodItem.TexName = "..\\..\\..\\global\\textures\\overheadwire.ace";
+                lodItem.TexName = overheadWire;
             }
             else
             {
-                Trace.TraceInformation("Ignored missing overheadwire.ace, using default. You can copy the overheadwire.ace from OR\'s AddOns folder to {0}\\Textures", viewer.Simulator.RoutePath);
-                lodItem.TexName = "..\\..\\..\\global\\textures\\dieselsmoke.ace";
+                Trace.TraceInformation("Ignored missing overheadwire.ace, using default. You can copy the overheadwire.ace from OR\'s AddOns folder to {0}", viewer.Simulator.RouteFolder.TexturesFolder);
+                lodItem.TexName = Path.Combine(viewer.Simulator.RouteFolder.ContentFolder.TexturesFolder, "dieselsmoke.ace");
             }
             lodItem.ShaderName = "TexDiff";
             lodItem.LightModelName = "DarkShade";
@@ -391,15 +392,15 @@ namespace Orts.ActivityRunner.Viewer3D
             lodItem.MipMapLevelOfDetailBias = 0;
             LODItem.LoadMaterial(viewer, lodItem);
 
-            bool drawTriphaseWire = (viewer.Simulator.TRK.Route.TriphaseEnabled == "Off" ? false :
-    viewer.Simulator.TRK.Route.TriphaseEnabled == "On");
-            bool drawDoubleWire = (viewer.Simulator.TRK.Route.DoubleWireEnabled == "Off" ? false :
-                viewer.Simulator.TRK.Route.DoubleWireEnabled == "On" || viewer.Settings.DoubleWire);
-            float topHeight = (float)viewer.Simulator.TRK.Route.OverheadWireHeight;
-            float topWireOffset = (viewer.Simulator.TRK.Route.DoubleWireHeight > 0 ?
-                viewer.Simulator.TRK.Route.DoubleWireHeight : 1.0f);
-            float dist = (viewer.Simulator.TRK.Route.TriphaseWidth > 0 ?
-                viewer.Simulator.TRK.Route.TriphaseWidth : 1.0f);
+            bool drawTriphaseWire = (viewer.Simulator.Route.TriphaseEnabled == "Off" ? false :
+    viewer.Simulator.Route.TriphaseEnabled == "On");
+            bool drawDoubleWire = (viewer.Simulator.Route.DoubleWireEnabled == "Off" ? false :
+                viewer.Simulator.Route.DoubleWireEnabled == "On" || viewer.Settings.DoubleWire);
+            float topHeight = (float)viewer.Simulator.Route.OverheadWireHeight;
+            float topWireOffset = (viewer.Simulator.Route.DoubleWireHeight > 0 ?
+                viewer.Simulator.Route.DoubleWireHeight : 1.0f);
+            float dist = (viewer.Simulator.Route.TriphaseWidth > 0 ?
+                viewer.Simulator.Route.TriphaseWidth : 1.0f);
 
             if (drawTriphaseWire)
             {
@@ -515,8 +516,8 @@ namespace Orts.ActivityRunner.Viewer3D
             }
             TrProfile = WireProfile;
 
-            topWireOffset = (viewer.Simulator.TRK.Route.DoubleWireHeight > 0 ?
-                viewer.Simulator.TRK.Route.DoubleWireHeight : 1.0f);
+            topWireOffset = (viewer.Simulator.Route.DoubleWireHeight > 0 ?
+                viewer.Simulator.Route.DoubleWireHeight : 1.0f);
 
             XNAEnd = endPosition.XNAMatrix.Translation;
 

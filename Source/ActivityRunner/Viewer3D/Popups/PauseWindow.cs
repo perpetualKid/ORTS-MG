@@ -68,9 +68,9 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
         {
             base.PrepareFrame(elapsedTime, updateFull);
 
-            if (GamePaused != Owner.Viewer.Simulator.Paused && Owner.Viewer.RealTime > 0.1)
+            if (GamePaused != Owner.Viewer.Simulator.GamePaused && Owner.Viewer.RealTime > 0.1)
             {
-                GamePaused = Owner.Viewer.Simulator.Paused;
+                GamePaused = Owner.Viewer.Simulator.GamePaused;
                 Animation = true;
                 AnimationStart = Owner.Viewer.RealTime;
                 AnimationSource = new Rectangle(0, 0, WindowManager.PauseTexture.Width, WindowManager.PauseTexture.Height / 2);

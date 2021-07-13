@@ -231,7 +231,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 {
                     var soundPathArray = new[] {
                     Path.Combine(Path.GetDirectoryName(Locomotive.WagFilePath), "SOUND"),
-                    Path.Combine(Simulator.BasePath, "SOUND"),
+                    Path.Combine(Simulator.RouteFolder.ContentFolder.SoundFolder),
                 };
                     var soundPath = FolderStructure.FindFileFromFolders(soundPathArray, SoundFileName);
                     if (File.Exists(soundPath))
@@ -342,7 +342,7 @@ namespace Orts.Simulation.RollingStocks.SubSystems
                 Script.AccelerationMpSS = () => Locomotive.AccelerationMpSS;
                 Script.AltitudeM = () => Locomotive.WorldPosition.Location.Y;
                 Script.CurrentGradientPercent = () => -Locomotive.CurrentElevationPercent;
-                Script.LineSpeedMpS = () => (float)Simulator.TRK.Route.SpeedLimit;
+                Script.LineSpeedMpS = () => (float)Simulator.Route.SpeedLimit;
                 Script.DoesStartFromTerminalStation = () => DoesStartFromTerminalStation();
                 Script.IsColdStart = () => Locomotive.Train.ColdStart;
                 Script.GetTrackNodeOffset = () => Locomotive.Train.FrontTDBTraveller.TrackNodeLength - Locomotive.Train.FrontTDBTraveller.TrackNodeOffset;

@@ -51,6 +51,7 @@ using Orts.Formats.Msts;
 using Orts.Formats.Msts.Files;
 using Orts.Formats.Msts.Models;
 using Orts.Simulation;
+using Orts.Simulation.World;
 
 using System;
 using System.Collections.Generic;
@@ -263,7 +264,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
             // determine file path to the WFile at the specified tile coordinates
             var WFileName = WorldFileNameFromTileCoordinates(tileX, tileZ);
-            var WFilePath = viewer.Simulator.RoutePath + @"\World\" + WFileName;
+            var WFilePath = Path.Combine(viewer.Simulator.RouteFolder.WorldFolder, WFileName);
 
             // if there isn't a file, then return with an empty WorldFile object
             if (!File.Exists(WFilePath))
@@ -277,7 +278,7 @@ namespace Orts.ActivityRunner.Viewer3D
             var WFile = new Formats.Msts.Files.WorldFile(WFilePath);
 
             // check for existence of world file in OpenRails subfolder
-            WFilePath = viewer.Simulator.RoutePath + @"\World\Openrails\" + WFileName;
+            WFilePath = Path.Combine(viewer.Simulator.RouteFolder.WorldFolder, "Openrails", WFileName);
             if (File.Exists(WFilePath))
             {
                 // We have an OR-specific addition to world file
@@ -285,16 +286,7 @@ namespace Orts.ActivityRunner.Viewer3D
             }
 
             // to avoid loop checking for every object this pre-check is performed
-            bool containsMovingTable = false;
-            if (Simulator.Instance.MovingTables != null)
-            {
-                foreach (var movingTable in Simulator.Instance.MovingTables)
-                    if (movingTable.WFile == WFileName)
-                    {
-                        containsMovingTable = true;
-                        break;
-                    }
-            }
+            bool containsMovingTable = Simulator.Instance.MovingTables.Where(m => m.WFile.Equals(WFileName, StringComparison.OrdinalIgnoreCase)).Any();
 
             // create all the individual scenery objects specified in the WFile
             foreach (var worldObject in WFile.Objects)
@@ -318,7 +310,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 var fileNameIsNotShape = (worldObject is TransferObject || worldObject is HazardObject);
 
                 // Determine the file path to the shape file for this scenery object and check it exists as expected.
-                var shapeFilePath = fileNameIsNotShape || String.IsNullOrEmpty(worldObject.FileName) ? null : global ? viewer.Simulator.BasePath + @"\Global\Shapes\" + worldObject.FileName : viewer.Simulator.RoutePath + @"\Shapes\" + worldObject.FileName;
+                string shapeFilePath = fileNameIsNotShape || string.IsNullOrEmpty(worldObject.FileName) ? null : global ? viewer.Simulator.RouteFolder.ContentFolder.ShapeFile(worldObject.FileName) : viewer.Simulator.RouteFolder.ShapeFile(worldObject.FileName);
                 if (shapeFilePath != null)
                 {
                     shapeFilePath = Path.GetFullPath(shapeFilePath);
@@ -351,7 +343,7 @@ namespace Orts.ActivityRunner.Viewer3D
                     {
                         var trackObj = (TrackObject)worldObject;
                         // Switch tracks need a link to the simulator engine so they can animate the points.
-                        TrackJunctionNode trJunctionNode = trackObj.WorldLocation != WorldLocation.None ? viewer.Simulator.TDB.TrackDB.GetJunctionNode(TileX, TileZ, (int)trackObj.UiD) : null;
+                        TrackJunctionNode trJunctionNode = trackObj.WorldLocation != WorldLocation.None ? viewer.Simulator.TrackDatabase.TrackDB.GetJunctionNode(TileX, TileZ, (int)trackObj.UiD) : null;
                         // We might not have found the junction node; if so, fall back to the static track shape.
                         if (trJunctionNode != null)
                         {
@@ -372,26 +364,24 @@ namespace Orts.ActivityRunner.Viewer3D
                             else
                             {
                                 var found = false;
-                                foreach (var movingTable in Simulator.Instance.MovingTables)
+                                foreach (MovingTable movingTable in Simulator.Instance.MovingTables)
                                 {
                                     if (worldObject.UiD == movingTable.UID && WFileName == movingTable.WFile)
                                     {
                                         found = true;
-                                        if (movingTable is Simulation.Turntable)
+                                        if (movingTable is TurnTable turnTable)
                                         {
-                                            var turntable = movingTable as Simulation.Turntable;
-                                            turntable.ComputeCenter(worldMatrix);
+                                            turnTable.ComputeCenter(worldMatrix);
                                             Quaternion quaternion = Quaternion.CreateFromRotationMatrix(worldObject.WorldPosition.XNAMatrix);
                                             //quaternion.Z *= -1;
                                             var startingY = Math.Asin(-2 * (quaternion.X * quaternion.Z - quaternion.Y * quaternion.W));
                                             //var startingY = Math.Asin(-2 * (worldObject.QDirection.A * worldObject.QDirection.C - worldObject.QDirection.B * worldObject.QDirection.D));
-                                            sceneryObjects.Add(new TurntableShape(shapeFilePath, new FixedWorldPositionSource(worldMatrix), shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None, turntable, startingY));
+                                            sceneryObjects.Add(new TurntableShape(shapeFilePath, new FixedWorldPositionSource(worldMatrix), shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None, turnTable, startingY));
                                         }
-                                        else
+                                        else if (movingTable is TransferTable transferTable)
                                         {
-                                            var transfertable = movingTable as Simulation.Transfertable;
-                                            transfertable.ComputeCenter(worldMatrix);
-                                            sceneryObjects.Add(new TransfertableShape(shapeFilePath, new FixedWorldPositionSource(worldMatrix), shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None, transfertable));
+                                            transferTable.ComputeCenter(worldMatrix);
+                                            sceneryObjects.Add(new TransfertableShape(shapeFilePath, new FixedWorldPositionSource(worldMatrix), shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None, transferTable));
                                         }
                                         break;
                                     }
@@ -399,7 +389,7 @@ namespace Orts.ActivityRunner.Viewer3D
                                 if (!found) sceneryObjects.Add(new StaticTrackShape(shapeFilePath, worldMatrix));
                             }
                         }
-                        if (viewer.Simulator.Settings.Wire == true && viewer.Simulator.TRK.Route.Electrified == true
+                        if (viewer.Simulator.Settings.Wire == true && viewer.Simulator.Route.Electrified == true
                             && worldObject.DetailLevel != 2   // Make it compatible with routes that use 'HideWire', a workaround for MSTS that 
                             && worldObject.DetailLevel != 3   // allowed a mix of electrified and non electrified track see http://msts.steam4me.net/tutorials/hidewire.html
                             )
@@ -411,7 +401,7 @@ namespace Orts.ActivityRunner.Viewer3D
                     }
                     else if (worldObject.GetType() == typeof(DynamicTrackObject))
                     {
-                        if (viewer.Simulator.Settings.Wire == true && viewer.Simulator.TRK.Route.Electrified == true)
+                        if (viewer.Simulator.Settings.Wire && viewer.Simulator.Route.Electrified)
                             Wire.DecomposeDynamicWire(viewer, dTrackList, (DynamicTrackObject)worldObject, worldMatrix);
                         // Add DyntrackDrawers for individual subsections
                         if (viewer.Simulator.UseSuperElevation > 0 && SuperElevationManager.UseSuperElevationDyn(viewer, dTrackList, (DynamicTrackObject)worldObject, worldMatrix))
@@ -438,7 +428,7 @@ namespace Orts.ActivityRunner.Viewer3D
                     }
                     else if (worldObject.GetType() == typeof(HazardObject))
                     {
-                        var h = HazardShape.CreateHazzard(shapeFilePath, new FixedWorldPositionSource(worldMatrix), shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None, (HazardObject)worldObject);
+                        var h = HazardShape.CreateHazard(shapeFilePath, new FixedWorldPositionSource(worldMatrix), shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None, (HazardObject)worldObject);
                         if (h != null) sceneryObjects.Add(h);
                     }
                     else if (worldObject.GetType() == typeof(SpeedPostObject))
@@ -450,7 +440,7 @@ namespace Orts.ActivityRunner.Viewer3D
                         if (Simulator.Instance.CarSpawnerLists != null && ((CarSpawnerObject)worldObject).ListName != null)
                         {
                             ((CarSpawnerObject)worldObject).CarSpawnerListIndex = Simulator.Instance.CarSpawnerLists.FindIndex(x => x.ListName == ((CarSpawnerObject)worldObject).ListName);
-                            if (((CarSpawnerObject)worldObject).CarSpawnerListIndex < 0 || ((CarSpawnerObject)worldObject).CarSpawnerListIndex > Simulator.Instance.CarSpawnerLists.Count-1) ((CarSpawnerObject)worldObject).CarSpawnerListIndex = 0;
+                            if (((CarSpawnerObject)worldObject).CarSpawnerListIndex < 0 || ((CarSpawnerObject)worldObject).CarSpawnerListIndex > Simulator.Instance.CarSpawnerLists.Count - 1) ((CarSpawnerObject)worldObject).CarSpawnerListIndex = 0;
                         }
                         else ((CarSpawnerObject)worldObject).CarSpawnerListIndex = 0;
                         carSpawners.Add(new RoadCarSpawner(viewer, worldMatrix, (CarSpawnerObject)worldObject));
@@ -476,7 +466,7 @@ namespace Orts.ActivityRunner.Viewer3D
                     }
                     else if (worldObject.GetType() == typeof(PickupObject))
                     {
-                            sceneryObjects.Add(new FuelPickupItemShape(shapeFilePath, new FixedWorldPositionSource(worldMatrix), shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None, (PickupObject)worldObject));
+                        sceneryObjects.Add(new FuelPickupItemShape(shapeFilePath, new FixedWorldPositionSource(worldMatrix), shadowCaster ? ShapeFlags.ShadowCaster : ShapeFlags.None, (PickupObject)worldObject));
                         PickupList.Add((PickupObject)worldObject);
                     }
                     else // It's some other type of object - not one of the above.
@@ -492,7 +482,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
             // Check if there are activity restricted speedposts to be loaded
 
-            if (Viewer.Simulator.ActivityRun != null && Viewer.Simulator.Activity.Activity.ActivityRestrictedSpeedZones != null)
+            if (Viewer.Simulator.ActivityRun != null && Viewer.Simulator.ActivityFile.Activity.ActivityRestrictedSpeedZones != null)
             {
                 foreach (TempSpeedPostItem tempSpeedItem in Viewer.Simulator.ActivityRun.TempSpeedPostItems)
                 {
@@ -500,13 +490,13 @@ namespace Orts.ActivityRunner.Viewer3D
                     {
                         if (Viewer.SpeedpostDatFile == null)
                         {
-                            Trace.TraceWarning($"{Viewer.Simulator.RoutePath}\\speedpost.dat missing; speed posts for temporary speed restrictions in tile {TileX} {TileZ} will not be visible.");
+                            Trace.TraceWarning($"{Viewer.Simulator.RouteFolder.CurrentFolder}\\speedpost.dat missing; speed posts for temporary speed restrictions in tile {TileX} {TileZ} will not be visible.");
                             break;
                         }
                         else
                         {
                             sceneryObjects.Add(new StaticShape(
-                                tempSpeedItem.IsWarning ? Viewer.SpeedpostDatFile.ShapeNames[SpeedPostShapeNames.Warning] : 
+                                tempSpeedItem.IsWarning ? Viewer.SpeedpostDatFile.ShapeNames[SpeedPostShapeNames.Warning] :
                                 (tempSpeedItem.IsResume ? Viewer.SpeedpostDatFile.ShapeNames[SpeedPostShapeNames.EndRestriction] : Viewer.SpeedpostDatFile.ShapeNames[SpeedPostShapeNames.StartRestriction]),
                                 tempSpeedItem.WorldPosition, ShapeFlags.None));
                         }

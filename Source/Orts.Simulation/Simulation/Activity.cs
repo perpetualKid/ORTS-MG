@@ -107,9 +107,9 @@ namespace Orts.Simulation
 
                     foreach (var i in sd.PlayerTraffics)
                     {
-                        if (i.PlatformStartID < Simulator.TDB.TrackDB.TrackItems.Length && i.PlatformStartID >= 0 &&
-                            Simulator.TDB.TrackDB.TrackItems[i.PlatformStartID] is PlatformItem)
-                            Platform = Simulator.TDB.TrackDB.TrackItems[i.PlatformStartID] as PlatformItem;
+                        if (i.PlatformStartID < Simulator.TrackDatabase.TrackDB.TrackItems.Length && i.PlatformStartID >= 0 &&
+                            Simulator.TrackDatabase.TrackDB.TrackItems[i.PlatformStartID] is PlatformItem)
+                            Platform = Simulator.TrackDatabase.TrackDB.TrackItems[i.PlatformStartID] as PlatformItem;
                         else
                         {
                             Trace.TraceWarning("PlatformStartID {0} is not present in TDB file", i.PlatformStartID);
@@ -117,9 +117,9 @@ namespace Orts.Simulation
                         }
                         if (Platform != null)
                         {
-                            if (Simulator.TDB.TrackDB.TrackItems[Platform.LinkedPlatformItemId] is PlatformItem)
+                            if (Simulator.TrackDatabase.TrackDB.TrackItems[Platform.LinkedPlatformItemId] is PlatformItem)
                             {
-                                PlatformItem Platform2 = Simulator.TDB.TrackDB.TrackItems[Platform.LinkedPlatformItemId] as PlatformItem;
+                                PlatformItem Platform2 = Simulator.TrackDatabase.TrackDB.TrackItems[Platform.LinkedPlatformItemId] as PlatformItem;
                                 Tasks.Add(task = new ActivityTaskPassengerStopAt(simulator,
                                     task,
                                     new DateTime().AddSeconds(i.ArrivalTime),
@@ -1077,8 +1077,8 @@ namespace Orts.Simulation
             ActArrive = rdval == -1 ? (DateTime?)null : new DateTime(rdval);
             rdval = inf.ReadInt64();
             ActDepart = rdval == -1 ? (DateTime?)null : new DateTime(rdval);
-            PlatformEnd1 = Simulator.TDB.TrackDB.TrackItems[inf.ReadInt32()] as PlatformItem;
-            PlatformEnd2 = Simulator.TDB.TrackDB.TrackItems[inf.ReadInt32()] as PlatformItem;
+            PlatformEnd1 = Simulator.TrackDatabase.TrackDB.TrackItems[inf.ReadInt32()] as PlatformItem;
+            PlatformEnd2 = Simulator.TrackDatabase.TrackDB.TrackItems[inf.ReadInt32()] as PlatformItem;
             BoardingEndS = inf.ReadDouble();
             BoardingS = inf.ReadDouble();
             TimerChk = inf.ReadInt32();
@@ -1229,9 +1229,9 @@ namespace Orts.Simulation
                 var i = e.SidingId.Value;
                 try
                 {
-                    SidingEnd1 = Simulator.TDB.TrackDB.TrackItems[i] as SidingItem;
+                    SidingEnd1 = Simulator.TrackDatabase.TrackDB.TrackItems[i] as SidingItem;
                     i = SidingEnd1.LinkedSidingId;
-                    SidingEnd2 = Simulator.TDB.TrackDB.TrackItems[i] as SidingItem;
+                    SidingEnd2 = Simulator.TrackDatabase.TrackDB.TrackItems[i] as SidingItem;
                 }
                 catch (IndexOutOfRangeException)
                 {

@@ -196,7 +196,7 @@ namespace Orts.ActivityRunner.Viewer3D
             if (filename == null)
                 return;
 
-            string[] pathArray = { Path.Combine(Viewer.Simulator.RoutePath, "SOUND"), Path.Combine(Viewer.Simulator.BasePath, "SOUND") };
+            string[] pathArray = { Viewer.Simulator.RouteFolder.SoundFolder, Viewer.Simulator.RouteFolder.ContentFolder.SoundFolder };
             var fullPath = FolderStructure.FindFileFromFolders(pathArray, filename);
             if (fullPath == null)
             {
@@ -452,7 +452,7 @@ namespace Orts.ActivityRunner.Viewer3D
                                 if (thisSection.CircuitType == TrackCircuitType.Junction || thisSection.CircuitType == TrackCircuitType.Crossover)
                                 {
                                     // train is on a switch; let's see if car is on a switch too
-                                    WorldLocation switchLocation = Viewer.Simulator.TDB.TrackDB.TrackNodes[thisSection.OriginalIndex].UiD.Location;
+                                    WorldLocation switchLocation = Viewer.Simulator.TrackDatabase.TrackDB.TrackNodes[thisSection.OriginalIndex].UiD.Location;
                                     var distanceFromSwitch = WorldLocation.GetDistanceSquared(Car.WorldPosition.WorldLocation, switchLocation);
                                     if (distanceFromSwitch < Car.CarLengthM * Car.CarLengthM + Math.Min(Car.SpeedMpS * 3, 150))
                                     {
@@ -2309,9 +2309,9 @@ namespace Orts.ActivityRunner.Viewer3D
                 iFile = Viewer.Random.Next(Files.Count);
             }
 
-            string[] pathArray = {  Path.Combine(Simulator.Instance.RoutePath, "SOUND"),
+            string[] pathArray = {  Simulator.Instance.RouteFolder.SoundFolder,
                                     ORTSStream.SoundSource.SMSFolder,
-                                    Path.Combine(Simulator.Instance.BasePath, "SOUND") };
+                                    Simulator.Instance.RouteFolder.ContentFolder.SoundFolder };
             return FolderStructure.FindFileFromFolders(pathArray, Files[iFile]) ?? string.Empty;
         }
     }
@@ -2391,7 +2391,7 @@ namespace Orts.ActivityRunner.Viewer3D
                 traveller = new Traveller(train.RearTDBTraveller, Traveller.TravellerDirection.Backward);
             }
 
-            TrackDB trackDB = Viewer.Simulator.TDB.TrackDB;
+            TrackDB trackDB = Viewer.Simulator.TrackDatabase.TrackDB;
             TrackItem[] trItems = trackDB.TrackItems;
 
             WorldSoundRegion prevItem = null;
@@ -2516,11 +2516,11 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public void AddByTile(int TileX, int TileZ)
         {
-            string name = Viewer.Simulator.RoutePath + @"\WORLD\" + WorldFile.WorldFileNameFromTileCoordinates(TileX, TileZ) + "s";
-            WorldSoundFile wf = new WorldSoundFile(name, Viewer.Simulator.TDB.TrackDB.TrackItems);
+            string name = Path.Combine(Viewer.Simulator.RouteFolder.WorldFolder, WorldFile.WorldFileNameFromTileCoordinates(TileX, TileZ) + "s");
+            WorldSoundFile wf = new WorldSoundFile(name, Viewer.Simulator.TrackDatabase.TrackDB.TrackItems);
             if (wf.TrackItemSound != null)
             {
-                string[] pathArray = { Path.Combine(Viewer.Simulator.RoutePath, "SOUND"), Path.Combine(Viewer.Simulator.BasePath, "SOUND") };
+                string[] pathArray = { Viewer.Simulator.RouteFolder.SoundFolder, Viewer.Simulator.RouteFolder.ContentFolder.SoundFolder };
 
                 var ls = new List<SoundSourceBase>();
                 foreach (var fss in wf.TrackItemSound.SoundSources)
@@ -2548,7 +2548,7 @@ namespace Orts.ActivityRunner.Viewer3D
 
         public void RemoveByTile(int TileX, int TileZ)
         {
-            string name = Viewer.Simulator.RoutePath + @"\WORLD\" + WorldFile.WorldFileNameFromTileCoordinates(TileX, TileZ) + "s";
+            string name = Path.Combine(Viewer.Simulator.RouteFolder.WorldFolder, WorldFile.WorldFileNameFromTileCoordinates(TileX, TileZ) + "s");
             Viewer.SoundProcess.RemoveSoundSources(name);
             lock (SoundRegions)
             {
@@ -2569,8 +2569,8 @@ namespace Orts.ActivityRunner.Viewer3D
         public TDBObjects(MSTSWagon Car, Viewer Viewer)
         {
             _car = Car;
-            trackNodes = Viewer.Simulator.TDB.TrackDB.TrackNodes;
-            trItems = Viewer.Simulator.TDB.TrackDB.TrackItems;
+            trackNodes = Viewer.Simulator.TrackDatabase.TrackDB.TrackNodes;
+            trItems = Viewer.Simulator.TrackDatabase.TrackDB.TrackItems;
         }
 
         private AIPathNode FindNode()

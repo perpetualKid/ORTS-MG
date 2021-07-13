@@ -29,14 +29,14 @@ namespace Orts.ActivityRunner.Viewer3D.Materials
             GraphicsDevice gd = game.RenderProcess.GraphicsDevice;
             string defaultScreen = "load.ace";
 
-            string loadingScreen = Simulator.Instance.TRK.Route.LoadingScreen;
+            string loadingScreen = Simulator.Instance.Route.LoadingScreen;
             if (IsWideScreen(game))
             {
-                string loadingScreenWide = Simulator.Instance.TRK.Route.LoadingScreenWide;
+                string loadingScreenWide = Simulator.Instance.Route.LoadingScreenWide;
                 loadingScreen = loadingScreenWide ?? loadingScreen;
             }
             loadingScreen = loadingScreen ?? defaultScreen;
-            string path = Path.Combine(Simulator.Instance.RoutePath, loadingScreen);
+            string path = Path.Combine(Simulator.Instance.RouteFolder.CurrentFolder, loadingScreen);
             if (Path.GetExtension(path) == ".dds" && File.Exists(path))
             {
                 DDSLib.DDSFromFile(path, gd, true, out texture);
@@ -55,7 +55,7 @@ namespace Orts.ActivityRunner.Viewer3D.Materials
                 }
                 else
                 {
-                    path = Path.Combine(Simulator.Instance.RoutePath, defaultScreen);
+                    path = Path.Combine(Simulator.Instance.RouteFolder.CurrentFolder, defaultScreen);
                     if (File.Exists(path))
                     {
                         texture = AceFile.Texture2DFromFile(gd, path);

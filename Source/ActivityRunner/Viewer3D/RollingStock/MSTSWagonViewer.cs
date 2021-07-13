@@ -99,8 +99,8 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
             : base(viewer, car)
         {
 
-            string steamTexture = viewer.Simulator.BasePath + @"\GLOBAL\TEXTURES\smokemain.ace";
-            string dieselTexture = viewer.Simulator.BasePath + @"\GLOBAL\TEXTURES\dieselsmoke.ace";
+            string steamTexture = viewer.Simulator.RouteFolder.ContentFolder.TextureFile("smokemain.ace");
+            string dieselTexture = viewer.Simulator.RouteFolder.ContentFolder.TextureFile("dieselsmoke.ace");
 
             // Particle Drawers called in Wagon so that wagons can also have steam effects.
             ParticleDrawers = (
@@ -1036,18 +1036,18 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         /// check first in the wagon folder, then the global folder for the sound.
         /// If not found, report a warning.
         /// </summary>
-        /// <param name="wagonFolderSlash"></param>
+        /// <param name="wagonFolder"></param>
         /// <param name="filename"></param>
-        protected void LoadCarSound(string wagonFolderSlash, string filename)
+        protected void LoadCarSound(string wagonFolder, string filename)
         {
             if (filename == null)
                 return;
-            string smsFilePath = Path.GetFullPath(Path.Combine(wagonFolderSlash, "sound", filename));
+            string smsFilePath = Path.GetFullPath(Path.Combine(wagonFolder, "sound", filename));
             if (!File.Exists(smsFilePath))
-                smsFilePath = Path.GetFullPath(Path.Combine(Viewer.Simulator.BasePath, "sound", filename));
+                smsFilePath = Path.GetFullPath(Viewer.Simulator.RouteFolder.ContentFolder.SoundFile(filename));
             if (!File.Exists(smsFilePath))
             {
-                Trace.TraceWarning("Cannot find {1} car sound file {0}", filename, wagonFolderSlash);
+                Trace.TraceWarning("Cannot find {1} car sound file {0}", filename, wagonFolder);
                 return;
             }
 
@@ -1084,9 +1084,9 @@ namespace Orts.ActivityRunner.Viewer3D.RollingStock
         {
             if (filename == null)
                 return;
-            string path = Viewer.Simulator.RoutePath + @"\SOUND\" + filename;
+            string path = Viewer.Simulator.RouteFolder.SoundFile(filename);
             if (!File.Exists(path))
-                path = Viewer.Simulator.BasePath + @"\SOUND\" + filename;
+                path = Viewer.Simulator.RouteFolder.ContentFolder.SoundFile(filename);
             if (!File.Exists(path))
             {
                 Trace.TraceWarning("Cannot find track sound file {0}", filename);

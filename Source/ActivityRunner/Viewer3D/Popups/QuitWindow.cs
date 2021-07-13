@@ -76,7 +76,7 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
 
         private void buttonContinue_Click(Control arg1, Point arg2)
         {
-            Visible = Owner.Viewer.Simulator.Paused = false;
+            Visible = Owner.Viewer.Simulator.GamePaused = false;
             if( Owner.Viewer.Log.PauseState == ReplayPauseState.During ) {
                 Owner.Viewer.Log.PauseState = ReplayPauseState.Done;
             }

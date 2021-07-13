@@ -304,7 +304,7 @@ namespace Orts.Simulation.RollingStocks
                         if (id == 3) Simulator.Confirmer.Confirm(CabControl.Pantograph3, CabSetting.On);
                         if (id == 4) Simulator.Confirmer.Confirm(CabControl.Pantograph4, CabSetting.On);
 
-                        if (!Simulator.TRK.Route.Electrified)
+                        if (!Simulator.Route.Electrified)
                             Simulator.Confirmer.Warning(Simulator.Catalog.GetString("No power line!"));
                         if (Simulator.Settings.OverrideNonElectrifiedRoutes)
                             Simulator.Confirmer.Information(Simulator.Catalog.GetString("Power line condition overridden."));

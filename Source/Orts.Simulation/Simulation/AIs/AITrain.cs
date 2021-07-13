@@ -41,6 +41,7 @@ using Orts.Simulation.RollingStocks;
 using Orts.Simulation.RollingStocks.SubSystems.Brakes.MSTS;
 using Orts.Simulation.Signalling;
 using Orts.Simulation.Track;
+using Orts.Simulation.World;
 
 namespace Orts.Simulation.AIs
 {
@@ -346,7 +347,7 @@ namespace Orts.Simulation.AIs
                 CheckDeadlock(ValidRoute[0], Number);
 
             // Set up horn blow at crossings if required
-            LevelCrossingHornPattern = Simulator.Instance.Activity.Activity.AIBlowsHornAtLevelCrossings ? AILevelCrossingHornPattern.CreateInstance(Simulator.Instance.Activity.Activity.AILevelCrossingHornPattern) : null;
+            LevelCrossingHornPattern = Simulator.Instance.ActivityFile.Activity.AIBlowsHornAtLevelCrossings ? AILevelCrossingHornPattern.CreateInstance(Simulator.Instance.ActivityFile.Activity.AILevelCrossingHornPattern) : null;
 
             // set initial position and state
 
@@ -401,7 +402,7 @@ namespace Orts.Simulation.AIs
                         var sectionEfficiency = ServiceDefinition[0].Efficiency;
                         if (simulator.Settings.ActRandomizationLevel > 0) RandomizeEfficiency(ref sectionEfficiency);
                         if (sectionEfficiency > 0)
-                            TrainMaxSpeedMpS = Math.Min((float)simulator.TRK.Route.SpeedLimit, MaxVelocityA * sectionEfficiency);
+                            TrainMaxSpeedMpS = Math.Min((float)simulator.Route.SpeedLimit, MaxVelocityA * sectionEfficiency);
                     }
                 }
 
@@ -591,7 +592,7 @@ namespace Orts.Simulation.AIs
                 // set wipers on or off
                 if (Cars[0] is MSTSLocomotive leadingLoco)
                 {
-                    bool rainingOrSnowing = simulator.Weather.PrecipitationIntensityPPSPM2 > 0;
+                    bool rainingOrSnowing = simulator.Weather.PrecipitationIntensity > 0;
                     if (leadingLoco.Wiper && !rainingOrSnowing)
                         leadingLoco.SignalEvent(TrainEvent.WiperOff);
                     else if (!leadingLoco.Wiper && rainingOrSnowing)
@@ -1698,13 +1699,13 @@ namespace Orts.Simulation.AIs
                     if (simulator.Settings.ActRandomizationLevel > 0) RandomizeEfficiency(ref sectionEfficiency);
                     if (sectionEfficiency > 0)
                     {
-                        TrainMaxSpeedMpS = Math.Min((float)simulator.TRK.Route.SpeedLimit, MaxVelocityA * sectionEfficiency);
+                        TrainMaxSpeedMpS = Math.Min((float)simulator.Route.SpeedLimit, MaxVelocityA * sectionEfficiency);
                         RecalculateAllowedMaxSpeed();
                     }
                 }
                 else if (MaxVelocityA > 0 && Efficiency > 0)
                 {
-                    TrainMaxSpeedMpS = Math.Min((float)simulator.TRK.Route.SpeedLimit, MaxVelocityA * Efficiency);
+                    TrainMaxSpeedMpS = Math.Min((float)simulator.Route.SpeedLimit, MaxVelocityA * Efficiency);
                     RecalculateAllowedMaxSpeed();
                 }
             }
@@ -3753,7 +3754,7 @@ namespace Orts.Simulation.AIs
                 attachTrain.RemoveFromTrack();
                 simulator.Trains.Remove(attachTrain);
                 simulator.TrainDictionary.Remove(attachTrain.Number);
-                simulator.NameDictionary.Remove(attachTrain.Name.ToLower());
+                simulator.NameDictionary.Remove(attachTrain.Name);
             }
             if (MPManager.IsMultiPlayer()) MPManager.BroadCast((new MSGCouple(this, attachTrain, false)).ToString());
             UpdateOccupancies();

@@ -1527,9 +1527,9 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
                 {
                     var status = thisTrain.GetStatus(Viewer.MilepostUnitsMetric);
                     if (thisTrain.TrainType == TrainType.AiPlayerHosting) status = ((AITrain)thisTrain).AddMovementState(status, Viewer.MilepostUnitsMetric);
-                    else if (thisTrain == Simulator.Instance.OriginalPlayerTrain && Simulator.Instance.Activity != null) 
+                    else if (thisTrain == Simulator.Instance.OriginalPlayerTrain && Simulator.Instance.ActivityFile != null) 
                         thisTrain.AddRestartTime(status);
-                    else if (thisTrain.IsActualPlayerTrain && Simulator.Instance.Activity != null && thisTrain.ControlMode != TrainControlMode.Explorer && !thisTrain.IsPathless)
+                    else if (thisTrain.IsActualPlayerTrain && Simulator.Instance.ActivityFile != null && thisTrain.ControlMode != TrainControlMode.Explorer && !thisTrain.IsPathless)
                         thisTrain.AddRestartTime(status);
 
                     //HudScroll
@@ -1720,11 +1720,11 @@ namespace Orts.ActivityRunner.Viewer3D.Popups
             if (hudWindowFullScreen)
                 TableSetLabelValueColumns(table, 0, 2);
 
-            TableAddLabelValue(table, Viewer.Catalog.GetString("Visibility"), Viewer.Catalog.GetString("{0:N0} m", Viewer.Simulator.Weather.FogDistance));
+            TableAddLabelValue(table, Viewer.Catalog.GetString("Visibility"), Viewer.Catalog.GetString("{0:N0} m", Viewer.Simulator.Weather.FogVisibilityDistance));
             TableAddLabelValue(table, Viewer.Catalog.GetString("Cloud cover"), Viewer.Catalog.GetString("{0:F0} %", Viewer.Simulator.Weather.OvercastFactor * 100));
-            TableAddLabelValue(table, Viewer.Catalog.GetString("Intensity"), Viewer.Catalog.GetString("{0:F4} p/s/m^2", Viewer.Simulator.Weather.PrecipitationIntensityPPSPM2));
+            TableAddLabelValue(table, Viewer.Catalog.GetString("Intensity"), Viewer.Catalog.GetString("{0:F4} p/s/m^2", Viewer.Simulator.Weather.PrecipitationIntensity));
             TableAddLabelValue(table, Viewer.Catalog.GetString("Liquidity"), Viewer.Catalog.GetString("{0:F0} %", Viewer.Simulator.Weather.PrecipitationLiquidity * 100));
-            TableAddLabelValue(table, Viewer.Catalog.GetString("Wind"), Viewer.Catalog.GetString("{0:F1},{1:F1} m/s", Viewer.Simulator.Weather.WindSpeedMpS.X, Viewer.Simulator.Weather.WindSpeedMpS.Y));
+            TableAddLabelValue(table, Viewer.Catalog.GetString("Wind"), Viewer.Catalog.GetString("{0:F1},{1:F1} m/s", Viewer.Simulator.Weather.WindSpeed.X, Viewer.Simulator.Weather.WindSpeed.Y));
             TableAddLabelValue(table, Viewer.Catalog.GetString("Amb Temp"), FormatStrings.FormatTemperature(Viewer.PlayerLocomotive.Train.TrainOutsideTempC, Viewer.PlayerLocomotive.IsMetric));
         }
 

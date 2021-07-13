@@ -1,7 +1,6 @@
 # OpenRails "Ultimate" Train Simulator  [![Join the chat at https://gitter.im/ORTS-MG/community](https://badges.gitter.im/ORTS-MG/community.svg)](https://gitter.im/ORTS-MG/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-This is a fork of [OpenRails](http://www.openrails.org), including [Monogame patch](http://www.elvastower.com/forums/index.php?/topic/30924-going-beyond-the-4-gb-of-memory/page__view__findpost__p__237281) and many other improvements and performance tweaks. 
-The master branch is kept in mostly sync with [OpenRails Source Code](https://github.com/openrails/openrails)
+This is a fork of [OpenRails](http://www.openrails.org), running on .NET Core and based on [Monogame patch](http://www.elvastower.com/forums/index.php?/topic/30924-going-beyond-the-4-gb-of-memory/page__view__findpost__p__237281) and many other improvements and performance tweaks like completely rewritten RailDriver input, Signalscript-Parser and much more, at the same time adopting most of the updates and features from [OpenRails Source Code](https://github.com/openrails/openrails) as well.
 
 ## Download
 [![GitHub All Releases](https://img.shields.io/github/downloads/perpetualKid/orts-mg/total)](https://github.com/perpetualKid/ORTS-MG/releases/)
@@ -21,17 +20,9 @@ Anyone is welcome to contribute, and this is not limited to programmers writing 
 
 ## Installation Requirements
 
-Assuming you are running on Windows 10 with recent patch status (version 1809 or higher), there are no separate downloads needed, all pre-requisites such as DirectX and .NET Framework 4.8 are already part of the OS. Same also applies to fully patched Windows 7 SP1. You will need to have an DirectX 11.0 compatible graphics adapter (GPU).
+Running on Windows 10 with recent patch status (version 1809 or higher), the only separate download needed may be [.NET Core 3.1](https://dotnet.microsoft.com/download/dotnet/3.1/runtime). If not installed already, trying to start the program will guide through necessary downloads.  
 
-*****
-As of [February 2021 and version 1.3.6-ci.9](https://github.com/perpetualKid/ORTS-MG/wiki#2021-02-15-version-136-ci9), we are preparing to move to .NET Core 3.1 framrework, and the launcher will show a message about that. While current versions still are available for .NET framework 4.8, please [install .NET Core 3.1](https://dotnet.microsoft.com/download/dotnet/3.1/runtime) to support future upgrades.     
-*****
-
-If you are on an older or unsupported OS version, you may need to download and install some prerequisites manually:
-
-- [.NET Framework 4.8](https://dotnet.microsoft.com/download/dotnet-framework/net48)
-- [.NET Core 3.1](https://dotnet.microsoft.com/download/dotnet/3.1/runtime)
-- [DirectX End-User Runtime Web Installer ](https://www.microsoft.com/en-us/download/details.aspx?id=35&nowin10)
+You will need to have an DirectX 11.0 compatible graphics adapter (GPU).
 
 To install on Linux, please see the [wiki](https://github.com/perpetualKid/ORTS-MG/wiki/Linux-Wine)
 

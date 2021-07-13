@@ -42,7 +42,7 @@ namespace Orts.TrackViewer
 
             loadTasks.Add(Task.Run(() =>
             {
-                string tdbFile = routeFolder.TrackDatabaseFile(routeFile);
+                string tdbFile = routeFolder.TrackDatabaseFile(routeFile.Route.FileName);
                 if (!File.Exists(tdbFile))
                 {
                     Trace.TraceError($"Track Database File not found in {tdbFile}");
@@ -58,7 +58,7 @@ namespace Orts.TrackViewer
             }, cancellationToken));
             loadTasks.Add(Task.Run(() =>
             {
-                string rdbFile = routeFolder.RoadTrackDatabaseFile(routeFile);
+                string rdbFile = routeFolder.RoadTrackDatabaseFile(routeFile.Route.FileName);
                 if (!File.Exists(rdbFile))
                 {
                     Trace.TraceError($"Road Database File not found in {rdbFile}");
